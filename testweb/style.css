@@ -1,0 +1,66 @@
+p {
+    color: burlywood;
+    background-color: aqua;
+}
+
+a {
+    color: black;
+}
+
+#inputrow {
+    background-color: aquamarine;
+    color: darkorange;
+}
+#keyprompt {
+    font-size: 40;
+}
+body {
+    background-color: #4CE0D2;
+}
+
+#submitbutton1, #submitbutton2, #codesubmit {
+    display:inline-block;
+    padding:0.35em 1.2em;
+    margin:0 0.3em 0.3em 0;
+    border-radius:0.12em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-weight:300;
+    text-align:center;
+    transition: all 0.2s;
+    background-color: #60AFFF
+}
+
+button:hover {
+    color:#000000;
+    background-color:#FFFFFF;
+}
+
+#codebox {
+    position: absolute;
+    width : 40;
+}
+
+#statusbox {
+    position: absolute;
+}
+
+#codebit {
+    background-color: #84CAE7;
+}
+
+#codeboxheader, #statusboxheader {
+    padding: 10px;
+    cursor: move;
+    z-index: 10;
+    background-color: #A6D8EE;
+    color: #072220;
+    width: 150px;
+}
+
+.square {
+    height: 200px;
+    width: 500px;
+    background-color: #22AAA1;
+}
