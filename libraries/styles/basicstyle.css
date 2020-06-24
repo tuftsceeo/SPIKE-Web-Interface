@@ -1,0 +1,73 @@
+a {
+    color: black;
+}
+
+#tagModification{
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+#keyprompt {
+    font-size: 40;
+}
+
+body {
+    background-color: #4CE0D2;
+}
+
+#updateTagValue {
+    display:inline-block;
+    padding:0.35em 1.2em;
+    margin:0 0.3em 0.3em 0;
+    border-radius:0.12em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-weight:300;
+    text-align:center;
+    transition: all 0.2s;
+    background-color: #60AFFF
+}
+
+button:hover {
+    color:#000000;
+    background-color:#FFFFFF;
+}
+
+#codebox {
+    position: absolute;
+    width : 40;
+}
+
+#syslinkbox {
+    width: 500px;
+    height: 200px;
+    background-color: #22AAA1;
+}
+#syslinkextract {
+    width: 500px;
+    height: 200px;
+    background-color: #22AAA1;
+    float: right;
+}
+
+#REPL {
+    width: 1300px;
+}
+
+#jsonrpcbox {
+    top: 600px;
+    width: 1400px;
+    height: 300px;
+    background-color: #22AAA1;
+}
+
+#container {
+    width:1100px;
+}
+
+.square {
+    width: 500px;
+    height: 200px;
+    background-color: #22AAA1;
+}
