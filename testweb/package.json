@@ -1,8 +1,0 @@
-{ 
-    "name": "testweb", 
-    "description": "test implementation for tuftsceeo SPIKE Prime web interface",
-    "version": "0.0.1", 
-    "dependencies": {
-        "jquery": "3.5.1"
-    }
-}
