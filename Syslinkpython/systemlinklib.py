@@ -17,7 +17,7 @@ class SLObject:
     # Manually accessing cloud (when using it first time):
     # 1. Go to https://www.systemlinkcloud.com/
     # 2. Sign up with a NI account.
-    # 3. Verify via the serial number: J11X52619
+    # 3. Verify via the serial number: 
     # 4. Make APIkey
 
     # EXAMPLE USE:
