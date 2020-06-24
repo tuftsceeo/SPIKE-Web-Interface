@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: syslinkbasic.html
+Author: Jeremy Jung
+Last update: 6/19/20
+Description: basic interface for changing tags on syslink cloud
+Credits/inspirations:
+History: 
+    Created by Jeremy on 6/11/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<html>
+        <head>
+            <link rel = "stylesheet" type = "text/css" href = "../libraries/styles/basicstyle.css">
+            <title>
+                System Link Cloud Basic Interface
+            </title>
+        </head>
+    <body>
+        <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <div id = "statusbox">
+            <div class="square">
+                <p id = "keyprompt">
+                    <center>
+                        API Key
+                        <input type = "text" id = "keyinputfield">
+                        <span id = "key_valid"> Invalid </span>
+                    </center>
+                </p>
+                <div id = "tagModification">
+                    <center>
+                        <p>
+                            Create or update a tag:
+                        </p>
+                        <form id = "tagForm">
+                            <select id = "tagSelect" onchange = display_select_value()></select>
+                            <input type = "text" id = "tagValInput">
+                            <button id = "updateTagValue" type = "button" > Submit</button>
+                        </form>
+                    </center>
+                    <span id = "currValspan"> Current value: <span id = "currVal"></span> </span>
+                </div>
+            </div>
+        </div>
+        <script src = "libraries/SLajaxlib.js" type = "text/javascript"></script>
+
+        <script> 
+            var APIkey = ""
+            var all_tags = [];
+
+            //run when document is done loading
+            $(document).ready(new function() {
+                console.log("daddy's home");
+                //check APIkey and display available tags whenever there is input
+                $("#keyinputfield").on("input", async function (event) {
+                    if( await auth_key($("#keyinputfield").val()) ) {
+                        $("#key_valid").html("Valid APIkey!");
+                        APIkey = $("#keyinputfield").val();
+                        //get all tag names from cloud and display it on UI
+                        await get_tag_list(APIkey).then(
+                            (tags_list) => update_tag_selects(tags_list), 
+                            (tags_list) => all_tags = tags_list
+                        );
+                        //display the first selected tag
+                        display_select_value();
+                    }
+                });
+
+                //when "Submit" button is clicked, update value
+                $("#updateTagValue").click(change_current_value)
+            });
+
+            //update the scroll down list with available tags
+            function update_tag_selects(tags_list) { 
+                var number_of_tags = tags_list.length
+                console.log("total count:" + number_of_tags)
+                for (var i = 0; i < number_of_tags; i++) {
+                    var select_element = $("<option></option>").text(tags_list[i])
+                    $("#tagSelect").append(select_element)
+                }
+            }
+
+            //shows the selected tag's current value
+            async function display_select_value() {
+                var selected_option = $("#tagSelect option:selected").text(); 
+                get_value(APIkey, selected_option).then((value) => $("#currVal").text(value))
+            }
+            
+            //change the current value of tag
+            async function change_current_value() {
+                var selected_option = await $("#tagSelect option:selected").text(); 
+                var new_value = await $("#tagValInput").val();
+                console.log("new_value", new_value)
+                console.log("selected option", selected_option)
+                var exists = false;
+                console.log("newvalue", new_value)
+                for (var i = 0; i < all_tags.length; i++) {
+                    if ( all_tags[i] == selected_option ) {
+                        exists = true;
+                    }
+                }
+                //check type of new_value
+                var inputType = input_type(new_value);
+                await update_value(APIkey, selected_option, inputType, new_value);
+                display_select_value()
+            }
+
+
+            //returns the data type indicator of tag based on given argument
+            function input_type(new_value) {
+                //if the value is not a number
+                if ( isNaN(new_value) ) {
+                    //if the value is a boolean
+                    if (new_value == "true" || new_value == "false") {
+                        return "BOOLEAN";
+                    }
+                    //if the value is a string
+                return "STRING"; 
+                }
+                //value is a number
+                else {
+                    //if value is an integer
+                    if ( Number.isInteger(parseFloat(new_value)) ) {
+                        return "INT"
+                    }
+                    //if value is a double
+                    else {
+                        return "DOUBLE"
+                    }
+                }
+            }
+
+        </script>
+    </body>
+
+</html>
