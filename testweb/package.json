@@ -1,17 +1,8 @@
-{
-  "name": "testweb",
-  "version": "1.0.0",
-  "description": "test implementation for tuftsceeo SPIKE Prime web interface",
-  "main": "HTTPRequests.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "express": "^4.17.1",
-    "jquery": "3.5.1",
-    "request": "^2.88.2"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+{ 
+    "name": "testweb", 
+    "description": "test implementation for tuftsceeo SPIKE Prime web interface",
+    "version": "0.0.1", 
+    "dependencies": {
+        "jquery": "3.5.1"
+    }
 }
