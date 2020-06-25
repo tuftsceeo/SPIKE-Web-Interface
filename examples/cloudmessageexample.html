@@ -32,24 +32,6 @@ OR
             </title>
         </head>
         <div id = "container">
-            <div id = "BrowserExplanation">
-                <center>
-                <p>Browser Setup (once):</p>
-                </center>
-                <ol>
-                    <li>Open this webpage in a Chrome Browser</li>
-                    <li>Go to the URL: chrome://flags</li>
-                    <li>Search "Experimental Web Platform"</li>
-                    <li><em>ENABLE</em> Experimental Web Platform (#enable-experimental-web-platform-features)</li>
-                    <li>Restart your Chrome web browser</li>
-                    <li>Plug in your SPIKE Prime hub by USB to this computer (and turn it on)!</li>
-                    <li>Click "Connect" below and look for device: <em>"LEGO Technic Large Hub"</em></li>
-                </ol>
-                <center>
-                <p><em><b>Once enabled, now you can play:</b></em></p>
-                </center>
-            </div>
-            
             <div id = "syslinkbox">
                 <div class="square">
                     <p id = "keyprompt">
@@ -70,15 +52,33 @@ OR
                                 <button id = "updateTagValue" type = "button" > Submit</button>
                             </form>
                         </center>
-                        <span id = "currValspan"> Current value: <span id = "currVal"></span> </span>
+                        <span id = "currValspan" style="position: relative; left: 20px" > Current value: <span id = "currVal"></span> </span>
                     </div>
                     <span id = "whatshappening"></span>
                 </div>
             </div>
+            <div id = "BrowserExplanation">
+                <input type=button id="togglex" value="hide">
+                <center>
+                <p>Browser Setup (once):</p>
+                </center>
+                <ol>
+                    <li>Open this webpage in a Chrome Browser</li>
+                    <li>Go to the URL: chrome://flags</li>
+                    <li>Search "Experimental Web Platform"</li>
+                    <li><em>ENABLE</em> Experimental Web Platform (#enable-experimental-web-platform-features)</li>
+                    <li>Restart your Chrome web browser</li>
+                    <li>Plug in your SPIKE Prime hub by USB to this computer (and turn it on)!</li>
+                    <li>Click "Connect" below and look for device: <em>"LEGO Technic Large Hub"</em></li>
+                </ol>
+                <center>
+                <p><em><b>Once enabled, now you can play:</b></em></p>
+                </center>
+            </div>
             <div id = "jsonrpcbox">
                     <center>
                         <p>
-                            JSON RPC
+                            UJSON RPC
                         </p>
                         <input type=button id="connect" name="Connect" value="Connect">
                         <span style="background-color: red" id="connection_status">Status: Disconnected</span>
@@ -86,10 +86,9 @@ OR
                         <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
                         <button id = "autoget" onclick = >autoGET</button>
                     </center>
-                    <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier" /></textarea>
-                    <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier" />
-                    </textarea>
-                    <input type=button id="send" name="Send" value="Send">
+                        <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier;position: relative; left: 20px"/></textarea>
+                        <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+                        <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
             </div>
         </div>
         </div>
@@ -99,6 +98,7 @@ OR
         var APIkey = ""
         var all_tags = [];
         var auto_get = false;
+        var explain = true;
         //run when document is done loading
         $(document).ready(new function() {
             console.log("daddy's home");
@@ -135,7 +135,22 @@ OR
             $("#autoget").on("click", () => {
                 toggle_autoget()
             });
+
+            $("#togglex").on("click", () => {
+                toggleEx()
+            })
         });
+
+        function toggleEx() {
+            if (explain) {
+                $("#BrowserExplanation").css("display","none");
+                explain = false;
+            }
+            else {
+                $("#BrowserExplanation").css("display","block");
+                explain = true;
+            }
+        }
     </script>
 
     <!-- script for JSONRPC (specfically jsonrpcbox) -->

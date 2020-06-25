@@ -37,16 +37,17 @@ button:hover {
 
 #syslinkbox, #graphbox{
     position: absolute;
-    top: 260px;
-    left: 750px;
+    top: 20px;
+    left: 20px;
     width: 600px;
     height: 200px;
     background-color:#4CE0D2;
 }
 
 #BrowserExplanation, #SPIKEExplanation {
-    position: relative;
-    top: 260px;
+    position: absolute;
+    top: 20px;
+    left: 650px;
     width: 700px;
     height: 250px;
     background-color: #4CE0D2;
@@ -64,7 +65,8 @@ button:hover {
 
 #jsonrpcbox {
     position: absolute;
-    top: 50px;
+    top: 480px;
+    left: 10px;
     width: 1400px;
     height: 200px;
     background-color: #4CE0D2;

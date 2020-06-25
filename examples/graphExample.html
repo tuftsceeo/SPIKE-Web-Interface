@@ -29,6 +29,7 @@ USAGE:
             </title>
         </head>
             <div id = "BrowserExplanation">
+                <input type=button id="togglex" value="hide">
                 <center>
                 <p>Browser Setup (once):</p>
                 </center>
@@ -87,14 +88,14 @@ USAGE:
             <div id = "jsonrpcbox">
                     <center>
                         <p>
-                            JSON RPC
+                            UJSON RPC
                         </p>
                         <input type=button id="connect" name="Connect" value="Connect">
                         <span style="background-color: red" id="connection_status">Status: Disconnected</span>
                         <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
                         <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
-                    </center>
-                    <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier" /></textarea>
+                        <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier" /></textarea>
+                </center>
             </div>
         </div>
     </body>
@@ -102,6 +103,7 @@ USAGE:
     <script>
         var browserEx = true;
         var auto_get = false;
+        explain = true;
         //run when document is done loading
         $(document).ready(new function() {
             console.log("daddy's home");
@@ -122,15 +124,14 @@ USAGE:
 
         //toggle explanation
         function toggleEx() {
-            /*
-            if(browserEx) {
-                document.getElementById('BrowserExplanation').style.display = "block";
-                document.getElementById('SPIKEExplanation').style.display = "none";
-            }  
+            if (explain) {
+                $("#BrowserExplanation").css("display","none");
+                explain = false;
+            }
             else {
-                document.getElementById('BrowserExplanation').style.display = "none";
-                document.getElementById('SPIKEExplanation').style.display = "block";
-            }*/
+                $("#BrowserExplanation").css("display","block");
+                explain = true;
+            }
         }
     </script>
 
