@@ -91,7 +91,6 @@ OR
                         <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
             </div>
         </div>
-        </div>
     </body>
     <!-- when document loads -->
     <script>
@@ -139,6 +138,8 @@ OR
             $("#togglex").on("click", () => {
                 toggleEx()
             })
+
+            get_value_interval()
         });
 
         function toggleEx() {
@@ -283,6 +284,13 @@ OR
                     return "DOUBLE"
                 }
             }
+        }
+
+        async function get_value_interval() {
+                getValInt = setInterval( async () => {
+                display_select_value()
+                }, 1000
+            )
         }
     </script>
 </html>
