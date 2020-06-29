@@ -45,7 +45,7 @@ const filter = {
 async function reboot_hub() {
     console.log("rebooting")
     // make sure ready to write to device
-    await setup_writer();
+    setup_writer();
     writer.write(CONTROL_C);
     writer.write(CONTROL_D);
 }
@@ -90,12 +90,15 @@ async function read_stream() {
                     //concatenating incomplete json objects from the hub
                     if (value) {
                         json_string = JSON.stringify(value)
-                        //console.log("json_string", json_string)
                         rcb_index = json_string.indexOf('}')
+                        lcb_index = json_string.indexOf('{')
                         jsonline = jsonline + value
-                        //console.log("jsonline", jsonline)
                         if (rcb_index > -1) {
-                            one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
+                            console.log(jsonline[0])
+                            if (jsonline[0] === "{") {
+                                //get substring until }\r
+                                one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
+                            }
                             jsonline = ""
                         }
                     }
@@ -175,5 +178,42 @@ function sendDATA(command) {
         // turn JSON back into string and write it out
         writer.write(JSON.stringify(myobj));
         writer.write(RETURN); // extra return at the end
+    }
+}
+
+async function get_devices() {
+    if (one_line) {
+        let data_stream = await JSON.parse(one_line)
+        var ports = 
+        {
+            "A": "None",
+            "B": "None",
+            "C": "None",
+            "D": "None",
+            "E": "None",
+            "F": "None"
+        }
+        var index_to_port = ["A","B","C","D","E","F"]
+        data_stream = data_stream.p
+        for (var key = 0; key < 6; key++) {
+            var the_key = index_to_port[key]
+            if (data_stream[key][0] == 48 || data_stream[key][0] == 49) {
+                ports[the_key] = "Motor"
+            }
+            else if (data_stream[key][0] == 62) {
+                ports[the_key] = "Ultrasonic"
+            }
+            else if (data_stream[key][0] == 63) {
+                ports[the_key] = "Force"
+            }
+            else if (data_stream[key][0] == 61) {
+                ports[the_key] = "Color"
+            }
+            else if (data_stream[key][0] == 0) {
+                ports[the_key] = "None"
+            }
+        }
+        return ports
+        //console.log(ports)
     }
 }
