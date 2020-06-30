@@ -24,6 +24,7 @@ OR
     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src = "../libraries/SLajaxlib.js" type = "text/javascript"></script>
     <script src = "../libraries/JSONRPClib.js" type = "text/javascript"></script>
+    <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
     <body>
         <head>
             <link rel = "stylesheet" type = "text/css" href = "../libraries/styles/msgexstyle.css">
@@ -57,8 +58,43 @@ OR
                     <span id = "whatshappening"></span>
                 </div>
             </div>
-            <div id = "BrowserExplanation">
-                <input type=button id="togglex" value="hide">
+            <div id = "jsonrpcbox">
+                    <center>
+                        <p>
+                            UJSON RPC
+                        </p>
+                        <input type=button id="connect" name="Connect" value="Connect">
+                        <span style="background-color: red" id="connection_status">Status: Disconnected</span>
+                        <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
+                        <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
+                        <button id = "autoget" onclick = >autoGET</button>
+                    </center>
+                        <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier;position: relative; left: 20px"/></textarea>
+                        <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+                        <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
+            </div>
+            <!-- Testing html modules
+            <script>
+                $(function(){
+                    try {
+                        $('body').load('/modules/navbar.html #navbarDIV', function(){
+                            console.log("Load was performed")
+                        })
+                    }
+                    catch (e){
+                        console.log(e);
+                    }
+                });
+            </script>
+            -->
+            <button id = "navbarbutton" class="btn"><i class="fa fa-bars"></i></button>
+            <div id = "navbar" style="z-index:100;">
+                <ul>
+                    <li id = "browsersetup" style="z-index:100;"><a>Browser Setup</a></li>
+                    <li id = "usage" style="z-index:100;"><a>Usage</a></li>
+                </ul>
+            </div>
+            <div id = "BrowserExplanation" style = "left:200px; display:none;">
                 <center>
                 <p>Browser Setup (once):</p>
                 </center>
@@ -75,29 +111,29 @@ OR
                 <p><em><b>Once enabled, now you can play:</b></em></p>
                 </center>
             </div>
-            <div id = "jsonrpcbox">
-                    <center>
-                        <p>
-                            UJSON RPC
-                        </p>
-                        <input type=button id="connect" name="Connect" value="Connect">
-                        <span style="background-color: red" id="connection_status">Status: Disconnected</span>
-                        <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
-                        <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
-                        <button id = "autoget" onclick = >autoGET</button>
-                    </center>
-                        <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier;position: relative; left: 20px"/></textarea>
-                        <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
-                        <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
+            <div id = "DemoExplanation" style = "left:200px; display:none;">
+                <center>
+                <p>Demonstration 1) Changing hub display with systemlink:</p>
+                </center>
+                <ol>
+                    <li> On Google Chrome, open cloudmessageexample.html on one tab and syslinkbasic.html on another tab </li>
+                    <li> Connect your SPIKE Prime to the computer, and please do Browser Setup if you haven't. </li>
+                    <li> On cloudmessageexample.html, Press "connect", and select your port. </li>
+                    <li>On both html pages, copy & paste the APIkey into the "APIkey" box ( daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7 )</li>
+                    <li>On cloudmessageexample.html, press the "autoGET" button once. (This will display "message" on the hub whenever it's changed)</li>
+                    <li>On the syslinkbasic.html, scroll the tags list and select, "message". Change the value to whatever string you'd like.</li>
+                    <li>Watch the SPIKE Prime display your message</li>
+                </ol>
             </div>
         </div>
+
     </body>
     <!-- when document loads -->
     <script>
         var APIkey = ""
         var all_tags = [];
         var auto_get = false;
-        var explain = true;
+        navbar = true;
         //run when document is done loading
         $(document).ready(new function() {
             console.log("daddy's home");
@@ -113,6 +149,7 @@ OR
                     );
                     //display the first selected tag
                     display_select_value();
+                    get_value_interval()
                     //display UJSON command with current value of "message" when webpage loads
                     last_message = display_image_value()
                 }
@@ -139,17 +176,37 @@ OR
                 toggleEx()
             })
 
-            get_value_interval()
+            $("#navbarbutton").on("click", () => {
+                toggle_navbar();
+                $("#navbar").find("a.active").removeClass("active");
+            })
+
+            $("#browsersetup").on("click", () => {
+                $("#navbar").find("a.active").removeClass("active");
+                $("#browsersetup").find("a").addClass("active");
+                $("#DemoExplanation").css("display","none");
+                $("#BrowserExplanation").css("display","block");
+            })
+
+            $("#usage").on("click", () => {
+                $("#navbar").find("a.active").removeClass("active");
+                $("#usage").find("a").addClass("active");
+                $("#BrowserExplanation").css("display","none");
+                $("#DemoExplanation").css("display","block");
+            })
         });
 
-        function toggleEx() {
-            if (explain) {
+        //toggle navigation bar
+        function toggle_navbar() {
+            if ( navbar ) {
+                $("#navbar").css("display","none");
                 $("#BrowserExplanation").css("display","none");
-                explain = false;
+                $("#DemoExplanation").css("display","none");
+                navbar = false;
             }
             else {
-                $("#BrowserExplanation").css("display","block");
-                explain = true;
+                $("#navbar").css("display","block");
+                navbar = true;
             }
         }
     </script>
