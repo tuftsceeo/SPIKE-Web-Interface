@@ -44,14 +44,16 @@ button:hover {
     background-color:#4CE0D2;
 }
 
-#BrowserExplanation {
+#BrowserExplanation, #DemoExplanation {
     position: absolute;
     top: 20px;
-    left: 650px;
+    left: 20px;
     width: 700px;
     height: 250px;
-    background-color: #4CE0D2;
+    background-color: #6CE1DF;
+    border-style: dotted;
 }
+
 
 #syslinkextract {
     width: 500px;
@@ -79,4 +81,46 @@ button:hover {
 #tagModification{
     overflow-x: auto;
     white-space: nowrap;
+}
+
+
+#navbarbutton {
+    background-color: #A2E1EF; /* Blue background */
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 12px 16px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+}
+  
+/* Darker background on mouse-over */
+#navbarbutton:hover {
+    background-color: #2EBCDC;
+}
+
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #f1f1f1;
+  }
+  
+li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+li a.active {
+    background-color: #2FAFCC;
+    color: white;
+}
+
+li a:hover:not(.active) {
+    background-color: #555;
+    color: white;
 }
