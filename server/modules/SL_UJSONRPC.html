@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: SL_UJSONRPC.html
+Author: Jeremy Jung
+Last update: 7/7/20
+Description: module to be loaded into servicedockexample 
+            for sending  UJSONRPC commands to hub with data 
+            from SystemLink
+* this module can only run with service dock *
+Credits/inspirations:
+History: 
+    Created by Jeremy on 7/7/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+
+<!-- load global libraries -->
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src = "SLajaxlib.js" type = "text/javascript"></script>
+<script src = "hoverscript_jquery.js" type = "text/javascript"></script>
+<script src = "UJSONRPClib.js" type = "text/javascript"></script>
+<div id = "slujsonbox">
+    <center>
+        <head>
+            SystemLink driven UJSON RPC
+        </head>
+        <div id = "all_selects">
+            <select id = "slujson_rpcSelect">
+            </select>
+            <select id = "slujson_portSelect">
+                <option>port</option>
+            </select>
+            <select id = "slujson_tagSelect">
+            </select>
+            <input type = "submit" value = "send">
+        </div>
+    </center>
+</div>
+<script>
+    var command = {
+        "m": "placeholder",
+        "p": "placeholder"
+    }
+    var parameters = {
+        "port": ['A', 'B', 'C', 'D', 'E', 'F'],
+        "lights": ['upper-left', 'upper-right', 'lower-left', 'lower-right'],
+        "image": ['ANGRY', 'ARROW_E', 'ARROW_N', 'ARROW_NE', 'ARROW_NW', 'ARROW_S', 'ARROW_SE', 'ARROW_SW', 
+                'ARROW_W', 'ASLEEP', 'BUTTERFLY', 'CHESSBOARD', 'CLOCK1', 'CLOCK10', 'CLOCK11', 'CLOCK12', 'CLOCK2', 'CLOCK3', 'CLOCK4', 
+                'CLOCK5', 'CLOCK6', 'CLOCK7', 'CLOCK8', 'CLOCK9', 'CONFUSED', 'COW', 'DIAMOND', 'DIAMOND_SMALL', 'DUCK', 'FABULOUS', 'GHOST', 'GIRAFFE', 'GO_RIGHT', 'GO_LEFT', 
+                'GO_IP', 'GO_DOWN', 'HAPPY', 'HEART', 'HEART_SMALL', 'HOUSE', 'MEH', 'MUSIC_CROTCHET', 'MUSIC_QUAVER', 'MUSIC_QUAVERS', 'NO', 'PACMAN', 'PITCHFORK', 'RABBIT', 
+                'ROLLERSKATE', 'SAD', 'SILLY', 'SKULL', 'SMILE', 'SNAKE', 'SQUARE', 'SQUARE_SMALL', 'STICKFIGURE', 'SURPRISED', 'SWORD', 'TARGET', 'TORTOISE', 'TRIANGLE', 'TRIANGLE_LEFT', 'TSHIRT', 
+                'UMBRELLA', 'XMAS', 'YES']
+    }
+
+    var APIkey = "";
+    var all_tags = [];
+
+    
+    var check_APIkey_and_port_connected;
+    check_APIkey_and_port_connected = setInterval( async () => {
+        //check connection variables at servicedock and UJSONRPC interface
+        if (port_connected) {
+            if (APIkey_valid_at_SD) {
+                clearInterval(check_APIkey_and_port_connected);
+                APIkey = await SD_APIkey;
+                console.log("collected APIkey at SL_UJSONRPC", APIkey);
+                //get all tag names from cloud and display it on UI
+                await get_tag_list(APIkey).then(
+                    (tags_list) => all_tags = tags_list
+                );
+                initSelects();
+                /*
+                SLUJSON_get_value_int = setInterval( async () => {
+                    selected_option = 
+                    get_value(APIkey, selected_option).then((value) => $("#currVal").text(value))
+                })*/
+            }
+        }
+    }, 500)
+
+    var available_scripts = ["display_image", "display_text"];
+    $(document).ready( () => {
+        dragElement("slujsonbox")
+    })
+
+    async function initSelects() {
+        for (var i = 0; i < available_scripts.length; i++) {
+            var select_element = $("<option></option>").text(available_scripts[i])
+            $("#slujson_rpcSelect").append(select_element)
+        }
+
+        //using tags_list variable from sd_syslink_interface.html
+        console.log("all_tags", all_tags)
+        var number_of_tags = all_tags.length
+        console.log("total count:" + number_of_tags)
+        for (var i = 0; i < number_of_tags; i++) {
+            var select_element = $("<option></option>").text(all_tags[i])
+            $("#slujson_tagSelect").append(select_element)
+        }
+    }
+</script>
+
+<style>
+     #slujsonbox{
+        width: 600px;
+        height: 150px;
+        background-color:#4CE0D2;
+        position: absolute;
+        border: solid;
+    }
+
+    #data{
+        position: relative;
+        top: 20px;
+    }
+</style>

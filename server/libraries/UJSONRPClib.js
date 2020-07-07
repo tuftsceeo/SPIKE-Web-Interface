@@ -1,0 +1,254 @@
+/*
+Project Name: SPIKE Prime Web Interface
+File name: UJSONRPClib.js
+Description: General library for using communicating Webserial UJSON RPC with SPIKE
+* This webpage works in Chrome and uses 
+* the #enable-experimental-web-platform-features
+* flag for enabling WebSerial communication, for
+* talking back-and-forth with the LEGO SPIKE Prime.
+Credits/inspirations:
+    Written by Jeremy Jung
+    Based on code written by Ethan Danahy
+    Based on WebSerial investigations by Olga Sans
+History: 
+    - 0.3 update by Ethan Danahy (2020-05-26)
+    - 0.4 (2020-07-7)
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+*/
+
+VERSION = "0.4"; // version of this code
+
+// define for communication
+let port;
+let reader;
+let writer;
+let value;
+let done;
+
+//define for json concatenation
+let jsonline = ""
+//contains latest full json object from SPIKE readings
+let one_line;
+
+VENDOR_ID = 0x0694; // LEGO SPIKE Prime Hub
+
+// common characters to send (for REPL/uPython on the Hub)
+CONTROL_C = '\x03'; // CTRL-C character (ETX character)
+CONTROL_D = '\x04'; // CTRL-D character (EOT character)
+RETURN = '\x0D';	// RETURN key (enter, new line)
+
+const filter = {
+    usbVendorId: VENDOR_ID 
+};
+
+async function reboot_hub() {
+    console.log("rebooting")
+    // make sure ready to write to device
+    setup_writer();
+    writer.write(CONTROL_C);
+    writer.write(CONTROL_D);
+}
+
+//to be run once before getting stream
+//list the available ports and initialize it
+async function setup_port() {
+    success = false;
+    port = await navigator.serial.getPorts();
+    console.log("ports:", port);
+    try {
+         // select device
+        port = await navigator.serial.requestPort({
+        filters: [filter]
+        });
+        // wait for the port to open.
+        await port.open({ baudrate: 115200 });
+        success = true;
+
+    } catch (e) {
+        console.log('ERROR trying to open:', e);
+    }
+    return success
+}
+
+//continuously take input from the hub 
+async function read_stream() {
+    try {
+        // now start reading
+        while (port.readable) {
+            document.getElementById("connection_status").innerHTML = "Status: Connected";
+			document.getElementById("connection_status").style.backgroundColor = "green";
+            const decoder = new TextDecoderStream();
+            const readableStreamClosed = port.readable.pipeTo(decoder.writable);
+            reader = decoder.readable.getReader();
+            while (true) {
+                try {
+                    // read
+                    ({value, done} = await reader.read());
+
+                    // log value
+                    //console.log('Value:', value)
+
+                    //concatenating incomplete json objects from the hub
+                    if (value) {
+                        json_string = JSON.stringify(value)
+                        rcb_index = json_string.indexOf('}')
+                        lcb_index = json_string.indexOf('{')
+                        jsonline = jsonline + value
+                        if (rcb_index > -1) {
+                            //console.log(jsonline[0])
+                            if (jsonline[0] === "{") {
+                                //get substring until instance of }\r
+
+                                // when REPL is declared with vanilla js
+                                one_line = jsonline.substring(0,jsonline.indexOf('}')+2)
+                                // when REPL is decalred with jquery
+                                //one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
+                            }
+                            jsonline = ""
+                        }
+                    }
+
+                    if (done) {
+                        // reader has been canceled.
+                        console.log("[readLoop] DONE", done);
+                    }
+                }
+                catch (error) {
+                    console.log('[readLoop] ERROR', error);
+                    // error detected: release
+                    reader.releaseLock();
+                    await readableStreamClosed.catch(reason => {});
+                    document.getElementById("connection_status").innerHTML = "Status: Disconnected";
+					document.getElementById("connection_status").style.backgroundColor = "red";
+                    await port.close();
+                    break; // stop trying to read
+                }
+            } // end of: while (true) [reader loop]
+            
+            // release the lock
+            reader.releaseLock();
+            
+        } // end of: while (port.readable) [checking if readable loop]
+        
+        console.log("- port.readable is FALSE")
+        document.getElementById("connection_status").innerHTML = "Status: Disconnected";
+		document.getElementById("connection_status").style.backgroundColor = "red";
+        
+    } // end of: trying to open port
+    catch (e) {
+        // Permission to access a device was denied implicitly or explicitly by the user.
+        console.log('ERROR trying to open:', e);
+        document.getElementById("connection_status").innerHTML = "Status: Disconnected";
+		document.getElementById("connection_status").style.backgroundColor = "red";
+    }
+}
+
+//return the latest complete json object stream retrieved from Hub
+async function retrieve_data() {
+    try {
+        result = await JSON.parse(one_line)
+        //catch runtime_error made at ujsonrpc level
+        if( result["m"] == "runtime_error" ) {
+            console.log(one_line);
+        }
+        //catch this mysterious thing
+        else if (result["m"]== 2) {
+            //console.log(one_line);
+        }
+    }
+    catch (error) {
+        //console.log('[retrieveData] ERROR', error);
+    }
+    return one_line
+}
+// helper function used when sending commands
+function setup_writer() {
+    // if writer not yet defined:
+    if (typeof writer === 'undefined') {
+        // set up writer for the first time
+        const encoder = new TextEncoderStream();
+        const writableStreamClosed = encoder.readable.pipeTo(port.writable);
+        writer = encoder.writable.getWriter();
+    }
+}
+
+// generic send data function
+// command is a string to send (or sequence of commands, separated by new lines
+async function sendDATA(command) {
+    console.log ("command", command);
+    // look up the command to send
+    commands = command.split("\n"); // split on new line
+    console.log("sendDATA: " + commands);
+
+    // make sure ready to write to device
+    setup_writer();
+
+    // go through each line of the command
+    // trim it, send it, and send a return...
+    for (i=0; i<commands.length; i++) {
+        current = commands[i].trim();
+        // turn string into JSON
+        myobj = JSON.parse(current);
+        // turn JSON back into string and write it out
+        writer.write(JSON.stringify(myobj));
+        writer.write(RETURN); // extra return at the end
+    }
+}
+
+//NOT IMPLEMENTED
+//reach the micropy level of REPL
+function sendPythonDATA(command){
+    commands = command.split("\n"); // split on new line
+    console.log("sendDATA: " + commands);
+    writer.write(commands);
+    writer.write(RETURN);
+
+}
+
+//return a json dictionary detailing what device is connected to each port
+async function get_devices() {
+    if (one_line) {
+        var data_stream;
+        try{
+            data_stream = await JSON.parse(one_line)
+        }
+        catch (e){
+            console.log("error parsing one_Line at get_devices", one_line);
+        }
+        var ports = 
+        {
+            "A": "None",
+            "B": "None",
+            "C": "None",
+            "D": "None",
+            "E": "None",
+            "F": "None"
+        }
+        var index_to_port = ["A","B","C","D","E","F"]
+        data_stream = data_stream.p
+        for (var key = 0; key < 6; key++) {
+            //ignore errors
+            try {
+                var the_key = index_to_port[key]
+                if (data_stream[key][0] == 48 || data_stream[key][0] == 49) {
+                    ports[the_key] = "Motor"
+                }
+                else if (data_stream[key][0] == 62) {
+                    ports[the_key] = "Ultrasonic"
+                }
+                else if (data_stream[key][0] == 63) {
+                    ports[the_key] = "Force"
+                }
+                else if (data_stream[key][0] == 61) {
+                    ports[the_key] = "Color"
+                }
+                else if (data_stream[key][0] == 0) {
+                    ports[the_key] = "None"
+                }
+            } catch (e) {}
+        }
+        return ports
+        //console.log(ports)
+    }
+}

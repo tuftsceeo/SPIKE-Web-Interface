@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock.html
+Author: Jeremy Jung
+Last update: 7/7/20
+Description: service dock markup
+Credits/inspirations:
+    Service Dock by Ethan Danahy
+History: 
+    Created by Jeremy on 7/5/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src = "SLajaxlib.js" type = "text/javascript"></script>
+<div id = "servicedock">
+    <div id = "explain">
+        <button id = "explain_button" class = "SD_button">
+            <i class = "fas fa-question"></i>
+            <div class = "status"></div>
+        </button>
+    </div>
+    <div id = "sl_service">
+        <button id = "sl_button" class = "SD_button">
+            <i class="fas fa-cloud"></i>
+            <div class = "status"></div>
+        </button>
+            <button id = "API_button" class = "SD_option" style = "display:none">
+                <i class = "fas fa-key"></i>
+                <div class = "status"></div>
+            </button>
+            <div id = "apikey_input" style = "display:none">
+                <center>
+                    API Key
+                    <input type = "text" id = "keyinputfield">
+                    <span id = "key_valid"> Invalid </span>
+                </center>
+            </div>
+    </div>
+    <div id = "spike_service">
+        <button id = "spike_button" class = "SD_button">
+            <i class="fas fa-th"></i>
+            <div class = "status"></div>
+        </button>
+        <button id = "graph_button" class = "SD_option" style = "display:none">
+            <i class = "fas fa-chart-line"></i>
+            <div class = "status"></div>
+        </button>
+        <button id = "slujson_button" class = "SD_option" style = "display:none">
+            <i class = "fas fa-cloud-download-alt"></i>
+            <div class = "status"></div>
+        </button>
+    </div>
+</div>
+<script>
+    $(document).ready(new function() {
+        //for systemlink
+        var APIkey;
+
+        //SD_buttons' states
+        var toggle_question = false;
+        var toggle_sl = false;
+        var toggle_spike = false;
+
+        //SD_option buttons' states
+        var toggle_graph = false;
+        var toggle_slujson = false;
+        
+        //check the APIkey inserted into the service dock
+        var check_APIkey_valid;
+        check_APIkey_valid = setInterval( async () => {
+            if (APIkey_valid_at_SD) {
+                //valid APIkey was entered, so no need to check anymore
+                clearInterval(check_APIkey_valid)
+                $("#apikey_input").css("display","none");
+                $("#API_button .status").css("background-color", "green");
+            }
+        }, 500)
+
+        /*event listeners for all buttons for service dock visuals*/
+
+        $("#spike_button").on("click", () => {
+            var options = $("#spike_service .SD_option").get();
+            if (toggle_spike) {
+                $("#spike_button .status").css("background-color", "red");
+                for (var i = 0; i < options.length; i++) {
+                    options[i].style.display = "none";
+                }
+                toggle_spike = false;
+            }
+            else {
+                $("#spike_button .status").css("background-color", "green");
+                for (var i = 0; i < options.length; i++) {
+                    options[i].style.display = "block";
+                }
+                toggle_spike = true;
+            }
+        })
+
+        $("#sl_button").on("click", () => {
+            var options = $("#sl_service .SD_option").get();
+            if (toggle_sl) {
+                $("#sl_button .status").css("background-color", "red");
+                for (var i = 0; i < options.length; i++) {
+                    options[i].style.display = "none";
+                }
+                toggle_sl = false;
+            } 
+            else {
+                $("#sl_button .status").css("background-color", "green");
+                for (var i = 0; i < options.length; i++) {
+                    options[i].style.display = "block";
+                }
+                toggle_sl = true;
+            }
+        })
+
+        $("#explain_button").on("click", () => {
+            if (toggle_question) {
+                $("#explain_button .status").css("background-color", "red");
+                toggle_question = false;
+            }
+            else {
+                $("#explain_button .status").css("background-color", "green");
+                toggle_question = true;
+            }
+        })
+
+        $("#graph_button").on("click", () => {
+            if (toggle_graph) {
+                $("#graph_button .status").css("background-color", "red");
+                toggle_graph = false;
+            }
+            else {
+                $("#graph_button .status").css("background-color", "green");
+                toggle_graph = true;
+            }
+        })
+
+        $("#slujson_button").on("click", () => {
+            if (toggle_slujson) {
+                $("#slujson_button .status").css("background-color", "red");
+                toggle_slujson = false;
+            }
+            else {
+                $("#slujson_button .status").css("background-color", "green");
+                toggle_slujson = true;
+            }
+        })
+
+        $("#API_button").on("click", async () => {
+            $("#apikey_input").css("display","block");
+        })
+
+    })
+</script>
+
+<style>
+    .SD_button {
+        background-color: #A2E1EF;
+        border: none;
+        color: white; 
+        font-size: 30px; /*font-size determines size of loaded fa icon*/
+        cursor: pointer; 
+        margin: 4px 0px;
+        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        position: relative;
+    }
+
+    .SD_option {
+        background-color: rgb(173, 245, 110);
+        border: none; 
+        color: white; 
+        font-size: 25px; /*font-size determines size of loaded fa icon*/
+        cursor: pointer; 
+        margin: 4px 0px;
+        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        position: relative;
+    }
+
+    .SD_button .status {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        margin: -4px 34px;
+    }
+
+    .SD_option .status {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        margin: -4px 25px;
+    }
+
+    #apikey_input {
+        position: relative;
+        top:5px;
+        height: 40px;
+        width: 260px;
+        margin:10px;
+        background-color: rgb(173, 245, 110);
+    }
+
+    .SD_button:hover, .SD_option:hover {
+        color:#000000;
+        background-color:#FFFFFF;
+    }
+</style>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: navbar.html
+Author: Jeremy Jung
+Last update: 6/25/20
+Description: display useful information and steps for an example
+Credits/inspirations:
+History: 
+    Created by Jeremy on 6/25/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div id = "navbarDIV">
+    <button id = "navbarbutton" class="btn"><i class="fa fa-bars"></i></button>
+    <div id = "navbar">
+        <ul>
+            <li id = "browsersetup"><a>Browser Setup</a></li>
+            <li id = "usage"><a>Usage</a></li>
+        </ul>
+    </div>
+    <div id = "BrowserExplanation" style = "left:200px; display:none;">
+        <center>
+        <p>Browser Setup (once):</p>
+        </center>
+        <ol>
+            <li>Open this webpage in a Chrome Browser</li>
+            <li>Go to the URL: chrome://flags</li>
+            <li>Search "Experimental Web Platform"</li>
+            <li><em>ENABLE</em> Experimental Web Platform (#enable-experimental-web-platform-features)</li>
+            <li>Restart your Chrome web browser</li>
+            <li>Plug in your SPIKE Prime hub by USB to this computer (and turn it on)!</li>
+            <li>Click "Connect" below and look for device: <em>"LEGO Technic Large Hub"</em></li>
+        </ol>
+    </div>
+    <div id = "DemoExplanation" style = "left:200px; display:none;">
+        <center>
+        <p>Demonstration 1) Changing hub display with systemlink:</p>
+        </center>
+        <ol>
+            <li> On Google Chrome, open cloudmessageexample.html on one tab and syslinkbasic.html on another tab </li>
+            <li> Connect your SPIKE Prime to the computer, and please do Browser Setup if you haven't. </li>
+            <li> On cloudmessageexample.html, Press "connect", and select your port. </li>
+            <li>On both html pages, copy & paste the APIkey into the "APIkey" box ( daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7 )</li>
+            <li>On cloudmessageexample.html, press the "autoGET" button once. (This will display "message" on the hub whenever it's changed)</li>
+            <li>On the syslinkbasic.html, scroll the tags list and select, "message". Change the value to whatever string you'd like.</li>
+            <li>Watch the SPIKE Prime display your message</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    navbar = true;
+    explain = false;
+    navbar = true;
+    $(document).ready(new function() {
+
+        $("#navbarbutton").on("click", () => {
+            toggle_navbar();
+            $("#navbar").find("a.active").removeClass("active");
+        })
+
+        $("#browsersetup").on("click", () => {
+            $("#navbar").find("a.active").removeClass("active");
+            $("#browsersetup").find("a").addClass("active");
+            $("#DemoExplanation").css("display","none");
+            $("#BrowserExplanation").css("display","block");
+        })
+
+        $("#usage").on("click", () => {
+            $("#navbar").find("a.active").removeClass("active");
+            $("#usage").find("a").addClass("active");
+            $("#BrowserExplanation").css("display","none");
+            $("#DemoExplanation").css("display","block");
+        })
+    });
+    //toggle navigation bar
+    function toggle_navbar() {
+            if ( navbar ) {
+                $("#navbar").css("display","none");
+                $("#BrowserExplanation").css("display","none");
+                $("#DemoExplanation").css("display","none");
+                navbar = false;
+            }
+            else {
+                $("#navbar").css("display","block");
+                navbar = true;
+            }
+        }
+</script>
+
+<style>
+#BrowserExplanation, #DemoExplanation {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 700px;
+    height: 250px;
+    background-color: #6CE1DF;
+    border-style: dotted;
+}
+
+#navbarbutton {
+    background-color: #A2E1EF; /* Blue background */
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 12px 16px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+}
+  
+/* Darker background on mouse-over */
+#navbarbutton:hover {
+    background-color: #2EBCDC;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #f1f1f1;
+  }
+  
+li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+li a.active {
+    background-color: #2FAFCC;
+    color: white;
+}
+
+li a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+}
+</style>

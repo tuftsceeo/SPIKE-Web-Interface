@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: sd_syslink_interface.html
+Author: Jeremy Jung
+Last update: 7/7/20
+Description: module to be loaded into servicedockexample for changing tags on syslink cloud
+* this module can only run with service dock *
+Credits/inspirations:
+History: 
+    Created by Jeremy on 6/11/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<head>
+    <!-- load global libraries -->
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src = "SLajaxlib.js" type = "text/javascript"></script>
+    <script src = "hoverscript_jquery.js" type = "text/javascript"></script>
+    <!-- load interface-specific logic -->
+    <!-- 
+    <script src = "SL_UI_script.js" type = "text/javascript"></script> 
+    -->
+
+</head>
+<div id = "syslinkbox">
+    <div id = "tagModification" class = "target_ignore">
+        <center class = "target_ignore">
+            <p class = "target_ignore">
+                Create or update a tag:
+            </p>
+            <form id = "tagForm">
+                <select id = "tagSelect" onchange = display_select_value()></select>
+                <input type = "text" id = "tagValInput">
+                <button id = "updateTagValue" type = "button" > Submit</button>
+            </form>
+        </center>
+        <span id = "currValspan" style="position: relative; left: 20px" class = "target_ignore"> Current value: <span id = "currVal"></span> </span>
+    </div>
+</div>
+
+
+<script> 
+    var all_tags = [];
+    var APIkey;
+    //run when document is done loading
+    $(document).ready(new function() {
+        console.log("daddy's home");
+
+        var check_APIkey_valid;
+        check_APIkey_valid = setInterval( async () => {
+            if (APIkey_valid_at_SD) {
+                //valid APIkey was entered, so no need to check anymore
+                clearInterval(check_APIkey_valid)
+                APIkey = await SD_APIkey;
+                console.log("APIKey", SD_APIkey)
+                //get all tag names from cloud and display it on UI
+                await get_tag_list(APIkey).then(
+                    (tags_list) => update_tag_selects(tags_list), 
+                    (tags_list) => all_tags = tags_list
+                );
+                //display the first selected tag
+                display_select_value();
+                get_value_interval();
+            }
+        }, 500)
+
+        //when "Submit" button is clicked, update value
+        $("#updateTagValue").click(change_current_value)
+
+        //make the interface draggable
+        dragElement("syslinkbox");
+    });
+
+    //update the scroll down list with available tags
+    function update_tag_selects(tags_list) { 
+        var number_of_tags = tags_list.length
+        for (var i = 0; i < number_of_tags; i++) {
+            var select_element = $("<option></option>").text(tags_list[i])
+            $("#tagSelect").append(select_element)
+        }
+    }
+
+    //shows the selected tag's current value
+    async function display_select_value() {
+        var selected_option = $("#tagSelect option:selected").text(); 
+        get_value(APIkey, selected_option).then((value) => $("#currVal").text(value))
+    }
+    
+    //change the current value of tag
+    async function change_current_value() {
+        //get the selected tag and value to assign
+        var selected_option = await $("#tagSelect option:selected").text(); 
+        var new_value = await $("#tagValInput").val();
+
+        /*
+        //see if the tag exists (for tag creation: NOT implemented)
+        var exists = false;
+        for (var i = 0; i < all_tags.length; i++) {
+            if ( all_tags[i] == selected_option ) {
+                exists = true;
+            }
+        }*/
+
+        //check type of new_value for correct json parameters
+        var inputType = input_type(new_value);
+
+        //update value of tag on the cloud
+        await update_value(APIkey, selected_option, inputType, new_value);
+
+        //display the new value
+        display_select_value()
+    }
+
+
+    //returns the data type indicator of tag based on given argument
+    function input_type(new_value) {
+        //if the value is not a number
+        if ( isNaN(new_value) ) {
+            //if the value is a boolean
+            if (new_value == "true" || new_value == "false") {
+                return "BOOLEAN";
+            }
+            //if the value is a string
+        return "STRING"; 
+        }
+        //value is a number
+        else {
+            //if value is an integer
+            if ( Number.isInteger(parseFloat(new_value)) ) {
+                return "INT"
+            }
+            //if value is a double
+            else {
+                return "DOUBLE"
+            }
+        }
+    }
+
+    //repeatedly get the value of the currently selected tag
+    async function get_value_interval() {
+        getValInt = setInterval( async () => {
+        display_select_value()
+        }, 1000)   
+    }
+
+</script>
+
+<style>
+
+#tagModification{
+    white-space: nowrap;
+}
+
+
+#updateTagValue {
+    display:inline-block;
+    padding:0.35em 1.2em;
+    margin:0 0.3em 0.3em 0;
+    border-radius:0.12em;
+    box-sizing: border-box;
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-weight:300;
+    text-align:center;
+    transition: all 0.2s;
+    background-color: #60AFFF
+}
+
+#syslinkbox{
+    -webkit-user-select: none;
+    position: absolute;
+    margin: 0 450px;
+    top: 20px;
+    width: 500px;
+    height: 200px;
+    background-color:#4CE0D2;
+    border: solid;
+}
+</style>
