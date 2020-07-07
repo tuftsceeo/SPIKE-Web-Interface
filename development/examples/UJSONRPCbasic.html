@@ -26,19 +26,19 @@ LICENSE: MIT
             </title>
         </head>
             <div id = "hubInfo">
-                <div id = "portA" style = "left:50px; top: 20px;">
+                <div id = "portA" style = "left:250px; top: 20px;">
                     <div> Port A </div>
                     <div id = "portAinfo"> </div>
                 </div>
-                <div id = "portB" style = "left:550px; top: 20px;">
+                <div id = "portB" style = "left:750px; top: 20px;">
                     <div> Port B </div>
                     <div id = "portBinfo"> </div>
                 </div>
-                <div id = "portC" style = "left:50px; top: 170px;">
+                <div id = "portC" style = "left:250px; top: 170px;">
                     <div> Port C </div>
                     <div id = "portCinfo"> </div>
                 </div>
-                <div id = "hub" style = "left: 275px; top: 170px; width: 250px;">
+                <div id = "hub" style = "left: 475px; top: 170px; width: 250px;">
                     <table id = "hubTable">
                         <tr> 
                             <th>Gyroscope:</th>
@@ -55,15 +55,15 @@ LICENSE: MIT
                     </table>
 
                 </div>
-                <div id = "portD" style = "left:550px; top: 170px;">
+                <div id = "portD" style = "left:750px; top: 170px;">
                     <div> Port D </div>
                     <div id = "portDinfo"> </div>
                 </div>
-                <div id = "portE" style = "left:50px; top: 320px;">
+                <div id = "portE" style = "left:250px; top: 320px;">
                     <div> Port E </div>
                     <div id = "portEinfo"> </div>
                 </div>
-                <div id = "portF" style = "left:550px; top: 320px;">
+                <div id = "portF" style = "left:750px; top: 320px;">
                     <div> Port F </div>
                     <div id = "portFinfo"> </div>
                 </div>
@@ -80,6 +80,7 @@ LICENSE: MIT
                     <textarea cols=120 rows=5 id="REPL" name="REPL" value="" style="font-family: Courier" /></textarea>
             </center>
             <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left:20px" /></textarea>
+            <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
             </div>
             <button id = "navbarbutton" class="btn"><i class="fa fa-bars"></i></button>
             <div id = "navbar" style="z-index:100;">
@@ -112,59 +113,21 @@ LICENSE: MIT
         var motorInfo = "<div id = \"motorInfo\">" + "<span>MOTOR</span>" + "<table id = \"motorTable\">" +"<tr>" +"<th>Speed:</th>" +"<td id = \"Mspeed\"> 0</td>" +"</tr>" +
                 "<tr>" + "<th>Angle:</th>" + "<td id = \"Mangle\"> 0</td>" + "</tr>" + "<tr>" + "<th>Angle (unit circle):</th>" + "<td id = \"Muangle\" > 0</td>" +
                 "</tr>" + "<tr>" + "<th> Power: </th>" + "<td id = \"Mpower\"> 0</td>" + "</tr>" + "</table>" + "</div>";
-        var ultraInfo = "<div id = \"ultraInfo\">" +
-                            "<span>ULTRASONIC</span>" + 
-                            "<table id = \"ultraTable\">" +
-                                "<tr>" +
-                                    "<th>Distance:</th>" +
-                                    "<td id = \"Udist\"> 0</td>" +
-                                "</tr>" +
-                            "</table>" +
-                        "</div>";
 
-        var forceInfo = "<div id = \"forceInfo\">" +
-                            "<span>FORCE</span>" + 
-                            "<table id = \"forceTable\">" + 
-                                "<tr>" +
-                                    "<th>Force (1-10):</th>" +
-                                    "<td id = \"Famount\"> 0</td>" +
-                                "</tr>" +
-                                "<tr>" +
-                                    "<th>Binary</th>" +
-                                    "<td id = \"Fbinary\"> 0</td>" +
-                                "</tr>" +
-                                "<tr>" +
-                                    "<th>Force (Sensitive):</th>" +
-                                    "<td id = \"Fbigamount\" > 0</td>" +
-                                "</tr>" +
-                            "</table>" +
-                        "</div>";
+        var ultraInfo = "<div id = \"ultraInfo\">" + "<span>ULTRASONIC</span>" +  "<table id = \"ultraTable\">" + "<tr>" + "<th>Distance:</th>" + "<td id = \"Udist\"> 0</td>" + "</tr>" +
+                            "</table>" + "</div>";
+
+        var forceInfo = "<div id = \"forceInfo\">"  + "<span>FORCE</span>" + "<table id = \"forceTable\">" +  "<tr>" + "<th>Force (1-10):</th>" +
+                         "<td id = \"Famount\"> 0</td>" + "</tr>" + "<tr>" + "<th>Binary</th>" + "<td id = \"Fbinary\"> 0</td>" + "</tr>" +
+                        "<tr>" + "<th>Force (Sensitive):</th>" +  "<td id = \"Fbigamount\" > 0</td>" +  "</tr>" + "</table>" + "</div>";
 
 
-        var colorInfo = "<div id = \"colorInfo\">" + 
-                            "<span>COLOR</span>" + 
-                            "<table id = \"colorTable\">" +
-                                "<tr>" +
-                                    "<th> Reflectivity:</th>" +
-                                    "<td id = \"Cdist\"> 0</td>" +
-                                "</tr>" +
-                                "<tr>" +
-                                    "<th>Ambient Light:</th>" + 
-                                    "<td id = \"Cunknown\"> 0</td>" +
-                                "</tr>" +
-                                "<tr>" +
-                                "<th> Color (RGB):</th>" +
-                                    "<td id = \"Crgb\">" +
-                                    "<div id = \"rgbbox\" data-r = \"0\", data-g = \"0\", data-b = \"0\"> </div> " +
-                                    "</td>" +
-                                "</tr>" +
-                            "</table>" +
-                        "</div>";
+        var colorInfo = "<div id = \"colorInfo\">" + "<span>COLOR</span>" + "<table id = \"colorTable\">" +  "<tr>" +  "<th> Reflectivity:</th>" + "<td id = \"Cdist\"> 0</td>" +
+                        "</tr>" + "<tr>" + "<th>Ambient Light:</th>" +  "<td id = \"Cunknown\"> 0</td>" + "</tr>" + "<tr>" + "<th> Color (RGB):</th>" +
+                        "<td id = \"Crgb\">" + "<div id = \"rgbbox\" data-r = \"0\", data-g = \"0\", data-b = \"0\"> </div> " + "</td>" +
+                         "</tr>" + "</table>" + "</div>";
 
-        var browserEx = true;
         var auto_get = false;
-        explain = false;
-        navbar = true;
         //run when document is done loading
         $(document).ready(new function() {
             console.log("daddy's home");
@@ -196,6 +159,12 @@ LICENSE: MIT
             })
 
         });
+    </script>
+    <!-- For the navigation bar -->
+    <script>
+        explain = false;
+        navbar = true;
+
         //toggle navigation bar
         function toggle_navbar() {
             if ( navbar ) {
@@ -234,6 +203,10 @@ LICENSE: MIT
         // SEND Hub Reboot (control-C + control-D)
         rebootButton.addEventListener( 'click', async () => {
             reboot_hub();
+        });
+
+        sendbutton.addEventListener('click', async() => {
+            sendDATA(document.getElementById("data").value);
         });
 
         //change the interval at which data should be displayed
@@ -332,6 +305,7 @@ LICENSE: MIT
 
         //display current value when webpage loads
         change_retrieval_interval();
+        $("#data").val('{"i":' + Math.floor((Math.random()*10000)) +', "m": "scratch.display_text", "p": {"text": "HELLO" } }')
     </script>
     <script src = "../libraries/hoverscript_jquery.js" type = "text/javascript"></script>
 </html>

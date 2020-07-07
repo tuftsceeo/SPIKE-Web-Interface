@@ -15,6 +15,7 @@ dragElement("portC");
 dragElement("portD");
 dragElement("portE");
 dragElement("portF");
+dragElement("hub");
 
 
 //logic from https://www.w3schools.com/howto/howto_js_draggable.asp
@@ -32,15 +33,22 @@ function dragElement(elmnt) {
     
 
     function dragMouseDown() {
-        //console.log("mouse is down");
         var e = window.event;
-        e.preventDefault();
-        pos3 = e.clientX;
-        pos4 = e.clientY;
+        target_class = e.target.getAttribute("class")
+        if (e.target == document.getElementById(elmnt) || target_class == "target_ignore") {
+            e.preventDefault();
+            pos4 = e.clientY;
+            pos3 = e.clientX;
 
-        $(document).mousemove(elementDrag);
+            //console.log(e.target)
+            //console.log("mouse is down");
 
-        $(document).mouseup(closeDragElement);       
+            $(document).mousemove(elementDrag);
+
+            $(document).mouseup(closeDragElement);    
+        }   
+        //console.log(e.target)
+        //console.log(document.getElementById(elmnt))
     }
 
     function elementDrag(){
@@ -54,16 +62,20 @@ function dragElement(elmnt) {
         pos4 = e.clientY;
         // set the element's new position:
         if($("#" + elmnt)) {
-            var offset_top = ($("#" + elmnt).offset().top - pos2) + "px";
-            var offset_left = ($("#" + elmnt).offset().left - pos1) + "px";
-            $("#" + elmnt).css("top", offset_top);
-            $("#" + elmnt).css("left", offset_left);
+
+            var offset_top = ($("#" + elmnt).offset().top)
+            var offset_left = ($("#" + elmnt).offset().left)
+
+            var new_top = offset_top - pos2;
+            var new_left = offset_left - pos1;
+
+            $("#" + elmnt).offset({top: new_top, left: new_left})
         }
     }
 
     function closeDragElement() {
         // stop moving when mouse button is released:
-        //console.log("mouse released, closeDragElement");
+        console.log("mouse released, closeDragElement");
         $(document).unbind("mouseup");
         $(document).unbind("mousemove");
     }

@@ -22,12 +22,16 @@ OR
 -->
 <html>
     <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!--
     <script src = "../libraries/SLajaxlib.js" type = "text/javascript"></script>
     <script src = "../libraries/JSONRPClib.js" type = "text/javascript"></script>
+    <link rel = "stylesheet" type = "text/css" href = "../libraries/styles/msgexstyle.css">
+    -->
+    <script src = "SLajaxlib.js" type = "text/javascript"></script>
+    <script src = "JSONRPClib.js" type = "text/javascript"></script>
     <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
     <body>
         <head>
-            <link rel = "stylesheet" type = "text/css" href = "../libraries/styles/msgexstyle.css">
             <title>
                 System Link Cloud (PRIME display) example
             </title>
@@ -73,11 +77,11 @@ OR
                         <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
                         <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
             </div>
-            <!-- Testing html modules
+            <!--
             <script>
                 $(function(){
                     try {
-                        $('body').load('/modules/navbar.html #navbarDIV', function(){
+                        $('body').load('/views/navbar.html #navbarDIV', function(){
                             console.log("Load was performed")
                         })
                     }
@@ -85,7 +89,7 @@ OR
                         console.log(e);
                     }
                 });
-            </script>
+            </script>   
             -->
             <button id = "navbarbutton" class="btn"><i class="fa fa-bars"></i></button>
             <div id = "navbar" style="z-index:100;">
@@ -126,7 +130,6 @@ OR
                 </ol>
             </div>
         </div>
-
     </body>
     <!-- when document loads -->
     <script>
@@ -195,9 +198,10 @@ OR
                 $("#DemoExplanation").css("display","block");
             })
         });
-
-        //toggle navigation bar
-        function toggle_navbar() {
+    </script>
+    <script>
+         //toggle navigation bar
+         function toggle_navbar() {
             if ( navbar ) {
                 $("#navbar").css("display","none");
                 $("#BrowserExplanation").css("display","none");
@@ -282,6 +286,7 @@ OR
     </script>
 
     <!-- script for SytemLink interaction (specifically statusbox) -->
+
     <script>
         //update the scroll down list with available tags
         function update_tag_selects(tags_list) { 

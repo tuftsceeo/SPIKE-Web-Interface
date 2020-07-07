@@ -94,7 +94,7 @@ async function read_stream() {
                         lcb_index = json_string.indexOf('{')
                         jsonline = jsonline + value
                         if (rcb_index > -1) {
-                            console.log(jsonline[0])
+                            //console.log(jsonline[0])
                             if (jsonline[0] === "{") {
                                 //get substring until }\r
                                 one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
@@ -161,7 +161,7 @@ function setup_writer() {
 
 // generic send data function
 // command is a string to send (or sequence of commands, separated by new lines
-function sendDATA(command) {
+async function sendDATA(command) {
     // look up the command to send
     commands = command.split("\n"); // split on new line
     console.log("sendDATA: " + commands);
@@ -179,6 +179,14 @@ function sendDATA(command) {
         writer.write(JSON.stringify(myobj));
         writer.write(RETURN); // extra return at the end
     }
+}
+
+function sendPythonDATA(command){
+    commands = command.split("\n"); // split on new line
+    console.log("sendDATA: " + commands);
+    writer.write(commands);
+    writer.write(RETURN);
+
 }
 
 async function get_devices() {
