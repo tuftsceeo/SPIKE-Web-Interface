@@ -1,9 +1,21 @@
-const http = require('http');
-const express = require('express');
-const request = require('request');
-const fs = require('fs');
-const path = require('path');
+/*
+Project Name: SPIKE Prime Web Interface
+File name: app.js
+Author: Jeremy Jung
+Date: 7/7/20
+Description: point jquery loads to correct html files
+Credits/inspirations:
+History: 
+    Created by Jeremy on 6/17/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
 
+Usage:
+node app.js in the server folder to start server
+*/
+
+const express = require('express');
+const path = require('path');
 const app = express();
 
 const hostname = '127.0.0.1';
