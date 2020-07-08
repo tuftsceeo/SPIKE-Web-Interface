@@ -59,7 +59,9 @@ async function get_tag_list(apikey) {
     return tag_list
 }
 
-//returns value of a tag
+//returns value of a tag on Systemlink
+//example:
+//value(return) : { type: "BOOLEAN", value: TRUE }
 async function get_value(apikey, tag_path) {
     var response_data;
     await $.ajax({
@@ -72,7 +74,7 @@ async function get_value(apikey, tag_path) {
     }).done(function (data){
         if ( console && console.log ) {
             if(data) {
-                response_data = data.value.value
+                response_data = data.value
             }
           }
     })
