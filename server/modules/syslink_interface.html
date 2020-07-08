@@ -88,7 +88,7 @@ LICENSE: MIT
     //shows the selected tag's current value
     async function display_select_value() {
         var selected_option = $("#tagSelect option:selected").text(); 
-        get_value(APIkey, selected_option).then((value) => $("#currVal").text(value))
+        get_value(APIkey, selected_option).then((value) => $("#currVal").text(value.value))
     }
     
     //change the current value of tag
