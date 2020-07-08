@@ -25,6 +25,7 @@ LICENSE: MIT
         <head>
             SystemLink driven UJSON RPC
         </head>
+        <!---
         <div id = "all_selects">
             <select id = "slujson_rpcSelect">
             </select>
@@ -33,11 +34,14 @@ LICENSE: MIT
             </select>
             <select id = "slujson_tagSelect">
             </select>
-            <input type = "submit" value = "send">
         </div>
+        -->
+        <textarea cols=60 rows=5 id="slujson_data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+        <input id = "slujson_send" type = "submit" value = "send">
     </center>
 </div>
 <script>
+    //{"i":1212, "m": "scratch.display_text", "p": { "text": cloudTagValue(message) } }
     var command = {
         "m": "placeholder",
         "p": "placeholder"
@@ -55,7 +59,6 @@ LICENSE: MIT
 
     var APIkey = "";
     var all_tags = [];
-
     
     var check_APIkey_and_port_connected;
     check_APIkey_and_port_connected = setInterval( async () => {
@@ -70,6 +73,7 @@ LICENSE: MIT
                     (tags_list) => all_tags = tags_list
                 );
                 initSelects();
+                $("#slujson_data").val('{"i":' + Math.floor((Math.random()*10000)) +', "m": "scratch.display_text", "p": {"text":'  + "cloudTagValue(message)" + '} }')
                 /*
                 SLUJSON_get_value_int = setInterval( async () => {
                     selected_option = 
@@ -82,6 +86,11 @@ LICENSE: MIT
     var available_scripts = ["display_image", "display_text"];
     $(document).ready( () => {
         dragElement("slujsonbox")
+
+        var slujson_send = document.getElementById("slujson_send");
+        slujson_send.addEventListener("click", async () => {
+            praseSLUJSONcommand();
+        })
     })
 
     async function initSelects() {
@@ -98,6 +107,34 @@ LICENSE: MIT
             var select_element = $("<option></option>").text(all_tags[i])
             $("#slujson_tagSelect").append(select_element)
         }
+    }
+    //parse the cloudTagValue() command inserted at the textbox and execute it
+    async function praseSLUJSONcommand() {
+        let dataInput = document.getElementById("slujson_data");
+        let raw_string = dataInput.value;
+        let index_cloudTagValue = await raw_string.indexOf("cloudTagValue(");
+        //find the index of raw_string at which the cloudTagValue function ends
+        let index_lastparen = await raw_string.indexOf( ")" , index_cloudTagValue );
+        //divide the raw_string into parts before the getValue and after
+        let first_raw_string_part = await raw_string.substring(0,index_cloudTagValue);
+        let second_raw_string_part = await raw_string.substring(index_lastparen+1, raw_string.length);
+
+        //find the argument of the cloudTagValue and get its info from the cloud
+        let cloudTagValue_string = await raw_string.substring( index_cloudTagValue , index_lastparen + 1 );
+        let index_first_paren = cloudTagValue_string.indexOf("(");
+        let index_last_paren = cloudTagValue_string.indexOf(")");
+        let tagName = cloudTagValue_string.substring(index_first_paren + 1,index_last_paren);
+        let selectedTagValue = await get_value(APIkey, tagName);
+        //send the final UJSONRPC script to the hub.
+        let final_RPC_command;
+        if (selectedTagValue.type == "STRING") {
+            console.log("this was run")
+            final_RPC_command = await first_raw_string_part + '"' + selectedTagValue.value + '"' + second_raw_string_part;
+        }
+        else if (selectedTagValue.type == "INT") {
+            final_RPC_command = await first_raw_string_part + selectedTagValue.value + second_raw_string_part;
+        }
+        sendDATA(final_RPC_command);
     }
 </script>
 
