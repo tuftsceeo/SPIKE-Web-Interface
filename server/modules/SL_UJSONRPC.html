@@ -57,7 +57,6 @@ LICENSE: MIT
                 'UMBRELLA', 'XMAS', 'YES']
     }
 
-    var APIkey = "";
     var all_tags = [];
     
     var check_APIkey_and_port_connected;
@@ -66,8 +65,8 @@ LICENSE: MIT
         if (port_connected) {
             if (APIkey_valid_at_SD) {
                 clearInterval(check_APIkey_and_port_connected);
-                APIkey = await SD_APIkey;
-                console.log("collected APIkey at SL_UJSONRPC", APIkey);
+                console.log("collected APIkey at sd_syslink_interface", APIkey);
+                //ㅎㄷㅅ 솓 
                 //get all tag names from cloud and display it on UI
                 await get_tag_list(APIkey).then(
                     (tags_list) => all_tags = tags_list
