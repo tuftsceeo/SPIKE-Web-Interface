@@ -31,6 +31,8 @@ let jsonline = ""
 //contains latest full json object from SPIKE readings
 let one_line;
 
+var micropython_interpreter = false; // whether micropython was reached or not
+
 VENDOR_ID = 0x0694; // LEGO SPIKE Prime Hub
 
 // common characters to send (for REPL/uPython on the Hub)
@@ -96,7 +98,9 @@ async function read_stream() {
                     ({value, done} = await reader.read());
 
                     // log value
-                    //console.log('Value:', value)
+                    if (micropython_interpreter) {
+                        console.log(value)
+                    }
 
                     //concatenating incomplete json objects from the hub
                     if (value) {
@@ -258,7 +262,13 @@ async function reboot_hub() {
     setup_writer();
     writer.write(CONTROL_C);
     writer.write(CONTROL_D);
+    
+    //toggle micropython_interpreter flag if its was active
+    if (micropython_interpreter) {
+        micropython_interpreter = false;
+    }
 }
+
 /* get_devices() - get the devices that are connected to each port on the SPIKE Prime
  * 
  * Returns:
@@ -316,13 +326,40 @@ async function get_devices() {
     }
 }
 
+/* reach_micropython() - reach the micropython interpreter beneath UJSON RPC
+ * 
+ * Effect:
+ * stops UJSON RPC stream
+ * 
+ * Note:
+ * to get UJSON RPC back, hub needs to be rebooted
+ */
+async function reach_micropython() {
+    console.log("starting micropy interpreter");
+    setup_writer();
+    writer.write(CONTROL_C);
+    micropython_interpreter = true;
+}
 
-//NOT IMPLEMENTED
-//reach the micropy level of REPL
+/* sendPythonDATA() - send micropy commands to hub
+ * 
+ * Effect:
+ * may make the hub do something
+ * 
+ */
 function sendPythonDATA(command){
-    commands = command.split("\n"); // split on new line
-    console.log("sendDATA: " + commands);
-    writer.write(commands);
-    writer.write(RETURN);
+    if (micropython_interpreter) {
+        commands = command.split("\n"); // split on new line
+        setup_writer();
+        console.log("sendpythonDATA: " + commands);
+        for ( var i = 0; i < commands.length; i++ ) {
+            console.log("commands.length", commands.length)
 
+            // trim trailing, leading whitespaces
+            current = commands[i].trim();
+            
+            writer.write(current);
+            writer.write(RETURN); // extra return at the end
+        }
+    }
 }
