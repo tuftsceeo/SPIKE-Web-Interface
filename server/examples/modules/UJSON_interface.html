@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: UJSON_interface.html
+Author: Jeremy Jung
+Last update: 7/12/20
+Description: basic interface for reading hub/sensor data and sending UJSONRPC commands
+* this module can be only run with servicedock_index.html *
+Credits/inspirations:
+    Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
+History: 
+    Created by Jeremy on 6/28/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+Note: 
+Connection to the hub is done via servicedock
+-->
+
+<!-- load global libraries-->
+<script src = "./libraries/UJSONRPClib.js" type = "text/javascript"></script>
+<script src = "./libraries/jquery_351.js" type = "text/javascript"></script>
+<script src = "./libraries/hoverscript_jquery.js" type = "text/javascript"></script>
+
+<div id = "ujsonrpcbox">
+    <!-- put "ignore"-->
+    <center class = "target_ignore">
+        <p class = "target_ignore">
+            UJSON RPC
+        </p>
+    </center>
+        <div id = "ujsonrpcbox_panel" class = "target_ignore">
+            <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
+            <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
+            <button id = "toggleStream">toggleStream</button>
+        </div>
+        <div id = "include_SL_service">
+
+        </div>
+        <div id = "datastream" style = "display:block">
+            <textarea id="REPL" name="REPL" value="" style="font-size: 15px; font-family: Courier;position: relative; left: 20px"/></textarea>
+        </div>
+        <div id = "portdatastream" style = "display:none">
+            <div id = "porthub" class = "portData">
+                <div id ="gyroInfo">
+                    gyro:
+                    <div id = "gyro">
+                    </div>
+                </div>
+                <div id = "accelInfo">
+                    accel:
+                    <div id = "accel"></div>
+                </div>
+                <div id = "posiInfo">
+                    position:
+                    <div id = "posi"></div>
+                </div>
+            </div>
+            <div id = "portA" class = "portData">
+                <div>port A</div>
+                <div id = "portAinfo"></div>
+            </div>
+            <div id = "portB" class = "portData">
+                <div>port B</div>
+                <div id = "portBinfo"></div>
+            </div>
+            <div id = "portC" class = "portData">
+                <div>port C</div>
+                <div id = "portCinfo"></div>
+            </div>
+            <div id = "portD" class = "portData">
+                <div>port D</div>
+                <div id = "portDinfo"></div>
+            </div>
+            <div id = "portE" class = "portData">
+                <div>port E</div>
+                <div id = "portEinfo"></div>
+            </div>
+            <div id = "portF" class = "portData">
+                <div>port F</div>
+                <div id = "portFinfo"></div>
+            </div>
+        </div>
+        <div id = "ujsonrpc_send" style = "display:block">
+            <textarea cols=120 rows=5 id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+            <input type=button id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
+        </div>
+</div>
+<!-- script for JSONRPC (specfically jsonrpcbox) -->
+<script>
+    //html table elements for all device types (declared to be appeneded for sensor display)
+    var motorInfo = "<div id = \"motorInfo\">" + "<span>MOTOR</span>" + "<table id = \"motorTable\">" +"<tr>" +"<th>Speed:</th>" +"<td id = \"Mspeed\"> 0</td>" +"</tr>" +
+        "<tr>" + "<th>Angle:</th>" + "<td id = \"Mangle\"> 0</td>" + "</tr>" + "<tr>" + "<th>Angle (unit circle):</th>" + "<td id = \"Muangle\" > 0</td>" +
+        "</tr>" + "<tr>" + "<th> Power: </th>" + "<td id = \"Mpower\"> 0</td>" + "</tr>" + "</table>" + "</div>";
+
+    var ultraInfo = "<div id = \"ultraInfo\">" + "<span>ULTRASONIC</span>" +  "<table id = \"ultraTable\">" + "<tr>" + "<th>Distance:</th>" + "<td id = \"Udist\"> 0</td>" + "</tr>" +
+                        "</table>" + "</div>";
+
+    var forceInfo = "<div id = \"forceInfo\">"  + "<span>FORCE</span>" + "<table id = \"forceTable\">" +  "<tr>" + "<th>Force (1-10):</th>" +
+                        "<td id = \"Famount\"> 0</td>" + "</tr>" + "<tr>" + "<th>Binary</th>" + "<td id = \"Fbinary\"> 0</td>" + "</tr>" +
+                    "<tr>" + "<th>Force (Sensitive):</th>" +  "<td id = \"Fbigamount\" > 0</td>" +  "</tr>" + "</table>" + "</div>";
+
+
+    var colorInfo = "<div id = \"colorInfo\">" + "<span>COLOR</span>" + "<table id = \"colorTable\">" +  "<tr>" +  "<th> Reflectivity:</th>" + "<td id = \"Cdist\"> 0</td>" +
+                    "</tr>" + "<tr>" + "<th>Ambient Light:</th>" +  "<td id = \"Cunknown\"> 0</td>" + "</tr>" + "<tr>" + "<th> Color (RGB):</th>" +
+                    "<td id = \"Crgb\">" + "<div id = \"rgbbox\" data-r = \"0\", data-g = \"0\", data-b = \"0\"> </div> " + "</td>" +
+                        "</tr>" + "</table>" + "</div>";
+
+    let REPL = document.getElementById("REPL");
+
+    //for toggling between UJSON RPC stream or sensor display by port
+    var show_datastream = true;
+
+    //parse information about devices connected to the ports and display them
+    async function display_port() {
+        ports = await get_devices();
+        value = await retrieve_data();
+        parsed = await JSON.parse(value);
+        data = await parsed.p;
+        var index_to_port = ["A","B","C","D","E","F"];
+        //parse connected devices' readings and display it on the port divs
+        for ( var key = 0; key < 6; key++ ) {
+            letter = index_to_port[key];
+            device_type = ports[letter];
+            if ( device_type != "None" ) {
+                try {
+                    if ( device_type == "Motor" ) {
+                        await $("#port" + letter + "info").html(motorInfo);
+                        Mspeed = await data[key][1][0];
+                        Mangle = await data[key][1][1];
+                        Muangle = await data[key][1][2];
+                        Mpower = await data[key][1][3];
+
+                        $("#port" + letter).find("#Mspeed").text(Mspeed);
+                        $("#port" + letter).find("#Mangle").text(Mangle);
+                        $("#port" + letter).find("#Muangle").text(Muangle);
+                        $("#port" + letter).find("#Mpower").text(Mpower);
+                    }
+                    if ( device_type == "Ultrasonic" ) {
+                        await $("#port" + letter + "info").html(ultraInfo);
+                        Udist = await data[key][1][0];
+                        $("#port" + letter).find("#Udist").text(Udist);
+                    }
+                    if ( device_type == "Force") {
+                        await $("#port" + letter + "info").html(forceInfo);
+                        Famount = await data[key][1][0];
+                        Fbinary = await data[key][1][1];
+                        Fbigamount = await data[key][1][2];
+                        $("#port" + letter).find("#Famount").text(Famount);
+                        $("#port" + letter).find("#Fbinary").text(Fbinary);
+                        $("#port" + letter).find("#Fbigamount").text(Fbigamount);
+                    }
+                    if ( device_type == "Color" ) {
+                        await $("#port" + letter + "info").html(colorInfo);
+                        Cdist = await data[key][1][0];
+                        Cunknown = await data[key][1][1];
+                        Cr = await data[key][1][2];
+                        Cg = await data[key][1][3];
+                        Cb = await data[key][1][4];
+                        $("#" + letter).find("#Cdist").text(Cdist);
+                        $("#" + letter).find("#Cunknown").text(Cunknown);
+                        $("#" + letter).find("#rgbbox").css("background-color", "rgb(" + Cr + "," + Cg + "," + Cb + ")");
+                    }
+                } catch(e) {}
+                
+            }
+            else {
+                await  $("#port" + letter + "info").html("");
+            }
+        }
+        try {
+            //parse hub information
+            gyro_x = data[6][0];
+            gyro_y = data[6][1];
+            gyro_z = data[6][2];
+            $("#gyro").text(gyro_x + ", " + gyro_y + "," + gyro_z);
+            accel_x = data[7][0];
+            accel_y = data[7][1];
+            accel_z = data[7][2];
+            $("#accel").text(accel_x + ", " + accel_y + ", " + accel_z);
+            posi_x = data[8][0];
+            posi_y = data[8][1];
+            posi_z = data[8][2];
+            $("#posi").text(posi_x + ", " + posi_y + ", " + posi_z);
+        } catch (e) {}
+    }
+
+    //toggle between data stream and port readings
+    async function toggleStream() {
+        if (show_datastream) {
+            $("#datastream").css("display","none");
+            $("#portdatastream").css("display","block");
+            show_datastream = false;
+        }
+        else {
+            $("#datastream").css("display","block");
+            $("#portdatastream").css("display","none");
+            show_datastream = true;
+        }
+    }
+
+    //when DOM is ready
+    $(document).ready(new function() {
+
+        //change the time interval of retrieving the lines of UJSON RPC data
+        $("#delay_amount").on("input", function (event) {
+                change_retrieval_interval()
+        });
+        
+        $("#reboot").on("click", async () => {
+             // SEND Hub Reboot (control-C + control-D)
+            reboot_hub()
+        })
+
+        $("#send").on("click", async () => {
+            sendDATA($("#data").val());
+        })
+
+        $("#toggleStream").on("click", async () => {
+            toggleStream();
+        })
+
+        //make the interface draggable
+        dragElement("ujsonrpcbox");
+
+        change_retrieval_interval()
+
+        $("#data").val('{"i":' + Math.floor((Math.random()*10000)) +', "m": "scratch.display_text", "p": {"text":"'  + "here we go" + '"} }')
+    });
+
+    //set or change the interval at which data is retrieved
+    var setInt
+    async function change_retrieval_interval() {
+        console.log($("#delay_amount").val())
+        clearInterval(setInt)
+        setInt = setInterval( async () => {
+            retrieve_data().then((value => REPL.value = value))
+        }, $("#delay_amount").val() * 1000
+        )
+    }
+
+    //sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+</script>
+
+<style>
+    #REPL {
+        width: 1300px;
+        height: 20px;
+    }
+
+    #ujsonrpcbox {
+        position: absolute;
+        top: 300px;
+        left: 20px;
+        width: 1400px;
+        height: 300px;
+        background-color: #4CE0D2;
+        border: solid;
+    }
+
+    #ujsonrpcbox_panel {
+        position: relative;
+        left:20px;
+    }
+
+    #portdatastream {
+        position: absolute;
+        height: 120px;
+        width: 1350px;
+        left: 20px;
+    }
+
+    #ujsonrpc_send {
+        position: absolute;
+        top: 200px;
+    }
+
+    .portData {
+        background-color:white;
+        width: 190px;
+        height: 120px;
+        float: left;
+        margin: 0px 2px 0px 0px;
+    }
+</style>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- 
 Project Name: SPIKE Prime Web Interface
-File name: servicedock_index.html
+File name: servicedockexample.html
 Author: Jeremy Jung
 Last update: 7/7/20
 Description: combined use of all previous examples joined together by Service Dock UI
@@ -20,9 +20,9 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
 <head>
 <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src = "./modules/libraries/SLajaxlib.js" type = "text/javascript"></script>
-<script src = "./modules/libraries/UJSONRPClib.js"></script>
-<script src = "./modules/libraries/hoverscript_jquery.js" type = "text/javascript"></script>
+<script src = "SLajaxlib.js" type = "text/javascript"></script>
+<script src = "UJSONRPClib.js"></script>
+<script src = "hoverscript_jquery.js" type = "text/javascript"></script>
 <!-- plotly for grapher.html needs to be included in this html-->
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
 </head>
@@ -56,7 +56,7 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
         //load service dock
         $( function () {
 
-            $('#sd_container').load('./modules/servicedock.html', async function () {
+            $('#sd_container').load('servicedock.html', async function () {
                 
                 /* initialize buttons loaded from service dock */
 
@@ -127,7 +127,7 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
                         sl_service_loaded = true;
                         var sl_container = "<div id = 'sl_container'></div>";
                         await $("#container").append(sl_container);
-                        await $('#sl_container').load('./modules/SL_interface.html');
+                        await $('#sl_container').load('SL_interface.html');
                     }
                     //when button is clicked first time after it loads, hide syslinkbox
                     else {
@@ -157,7 +157,7 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
 
                         var spike_container= "<div id = 'spike_container'></div>";
                         await $("#container").append(spike_container)
-                        await $('#spike_container').load('./modules/UJSON_interface.html')
+                        await $('#spike_container').load('UJSON_interface.html')
                     }
                     //when button is clicked first time after it loads, hide jsonrpcbox
                     else {
@@ -182,7 +182,7 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
                         graph_service_loaded = true;
                         var graph_container= "<div id = 'graph_container'></div>";
                         await $("#container").append(graph_container);
-                        await $('#graph_container').load('./modules/graph_interface.html');
+                        await $('#graph_container').load('graph_interface.html');
                     }
                     //when button is clicked first time after it loads, hide interface
                     else {
@@ -208,7 +208,7 @@ port_connected (boolean) - whether SPIKE hub was connected with web serial
                         slujson_service_loaded = true;
                         var slujson_container= "<div id = 'slujson_container'></div>";
                         await $("#container").append(slujson_container);
-                        await $('#slujson_container').load('./modules/SLxUJSONRPC_interface.html');
+                        await $('#slujson_container').load('SLxUJSONRPC_interface.html');
                         
                         $("#slujsonbox").css("display","block");
                     }

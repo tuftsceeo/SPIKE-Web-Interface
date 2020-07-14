@@ -15,9 +15,9 @@ USAGE:
 - Connect a motor to each side of the hub. Control the paddles with the motor
 -->
 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src = "./modules/libraries/SLajaxlib.js" type = "text/javascript"></script>
-<script src = "./modules/libraries/UJSONRPClib.js"></script>
-<script src = "./modules/libraries/hoverscript_jquery.js" type = "text/javascript"></script>
+<script src = "SLajaxlib.js" type = "text/javascript"></script>
+<script src = "UJSONRPClib.js"></script>
+<script src = "hoverscript_jquery.js" type = "text/javascript"></script>
 <html>
     <div id = "servicedock_container"></div>
     <div id = "pong">
@@ -25,11 +25,11 @@ USAGE:
     </div>
     <script>
         $( function () {
-            $("#servicedock_container").load("./servicedock_index.html", async function() {
+            $("#servicedock_container").load("servicedock_index.html", async function() {
                 $("#servicedock_index").css("position","fixed")
             })
 
-            $("#pong").load("./pong.html")
+            $("#pong").load("pong.html")
         });
 
     </script>

@@ -128,7 +128,7 @@ LICENSE: MIT
         let index_first_paren = cloudTagValue_string.indexOf("(");
         let index_last_paren = cloudTagValue_string.indexOf(")");
         let tagName = cloudTagValue_string.substring(index_first_paren + 1,index_last_paren);
-        let selectedTagValue = await get_value(APIkey, tagName);
+        let selectedTagValue = await get_value(SD_APIkey, tagName);
         //send the final UJSONRPC script to the hub.
         let final_RPC_command;
         if (selectedTagValue.type == "STRING") {

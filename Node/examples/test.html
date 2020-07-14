@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  </style>
+</head>
+    <body>
+        <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            var device_uuid   = "03970000-2D00-4E00-0551-383235373836"
+            var device_uuid_2 = "03970000-0000-1000-8000-00805f9b34fb"
+            var device_uuid_3 = "03970000-2D00-4E00-0551-00805f9b34fb"
+        </script>
+        <!--
+        <script>
+        APIkey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"
+        
+            async function send_post() {
+                navigator.bluetooth.requestDevice({ 
+                    acceptAllDevices: true
+                })
+                .then(device => {
+                    console.log(device);
+                    // Human-readable name of the device.
+                    console.log(device.name);
+                    // Attempts to connect to remote GATT Server.
+                    return device.gatt.connect();
+                })
+                .then(server => { 
+                    return server.getPrimaryService('battery_service');
+                })
+                .then(service => {
+                    // Getting Battery Level Characteristic...
+                    return service.getCharacteristic('battery_level');
+                })
+                .then(characteristic => {
+                    // Reading Battery Level...
+                    return characteristic.readValue();
+                })
+                .then(value => {
+                    console.log('Battery percentage is ' + value.getUint8(0));
+                })
+            
+                .catch(error => { console.log(error); });
+            
+            }
+        </script>
+        -->
+        <script>
+            var access_key = "c4peGcBE9NFJSS3z6s657dIc";
+            var secret_key = "sNfmVtDlEM9HHvRgPVi9Gf26Mt0OPVwhgVRRp0WrzQL86umt";
+            // var did = "faa054c33dbf50b8a8fcfa4d";
+            // var wid = "9db11badd909f2170f4bf0b2";
+            //Medium Motor Assembly (SMall Spike Motor)
+            //var eid = "dcab898a0269b6f07539fb65";
+            
+            var did = "12ae4e8452feed57f993bda3";
+            var wid = "bbe3cde5759d1f0c7b2a6f0f";
+            //Medium Motor Assmembly (in test document)
+            var eid = "866bf4cbbb1497e5cad582c5";
+            headers = {'Accept': 'application/vnd.onshape.v1+json; charset=UTF-8;qs=0.1', 'Content-Type': 'application/json'}
+            var generic_url = "https://api-explorer.onshape.com/generic-endpoint";
+            //actualPath: "/api/assemblies/d/12ae4e8452feed57f993bda3/w/bbe3cde5759d1f0c7b2a6f0f/e/866bf4cbbb1497e5cad582c5?includeMateFeatures=false&includeNonSolids=false&includeMateConnectors=false",
+            async function send_post() {}{
+                get_assembly_def();
+            }
+            //get the assembly definition
+            async function get_assembly_def() {
+                var base_url = "https://rogers.onshape.com";
+                var API_url = base_url + "/api/assemblies/d/" + did + "/w/" + wid + "/e/" + eid;
+                //default ajax method is GET
+                await $.ajax({
+                    url: API_url,
+                    accessKey: access_key,
+                    baseUrl: base_url,
+                    headers: {
+                    "Accept": "application/vnd.onshape.v1+json",
+                    'Content-Type': "application/json"
+                    },
+                    secretKey: secret_key
+                })
+                .done(function(data) {
+                    if ( console && console.log ) {
+                        console.log( "Sample of data:", data);
+                    }
+                });
+            } 
+        </script>
+        <button type = "button" onclick = send_post()> Send POST </button>
+   </body>
+</html>

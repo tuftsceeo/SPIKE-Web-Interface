@@ -198,7 +198,6 @@ async function retrieve_data() {
     catch (error) {
         //console.log('[retrieveData] ERROR', error);
     }
-    console.log("typof one_line", typeof one_line)
     return one_line
 }
 
@@ -226,9 +225,9 @@ function setup_writer() {
  */
 async function sendDATA(command) {
     // look up the command to send
-    //commands = command.split("\n"); // split on new line
-    commands = command
-    // console.log("sendDATA: " + commands);
+    commands = command.split("\n"); // split on new line
+    //commands = command
+     console.log("sendDATA: " + commands);
 
     // make sure ready to write to device
     setup_writer();
@@ -238,7 +237,7 @@ async function sendDATA(command) {
     for ( var i = 0; i < commands.length; i++ ) {
         console.log("commands.length", commands.length)
         current = commands[i].trim();
-        console.log("current", current);
+        //console.log("current", current);
         // turn string into JSON
         //string_current = (JSON.stringify(current));
         //myobj = JSON.parse(string_current);
