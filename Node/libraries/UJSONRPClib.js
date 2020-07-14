@@ -96,7 +96,7 @@ async function read_stream() {
                     ({value, done} = await reader.read());
 
                     // log value
-                    console.log('Value:', value)
+                    //console.log('Value:', value)
 
                     //concatenating incomplete json objects from the hub
                     if (value) {
@@ -192,7 +192,7 @@ async function retrieve_data() {
         }
         //catch this mysterious thing
         else if (result["m"]== 2) {
-            //console.log(one_line);
+            console.log(one_line);
         }
     }
     catch (error) {
@@ -259,7 +259,6 @@ async function reboot_hub() {
     writer.write(CONTROL_C);
     writer.write(CONTROL_D);
 }
-
 /* get_devices() - get the devices that are connected to each port on the SPIKE Prime
  * 
  * Returns:
@@ -325,9 +324,5 @@ function sendPythonDATA(command){
     console.log("sendDATA: " + commands);
     writer.write(commands);
     writer.write(RETURN);
-}
 
-async function reach_micropy() {
-    setup_writer();
-    writer.write(CONTROL_C);
 }
