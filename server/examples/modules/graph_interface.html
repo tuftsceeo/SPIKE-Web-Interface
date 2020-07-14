@@ -219,6 +219,7 @@ LICENSE: MIT
 
             //checking if port was connected at the main UJSON interface
             var check_port_connection;
+            var execute_once_flag = true;
             check_port_connection = setInterval( async () => {
                 if (port_connected) {
                     //now that port is connected, there is no need to repeatedly check
@@ -229,6 +230,12 @@ LICENSE: MIT
                     
                     //populate the select tags with device information connected to the hub
                     await ports_to_options();
+
+                    //execute once
+                    if (execute_once_flag) {
+                        await change_dataSelect();
+                        execute_once_flag = false;
+                    }
                 }
             }, 100)
 
