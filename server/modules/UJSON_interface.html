@@ -3,43 +3,43 @@
 Project Name: SPIKE Prime Web Interface
 File name: UJSON_interface.html
 Author: Jeremy Jung
-Last update: 7/7/20
+Last update: 7/12/20
 Description: basic interface for reading hub/sensor data and sending UJSONRPC commands
+* this module can be only run with servicedock_index.html *
 Credits/inspirations:
     Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
 History: 
     Created by Jeremy on 6/28/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+Note: 
+Connection to the hub is done via servicedock
 -->
 
 <!-- load global libraries-->
 <script src = "UJSONRPClib.js" type = "text/javascript"></script>
 <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src = "hoverscript_jquery.js" type = "text/javascript"></script>
-<!-- load interface specific logic-->
-<!--
-<script src = "UJSON_UI_script.js" type = "text/javascript"></script>
--->
+
 <div id = "ujsonrpcbox">
     <!-- put "ignore"-->
     <center class = "target_ignore">
         <p class = "target_ignore">
             UJSON RPC
         </p>
-        <input type=button id="connect" name="Connect" value="Connect">
-        <span style="background-color: red" id="connection_status">Status: Disconnected</span>
-        <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
-        <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
-        <button id = "autoget" onclick = >autoGET</button>
-        <button id = "toggleStream">toggleStream</button>
+    </center>
+        <div id = "ujsonrpcbox_panel" class = "target_ignore">
+            <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
+            <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount" onchange = change_retrieval_interval() /> seconds</em>
+            <button id = "toggleStream">toggleStream</button>
+        </div>
         <div id = "include_SL_service">
 
         </div>
         <div id = "datastream" style = "display:block">
-            <textarea cols=20 rows=6 id="REPL" name="REPL" value="" style="font-size: 15px; font-family: Courier;position: relative; left: 20px"/></textarea>
+            <textarea id="REPL" name="REPL" value="" style="font-size: 15px; font-family: Courier;position: relative; left: 20px"/></textarea>
         </div>
-    </center>
         <div id = "portdatastream" style = "display:none">
             <div id = "porthub" class = "portData">
                 <div id ="gyroInfo">
@@ -110,9 +110,6 @@ LICENSE: MIT
 
     //for toggling between UJSON RPC stream or sensor display by port
     var show_datastream = true;
-
-    //"public" variables to trigger external events
-    var port_connected = false;
 
     //parse information about devices connected to the ports and display them
     async function display_port() {
@@ -215,22 +212,6 @@ LICENSE: MIT
             reboot_hub()
         })
 
-        $("#connect").on("click", async () => {
-            //start streaming
-            port_connected = await setup_port();
-            read_stream()
-
-            //assign "public" variable
-            connect_pressed = true;
-
-            //wait until one full json line is read
-            await sleep(3000)
-            //get port sensor readings every interval
-            setPortInt = setInterval( async () => {
-                await display_port();
-            }, 100);
-        })
-
         $("#send").on("click", async () => {
             sendDATA($("#data").val());
         })
@@ -274,10 +255,15 @@ LICENSE: MIT
         position: absolute;
         top: 300px;
         left: 20px;
-        width: 1500px;
+        width: 1400px;
         height: 300px;
         background-color: #4CE0D2;
         border: solid;
+    }
+
+    #ujsonrpcbox_panel {
+        position: relative;
+        left:20px;
     }
 
     #portdatastream {

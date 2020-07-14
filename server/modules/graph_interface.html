@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <!-- 
 Project Name: SPIKE Prime Web Interface
-File name: grapher.html
+File name: graph_interface.html
 Author: Jeremy Jung
 Last update: 7/7/20
 Description: module to be loaded into service dock example that enables graphing of sensor data
-* this module can only run with service dock *
+* this module can be only run with servicedock_index.html *
 Credits/inspirations:
     Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
 History: 
@@ -39,10 +39,13 @@ LICENSE: MIT
 
 <script>
 
-        //parse information about devices connected to the ports
+        // parse information about devices connected to the ports
         async function ports_to_options() {
+
+            // get device info with functions from UJSONRPClib
             ports = await get_devices();
             value = await retrieve_data();
+
             var parsed;
             try { 
                 parsed = await JSON.parse(value);
@@ -50,7 +53,9 @@ LICENSE: MIT
             catch (error) {
                 console.log(value);
             }
+
             data = await parsed.p;
+            
             var index_to_port = ["A","B","C","D","E","F"];
             //parse connected devices' readings
             for ( var key = 0; key < 6; key++ ) {
@@ -179,7 +184,8 @@ LICENSE: MIT
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        //start graphing
+        // start graphing
+        // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
         $(function() {            
             Plotly.plot('chart',[{
                 y:[graph_it()],

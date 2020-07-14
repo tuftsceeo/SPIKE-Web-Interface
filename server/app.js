@@ -54,11 +54,17 @@ app.get('/pong.html', function (req, res) {
     res.sendFile(path.join(__dirname + '/examples/pong.html'));
 })
 
-app.get('/servicedockexample.html', function (req, res) {
-    res.sendFile(path.join(__dirname + '/examples/servicedockexample.html'));
+app.get('/servicedock_index.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/examples/servicedock_index.html'));
 })
 
+app.get('/servicedock_pong.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/examples/servicedock_pong.html'));
+})
 
+app.get('/pong_copy.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/examples/pong_copy.html'));
+})
 //link modules
 
 app.get('/navbar.html', function (req, res) {
@@ -69,12 +75,12 @@ app.get('/UJSON_interface.html', function (req, res) {
     res.sendFile(path.join(__dirname + '/modules/UJSON_interface.html'));
 })
 
-app.get('/syslink_interface.html', function (req, res) {
-    res.sendFile(path.join(__dirname + '/modules/syslink_interface.html'));
+app.get('/main_syslink_interface.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/modules/main_syslink_interface.html'));
 })
 
-app.get('/sd_syslink_interface.html', function (req, res) {
-    res.sendFile(path.join(__dirname + '/modules/sd_syslink_interface.html'));
+app.get('/SL_interface.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/modules/SL_interface.html'));
 })
 
 app.get('/UJSONRPC_send.html', function (req, res) {
@@ -85,12 +91,12 @@ app.get('/servicedock.html', function (req, res) {
     res.sendFile(path.join(__dirname + '/modules/servicedock.html'));
 })
 
-app.get('/grapher.html', function (req, res) {
-    res.sendFile(path.join(__dirname + '/modules/grapher.html'));
+app.get('/graph_interface.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/modules/graph_interface.html'));
 })
 
-app.get('/SL_UJSONRPC.html', function (req, res) {
-    res.sendFile(path.join(__dirname + '/modules/SL_UJSONRPC.html'));
+app.get('/SLxUJSONRPC_interface.html', function (req, res) {
+    res.sendFile(path.join(__dirname + '/modules/SLxUJSONRPC_interface.html'));
 })
 
 //link scripts

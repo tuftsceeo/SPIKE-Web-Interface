@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <!-- 
 Project Name: SPIKE Prime Web Interface
-File name: SL_UJSONRPC.html
+File name: SLxUJSONRPC_interface.html
 Author: Jeremy Jung
 Last update: 7/7/20
 Description: module to be loaded into servicedockexample 
             for sending  UJSONRPC commands to hub with data 
             from SystemLink
-* this module can only run with service dock *
+* this module can be only run with servicedock_index.html *
 Credits/inspirations:
 History: 
     Created by Jeremy on 7/7/20
@@ -21,8 +21,8 @@ LICENSE: MIT
 <script src = "hoverscript_jquery.js" type = "text/javascript"></script>
 <script src = "UJSONRPClib.js" type = "text/javascript"></script>
 <div id = "slujsonbox">
-    <center>
-        <head>
+    <center class = "target_ignore">
+        <head class = "target_ignore">
             SystemLink driven UJSON RPC
         </head>
         <!---
@@ -58,17 +58,19 @@ LICENSE: MIT
     }
 
     var all_tags = [];
-    
+
+    var available_scripts = ["display_image", "display_text"];
+
     var check_APIkey_and_port_connected;
     check_APIkey_and_port_connected = setInterval( async () => {
         //check connection variables at servicedock and UJSONRPC interface
         if (port_connected) {
             if (APIkey_valid_at_SD) {
                 clearInterval(check_APIkey_and_port_connected);
-                console.log("collected APIkey at sd_syslink_interface", APIkey);
-                //ㅎㄷㅅ 솓 
+                console.log("collected APIkey at sd_syslink_interface", SD_APIkey);
+                $("#slujson_button .status").css("background-color", "green");
                 //get all tag names from cloud and display it on UI
-                await get_tag_list(APIkey).then(
+                await get_tag_list(SD_APIkey).then(
                     (tags_list) => all_tags = tags_list
                 );
                 initSelects();
@@ -81,17 +83,19 @@ LICENSE: MIT
             }
         }
     }, 500)
-
-    var available_scripts = ["display_image", "display_text"];
+    
     $(document).ready( () => {
+        //make the interface draggable
         dragElement("slujsonbox")
 
+        // parse for cloudTagValue in command when "send" is clicked
         var slujson_send = document.getElementById("slujson_send");
         slujson_send.addEventListener("click", async () => {
             praseSLUJSONcommand();
         })
-    })
 
+    })
+    // initialize selects
     async function initSelects() {
         for (var i = 0; i < available_scripts.length; i++) {
             var select_element = $("<option></option>").text(available_scripts[i])
@@ -107,6 +111,7 @@ LICENSE: MIT
             $("#slujson_tagSelect").append(select_element)
         }
     }
+
     //parse the cloudTagValue() command inserted at the textbox and execute it
     async function praseSLUJSONcommand() {
         let dataInput = document.getElementById("slujson_data");

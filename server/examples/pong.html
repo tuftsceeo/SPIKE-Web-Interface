@@ -7,6 +7,7 @@ Last update: 6/24/20
 Description: example of using sensors to move around html elements
 Credits/inspirations:
     Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
+    straker (For the Pong) https://gist.github.com/straker/81b59eecf70da93af396f963596dfdc5
 History: 
     Created by Jeremy on 6/19/20
 LICENSE: MIT
@@ -14,29 +15,45 @@ LICENSE: MIT
 
 USAGE: 
 - Connect a motor to each side of the hub. Control the paddles with the motor
--->
-<html>
-<script src = "../libraries/JSONRPClib.js" type = "text/javascript"></script>
-<script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<head>
-  <title></title>
-  <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-  }
 
-  body {
-    background: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+NOTE: the main() function is where service dock's already declared variables 
+      are used to make this demo possible
+-->
+
+
+<style>
+#pongbody {
+  height: 100%;
+  margin: 0;
+}
+#pongbody {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body {
+  background: black;
+}
+</style>
+<style>
+
+  #p1paddle {
+      height: 100px;
+      width: 20px;
+      background-color: #000dff;
+      position: relative;
+  }
+  
+  #p2paddle {
+      height: 100px;
+      width: 20px;
+      background-color: #ff0000;
+      position: relative;
+      left: 1400px;
   }
   </style>
-</head>
-<span style="background-color: red; position: absolute; left: 530px; top: 20px;" id="connection_status">Status: Disconnected</span>
-<input type=button id="connect" name="Connect" value="Connect" style="position: absolute; left: 685px; top: 20px;">
-<body>
+
+<div id = "pongbody">
 <canvas width="750" height="585" id="game"></canvas>
 <script>
 const canvas = document.getElementById('game');
@@ -50,7 +67,6 @@ var paddleSpeed = 6;
 var leftpaddleSpeed = 6;
 var rightpaddleSpeed = 6;
 var ballSpeed = 5;
-var hub_connected = false;
 
 const leftPaddle = {
   // start in the middle of the game on the left side
@@ -101,7 +117,7 @@ function collides(obj1, obj2) {
 function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
-  if ( hub_connected ) {
+  if ( port_connected ) {
     main();
   }
   // move paddles by their velocity
@@ -224,18 +240,10 @@ document.addEventListener('keyup', function(e) {
   }
 });
 
-let connectbutton = document.getElementById('connect');
-//prompt for a connection to a specified port, start reading stream
-connectbutton.addEventListener('click', async() => {
-  await setup_port();
-  hub_connected = true;
-  read_stream();
-});
 
 async function main() {
   value = await retrieve_data();
   ports = await get_devices();
-  console.log(value);
   parsed = await JSON.parse(value);
   data = parsed.p;
   var index_to_port = ["A","B","C","D","E","F"];
@@ -269,26 +277,4 @@ async function main() {
 // start the game
 requestAnimationFrame(loop);
 </script>
-</body>
-</html>
-
-<style>
-  body {
-    background-color: #4CE0D2;
-}
-
-#p1paddle {
-    height: 100px;
-    width: 20px;
-    background-color: #000dff;
-    position: relative;
-}
-
-#p2paddle {
-    height: 100px;
-    width: 20px;
-    background-color: #ff0000;
-    position: relative;
-    left: 1400px;
-}
-</style>
+</div>

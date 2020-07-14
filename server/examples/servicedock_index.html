@@ -11,6 +11,11 @@ History:
     Created by Jeremy on 7/4/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+PUBLIC VARIABLES:
+APIkey_valid_at_SD (boolean) - whether a valid APIkey was entered for systemlink service
+SD_APIkey (string) - string containing the APIkey
+port_connected (boolean) - whether SPIKE hub was connected with web serial
 -->
 <head>
 <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
@@ -22,16 +27,15 @@ LICENSE: MIT
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
 </head>
 <html>
-    <head>
-        <title>
-            Service Dock example
-        </title>
-    </head>
+    <div id = "servicedock_index">
     <div id = "container">
         <div id = "sd_container">
         </div>
     </div>
     <script>
+        // toggle variables for services
+        // if service_loaded = true, the service's HTML file has been loaded
+        // if service_hidden = true, the service is toggled hidden from view
         var sl_service_loaded = false;
         var sl_service_hidden = false;
 
@@ -47,10 +51,15 @@ LICENSE: MIT
         //"public" variables to trigger external events
         var APIkey_valid_at_SD = false;
         var SD_APIkey = "";
-
+        var port_connected = false;
+        
         //load service dock
         $( function () {
+
             $('#sd_container').load('servicedock.html', async function () {
+                
+                /* initialize buttons loaded from service dock */
+
                 //main service dock buttons
                 sl_button = document.getElementById("sl_button");
                 spike_button = document.getElementById("spike_button");
@@ -58,10 +67,38 @@ LICENSE: MIT
                 //sub service dock buttons
                 graph_button = document.getElementById("graph_button");
                 ports_button = document.getElementById("ports_button");
-                apikey_input = document.getElementById("keyinputfield");
                 slujson_button = document.getElementById("slujson_button")
+                sl_api_button = document.getElementById("API_button")
+                ujsonrpc_button = document.getElementById("ujsonrpc_button")
                 
-                //check APIkey
+                //service initialization
+                apikey_input = document.getElementById("keyinputfield");
+                connect_input= document.getElementById("connect")
+
+                /* Description: "conect to port" button event listener
+                 * Effects:
+                 * - sets up port, startings reading UJSON RPC stream
+                 * - continously gets connected devices information (ASYNC INTERVAL)
+                 */
+                connect_input.addEventListener("click", async () => {
+                     //start streaming
+                    port_connected = await setup_port();
+                    read_stream()
+
+                    //wait until one full json line is read
+                    await sleep(3000)
+                    //get port sensor readings every interval
+                    setPortInt = setInterval( async () => {
+                        await display_port();
+                    }, 100);
+                })
+
+                /* Description: "apikey_input" input event listener
+                 * Effects:
+                 * - checks if entered Systemlink API key is valid
+                 * - assigns the apikey to {SD_APIkey} public variable 
+                 * - sets {APIkey_valid_at_SD} public var to true 
+                 */
                 apikey_input.addEventListener("input", async () => {
                     if( await auth_key(apikey_input.value)) {
                         $("#key_valid").html("Valid APIkey!");
@@ -72,16 +109,19 @@ LICENSE: MIT
                     }
                 })
 
-                //when sl_button is clicked
-                sl_button.addEventListener("click", () => {
+                /* Description: "system link button" button event listener
+                 * Effects:
+                 * - loads SL_interface.html
+                 * - display or hide the systemlink interface when clicked
+                 */
+                sl_api_button.addEventListener("click", async () => {
+
                     //load the syslinkbox unless it has been already loaded
                     if ( !sl_service_loaded ) {
                         sl_service_loaded = true;
                         var sl_container = "<div id = 'sl_container'></div>";
-                        $("#container").append(sl_container).then(
-                            $('#sl_container').load('sd_syslink_interface.html')
-                        );
-                        console.log("help")
+                        await $("#container").append(sl_container);
+                        await $('#sl_container').load('SL_interface.html');
                     }
                     //when button is clicked first time after it loads, hide syslinkbox
                     else {
@@ -95,13 +135,20 @@ LICENSE: MIT
                         }
                     }
 
-                })
+                });
 
                 /* button event listeners for SPIKE PRIME RELATED */
-                spike_button.addEventListener("click", async () => {
-                    //load the syslinkbox unless it has been already loaded
+                
+                /* Description: "ujsonrpc button" button event listener
+                 * Effects:
+                 * - loads UJSON_interface.html
+                 * - display or hide the UJSON RPC interface when clicked
+                 */
+                ujsonrpc_button.addEventListener("click", async () => {
+                    //load the interface unless it has been already loaded
                     if ( !spike_service_loaded ) {
                         spike_service_loaded = true;
+
                         var spike_container= "<div id = 'spike_container'></div>";
                         await $("#container").append(spike_container)
                         await $('#spike_container').load('UJSON_interface.html')
@@ -118,16 +165,20 @@ LICENSE: MIT
                         }
                     }
                 })
-
+                /* Description: "graph button" button event listener
+                 * Effects:
+                 * - loads graph_interface.html
+                 * - display or hide the graph interface when clicked
+                 */
                 graph_button.addEventListener("click", async () => {
                     //load the graph unless it has been already loaded
                     if ( !graph_service_loaded ) {
                         graph_service_loaded = true;
                         var graph_container= "<div id = 'graph_container'></div>";
                         await $("#container").append(graph_container);
-                        await $('#graph_container').load('grapher.html');
+                        await $('#graph_container').load('graph_interface.html');
                     }
-                    //when button is clicked first time after it loads, hide syslinkbox
+                    //when button is clicked first time after it loads, hide interface
                     else {
                         if ( !graph_service_hidden ) {
                             $("#graphbox").css("display","none");
@@ -140,15 +191,22 @@ LICENSE: MIT
                     }
                 })
 
+                /* Description: "slujson_button" button event listener
+                 * Effects:
+                 * - loads SLxUJSONRPC_interface.html
+                 * - display or hide the SLxUJSONRPC interface when clicked
+                 */
                 slujson_button.addEventListener("click", async () => {
-                    //load the graph unless it has been already loaded
+                    //load the interface unless it has been already loaded
                     if ( !slujson_service_loaded ) {
                         slujson_service_loaded = true;
                         var slujson_container= "<div id = 'slujson_container'></div>";
                         await $("#container").append(slujson_container);
-                        await $('#slujson_container').load('SL_UJSONRPC.html');
+                        await $('#slujson_container').load('SLxUJSONRPC_interface.html');
+                        
+                        $("#slujsonbox").css("display","block");
                     }
-                    //when button is clicked first time after it loads, hide syslinkbox
+                    //when button is clicked first time after it loads, hide interface
                     else {
                         if ( !slujson_service_hidden ) {
                             $("#slujsonbox").css("display","none");
@@ -166,6 +224,11 @@ LICENSE: MIT
 
         })
 
-        
+        //sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
     </script>
+    </div>
 </html>
