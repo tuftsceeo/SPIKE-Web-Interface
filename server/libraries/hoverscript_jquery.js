@@ -12,7 +12,7 @@ LICENSE: MIT
 
 Usage:
 dragElement("div id") in html modules that you want to move around.
-assign class = "target-ignore" in HTML elements in those divs to make them draggable as well
+assign class = "target_ignore" in HTML elements in those divs to make them draggable as well
 */
 
 //drag an element 

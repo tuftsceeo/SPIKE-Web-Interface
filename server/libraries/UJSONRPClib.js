@@ -42,16 +42,14 @@ const filter = {
     usbVendorId: VENDOR_ID 
 };
 
-async function reboot_hub() {
-    console.log("rebooting")
-    // make sure ready to write to device
-    setup_writer();
-    writer.write(CONTROL_C);
-    writer.write(CONTROL_D);
-}
-
-//to be run once before getting stream
-//list the available ports and initialize it
+/* setup_port() - prompt user to select web serial port and make connection to SPIKE Prime
+ * 
+ * Effect:
+ * Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled)
+ *
+ * Note:
+ * This function is to be executed before reading in JSON RPC streams from the hub
+ */
 async function setup_port() {
     success = false;
     port = await navigator.serial.getPorts();
@@ -71,19 +69,30 @@ async function setup_port() {
     return success
 }
 
-//continuously take input from the hub 
+
+/* read_stream() - Continuously take UJSON RPC input from SPIKE Prime
+ * 
+ * Effect:
+ * Changes "#connection_status" icon in servicedock.html
+ * 
+ */
 async function read_stream() {
     try {
-        // now start reading
+        // read when port is set up
         while (port.readable) {
+            // change connection status in HTML elements
             document.getElementById("connection_status").innerHTML = "Status: Connected";
 			document.getElementById("connection_status").style.backgroundColor = "green";
+            
+            // initialize readers
             const decoder = new TextDecoderStream();
             const readableStreamClosed = port.readable.pipeTo(decoder.writable);
             reader = decoder.readable.getReader();
+            
+            // continuously get
             while (true) {
                 try {
-                    // read
+                    // read UJSON RPC stream ( actual data in {value} )
                     ({value, done} = await reader.read());
 
                     // log value
@@ -91,20 +100,33 @@ async function read_stream() {
 
                     //concatenating incomplete json objects from the hub
                     if (value) {
+
+                        /* stringify input value and concatenate to jsonline */
+                        
                         json_string = JSON.stringify(value)
+                        jsonline = jsonline + value
+
+                        /* parse jsonline where the JSON object starts and ends */
+                        
                         rcb_index = json_string.indexOf('}')
                         lcb_index = json_string.indexOf('{')
-                        jsonline = jsonline + value
+                        // if the right curly brace exists (end of json)
                         if (rcb_index > -1) {
-                            //console.log(jsonline[0])
-                            if (jsonline[0] === "{") {
-                                //get substring until instance of }\r
 
-                                // when REPL is declared with vanilla js
+                            // if the first index is a left curly brace (start of json)
+                            if (jsonline[0] === "{") {
+
+                                /* get substring until instance of }\r */
+
+                                // when REPL is declared with vanilla js (ex) document.getElementById
                                 one_line = jsonline.substring(0,jsonline.indexOf('}')+2)
-                                // when REPL is decalred with jquery
+
+                                // when REPL is decalred with jquery (ex) $("#REPL")
                                 //one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
+                            
                             }
+
+                            // reset jsonline to concatenate next stream
                             jsonline = ""
                         }
                     }
@@ -114,6 +136,7 @@ async function read_stream() {
                         console.log("[readLoop] DONE", done);
                     }
                 }
+                // error handler
                 catch (error) {
                     console.log('[readLoop] ERROR', error);
                     // error detected: release
@@ -144,7 +167,22 @@ async function read_stream() {
     }
 }
 
-//return the latest complete json object stream retrieved from Hub
+//////////////////////////////////////////
+//                                      //
+//        While reading stream          //
+//                                      //
+//////////////////////////////////////////
+
+
+/* retrieve_data() - get the latest complete line of UJSON RPC from stream 
+ * 
+ * Returns:
+ * {one_line} (string) - a string represent a JSON object from UJSON RPC
+ * 
+ * Effect:
+ * Logs in the console when some particular messages are caught
+ * 
+ */
 async function retrieve_data() {
     try {
         result = await JSON.parse(one_line)
@@ -154,15 +192,19 @@ async function retrieve_data() {
         }
         //catch this mysterious thing
         else if (result["m"]== 2) {
-            //console.log(one_line);
+            console.log(one_line);
         }
     }
     catch (error) {
         //console.log('[retrieveData] ERROR', error);
     }
+    console.log("typof one_line", typeof one_line)
     return one_line
 }
-// helper function used when sending commands
+
+
+/* setup_writer() - initialize writer object before sending commands
+ */
 function setup_writer() {
     // if writer not yet defined:
     if (typeof writer === 'undefined') {
@@ -173,49 +215,70 @@ function setup_writer() {
     }
 }
 
-// generic send data function
-// command is a string to send (or sequence of commands, separated by new lines
+/* sendDATA() - send UJSON RPC command to the SPIKE Prime
+ * 
+ * Parameters:
+ * {command} (string) - a string to send (or sequence of commands, separated by new lines)
+ * 
+ * Effect:
+ * May make the SPIKE Prime do something
+ * 
+ */
 async function sendDATA(command) {
-    console.log ("command", command);
     // look up the command to send
-    commands = command.split("\n"); // split on new line
-    console.log("sendDATA: " + commands);
+    //commands = command.split("\n"); // split on new line
+    commands = command
+    // console.log("sendDATA: " + commands);
 
     // make sure ready to write to device
     setup_writer();
 
     // go through each line of the command
     // trim it, send it, and send a return...
-    for (i=0; i<commands.length; i++) {
+    for ( var i = 0; i < commands.length; i++ ) {
+        console.log("commands.length", commands.length)
         current = commands[i].trim();
+        console.log("current", current);
         // turn string into JSON
-        myobj = JSON.parse(current);
+        //string_current = (JSON.stringify(current));
+        //myobj = JSON.parse(string_current);
+        myobj = await JSON.parse(current);
         // turn JSON back into string and write it out
         writer.write(JSON.stringify(myobj));
         writer.write(RETURN); // extra return at the end
     }
 }
 
-//NOT IMPLEMENTED
-//reach the micropy level of REPL
-function sendPythonDATA(command){
-    commands = command.split("\n"); // split on new line
-    console.log("sendDATA: " + commands);
-    writer.write(commands);
-    writer.write(RETURN);
 
+/* reboot_hub() - send character sequences to reboot SPIKE Prime
+ * 
+ */
+async function reboot_hub() {
+    console.log("rebooting")
+    // make sure ready to write to device
+    setup_writer();
+    writer.write(CONTROL_C);
+    writer.write(CONTROL_D);
 }
-
-//return a json dictionary detailing what device is connected to each port
+/* get_devices() - get the devices that are connected to each port on the SPIKE Prime
+ * 
+ * Returns:
+ * {ports} (object/dictionary) - an object with keys as port letters and values as strings of connected devices
+ * 
+ */
 async function get_devices() {
     if (one_line) {
         var data_stream;
+        
+        //get a line from the latest JSON RPC stream
         try{
             data_stream = await JSON.parse(one_line)
         }
         catch (e){
             console.log("error parsing one_Line at get_devices", one_line);
         }
+
+        //initialize ports to send
         var ports = 
         {
             "A": "None",
@@ -226,9 +289,11 @@ async function get_devices() {
             "F": "None"
         }
         var index_to_port = ["A","B","C","D","E","F"]
+
         data_stream = data_stream.p
+
+        // iterate through each port and assign a device_type to {ports}
         for (var key = 0; key < 6; key++) {
-            //ignore errors
             try {
                 var the_key = index_to_port[key]
                 if (data_stream[key][0] == 48 || data_stream[key][0] == 49) {
@@ -246,9 +311,19 @@ async function get_devices() {
                 else if (data_stream[key][0] == 0) {
                     ports[the_key] = "None"
                 }
-            } catch (e) {}
+            } catch (e) {} //ignore errors
         }
         return ports
-        //console.log(ports)
     }
+}
+
+
+//NOT IMPLEMENTED
+//reach the micropy level of REPL
+function sendPythonDATA(command){
+    commands = command.split("\n"); // split on new line
+    console.log("sendDATA: " + commands);
+    writer.write(commands);
+    writer.write(RETURN);
+
 }

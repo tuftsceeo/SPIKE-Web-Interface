@@ -12,10 +12,19 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
-//check API key
+
+/* auth_key() - check if Systemlink API key is valid for use
+ * 
+ * Parameters:
+ * {apikey} (string) - Systemlink API key
+ * 
+ * Return: 
+ * {is_valid} (boolean) - (TRUE if API key valid) (FALSE if invalid)
+ * 
+ */
 async function auth_key(apikey) {
-    console.log(apikey)
     var is_valid = false
+    //send get request
     await $.ajax({
         url: "https://api.systemlinkcloud.com/niauth/v1/auth",
         headers: {
@@ -32,9 +41,22 @@ async function auth_key(apikey) {
     return is_valid
 }
 
-//get a list of already existing tags
+
+/* get_tag_list() - get the list of tags existing in the cloud
+ * 
+ * Parameters:
+ * {apikey} (string) - Systemlink API key
+ * 
+ * Return: 
+ * {tag_list} (array) - an array of the names of the tags
+ * 
+ */
 async function get_tag_list(apikey) {
+    
+    // return to which tags will be appended
     var tag_list = []
+
+    //send get request
     await $.ajax({
         url: "https://api.systemlinkcloud.com/nitag/v2/tags",
         headers: {
@@ -43,27 +65,41 @@ async function get_tag_list(apikey) {
         }
     })
     .done(function(data) {
-     if ( console && console.log ) {
-         console.log( "Sample of data:", data);
-         var number_of_tags = data.totalCount
-         console.log("total count:" + number_of_tags)
-         var i
-         for (i = 0; i < number_of_tags; i++) {
-             //js keys are accessed with [] for integer keys
-             tag_name = data.tags[i].path
-             tag_list.push(tag_name)
-             console.log(tag_name)
-         }
-       }
+        //check if console is available (purely for debugging purposes)
+        if ( console && console.log ) {
+            
+            // the total number of tags
+            var number_of_tags = data.totalCount
+
+            for ( var i = 0; i < number_of_tags; i++ ) {
+                // js keys are accessed with [] for integer keys
+                tag_name = data.tags[i].path
+                // append to result
+                tag_list.push(tag_name)
+            }
+        }
     });
+
     return tag_list
 }
 
-//returns value of a tag on Systemlink
-//example:
-//value(return) : { type: "BOOLEAN", value: TRUE }
+/* get_value() - get the "value" of a tag
+ * 
+ * Parameters:
+ * {apikey} (string) - Sytemlink API key
+ * {tag_path} (string) - name of the tag
+ * 
+ * Return: 
+ * {response_data} (object) - the value of the tag
+ * ex) response_data = { type: "BOOLEAN", value: TRUE }
+ * 
+ * Note:
+ * The return is not the actual value, but an object, in which 
+ * there is the value of the tag and the value's datatype
+ */
 async function get_value(apikey, tag_path) {
     var response_data;
+    
     await $.ajax({
         url: "https://api.systemlinkcloud.com/nitag/v2/tags/" + tag_path + "/values/current",
         "method": "GET",
@@ -80,6 +116,45 @@ async function get_value(apikey, tag_path) {
     })
     return response_data;
 }
+
+/* update_value() - update current value of an existing tag
+ * 
+ * Parameters:
+ * {apikey} (string) - Sytemlink API key
+ * {tag_path} (string) - name of the tag
+ * {inputType} (string) - data type of the new value
+ * {new_value} - the new value of the tag
+ * 
+ */
+async function update_value(apikey, tag_path, inputType, new_value) {
+    // TO-DO; decide whether tag is selected or new tag to be created
+    let data = {"value": {"type": inputType, "value": new_value}};
+    await $.ajax({
+        url: 
+        "https://api.systemlinkcloud.com/nitag/v2/tags/" + tag_path + "/values/current",
+        "method": "PUT",
+        headers: {
+            "Content-type": "application/json",
+            "x-ni-api-key": apikey
+        },
+        data: JSON.stringify(data)
+    }).done(function(data) {
+        if ( console && console.log ) {
+            console.log("newValue: " + new_value)
+            console.log( "Sucess; Sample of data:", data);
+        }
+    }).fail(function (data){
+        if ( console && console.log ) {
+            console.log( "Failed; Sample of data:", data);
+        }
+    })
+}
+
+//////////////////////////////////////////
+//                                      //
+//        UNIMPLEMENTED FUNCTIONS       //
+//                                      //
+//////////////////////////////////////////
 
 //download a file from the cloud
 //doesn't work yet (conflict with Cross Origin)
@@ -188,29 +263,4 @@ async function message_service(apikey) {
             console.log( "Failed; Sample of data:", data);
         }
     })  
-}
-
-//update current value of an existing tag
-async function update_value(apikey, tag_path, inputType, new_value) {
-    // TO-DO; decide whether tag is selected or new tag to be created
-    let data = {"value": {"type": inputType, "value": new_value}};
-    await $.ajax({
-        url: 
-        "https://api.systemlinkcloud.com/nitag/v2/tags/" + tag_path + "/values/current",
-        "method": "PUT",
-        headers: {
-            "Content-type": "application/json",
-            "x-ni-api-key": apikey
-        },
-        data: JSON.stringify(data)
-    }).done(function(data) {
-        if ( console && console.log ) {
-            console.log("newValue: " + new_value)
-            console.log( "Sucess; Sample of data:", data);
-        }
-    }).fail(function (data){
-        if ( console && console.log ) {
-            console.log( "Failed; Sample of data:", data);
-        }
-    })
 }
