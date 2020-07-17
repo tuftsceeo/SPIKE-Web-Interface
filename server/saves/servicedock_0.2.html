@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_0.2.html
+Author: Jeremy Jung
+Last update: 7/7/20
+Description: service dock markup
+* this module can be only run with servicedock_index.html *
+Credits/inspirations:
+    Service Dock by Ethan Danahy
+History: 
+    Created by Jeremy on 7/5/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+-->
+<link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+<script src = "./classes/SPIKE_Service.js" type = "text/javascript"></script>
+<script src="./classes/SystemLink_Service.js" type="text/javascript"></script>
+<div id = "servicedock">
+    <div id = "explanation" style = "display: none">
+        <center id = "target_ignore">
+            Enabling flag on Google Chrome
+        </center>
+        <ol>
+            <li>Go to the URL: chrome://flags</li>
+            <li>Search "Experimental Web Platform"</li>
+            <li><em>ENABLE</em> Experimental Web Platform (#enable-experimental-web-platform-features)</li>
+            <li>Restart your Chrome web browser</li>
+        </ol>
+    </div>
+    <div id = "explain">
+        <button id = "explain_button" class = "SD_button">
+            <i class = "fas fa-question"></i>
+        </button>
+    </div>
+    <button id = "hi" ></button>
+        <!--<i style = "background: url(./classes/cloud.png) no-repeat; background-origin: content-box; "></i>-->
+    </button>
+    <!--
+    <div id = "sl_service">
+        <button id = "sl_button" class = "SD_button">
+            <i class="fas fa-cloud"></i>
+            <div class = "status"></div>
+        </button>
+        <div id = "apikey_input" style = "display:none">
+            <center>
+                API Key
+                <input type = "text" id = "keyinputfield">
+                <span id = "key_valid"> Invalid </span>
+            </center>
+        </div>
+    </div>
+    -->
+    <div id = "spike_service">
+        <button id = "spike_button" class = "SD_button">
+            <i class="fas fa-th"></i>
+            <div class = "status"></div>
+        </button>
+    </div>
+</div>
+<script>
+
+    var spike_service_loaded = false;
+    var systemlink_service_loaded = false;
+
+    // instantiate a SPIKE service object
+    var mySPIKEService = new SPIKE_Service();
+    //instantiate a systemlink service object
+    var mySLService = new SystemLink_Service();
+
+
+    var toggle_question = false;
+    var spike_button_clicked = false;
+    var sl_button_clicked = false;
+    
+    spike_button = document.getElementById("spike_button");
+    systemlink_button = document.getElementById("sl_button");
+    explain_button = document.getElementById("explain_button");
+    explanation = document.getElementById("explanation");
+
+    window.addEventListener("load", function () {
+        console.log("servicedock 0.2 loaded!");
+
+        /*     SPIKE SERVICE button event listener   */
+        spike_button.addEventListener("click", async function () {
+            //initialize object
+            var serviceInitialized = await mySPIKEService.init();
+
+            // mySPIKEService was initialized ( connected to WebSerial and currently streaming UJSONRPC)
+            if (serviceInitialized) {
+                console.log("SPIKE service initialized");
+                spike_button_status = spike_button.querySelector(".status");
+                spike_button_status.style.background = "green";
+                spike_service_loaded = true;
+            }
+
+        })
+
+        /*     SYSTEM LINK SERVICE button event listener   */
+        systemlink_button.addEventListener("click", async function() {
+            if (!sl_button_clicked) {
+
+                //initialize
+                var serviceInitialized = await mySLService.init();
+
+                // SystemLink Service was initialized ( APIkey is valid )
+                if (serviceInitialized) {
+                    console.log("Systemlink service initialized");
+                    sl_button_status = systemlink_button.querySelector(".status");
+                    sl_button_status.style.background = "green";
+                    systemlink_service_loaded = true;
+                    sl_button_clicked = true;
+                }
+            }
+        })
+
+        /*     explain button event listener   */
+        explain_button.addEventListener("click", function () {
+            if (toggle_question) {
+                explanation.style.display = "none";
+                toggle_question = false;
+            }
+            else {
+                explanation.style.display = "block";
+                toggle_question = true;
+            }
+        })
+
+    })
+</script>
+
+<style>
+    .SD_button {
+        background-color: #A2E1EF;
+        border: none;
+        color: white; 
+        font-size: 30px; /*font-size determines size of loaded fa icon*/
+        cursor: pointer; 
+        margin: 4px 0px;
+        border-radius: 10px;
+        width: 50px;
+        height: 50px;
+        position: relative;
+    }
+
+    .SD_option {
+        background-color: rgb(173, 245, 110);
+        border: none; 
+        color: white; 
+        font-size: 25px; /*font-size determines size of loaded fa icon*/
+        cursor: pointer; 
+        margin: 4px 0px;
+        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        position: relative;
+    }
+
+    .SD_button .status {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        margin: -4px 34px;
+    }
+
+    .SD_option .status {
+        height: 15px;
+        width: 15px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        margin: -4px 25px;
+    }
+
+    #apikey_input { 
+        position: relative; 
+        top:5px;    
+        height: 40px;
+        width: 260px;
+        margin:10px;
+        background-color: rgb(173, 245, 110);
+    }
+
+    .SD_button:hover, .SD_option:hover {
+        color:#000000;
+        background-color:#FFFFFF;
+    }
+
+    #hi:hover {
+        color:#000000;
+        background-color:#FFFFFF;
+    }
+
+    #hi {
+        width: 50px;
+        height: 50px;
+        background: url(./classes/cloud.png) no-repeat;
+        background-size: 40px 40px;
+        background-color: #A2E1EF;
+        border: none;
+        background-position: center;
+        cursor: pointer; 
+        border-radius: 10px;
+        position: relative;
+        margin: 4px 0px;
+    }
+
+    #explanation {
+        position: absolute;
+        left: 200px;
+        background-color: #A2E1EF;
+        height: 200px;
+        width: 500px;
+    }
+</style>

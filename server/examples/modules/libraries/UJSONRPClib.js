@@ -55,7 +55,7 @@ const filter = {
 async function setup_port() {
     success = false;
     port = await navigator.serial.getPorts();
-    console.log("ports:", port);
+    console.log("WebSerialports:", port);
     try {
          // select device
         port = await navigator.serial.requestPort({
