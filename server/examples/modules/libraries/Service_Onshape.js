@@ -2,18 +2,22 @@
 Project Name: SPIKE Prime Web Interface
 File name: Service_Onshape.js
 Author: Jeremy Jung
-Last update: 7/15/20
-Description: SPIKE Service Library (OOP)
+Last update: 7/18/20
+Description: Onshape Service Library (OOP)
 Credits/inspirations:
-    Based on code wrriten by Ethan Danahy, Chris Rogers
+    The Onshape Team (Milan, Teo, Matt)
+    https://github.com/onshape-public/apikey
 History:
-    Created by Jeremy on 7/15/20
+    Created by Jeremy on 7/18/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+Note:
+Doesn't work (conflict with Same Origin policy)
+Onshape API CORS disabled? or error in request body.
 */
 
-
-function OnshapeService() {
+function ServiceOnshape() {
 
     //////////////////////////////////////////
     //                                      //
