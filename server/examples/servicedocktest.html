@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+    <div id="servicedock" style="float:left;">
+        <service-systemlink id="service_systemlink"></service-systemlink>
+        <service-spike id="service_spike"></service-spike>
+    </div>
+    <input type = "button" id = "button1" value = "buttonONE">
+    <script>
+        mySPIKE = document.getElementById("service_spike").getService();
+        buttonOne = document.getElementById("button1");
+        buttonOne.addEventListener("click", function () {
+            mySPIKE.rebootHub();
+        })
+    </script>
+
+</html>

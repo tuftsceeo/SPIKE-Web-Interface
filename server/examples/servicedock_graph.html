@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+    
+</html>
+<script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
+<script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+<script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+<body>
+    <div id="servicedock" style="float:left;">
+        <service-spike id = "service_spike1"></service-spike>
+        <service-spike id="service_spike2"></service-spike>
+    </div>
+    <div id="mySPIKE1_graphbox" class = "graphbox">
+        <div id="selectbox" class="target_ignore">
+            <select id="portSelect" class="select_components target_ignore">
+                <option id="A">A</option>
+                <option id="B">B</option>
+                <option id="C">C</option>
+                <option id="D">D</option>
+                <option id="E">E</option>
+                <option id="F">F</option>
+            </select>
+            <select id="dataSelect" class="select_components target_ignore"></select>
+        </div>
+        <div id="chart"></div>
+    </div>
+
+    <div id="mySPIKE2_graphbox" class = "graphbox">
+        <div id="selectbox" class="target_ignore">
+            <select id="portSelect" class="select_components target_ignore" onchange=change_dataSelect()>
+                <option id="A">A</option>
+                <option id="B">B</option>
+                <option id="C">C</option>
+                <option id="D">D</option>
+                <option id="E">E</option>
+                <option id="F">F</option>
+            </select>
+            <select id="dataSelect" class="select_components target_ignore" onchange=graph_it()></select>
+        </div>
+        <div id="chart"></div>
+    </div>
+</body>
+<script>
+    /* graphInterface object*/
+    function graphInterface() {
+
+        let graphBoxId;
+        let Service_SPIKE;
+
+        // first param: Service_SPIKE object
+        // second param: #graphbox element id
+        function init(serviceSPIKEInput, graphBoxInput) {
+            graphBoxId = graphBoxInput;
+            Service_SPIKE = serviceSPIKEInput;
+        }
+
+        async function ports_to_selects() {
+            var portsInfo = await Service_SPIKE.getPortsInfo();
+            console.log("portsInfo",portsInfo)
+
+            // iterate through all ports and assign its device types to options
+            for (var key in portsInfo) {
+                var letter = key;
+                var device_type = portsInfo[key].device;
+                var portHTML = $("#" + letter)
+                $("#" + graphBoxId).find(portHTML).text(device_type + "(" + letter + ")");
+            }
+        }
+
+        //initialize options of data to graph based on port/device selection
+        async function change_dataSelect() {
+            //get the device type
+            var selectedPortHTML = $("#portSelect option:selected")
+            var str_length = $("#" + graphBoxId).find(selectedPortHTML).text().length
+            var device_type = await $("#" + graphBoxId).find(selectedPortHTML).text().substring(0, str_length - 3);
+            var dataHTML = $("#dataSelect")
+            //change options of available sensor data by device type
+            if (device_type == "smallMotor" || device_type == "bigMotor") {
+                $("#" + graphBoxId).find(dataHTML).empty();
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'speed'>speed</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'angle'>angle</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'uAngle'>unit angle</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'power'>power</option>")
+            }
+            if (device_type == "ultrasonic") {
+                $("#" + graphBoxId).find(dataHTML).empty();
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'distance'>distance</option>")
+            }
+            if (device_type == "force") {
+                $("#" + graphBoxId).find(dataHTML).empty();
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'force'>force</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'pressed'>true/false</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'forceSensitive'>precise force</option>")
+            }
+            if (device_type == "color") {
+                $("#" + graphBoxId).find(dataHTML).empty();
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'reflected'>reflected</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'ambient'>ambient light</option>")
+            }
+        }
+
+        // gets selected data to display from html element and returns its value
+        async function graph_it() {
+            var index_to_port = ["A", "B", "C", "D", "E", "F"];
+            //get ids of selected port and data to display
+            var selectedPortHTML = $("#portSelect option:selected")
+            var selectedDataHTML = $("#dataSelect option:selected")
+            var selected_port = $("#" + graphBoxId).find(selectedPortHTML).attr('id');
+            var selected_data = $("#" + graphBoxId).find(selectedDataHTML).attr('id');
+
+            var info = await Service_SPIKE.getPortInfo(selected_port);
+            var y_variable = info.data[selected_data];
+            return y_variable;
+        }
+
+        return {
+            init: init,
+            graph_it: graph_it,
+            change_dataSelect: change_dataSelect,
+            ports_to_selects: ports_to_selects
+        }
+
+    }
+</script>
+<script>
+        var service_spike = document.getElementById("service_spike1");
+        var mySPIKE = service_spike.getService();
+
+        var graphInterfaceOne = new graphInterface();
+        graphInterfaceOne.init(mySPIKE,"mySPIKE1_graphbox");
+
+        window.addEventListener("load", function () {
+            $("#mySPIKE1_graphbox").find($("#portSelect")).on("change", () => {
+                graphInterfaceOne.change_dataSelect()
+            }) 
+            $("#mySPIKE1_graphbox").find($("#dataSelect")).on("change", () => {
+                graphInterfaceOne.graph_it();
+            }) 
+
+            service_spike.addEventListener("click", async () => {
+                await sleep(5000); // wait for user to select port
+                console.log("clicked")
+                if ( await mySPIKE.isActive() ) {
+                    console.log("service active")
+                    graphInterfaceOne.ports_to_selects();
+                    // start graphing
+                    // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
+                    $(function () {
+                        Plotly.plot('chart', [{
+                            y: [graphInterfaceOne.graph_it()],
+                            type: 'line'
+                        }]);
+
+                        var cnt = 0;
+                        setInterval(async function () {
+                            var datapoint;
+                            try {
+                                datapoint = await graphInterfaceOne.graph_it();
+                            }
+                            catch (error) {
+
+                            }
+                            Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
+                            cnt++;
+                            if (cnt > 500) {
+                                Plotly.relayout('chart', {
+                                    xaxis: {
+                                        range: [cnt - 500, cnt]
+                                    }
+                                });
+                            }
+                        }, 15);
+                    })
+                }
+            })
+            dragElement("mySPIKE1_graphbox");
+            dragElement("mySPIKE2_graphbox");
+        })
+
+        //sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+</script>
+
+<style>
+    .graphbox {
+        background-color: #4CE0D2;
+        height: 600px;
+        width: 400px;
+        border: solid;
+    }
+</style>

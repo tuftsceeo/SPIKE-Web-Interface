@@ -1,33 +1,62 @@
-// import { SPIKE_Service } from "./SPIKE_Service.js";
+/*
+Project Name: SPIKE Prime Web Interface
+File name: ServiceDock_SPIKE.js
+Author: Jeremy Jung
+Last update: 7/19/20
+Description: HTML Element definition for <service-spike> to be used in ServiceDocks
+Credits/inspirations:
+History:
+    Created by Jeremy on 7/16/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+*/
 
-class spikeservice extends HTMLElement {   
+// import { Service_SPIKE } from "./Service_SPIKE.js";
+
+class servicespike extends HTMLElement {   
 
     constructor () {
         super();
-        this.service = new SPIKE_Service();
-        this.active = false;
+
+        this.active = false; // whether the service was activated
+        this.service = new Service_SPIKE(); // instantiate a service object ( one object per button )
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
 
-        // Create spans
+        /* wrapper definition and CSS */
+
         var wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'wrapper');
-        wrapper.setAttribute("style", "width: 50px; height: 50px; position: relative;")
-        /* making systemlink button */
+        wrapper.setAttribute("style", "width: 50px; height: 50px; position: relative; margin-top: 10px;")
 
-        // define the button
+        /* ServiceDock button definition and CSS */ 
+
         var button = document.createElement("button");
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
-        var slButtonStyle = "width: 50px; height: 50px; background: url(./modules/views/four.png) no-repeat; background-size: 40px 40px; background-color: #A2E1EF; border: none;"
-            + "background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
-        button.setAttribute("style", slButtonStyle);
 
-        //var style = document.createElement("style");
-        //style.textContent = "#sl_button:hover { color:#000000; background-color:#FFFFFF;}";
+        var imageRelPath = "./modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var length = 50; // for width and height of button
+        var buttonBackgroundColor = "#A2E1EF" // background color of the button
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
+            + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
+        button.setAttribute("style", buttonStyle);
 
-        /* button mouse hover/leave event listeners */
+        /* status circle definition and CSS */
+
+        var status = document.createElement("div");
+        status.setAttribute("class", "status");
+        var length = 20; // for width and height of circle
+        var statusBackgroundColor = "red" // default background color of service (inactive color)
+        var posLeft = 30;
+        var posTop = 20;
+        var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
+            "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
+        status.setAttribute("style", statusStyle);
+
+        /* event listeners */
+        
         button.addEventListener("mouseleave", function (event) {
             button.style.backgroundColor = "#A2E1EF";
             button.style.color = "#000000";
@@ -37,34 +66,61 @@ class spikeservice extends HTMLElement {
             button.style.backgroundColor = "#FFFFFF";
             button.style.color = "#000000";
         })
-
-        this.addEventListener("dblclick", function () {
-            console.log("activating service");
-            this.active = true;
-            this.service.init();
+    
+        // when ServiceDock button is double clicked
+        this.addEventListener("click", async function () {
+            // check active flag so once activated, the service doesnt reinit
+            if (!this.active) {
+                console.log("activating service");
+                var initSuccessful = await this.service.init();
+                if (initSuccessful) {
+                    this.active = true;
+                    status.style.backgroundColor = "green";
+                }
+                // var checkConnection = setInterval(function () {
+                //     if (!service.isActive()) {
+                //         clearInterval(checkConnection);
+                //         status.style.backgroundColor = "red";
+                //     }
+                // }, 5000)
+            } 
         });
 
 
         shadow.appendChild(wrapper);
+        button.appendChild(status);
         wrapper.appendChild(button);
 
     }
 
+    /* get the Service_SPIKE object */
     getService() {
         return this.service;
     }
 
+    /* get whether the ServiceDock button was clicked */
     getClicked() {
         return this.active;
     }
     
+    // initialize the service (is not used in this class but available for use publicly)
+    async init() {
+        var initSuccess = await this.service.init();
+        if (initSuccess) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
 
-window.customElements.define('spike-service', spikeservice);
+// when defining custom element, the name must have at least one - dash 
+window.customElements.define('service-spike', servicespike);
 
 /*
 Project Name: SPIKE Prime Web Interface
-File name: SPIKE_Service.js
+File name: Service_SPIKE.js
 Author: Jeremy Jung
 Last update: 7/15/20
 Description: SPIKE Service Library (OOP)
@@ -76,7 +132,7 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
-function SPIKE_Service() {
+function Service_SPIKE() {
 
     //////////////////////////////////////////
     //                                      //
@@ -123,7 +179,8 @@ function SPIKE_Service() {
 
     var micropython_interpreter = false; // whether micropython was reached or not
 
-    let serviceActive = false;
+    let serviceActive = false; //serviceActive flag
+
     //////////////////////////////////////////
     //                                      //
     //          Public Functions            //
@@ -132,6 +189,8 @@ function SPIKE_Service() {
 
     /* init() - initialize SPIKE_service
     *
+    * Parameter:
+    * 
     * Effect:
     * - Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled)
     * - Starts streaming UJSONRPC
@@ -214,7 +273,7 @@ function SPIKE_Service() {
     * ///USAGE///
     * ports = await getPortsInfo();
     * ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic")
-    * ports.{yourPortLetter}.info --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) 
+    * ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) 
     *
     * MOTOR_INFO = { "speed": motor speed, 
     *               "angle": motor angle , 
@@ -327,7 +386,6 @@ function SPIKE_Service() {
 
         // if a complete ujson rpc line was read
         if (one_line) {
-
             var data_stream; //UJSON RPC info to be parsed
 
             //get a line from the latest JSON RPC stream and parse to devices info
@@ -345,7 +403,7 @@ function SPIKE_Service() {
             // iterate through each port and assign a device_type to {ports}
             for (var key = 0; key < 6; key++) {
 
-                let device_value = { "device": "none", "info": {} }; // value to go in ports associated with the port letter keys
+                let device_value = { "device": "none", "data": {} }; // value to go in ports associated with the port letter keys
 
                 try {
                     var letter = index_to_port[key]
@@ -361,7 +419,7 @@ function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "smallMotor";
-                        device_value.info = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
+                        device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
                     }
                     // get BIG MOTOR information
@@ -374,7 +432,7 @@ function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "bigMotor";
-                        device_value.info = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
+                        device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
 
                     }
@@ -386,7 +444,7 @@ function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "ultrasonic";
-                        device_value.info = { "distance": 0 };
+                        device_value.data = { "distance": 0 };
                         ports[letter] = device_value;
                     }
                     // get FORCE sensor information
@@ -399,7 +457,7 @@ function SPIKE_Service() {
 
                         // populate value object
                         device_value = "force";
-                        device_value.info = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbitamount }
+                        device_value.data = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbitamount }
                         ports[letter] = device_value;
                     }
                     // get COLOR sensor information
@@ -415,14 +473,14 @@ function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "color";
-                        device_value.info = { "reflected": Creflected, "ambient": Cambient, "RGB": rgb_array };
+                        device_value.data = { "reflected": Creflected, "ambient": Cambient, "RGB": rgb_array };
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
                     else if (data_stream[key][0] == 0) {
                         // populate value object
                         device_value.device = "none";
-                        device_value.info = {};
+                        device_value.data = {};
                         ports[letter] = device_value;
                     }
 
@@ -561,12 +619,14 @@ function SPIKE_Service() {
                             }
                         }
                         if (done) {
+                            serviceActive = false;
                             // reader has been canceled.
                             console.log("[readLoop] DONE", done);
                         }
                     }
                     // error handler
                     catch (error) {
+                        serviceActive = false;
                         console.log('[readLoop] ERROR', error);
                         // error detected: release
                         reader.releaseLock();
@@ -583,6 +643,7 @@ function SPIKE_Service() {
             console.log("- port.readable is FALSE")
         } // end of: trying to open port
         catch (e) {
+            serviceActive = false;
             // Permission to access a device was denied implicitly or explicitly by the user.
             console.log('ERROR trying to open:', e);
         }

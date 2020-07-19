@@ -1,11 +1,26 @@
 <!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock.html
+Author: Jeremy Jung
+Last update: 6/20/20
+Description: raw ServiceDock template
+Credits/inspirations:
+    Based on ServiceDock by Ethan Danahy
+History: 
+    Created by Jeremy on 6/15/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
 <html>
     <head>
-        <script type="text/javascript" src="./modules/SysLink_ServiceDock.js"></script>
-        <script type="text/javascript" src="./modules/SPIKE_ServiceDock.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
-    <div id = "servicedock">
-        <systemlink-service id = "systemlink-service"></systemlink-service>
-        <spike-service id = "spike_service"></spike-service>
+    <div id = "servicedock" style = "float:left;"> <!-- this style must be kept for normal visualization-->
+        <service-systemlink id = "service_systemlink"></service-systemlink>
+        <service-spike id = "service_spike"></service-spike>
     </div>
 </html>
+
+

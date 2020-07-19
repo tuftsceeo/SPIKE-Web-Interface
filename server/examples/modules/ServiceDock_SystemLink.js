@@ -1,34 +1,62 @@
-// import { SystemLink_Service } from "./SystemLink_Service.js";
+/*
+Project Name: SPIKE Prime Web Interface
+File name: ServiceDock_SystemLink.js
+Author: Jeremy Jung
+Last update: 7/19/20
+Description: HTML Element definition for <service-systemlink> to be used in ServiceDocks
+Credits/inspirations:
+History:
+    Created by Jeremy on 7/16/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+*/
 
-class systemlinkservice extends HTMLElement {   
+// import { Service_SystemLink } from "./Service_SystemLink.js";
+
+class servicesystemlink extends HTMLElement {   
 
     constructor () {
         super();
 
-        this.active = false;
-        this.service = new SystemLink_Service();
+        this.active = false; // whether the service was activated
+        this.service = new Service_SystemLink(); // instantiate a service object ( one object per button )
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
 
-        // Create spans
+        /* wrapper definition and CSS */
         var wrapper = document.createElement('div');
         wrapper.setAttribute('class', 'wrapper');
-        wrapper.setAttribute("style", "width: 50px; height: 50px; position: relative;")
-        /* making systemlink button */
-
-        // define the button
+        wrapper.setAttribute("style", "width: 50px; height: 50px; position: relative; margin-top: 10px;")
+        
+        /* ServiceDock button definition and CSS */
+        
         var button = document.createElement("button");
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
-        var slButtonStyle = "width: 50px; height: 50px; background: url(./modules/views/cloud.png) no-repeat; background-size: 40px 40px; background-color: #A2E1EF; border: none;"
-                            + "background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
-        button.setAttribute("style", slButtonStyle);
+         /* CSS */
+        var imageRelPath = "./modules/views/cloud.png" // relative to the document in which a servicesystemlink is created ( NOT this file )
+        var length = 50; // for width and height of button
+        var backgroundColor = "#A2E1EF" // background color of the button
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + backgroundColor 
+                + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
+        button.setAttribute("style", buttonStyle);
 
-        //var style = document.createElement("style");
-        //style.textContent = "#sl_button:hover { color:#000000; background-color:#FFFFFF;}";
+        /* status circle definition and CSS */
 
-        /* button mouse hover/leave event listeners */
+        var status = document.createElement("div");
+        status.setAttribute("class", "status");
+        /* CSS */
+        var length = 20; // for width and height of circle
+        var statusBackgroundColor = "red" // default background color of service (inactive color)
+        var posLeft = 30;
+        var posTop = 20;
+        var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
+         "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
+        status.setAttribute("style", statusStyle);
+
+        /* event listeners */
+
         button.addEventListener("mouseleave", function (event) {
             button.style.backgroundColor = "#A2E1EF";
             button.style.color = "#000000";
@@ -39,32 +67,53 @@ class systemlinkservice extends HTMLElement {
             button.style.color = "#000000";
         })
 
-        this.addEventListener("dblclick", function(){ 
-            console.log("activating service");
-            this.active = true;
-            this.service.init();
+        this.addEventListener("click", async function() {
+            // check active flag so once activated, the service doesnt reinit
+            if ( !this.active ) {
+                console.log("activating service");
+                var initSuccessful = await this.service.init();
+                if (initSuccessful) {
+                    this.active = true;
+                    status.style.backgroundColor = "green";
+                }
+            }
         });
 
 
         shadow.appendChild(wrapper);
+        button.appendChild(status);
         wrapper.appendChild(button);
     }
 
+    /* get the Service_SystemLink object */
     getService() {
         return this.service;
     }
 
+    /* get whether the ServiceDock button was clicked */
     getClicked() {
         return this.active;
     }
 
+    // initialize the service (is not used in this class but available for use publicly)
+    async init() {
+        var initSuccess = await this.service.init();
+        if ( initSuccess ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
 
-window.customElements.define('systemlink-service', systemlinkservice);
+// when defining custom element, the name must have at least one - dash 
+window.customElements.define('service-systemlink', servicesystemlink);
 
 /*
 Project Name: SPIKE Prime Web Interface
-File name: SystemLink_Service.js
+File name: Service_SystemLink.js
 Author: Jeremy Jung
 Last update: 7/15/20
 Description: SystemLink Service Library (OOP)
@@ -74,7 +123,7 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
-function SystemLink_Service() {
+function Service_SystemLink() {
 
     //////////////////////////////////////////
     //                                      //
@@ -91,6 +140,7 @@ function SystemLink_Service() {
 
     let serviceActive = false; // set to true when service goes through init
 
+    let pollInterval = 1000;
     //////////////////////////////////////////
     //                                      //
     //           Public Functions           //
@@ -101,7 +151,7 @@ function SystemLink_Service() {
     *
     * Parameters:
     * OPTIONAL {APIKeyInput} (string) - SYstemlink APIkey to init service with
-    * 
+    * OPTIONAL {pollIntervalInput} (int) - interval at which to get tags from the cloud in MILISECONDS
     * Effect: 
     * - defines global variable APIKey for use in other functions
     * 
@@ -111,10 +161,10 @@ function SystemLink_Service() {
     * Note:
     * This function needs to be executed first before executing any other public functions of this class
     */
-    async function init(APIKeyInput) {
+    async function init(APIKeyInput, pollIntervalInput) {
 
         // if an APIKey was specified
-        if (APIKeyInput !== undefined) {
+        if ( APIKeyInput !== undefined ) {
             var response = await checkAPIKey(APIKeyInput);
             APIKey = APIKeyInput;
         }
@@ -125,8 +175,10 @@ function SystemLink_Service() {
         }
 
         // if response from checkAPIKey is valid
-        if (response) {
-
+        if ( response ) {
+            if ( pollIntervalInput !== undefined ) {
+                pollInterval = await pollIntervalInput;
+            }
             // initialize the tagsInfo global variable
             updateTagsInfo();
             active = true;
@@ -153,7 +205,7 @@ function SystemLink_Service() {
     * - changes the value of a tag on the cloud
     */
     async function setTagValue(tagName, newValue) {
-        updateTagValue(tagName, newValue);
+        return updateTagValue(tagName, newValue);
     }
 
     /* isActive() - get whether the Service was initialized or not
@@ -225,7 +277,7 @@ function SystemLink_Service() {
                 tagsInfo = collectedTagsInfo;
             }
 
-        }, 1000)
+        }, pollInterval)
     }
 
     /* getTagsInfoFromCloud() - get the info of a tag in the cloud

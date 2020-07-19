@@ -1,6 +1,6 @@
 /*
 Project Name: SPIKE Prime Web Interface
-File name: SPIKE_Service.js
+File name: Service_SPIKE.js
 Author: Jeremy Jung
 Last update: 7/15/20
 Description: SPIKE Service Library (OOP)
@@ -12,25 +12,25 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
-export function SPIKE_Service() {
-    
+function Service_SPIKE() {
+
     //////////////////////////////////////////
     //                                      //
     //          Global Variables            //
     //                                      //
     //////////////////////////////////////////
-    
+
     /* private members */
-    
+
     const VENDOR_ID = 0x0694; // LEGO SPIKE Prime Hub
-    
+
     // common characters to send (for REPL/uPython on the Hub)
     const CONTROL_C = '\x03'; // CTRL-C character (ETX character)
     const CONTROL_D = '\x04'; // CTRL-D character (EOT character)
     const RETURN = '\x0D';	// RETURN key (enter, new line)
-    
+
     const filter = {
-        usbVendorId: VENDOR_ID 
+        usbVendorId: VENDOR_ID
     };
 
     // define for communication
@@ -42,7 +42,7 @@ export function SPIKE_Service() {
 
     //define for json concatenation
     let jsonline = ""
-    
+
     // contains latest full json object from SPIKE readings
     let one_line;
 
@@ -59,6 +59,8 @@ export function SPIKE_Service() {
 
     var micropython_interpreter = false; // whether micropython was reached or not
 
+    let serviceActive = false; //serviceActive flag
+
     //////////////////////////////////////////
     //                                      //
     //          Public Functions            //
@@ -67,6 +69,8 @@ export function SPIKE_Service() {
 
     /* init() - initialize SPIKE_service
     *
+    * Parameter:
+    * 
     * Effect:
     * - Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled)
     * - Starts streaming UJSONRPC
@@ -77,17 +81,18 @@ export function SPIKE_Service() {
     async function init() {
         // initialize web serial connection
         var webSerialConnected = await initWebSerial();
-        
-        if ( webSerialConnected ) {
+
+        if (webSerialConnected) {
             // start streaming UJSONRPC
             streamUJSONRPC();
+            serviceActive = true;
             return true;
         }
         else {
             return false;
         }
     }
-    
+
     /* sendDATA() - send UJSON RPC command to the SPIKE Prime
      * 
      * Parameters:
@@ -100,23 +105,23 @@ export function SPIKE_Service() {
         // look up the command to send
         commands = command.split("\n"); // split on new line
         //commands = command
-         console.log("sendDATA: " + commands);
+        console.log("sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
 
         // go through each line of the command
         // trim it, send it, and send a return...
-        for ( var i = 0; i < commands.length; i++ ) {
+        for (var i = 0; i < commands.length; i++) {
             console.log("commands.length", commands.length)
             current = commands[i].trim();
             //console.log("current", current);
             // turn string into JSON
-            
+
             //string_current = (JSON.stringify(current));
             //myobj = JSON.parse(string_current);
             var myobj = await JSON.parse(current);
-            
+
             // turn JSON back into string and write it out
             writer.write(JSON.stringify(myobj));
             writer.write(RETURN); // extra return at the end
@@ -132,7 +137,7 @@ export function SPIKE_Service() {
         setupWriter();
         writer.write(CONTROL_C);
         writer.write(CONTROL_D);
-        
+
         //toggle micropython_interpreter flag if its was active
         if (micropython_interpreter) {
             micropython_interpreter = false;
@@ -148,7 +153,7 @@ export function SPIKE_Service() {
     * ///USAGE///
     * ports = await getPortsInfo();
     * ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic")
-    * ports.{yourPortLetter}.info --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) 
+    * ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) 
     *
     * MOTOR_INFO = { "speed": motor speed, 
     *               "angle": motor angle , 
@@ -169,7 +174,7 @@ export function SPIKE_Service() {
         return ports;
     }
 
-    async function getPortInfo( letter ){
+    async function getPortInfo(letter) {
         return ports[letter];
     }
 
@@ -211,22 +216,31 @@ export function SPIKE_Service() {
         }
     }
 
-    async function displayText ( text ) {
-        var randomId = Math.floor((Math.random() * 10000)); 
-        var command = '{"i":' + randomId + ', "m": "scratch.display_text", "p": {"text":' + '"'+ text + '"' + '} }'
+    /* isActive() - get whether the Service was initialized or not
+    *
+    * Returns:
+    * {serviceActive} (boolean) - whether Service was initialized or not
+    */
+    function isActive() {
+        return serviceActive;
+    }
+
+    async function displayText(text) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId + ', "m": "scratch.display_text", "p": {"text":' + '"' + text + '"' + '} }'
         sendDATA(command);
     }
 
-    async function displayImage ( image ) {
-        var randomId = Math.floor((Math.random() * 10000)); 
+    async function displayImage(image) {
+        var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.display_image", "p": {"image":' + '"' + image + '"' + '} }'
         sendDATA(command);
     }
 
-    async function motorStart (port, speed, stall) {
-        var randomId = Math.floor((Math.random() * 10000)); 
+    async function motorStart(port, speed, stall) {
+        var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
-            ', "speed":' + speed + ', "stall":' + stall +'} }'
+            ', "speed":' + speed + ', "stall":' + stall + '} }'
         sendDATA(command);
     }
 
@@ -237,7 +251,7 @@ export function SPIKE_Service() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
-    
+
     //sleep function
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -252,7 +266,6 @@ export function SPIKE_Service() {
 
         // if a complete ujson rpc line was read
         if (one_line) {
-
             var data_stream; //UJSON RPC info to be parsed
 
             //get a line from the latest JSON RPC stream and parse to devices info
@@ -270,7 +283,7 @@ export function SPIKE_Service() {
             // iterate through each port and assign a device_type to {ports}
             for (var key = 0; key < 6; key++) {
 
-                let device_value = { "device": "none", "info": {} }; // value to go in ports associated with the port letter keys
+                let device_value = { "device": "none", "data": {} }; // value to go in ports associated with the port letter keys
 
                 try {
                     var letter = index_to_port[key]
@@ -286,7 +299,7 @@ export function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "smallMotor";
-                        device_value.info = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
+                        device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
                     }
                     // get BIG MOTOR information
@@ -299,7 +312,7 @@ export function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "bigMotor";
-                        device_value.info = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
+                        device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
 
                     }
@@ -311,7 +324,7 @@ export function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "ultrasonic";
-                        device_value.info = { "distance": 0 };
+                        device_value.data = { "distance": 0 };
                         ports[letter] = device_value;
                     }
                     // get FORCE sensor information
@@ -324,7 +337,7 @@ export function SPIKE_Service() {
 
                         // populate value object
                         device_value = "force";
-                        device_value.info = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbitamount }
+                        device_value.data = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbitamount }
                         ports[letter] = device_value;
                     }
                     // get COLOR sensor information
@@ -340,14 +353,14 @@ export function SPIKE_Service() {
 
                         // populate value object
                         device_value.device = "color";
-                        device_value.info = { "reflected": Creflected, "ambient": Cambient, "RGB": rgb_array };
+                        device_value.data = { "reflected": Creflected, "ambient": Cambient, "RGB": rgb_array };
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
                     else if (data_stream[key][0] == 0) {
                         // populate value object
                         device_value.device = "none";
-                        device_value.info = {};
+                        device_value.data = {};
                         ports[letter] = device_value;
                     }
 
@@ -486,12 +499,14 @@ export function SPIKE_Service() {
                             }
                         }
                         if (done) {
+                            serviceActive = false;
                             // reader has been canceled.
                             console.log("[readLoop] DONE", done);
                         }
                     }
                     // error handler
                     catch (error) {
+                        serviceActive = false;
                         console.log('[readLoop] ERROR', error);
                         // error detected: release
                         reader.releaseLock();
@@ -508,6 +523,7 @@ export function SPIKE_Service() {
             console.log("- port.readable is FALSE")
         } // end of: trying to open port
         catch (e) {
+            serviceActive = false;
             // Permission to access a device was denied implicitly or explicitly by the user.
             console.log('ERROR trying to open:', e);
         }
@@ -524,6 +540,7 @@ export function SPIKE_Service() {
         getPortInfo: getPortInfo,
         displayText: displayText,
         displayImage: displayImage,
-        motorStart: motorStart
+        motorStart: motorStart,
+        isActive: isActive
     };
 }

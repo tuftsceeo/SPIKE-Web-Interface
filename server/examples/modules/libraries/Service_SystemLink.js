@@ -1,8 +1,8 @@
 /*
 Project Name: SPIKE Prime Web Interface
-File name: SystemLink_Service.js
+File name: Service_SystemLink.js
 Author: Jeremy Jung
-Last update: 7/15/20
+Last update: 7/19/20
 Description: SystemLink Service Library (OOP)
 History:
     Created by Jeremy on 7/15/20
@@ -10,14 +10,14 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
-export function SystemLink_Service() {
-    
+function Service_SystemLink() {
+
     //////////////////////////////////////////
     //                                      //
     //          Global Variables            //
     //                                      //
     //////////////////////////////////////////
-    
+
     /* private members */
 
     let tagsInfo = {}; // contains real-time information of the tags in the cloud
@@ -25,6 +25,9 @@ export function SystemLink_Service() {
     // defined during init
     let APIKey; // string of the valid APIkey
 
+    let serviceActive = false; // set to true when service goes through init
+
+    let pollInterval = 1000;
     //////////////////////////////////////////
     //                                      //
     //           Public Functions           //
@@ -35,7 +38,7 @@ export function SystemLink_Service() {
     *
     * Parameters:
     * OPTIONAL {APIKeyInput} (string) - SYstemlink APIkey to init service with
-    * 
+    * OPTIONAL {pollIntervalInput} (int) - interval at which to get tags from the cloud in MILISECONDS
     * Effect: 
     * - defines global variable APIKey for use in other functions
     * 
@@ -45,10 +48,10 @@ export function SystemLink_Service() {
     * Note:
     * This function needs to be executed first before executing any other public functions of this class
     */
-    async function init(APIKeyInput) {
+    async function init(APIKeyInput, pollIntervalInput) {
 
         // if an APIKey was specified
-        if ( APIKeyInput !== undefined ) {
+        if (APIKeyInput !== undefined) {
             var response = await checkAPIKey(APIKeyInput);
             APIKey = APIKeyInput;
         }
@@ -59,10 +62,13 @@ export function SystemLink_Service() {
         }
 
         // if response from checkAPIKey is valid
-        if ( response ) {
-
+        if (response) {
+            if (pollIntervalInput !== undefined) {
+                pollInterval = await pollIntervalInput;
+            }
             // initialize the tagsInfo global variable
             updateTagsInfo();
+            active = true;
             return true;
         }
         else {
@@ -74,7 +80,7 @@ export function SystemLink_Service() {
     /* getTagsInfo() - return the tagsInfo global variable
     *
     * Returns:
-    * {tagsInfo} - object containing basic information about currently existing tags in the cloud
+    * {tagsInfo} (object) - object containing basic information about currently existing tags in the cloud
     */
     async function getTagsInfo() {
         return tagsInfo;
@@ -86,7 +92,16 @@ export function SystemLink_Service() {
     * - changes the value of a tag on the cloud
     */
     async function setTagValue(tagName, newValue) {
-        updateTagValue(tagName, newValue);
+        return updateTagValue(tagName, newValue);
+    }
+
+    /* isActive() - get whether the Service was initialized or not
+    *
+    * Returns:
+    * {serviceActive} (boolean) - whether Service was initialized or not
+    */
+    function isActive() {
+        return serviceActive;
     }
 
     //////////////////////////////////////////
@@ -105,7 +120,7 @@ export function SystemLink_Service() {
     *           - if fail: reject(error)
     */
     async function checkAPIKey(APIKeyInput) {
-        return new Promise(async function (resolve, reject)  {
+        return new Promise(async function (resolve, reject) {
             var apiKeyAuthURL = "https://api.systemlinkcloud.com/niauth/v1/auth";
 
             var request = await sendXMLHTTPRequest("GET", apiKeyAuthURL, APIKeyInput)
@@ -114,17 +129,17 @@ export function SystemLink_Service() {
 
                 var response = JSON.parse(request.response);
 
-                if ( response.error ) {
+                if (response.error) {
                     reject(new Error("Error at apikey auth:", response));
                 }
                 else {
                     console.log("APIkey is valid")
                     resolve(true)
                 }
-                
+
             }
 
-            request.onerror = function() {
+            request.onerror = function () {
                 var response = JSON.parse(request.response);
                 // console.log("Error at apikey auth:", request.response);
                 reject(new Error("Error at apikey auth:", response));
@@ -149,7 +164,7 @@ export function SystemLink_Service() {
                 tagsInfo = collectedTagsInfo;
             }
 
-        }, 1000)
+        }, pollInterval)
     }
 
     /* getTagsInfoFromCloud() - get the info of a tag in the cloud
@@ -304,6 +319,7 @@ export function SystemLink_Service() {
     return {
         init: init,
         getTagsInfo: getTagsInfo,
-        setTagValue: setTagValue
+        setTagValue: setTagValue,
+        isActive: isActive
     }
 }
