@@ -1,0 +1,37 @@
+<script type = "text/javascript" src="./modules/libraries/Service_Onshape.js"></script>
+<script>
+    var onshape = new OnshapeService();
+    var method = "GET";
+    var queryObject = {}
+    // this opts is without the "query" parameter (may make things not work in the api call)
+    var opts = {
+            d: "12ae4e8452feed57f993bda3",
+            w: "bbe3cde5759d1f0c7b2a6f0f",
+            e: "866bf4cbbb1497e5cad582c5",
+            resource: "assemblies"
+    }
+    var path = '';
+    if ('path' in opts) {
+        path = opts.path;
+    } else {
+        path = onshape.buildDWMVEPath(opts);
+    }
+    //console.log("path", path)
+    var baseUrl = ('baseUrl' in opts) ? opts.baseUrl : "rogers.onshape.com";
+    var queryString = onshape.buildQueryString(opts);
+    var inputHeaders = onshape.inputHeadersFromOpts(opts);
+    var headers = onshape.buildHeaders('GET', path, queryString, inputHeaders);
+    //Send the proper header information along with the request
+    for (var key in headers) {
+            var header = {};
+            header[key] = headers[key];
+            // console.log(header);
+    }
+    var url = baseUrl + path + queryString;
+    //console.log(url)
+    // var hash = CryptoJS.HmacSHA256("Message", "secret");
+    // var hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+    // document.write(hashInBase64);
+
+    onshape.getAssemblyDef();
+</script>
