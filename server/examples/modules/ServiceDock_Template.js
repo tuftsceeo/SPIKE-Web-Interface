@@ -229,7 +229,7 @@ function Service_Template() {
     * 
     * Return: 
     * {Promise} - if success: true
-    *           - if fail: thrown error
+    *           - if fail: error
     */
     async function checkAPIKey(APIKeyInput) {
         return new Promise(async function (resolve, reject) {
@@ -284,7 +284,7 @@ function Service_Template() {
     * 
     * Return: 
     * {Promise} - if success: collectedAPIInfo
-    *           - if fail: thrown (error)
+    *           - if fail: (error)
     *
     */
     async function getInfoFromAPI() {
@@ -320,7 +320,7 @@ function Service_Template() {
     * 
     * Returns:
     * {Promise} - if success: true
-    *           - if fail: thrown error
+    *           - if fail: error
     */
     async function postAPIInfo(infoPath, newValue) {
 
