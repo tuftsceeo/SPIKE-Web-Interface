@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_index.html
+Author: Jeremy Jung
+Last update: 7/7/20
+Description: combined use of all previous examples joined together by Service Dock UI
+Credits/inspirations:
+    Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
+History: 
+    Created by Jeremy on 7/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+
+PUBLIC VARIABLES:
+APIkey_valid_at_SD (boolean) - whether a valid APIkey was entered for systemlink service
+SD_APIkey (string) - string containing the APIkey
+port_connected (boolean) - whether SPIKE hub was connected with web serial
+-->
+<head>
+    <link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css">
+    <script src = "./modules/libraries/jquery_351.js" type = "text/javascript"></script>
+    <script src = "./modules/libraries/SLajaxlib.js" type = "text/javascript"></script>
+    <script src = "./modules/libraries/UJSONRPClib.js"></script>
+    <script src = "./modules/libraries/hoverscript_jquery.js" type = "text/javascript"></script>
+    <!-- plotly for grapher.html needs to be included in this html-->
+    <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
+</head>
+<html>
+    <div id = "servicedock_index">
+    <div id = "container">
+        <div id = "sd_container">
+        </div>
+    </div>
+    <script>
+        // toggle variables for services
+        // if service_loaded = true, the service's HTML file has been loaded
+        // if service_hidden = true, the service is toggled hidden from view
+        var sl_service_loaded = false;
+        var sl_service_hidden = false;
+
+        var spike_service_loaded = false;
+        var spike_service_hidden = false;
+
+        var graph_service_loaded = false;
+        var graph_service_hidden = false;
+
+        var slujson_service_loaded = false;
+        var slujson_service_hidden = false;
+
+        //"public" variables to trigger external events
+        var APIkey_valid_at_SD = false;
+        var SD_APIkey = "";
+        var port_connected = false;
+        
+        //load service dock
+        $( function () {
+
+            $('#sd_container').load('./modules/servicedock.html', async function () {
+                
+                /* initialize buttons loaded from service dock */
+
+                //main service dock buttons
+                sl_button = document.getElementById("sl_button");
+                spike_button = document.getElementById("spike_button");
+
+                //sub service dock buttons
+                graph_button = document.getElementById("graph_button");
+                ports_button = document.getElementById("ports_button");
+                slujson_button = document.getElementById("slujson_button")
+                sl_api_button = document.getElementById("API_button")
+                ujsonrpc_button = document.getElementById("ujsonrpc_button")
+                
+                //service initialization
+                apikey_input = document.getElementById("keyinputfield");
+                connect_input= document.getElementById("connect")
+
+                /* Description: "conect to port" button event listener
+                 * Effects:
+                 * - sets up port, startings reading UJSON RPC stream
+                 * - continously gets connected devices information (ASYNC INTERVAL)
+                 */
+                connect_input.addEventListener("click", async () => {
+                     //start streaming
+                    port_connected = await setup_port();
+                    read_stream()
+
+                    //wait until one full json line is read
+                    await sleep(3000)
+                    //get port sensor readings every interval
+                    setPortInt = setInterval( async () => {
+                        // !!! display_port is a function from UJSON_interface
+                        try {
+                            await display_port();
+                        }
+                        catch (e) {
+                            //UJSON_interface has not been loaded yet
+                        }
+                    }, 100);
+                })
+
+                /* Description: "apikey_input" input event listener
+                 * Effects:
+                 * - checks if entered Systemlink API key is valid
+                 * - assigns the apikey to {SD_APIkey} public variable 
+                 * - sets {APIkey_valid_at_SD} public var to true 
+                 */
+                apikey_input.addEventListener("input", async () => {
+                    if( await auth_key(apikey_input.value)) {
+                        $("#key_valid").html("Valid APIkey!");
+
+                        //change "public" variables so systemlink interface can initialize
+                        SD_APIkey = await apikey_input.value;
+                        APIkey_valid_at_SD = true;
+                    }
+                })
+
+                /* Description: "system link button" button event listener
+                 * Effects:
+                 * - loads SL_interface.html
+                 * - display or hide the systemlink interface when clicked
+                 */
+                sl_api_button.addEventListener("click", async () => {
+
+                    //load the syslinkbox unless it has been already loaded
+                    if ( !sl_service_loaded ) {
+                        sl_service_loaded = true;
+                        var sl_container = "<div id = 'sl_container'></div>";
+                        await $("#container").append(sl_container);
+                        await $('#sl_container').load('./modules/SL_interface.html');
+                    }
+                    //when button is clicked first time after it loads, hide syslinkbox
+                    else {
+                        if ( !sl_service_hidden ) {
+                            $("#syslinkbox").css("display","none");
+                            sl_service_hidden = true;
+                        }
+                        else {
+                            $("#syslinkbox").css("display","block");
+                            sl_service_hidden = false;
+                        }
+                    }
+
+                });
+
+                /* button event listeners for SPIKE PRIME RELATED */
+                
+                /* Description: "ujsonrpc button" button event listener
+                 * Effects:
+                 * - loads UJSON_interface.html
+                 * - display or hide the UJSON RPC interface when clicked
+                 */
+                ujsonrpc_button.addEventListener("click", async () => {
+                    //load the interface unless it has been already loaded
+                    if ( !spike_service_loaded ) {
+                        spike_service_loaded = true;
+
+                        var spike_container= "<div id = 'spike_container'></div>";
+                        await $("#container").append(spike_container)
+                        await $('#spike_container').load('./modules/UJSON_interface.html')
+                    }
+                    //when button is clicked first time after it loads, hide jsonrpcbox
+                    else {
+                        if ( !spike_service_hidden ) {
+                            $("#ujsonrpcbox").css("display","none");
+                            spike_service_hidden = true;
+                        }
+                        else {
+                            $("#ujsonrpcbox").css("display","block");
+                            spike_service_hidden = false;
+                        }
+                    }
+                })
+                /* Description: "graph button" button event listener
+                 * Effects:
+                 * - loads graph_interface.html
+                 * - display or hide the graph interface when clicked
+                 */
+                graph_button.addEventListener("click", async () => {
+                    //load the graph unless it has been already loaded
+                    if ( !graph_service_loaded ) {
+                        graph_service_loaded = true;
+                        var graph_container= "<div id = 'graph_container'></div>";
+                        await $("#container").append(graph_container);
+                        await $('#graph_container').load('./modules/graph_interface.html');
+                    }
+                    //when button is clicked first time after it loads, hide interface
+                    else {
+                        if ( !graph_service_hidden ) {
+                            $("#graphbox").css("display","none");
+                            graph_service_hidden = true;
+                        }
+                        else {
+                            $("#graphbox").css("display","block");
+                            graph_service_hidden = false;
+                        }
+                    }
+                })
+
+                /* Description: "slujson_button" button event listener
+                 * Effects:
+                 * - loads SLxUJSONRPC_interface.html
+                 * - display or hide the SLxUJSONRPC interface when clicked
+                 */
+                slujson_button.addEventListener("click", async () => {
+                    //load the interface unless it has been already loaded
+                    if ( !slujson_service_loaded ) {
+                        slujson_service_loaded = true;
+                        var slujson_container= "<div id = 'slujson_container'></div>";
+                        await $("#container").append(slujson_container);
+                        await $('#slujson_container').load('./modules/SLxUJSONRPC_interface.html');
+                        
+                        $("#slujsonbox").css("display","block");
+                    }
+                    //when button is clicked first time after it loads, hide interface
+                    else {
+                        if ( !slujson_service_hidden ) {
+                            $("#slujsonbox").css("display","none");
+                            slujson_service_hidden = true;
+                        }
+                        else {
+                            $("#slujsonbox").css("display","block");
+                            slujson_service_hidden = false;
+                        }
+                    }
+                })
+
+
+            });
+
+        })
+
+        //sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+    </script>
+    </div>
+</html>
