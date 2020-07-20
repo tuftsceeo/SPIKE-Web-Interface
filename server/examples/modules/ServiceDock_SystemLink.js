@@ -302,7 +302,7 @@ function Service_SystemLink() {
             var request = await sendXMLHTTPRequest("GET", getMultipleTagsURL, APIKey);
 
             // when transaction is complete, parse response and update return value (collectedTagsInfo)
-            request.onload = function () {
+            request.onload = async function () {
 
                 // parse response (string) into JSON object
                 var responseJSON = JSON.parse(this.response)
@@ -317,9 +317,10 @@ function Service_SystemLink() {
                     var valueType = tagsInfoArray[i].current.value.type;
                     var tagName = tagsInfoArray[i].tag.path;
 
+                    var valueToAdd = await getValueFromType(valueType, value);
                     // store tag information
                     var pathInfo = {};
-                    pathInfo["value"] = value;
+                    pathInfo["value"] = valueToAdd;
                     pathInfo["type"] = valueType;
 
                     // add a tag info to the return object
@@ -426,6 +427,33 @@ function Service_SystemLink() {
                 return "DOUBLE"
             }
         }
+    }
+
+    /* getValueType() - helper function for converting values to correct type based on datatype
+    *
+    * Parameters:
+    * {valueType} - typeof value in systemlink format
+    * {value} - value to convert
+    * 
+    * Return:
+    * (value) - value in correct data type
+    */
+    function getValueFromType(valueType, value) {
+        if (valueType == "BOOLEAN") {
+            if (value == "true") {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else if (valueType == "STRING") {
+            return value;
+        }
+        else if (valueType == "INT" || valueType == "DOUBLE") {
+            return parseFloat(value);
+        }
+        return value;
     }
 
     /* public members */

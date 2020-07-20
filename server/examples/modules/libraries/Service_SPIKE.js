@@ -2,7 +2,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: Service_SPIKE.js
 Author: Jeremy Jung
-Last update: 7/15/20
+Last update: 7/20/20
 Description: SPIKE Service Library (OOP)
 Credits/inspirations:
     Based on code wrriten by Ethan Danahy, Chris Rogers
@@ -55,6 +55,12 @@ function Service_SPIKE() {
         "D": { "None": {} },
         "E": { "None": {} },
         "F": { "None": {} }
+    }
+    let hub =
+    {
+        "gyro": [0, 0, 0],
+        "accel": [0, 0, 0],
+        "pos": [0, 0, 0]
     }
 
     var micropython_interpreter = false; // whether micropython was reached or not
@@ -174,8 +180,24 @@ function Service_SPIKE() {
         return ports;
     }
 
+    /* getPortInfo() - get the info of a single port
+    *
+    * Parameter:
+    * {letter} - letter of the port to retrieve data from
+    * Returns:
+    * {port[leter]} (object/dictionary) - an object with keys as device and info
+    */
     async function getPortInfo(letter) {
         return ports[letter];
+    }
+
+    /* getHubInfo() - get info of the hub
+    *
+    * Returns:
+    * {hub} (object/dict) - includes info of the hub
+    */
+    async function getHubInfo() {
+        return hub;
     }
 
     /* reach_micropython() - reach the micropython interpreter beneath UJSON RPC
@@ -225,6 +247,12 @@ function Service_SPIKE() {
         return serviceActive;
     }
 
+    //////////////////////////////////////////
+    //                                      //
+    //          UJSONRPC Functions          //
+    //                                      //
+    //////////////////////////////////////////
+
     async function displayText(text) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.display_text", "p": {"text":' + '"' + text + '"' + '} }'
@@ -240,7 +268,52 @@ function Service_SPIKE() {
     async function motorStart(port, speed, stall) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
-            ', "speed":' + speed + ', "stall":' + stall + '} }'
+            ', "speed":' + speed + ', "stall":' + stall + '} }';
+        sendDATA(command);
+    }
+
+    /* doesnt work, runtime_error a KeyError at handling motor_stop in python firmware */
+    async function motorStop(port) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId + ', "m": "scratch.motor_stop", "p": {"port":' + '"' + port + '"' + '} }';
+        sendDATA(command);
+    }
+
+    async function motorPwm(port, power, stall) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
+            ', "power":' + power + ', "stall":' + stall + '} }';
+        sendDATA(command);
+    }
+
+    async function lightUltrasonic(port, lights) {
+        var lightsOptions = ['upper-left', 'upper-right', 'lower-left', 'lower-right'];
+        var validLights = false;
+        console.log("lights", lights)
+        // check if the lights parameter is correctly given
+        for (var option in lightsOptions) {
+            console.log("option", option)
+            if (lightsOptions[option] == lights) {
+                validLights = true;
+                break;
+            }
+        }
+        // throw error when invalid parameter
+        if (!validLights) {
+            throw Error("lights parameter is not valid, choose from: 'upper-left', 'upper-right', 'lower-left', 'lower-right'")
+        }
+        else {
+            var randomId = Math.floor((Math.random() * 10000));
+            var command = '{"i":' + randomId + ', "m": "scratch.ultrasonic_light_up", "p": {"port":' + '"' + port
+                + '", ' + '"lights":' + '"' + lights + '"' + '} }';
+            sendDATA(command);
+        }
+
+    }
+
+    async function getFirmwareInfo() {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId + ', "m": "get_firmware_info" ' + '}';
         sendDATA(command);
     }
 
@@ -261,6 +334,7 @@ function Service_SPIKE() {
     * 
     * Effect:
     * - Modifies {ports} global variable
+    * - Modifies {hub} global variable
     */
     async function updateHubPortsInfo() {
 
@@ -320,35 +394,35 @@ function Service_SPIKE() {
                     else if (data_stream[key][0] == 62) {
 
                         // parse ultrasonic sensor information
-                        var Udist = await data[key][1][0];
+                        var Udist = await data_stream[key][1][0];
 
                         // populate value object
                         device_value.device = "ultrasonic";
-                        device_value.data = { "distance": 0 };
+                        device_value.data = { "distance": Udist };
                         ports[letter] = device_value;
                     }
                     // get FORCE sensor information
                     else if (data_stream[key][0] == 63) {
 
                         // parse force sensor information
-                        var Famount = await data[key][1][0];
-                        var Fbinary = await data[key][1][1];
-                        var Fbigamount = await data[key][1][2];
+                        var Famount = await data_stream[key][1][0];
+                        var Fbinary = await data_stream[key][1][1];
+                        var Fbigamount = await data_stream[key][1][2];
 
                         // populate value object
-                        device_value = "force";
-                        device_value.data = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbitamount }
+                        device_value.device = "force";
+                        device_value.data = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbigamount }
                         ports[letter] = device_value;
                     }
                     // get COLOR sensor information
                     else if (data_stream[key][0] == 61) {
 
                         // parse color sensor information
-                        var Creflected = await data[key][1][0];
-                        var Cambient = await data[key][1][1];
-                        var Cr = await data[key][1][2];
-                        var Cg = await data[key][1][3];
-                        var Cb = await data[key][1][4];
+                        var Creflected = await data_stream[key][1][0];
+                        var Cambient = await data_stream[key][1][1];
+                        var Cr = await data_stream[key][1][2];
+                        var Cg = await data_stream[key][1][3];
+                        var Cb = await data_stream[key][1][4];
                         var rgb_array = [Cr, Cg, Cb];
 
                         // populate value object
@@ -363,6 +437,25 @@ function Service_SPIKE() {
                         device_value.data = {};
                         ports[letter] = device_value;
                     }
+
+                    //parse hub information
+                    var gyro_x = data_stream[6][0];
+                    var gyro_y = data_stream[6][1];
+                    var gyro_z = data_stream[6][2];
+                    var gyro = [gyro_x, gyro_y, gyro_z];
+                    hub["gyro"] = gyro;
+
+                    var accel_x = data_stream[7][0];
+                    var accel_y = data_stream[7][1];
+                    var accel_z = data_stream[7][2];
+                    var accel = [accel_x, accel_y, accel_z];
+                    hub["accel"] = accel;
+
+                    var posi_x = data_stream[8][0];
+                    var posi_y = data_stream[8][1];
+                    var posi_z = data_stream[8][2];
+                    var pos = [posi_x, posi_y, posi_z];
+                    hub["pos"] = pos;
 
                 } catch (e) { } //ignore errors
             }
@@ -538,9 +631,14 @@ function Service_SPIKE() {
         sendPythonDATA: sendPythonDATA,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
+        getHubInfo: getHubInfo,
         displayText: displayText,
         displayImage: displayImage,
         motorStart: motorStart,
-        isActive: isActive
+        getFirmwareInfo: getFirmwareInfo,
+        motorPwm: motorPwm,
+        lightUltrasonic: lightUltrasonic,
+        isActive: isActive,
+        getLatestUJSON: getLatestUJSON
     };
 }
