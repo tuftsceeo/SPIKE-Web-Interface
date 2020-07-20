@@ -313,18 +313,37 @@ function Service_SystemLink() {
                 for (var i = 0; i < tagsAmount; i++) {
 
                     // parse information of the tags
-                    var value = tagsInfoArray[i].current.value.value;
-                    var valueType = tagsInfoArray[i].current.value.type;
-                    var tagName = tagsInfoArray[i].tag.path;
 
-                    var valueToAdd = await getValueFromType(valueType, value);
-                    // store tag information
-                    var pathInfo = {};
-                    pathInfo["value"] = valueToAdd;
-                    pathInfo["type"] = valueType;
+                    try {
+                        var value = tagsInfoArray[i].current.value.value;
+                        var valueType = tagsInfoArray[i].current.value.type;
+                        var tagName = tagsInfoArray[i].tag.path;
+                        
+                        var valueToAdd = await getValueFromType(valueType, value);
+                        
+                        // store tag information
+                        var pathInfo = {};
+                        pathInfo["value"] = valueToAdd;
+                        pathInfo["type"] = valueType;
 
-                    // add a tag info to the return object
-                    collectedTagsInfo[tagName] = pathInfo;
+                        // add a tag info to the return object
+                        collectedTagsInfo[tagName] = pathInfo;
+                    }
+                    // when value is not yet assigned to tag
+                    catch (e) {
+                        var value = "NONE"
+                        var valueType = tagsInfoArray[i].tag.type;
+                        var tagName = tagsInfoArray[i].tag.path;
+
+                        var valueToAdd = await getValueFromType(valueType, value);
+                        // store tag information
+                        var pathInfo = {};
+                        pathInfo["value"] = valueToAdd;
+                        pathInfo["type"] = valueType;
+
+                        // add a tag info to the return object
+                        collectedTagsInfo[tagName] = pathInfo;
+                    }
                 }
 
                 resolve(collectedTagsInfo)
