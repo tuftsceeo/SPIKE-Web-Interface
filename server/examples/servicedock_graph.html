@@ -19,7 +19,6 @@ LICENSE: MIT
 <body>
     <div id="servicedock" style="float:left;">
         <service-spike id = "service_spike1"></service-spike>
-        <service-spike id="service_spike2"></service-spike>
         <!-- add more servicedock buttons when needed, change id accordingly-->
     </div>
     <!-- copy and paste the graphbox for every additional SPIKE. Change id's number to its indices-->
@@ -37,22 +36,7 @@ LICENSE: MIT
         </div>
         <div id="chart"></div>
     </div>
-    <!--
-    <div id="mySPIKE2_graphbox" class = "graphbox">
-        <div id="selectbox" class="target_ignore">
-            <select id="portSelect" class="select_components target_ignore" onchange=change_dataSelect()>
-                <option id="A">A</option>
-                <option id="B">B</option>
-                <option id="C">C</option>
-                <option id="D">D</option>
-                <option id="E">E</option>
-                <option id="F">F</option>
-            </select>
-            <select id="dataSelect" class="select_components target_ignore" onchange=graph_it()></select>
-        </div>
-        <div id="chart"></div>
-    </div>
-    -->
+
 </body>
 <!-- definition for graphInterface to simplify the graphing, you may skip it and go to the next <script> -->
 <script>
@@ -156,13 +140,17 @@ LICENSE: MIT
             $("#mySPIKE1_graphbox").find($("#portSelect")).on("change", () => {
                 graphInterfaceOne.change_dataSelect()
             }) 
+
             $("#mySPIKE1_graphbox").find($("#dataSelect")).on("change", () => {
                 graphInterfaceOne.graph_it();
             }) 
 
-            service_spike.addEventListener("click", async () => {
+            service_spike1.addEventListener("click", async () => {
+                
                 await sleep(5000); // wait for user to select port
+                
                 console.log("clicked")
+                
                 if ( await mySPIKE1.isActive() ) {
                     console.log("service active")
                     graphInterfaceOne.ports_to_selects();
@@ -197,54 +185,6 @@ LICENSE: MIT
                 }
             })
             dragElement("mySPIKE1_graphbox");
-
-            /*
-            $("#mySPIKE2_graphbox").find($("#portSelect")).on("change", () => {
-                graphInterfaceOne.change_dataSelect()
-            })
-            $("#mySPIKE2_graphbox").find($("#dataSelect")).on("change", () => {
-                graphInterfaceOne.graph_it();
-            })
-
-            service_spike2.addEventListener("click", async () => {
-                await sleep(5000); // wait for user to select port
-                console.log("clicked")
-                if (await mySPIKE2.isActive()) {
-                    console.log("service active")
-                    graphInterfaceOne.ports_to_selects();
-                    // start graphing
-                    // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
-                    $(function () {
-                        Plotly.plot('chart', [{
-                            y: [graphInterfaceOne.graph_it()],
-                            type: 'line'
-                        }]);
-
-                        var cnt = 0;
-                        setInterval(async function () {
-                            var datapoint;
-                            try {
-                                datapoint = await graphInterfaceOne.graph_it();
-                            }
-                            catch (error) {
-
-                            }
-                            Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
-                            cnt++;
-                            if (cnt > 500) {
-                                Plotly.relayout('chart', {
-                                    xaxis: {
-                                        range: [cnt - 500, cnt]
-                                    }
-                                });
-                            }
-                        }, 15);
-                    })
-                }
-            }) 
-            
-            dragElement("mySPIKE2_graphbox");
-            */
 
             // copy and paste commented section for every additional spike, and change variables accordingly
         })
