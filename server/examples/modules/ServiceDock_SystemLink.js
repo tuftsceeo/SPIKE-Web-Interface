@@ -194,6 +194,10 @@ function Service_SystemLink() {
     *
     * Returns:
     * {tagsInfo} (object) - object containing basic information about currently existing tags in the cloud
+    * // USAGE //
+    * var tagsInfo = await getTagsInfo();
+    * tagsInfo[{string of tag name}].value for value of tag 
+    * tagsInfo[{string of tag name}].value for datatype of tag
     */
     async function getTagsInfo() {
         return tagsInfo;
