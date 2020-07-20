@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html>
-    
-</html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_graph.html
+Author: Jeremy Jung
+Last update: 6/20/20
+Description: example of using multiple spike primes on service dock and graphing them
+Credits/inspirations:
+    plotly graphing
+History: 
+    Created by Jeremy on 6/20/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
 <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
 <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
 <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
@@ -10,7 +20,9 @@
     <div id="servicedock" style="float:left;">
         <service-spike id = "service_spike1"></service-spike>
         <service-spike id="service_spike2"></service-spike>
+        <!-- add more servicedock buttons when needed, change id accordingly-->
     </div>
+    <!-- copy and paste the graphbox for every additional SPIKE. Change id's number to its indices-->
     <div id="mySPIKE1_graphbox" class = "graphbox">
         <div id="selectbox" class="target_ignore">
             <select id="portSelect" class="select_components target_ignore">
@@ -25,7 +37,7 @@
         </div>
         <div id="chart"></div>
     </div>
-
+    <!--
     <div id="mySPIKE2_graphbox" class = "graphbox">
         <div id="selectbox" class="target_ignore">
             <select id="portSelect" class="select_components target_ignore" onchange=change_dataSelect()>
@@ -40,7 +52,9 @@
         </div>
         <div id="chart"></div>
     </div>
+    -->
 </body>
+<!-- definition for graphInterface to simplify the graphing, you may skip it and go to the next <script> -->
 <script>
     /* graphInterface object*/
     function graphInterface() {
@@ -123,14 +137,22 @@
 
     }
 </script>
+<!-- MAIN SCRIPT -->
 <script>
-        var service_spike = document.getElementById("service_spike1");
-        var mySPIKE = service_spike.getService();
+
+        var service_spike1 = document.getElementById("service_spike1");
+        //var servie_spike2 = document.getElementById("service_spike2");
+        var mySPIKE1 = service_spike1.getService();
+        // var mySPIKE2 = service_spike2.getService();
 
         var graphInterfaceOne = new graphInterface();
-        graphInterfaceOne.init(mySPIKE,"mySPIKE1_graphbox");
+        graphInterfaceOne.init(mySPIKE1,"mySPIKE1_graphbox");
+        // var graphInterfaceTwo = new graphInterface();
+        // graphInterfaceTwo.init(mySPIKE2,"mySPIKE2_graphbox");
 
         window.addEventListener("load", function () {
+
+
             $("#mySPIKE1_graphbox").find($("#portSelect")).on("change", () => {
                 graphInterfaceOne.change_dataSelect()
             }) 
@@ -141,7 +163,7 @@
             service_spike.addEventListener("click", async () => {
                 await sleep(5000); // wait for user to select port
                 console.log("clicked")
-                if ( await mySPIKE.isActive() ) {
+                if ( await mySPIKE1.isActive() ) {
                     console.log("service active")
                     graphInterfaceOne.ports_to_selects();
                     // start graphing
@@ -175,7 +197,56 @@
                 }
             })
             dragElement("mySPIKE1_graphbox");
+
+            /*
+            $("#mySPIKE2_graphbox").find($("#portSelect")).on("change", () => {
+                graphInterfaceOne.change_dataSelect()
+            })
+            $("#mySPIKE2_graphbox").find($("#dataSelect")).on("change", () => {
+                graphInterfaceOne.graph_it();
+            })
+
+            service_spike2.addEventListener("click", async () => {
+                await sleep(5000); // wait for user to select port
+                console.log("clicked")
+                if (await mySPIKE2.isActive()) {
+                    console.log("service active")
+                    graphInterfaceOne.ports_to_selects();
+                    // start graphing
+                    // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
+                    $(function () {
+                        Plotly.plot('chart', [{
+                            y: [graphInterfaceOne.graph_it()],
+                            type: 'line'
+                        }]);
+
+                        var cnt = 0;
+                        setInterval(async function () {
+                            var datapoint;
+                            try {
+                                datapoint = await graphInterfaceOne.graph_it();
+                            }
+                            catch (error) {
+
+                            }
+                            Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
+                            cnt++;
+                            if (cnt > 500) {
+                                Plotly.relayout('chart', {
+                                    xaxis: {
+                                        range: [cnt - 500, cnt]
+                                    }
+                                });
+                            }
+                        }, 15);
+                    })
+                }
+            }) 
+            
             dragElement("mySPIKE2_graphbox");
+            */
+
+            // copy and paste commented section for every additional spike, and change variables accordingly
         })
 
         //sleep function
