@@ -10,26 +10,34 @@ History:
     Created by Jeremy on 7/20/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+1. activate service systemlink
+2. activate EITHER a receiving SPIKE service or a sending SPIKE service
+3. wait for motor ports to append to drop down list
+4. if RECEIVING: choose motor to control the speed of ||| if SENDING: choose motor to get the speed of
+5. hit select
+6. rotate the "SENDING" motor and see the "RECEIVING" motor move
 -->
+
 <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
 <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
 <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
 <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
 <html>
     <div id="servicedock" style="float:left;">
+        <service-systemlink id="service_systemlink"></service-systemlink>
         <service-spike id="service_spike_receiving"></service-spike>
         <span> receiving </span>
         <service-spike id="service_spike_sending"></service-spike>
         <div> sending </div>
-        <service-systemlink id = "service_systemlink"></service-systemlink>
     </div>
     <div id = "receiving" class = "demobox">
         <center class="target_ignore">
             <h1 class="target_ignore"> Getting motor value from cloud</h1>
         </center>
-        <select id="recv portSelect" class="select_components target_ignore">
+        <select id="portSelect" class="select_components target_ignore">
         </select>
-        <input id = "recv selectport" type = "button" value = "select">
+        <input id = "selectport" type = "button" value = "select">
     </div>
     <div id = "sending" class = "demobox">
         <center class = "target_ignore">
@@ -40,7 +48,9 @@ LICENSE: MIT
         <input id="selectport" type="button" value="select">
     </div>
     <script>
-        var receiving;
+        var receiving; // flag for webpage ( true if page for receving, false if page for sending)
+
+        /* define objects for Service use and DOM manipulation*/
         var RECVbutton = document.getElementById("service_spike_receiving");
         var SENDbutton = document.getElementById("service_spike_sending");
 
@@ -48,27 +58,31 @@ LICENSE: MIT
         var mySENDSPIKE = document.getElementById("service_spike_sending").getService();
         var mySL = document.getElementById("service_systemlink").getService();
 
+        // make divs draggable
         dragElement("receiving")
         dragElement("sending")
 
+
+        /* get the ports of selected SPIKE to which motors are connected to*/
         async function getMotorPorts() {
+            // if receiving motor values            
             if ( receiving ) {
+                console.log("receiving")
                 var portsInfo = await myRECVSPIKE.getPortsInfo();
                 var motorPorts = [];
                 for (var key in portsInfo) {
-                    console.log("key", key);
                     if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
                         motorPorts.push(key);
                     }
                 }
                 return motorPorts;
             }
+            // if sending motor values
             else {
-                console.log("here")
+                console.log("sending")
                 var portsInfo = await mySENDSPIKE.getPortsInfo();
                 var motorPorts = [];
                 for (var key in portsInfo) {
-                    console.log("key", key);
                     if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
                         motorPorts.push(key);
                     }
@@ -77,9 +91,11 @@ LICENSE: MIT
             }
         }
 
+        /* append the motor ports to select HTML element */
         async function initPortSelect(motorPorts) {
             // if receiving motor values
             if ( receiving ) {
+                console.log("receiving");
                 for ( var port in motorPorts ) {
                     $("#receiving").find("#portSelect").append("<option id = "+ motorPorts[port] + ">" + motorPorts[port] +"</option>");
                 }
@@ -92,22 +108,63 @@ LICENSE: MIT
             }
         }
 
+        /* when DOM content is loaded */
         window.addEventListener("load", async function () {
 
+            // when sending motor values
             SENDbutton.addEventListener("click", async function () {
-                await sleep(5000);
-                var motorPorts = await getMotorPorts();
-                initPortSelect(motorPorts);
-
+                
+                receiving = false; //set the "receiving" flag
+                
+                await sleep(5000); // wait for Service to initialize 
+                
+                var motorPorts = await getMotorPorts(); // get ports connected to motors
+                initPortSelect(motorPorts); // append ports to <select>
+                    
+                // when the "select" button is clicked
                 $("#sending").find("#selectport").on("click", async () => {
-                    var port = await $("#portSelect option:selected").val();
-                    var portInfo = await mySENDSPIKE.getPortInfo(port);
-                    var toSend = portInfo.data.power;
-                    mySL.setTagValue("testInt", toSend);
+                    var sendToCloudInt = setInterval( async function() {
+                        // get the selected port
+                        var port = await $("#sending").find("#portSelect option:selected").val();
+                        
+                        // parse the motor's speed value 
+                        var portInfo = await mySENDSPIKE.getPortInfo(port);
+                        var toSend = portInfo.data.speed;
+
+                        // change the tag value in the cloud
+                        mySL.setTagValue("testInt", toSend);
+                    }, 500)
+                })
+            })
+
+            // when receiving motor values
+            RECVbutton.addEventListener("click", async () => {
+                
+                receiving = true; //set the "receiving" flag
+                
+                await sleep(5000); // wait for Service to initialize 
+                
+                var motorPorts = await getMotorPorts(); // get ports connected to motors
+                initPortSelect(motorPorts); // append ports to <select>
+                    
+                // when the "select" button is clicked
+                $("#receiving").find("#selectport").on("click", async () => { 
+                    var motorInt = setInterval(async function () {
+                        // get the selected port
+                        var port = await $("#receiving").find("#portSelect option:selected").val();
+
+                        // parse "testInt" tag's value 
+                        var tagsInfo = await mySL.getTagsInfo();
+                        var motorSpeed = tagsInfo["testInt"]["value"];
+
+                        // change the motor's speed
+                        myRECVSPIKE.motorStart(port, motorSpeed, 0);
+                    }, 500);
                 })
             })
 
         })
+
         //sleep function
         function sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
