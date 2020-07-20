@@ -1,37 +1,94 @@
 <script type = "text/javascript" src="./modules/libraries/Service_Onshape.js"></script>
+<script type="text/javascript" src="./modules/libraries/Service_GeoLocation.js"></script>
+<button id="find-me">Show my location</button><br />
+<p id="status"></p>
+<a id="map-link" target="_blank"></a>
+<input type="button" id="button1" value="buttonONE">
+<input type="button" id="button2" value="buttonTWO">
+<input type="button" id="button3" value="buttonTHREE">
 <script>
-    var onshape = new OnshapeService();
-    var method = "GET";
-    var queryObject = {}
-    // this opts is without the "query" parameter (may make things not work in the api call)
-    var opts = {
-            d: "12ae4e8452feed57f993bda3",
-            w: "bbe3cde5759d1f0c7b2a6f0f",
-            e: "866bf4cbbb1497e5cad582c5",
-            resource: "assemblies"
-    }
-    var path = '';
-    if ('path' in opts) {
-        path = opts.path;
-    } else {
-        path = onshape.buildDWMVEPath(opts);
-    }
-    //console.log("path", path)
-    var baseUrl = ('baseUrl' in opts) ? opts.baseUrl : "rogers.onshape.com";
-    var queryString = onshape.buildQueryString(opts);
-    var inputHeaders = onshape.inputHeadersFromOpts(opts);
-    var headers = onshape.buildHeaders('GET', path, queryString, inputHeaders);
-    //Send the proper header information along with the request
-    for (var key in headers) {
-            var header = {};
-            header[key] = headers[key];
-            // console.log(header);
-    }
-    var url = baseUrl + path + queryString;
-    //console.log(url)
-    // var hash = CryptoJS.HmacSHA256("Message", "secret");
-    // var hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
-    // document.write(hashInBase64);
+    buttonOne = document.getElementById("button1");
+    buttonTwo = document.getElementById("button2");
+    buttonThree = document.getElementById("button3");
 
-    onshape.getAssemblyDef();
+    var geo = new Service_GeoLocation();
+    geo.init();
+
+    buttonOne.addEventListener("click", async function () {
+        var latitude = await geo.getLatitude();
+        console.log(latitude);
+    })
+    buttonTwo.addEventListener("click", function () {
+        const options = {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 1000
+        };
+        function success(position) {
+            console.log(position.coords.latitude);
+            console.log(position.coords.longitude);
+        }
+        function error() {
+            function error() {
+                alert('Sorry, no position available.');
+            }
+        }
+        geo.watchPosition(success, error, options);
+    })
+    buttonThree.addEventListener("click", function () {
+
+    })
+    // var onshape = new OnshapeService();
+    // onshape.getAssemblyDef();
+    /*
+    function success(position) {
+        console.log(position.coords.latitude);
+        console.log(position.coords.longitude);
+    }
+
+    function error() {
+        alert('Sorry, no position available.');
+    }
+
+    const options = {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 1000
+    };
+
+    const watchID = navigator.geolocation.watchPosition(success, error, options);
+    */
+
+    /*
+    function geoFindMe() {
+
+            const status = document.querySelector('#status');
+            const mapLink = document.querySelector('#map-link');
+
+            mapLink.href = '';
+            mapLink.textContent = '';
+
+            function success(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                status.textContent = '';
+                mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+                mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+            }
+
+            function error() {
+                status.textContent = 'Unable to retrieve your location';
+            }
+
+            if (!navigator.geolocation) {
+                status.textContent = 'Geolocation is not supported by your browser';
+            } else {
+                status.textContent = 'Locating…';
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+
+        }
+
+        document.querySelector('#find-me').addEventListener('click', geoFindMe);*/
 </script>
