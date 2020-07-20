@@ -370,7 +370,7 @@ function Service_SystemLink() {
         return new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
-            var data = { "value": { "type": getValueType(newValue), "value": newValue } };
+            var data = { "value": { "type": getValueType(newValue), "value": JSON.stringify(newValue) } };
             var requestBody = data;
 
             var request = await sendXMLHTTPRequest("PUT", URL, APIKey, requestBody);
@@ -380,11 +380,10 @@ function Service_SystemLink() {
             }
 
             request.onerror = function () {
-                reject(new Error("Error at updateTAagValue"));
+                reject( new Error("Error at updateTAagValue"));
             }
         })
     }
-
 
     /* sendXMLHTTPRequest() - helper function for sending XMLHTTPRequests
     *
@@ -411,7 +410,12 @@ function Service_SystemLink() {
         else {
             request.setRequestHeader("Content-type", "application/json");
             var requestBody = JSON.stringify(body);
-            request.send(requestBody);
+            try {
+
+                request.send(requestBody);
+            } catch(e) {
+                console.log("error sending request:", request.response);
+            }
         }
 
         return request;
