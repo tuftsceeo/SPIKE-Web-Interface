@@ -1,3 +1,109 @@
+class servicegeolocation extends HTMLElement {
+
+    constructor() {
+        super();
+
+        this.active = false; // whether the service was activated
+        this.service = new Service_GeoLocation(); // instantiate a service object ( one object per button )
+
+        // Create a shadow root
+        var shadow = this.attachShadow({ mode: 'open' });
+
+        /* wrapper definition and CSS */
+
+        var wrapper = document.createElement('div');
+        wrapper.setAttribute('class', 'wrapper');
+        wrapper.setAttribute("style", "width: 50px; height: 50px; position: relative; margin-top: 10px;")
+
+        /* ServiceDock button definition and CSS */
+
+        var button = document.createElement("button");
+        button.setAttribute("id", "sl_button");
+        button.setAttribute("class", "SD_button");
+
+        var imageRelPath = "./modules/views/way.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var length = 50; // for width and height of button
+        var buttonBackgroundColor = "#A2E1EF" // background color of the button
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
+            + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
+        button.setAttribute("style", buttonStyle);
+
+        /* status circle definition and CSS */
+
+        var status = document.createElement("div");
+        status.setAttribute("class", "status");
+        var length = 20; // for width and height of circle
+        var statusBackgroundColor = "red" // default background color of service (inactive color)
+        var posLeft = 30;
+        var posTop = 20;
+        var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
+            "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
+        status.setAttribute("style", statusStyle);
+
+        /* event listeners */
+
+        button.addEventListener("mouseleave", function (event) {
+            button.style.backgroundColor = "#A2E1EF";
+            button.style.color = "#000000";
+        });
+
+        button.addEventListener("mouseenter", function (event) {
+            button.style.backgroundColor = "#FFFFFF";
+            button.style.color = "#000000";
+        })
+
+        // when ServiceDock button is double clicked
+        this.addEventListener("click", async function () {
+            // check active flag so once activated, the service doesnt reinit
+            if (!this.active) {
+                console.log("activating service");
+                var initSuccessful = await this.service.init();
+                if (initSuccessful) {
+                    this.active = true;
+                    status.style.backgroundColor = "green";
+                }
+                // var checkConnection = setInterval(function () {
+                //     if (!service.isActive()) {
+                //         clearInterval(checkConnection);
+                //         status.style.backgroundColor = "red";
+                //     }
+                // }, 5000)
+            }
+        });
+
+
+        shadow.appendChild(wrapper);
+        button.appendChild(status);
+        wrapper.appendChild(button);
+
+    }
+
+    /* get the Service_SPIKE object */
+    getService() {
+        return this.service;
+    }
+
+    /* get whether the ServiceDock button was clicked */
+    getClicked() {
+        return this.active;
+    }
+
+    // initialize the service (is not used in this class but available for use publicly)
+    async init() {
+        var initSuccess = await this.service.init();
+        if (initSuccess) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+}
+
+// when defining custom element, the name must have at least one - dash 
+window.customElements.define('service-geolocation', servicegeolocation);
+
+
 /*
 Project Name: SPIKE Prime Web Interface
 File name: Service_GeoLocation.js
@@ -52,8 +158,7 @@ function Service_GeoLocation() {
             return true;
         } else {
             /* geolocation IS NOT available */
-            console.log(Error("geolocation is not available on this browser or device"));
-            return false;
+            throw Error("geolocation is not available on this browser or device");
         }
     }
 
@@ -105,10 +210,10 @@ function Service_GeoLocation() {
     async function watchPosition(success, error, optionsInput) {
         var options = optionsInput;
 
-        if ( watchPositionActive ) {
+        if (watchPositionActive) {
             await clearWatchPosition(id);
             id = navigator.geolocation.watchPosition(success, error, options);
-        } 
+        }
         else {
             id = navigator.geolocation.watchPosition(success, error, options);
         }
@@ -139,10 +244,10 @@ function Service_GeoLocation() {
     * - may clear the previous watchPosition
     */
     async function clearWatchPosition(idInput) {
-        if ( idInput !== undefined ) {
+        if (idInput !== undefined) {
             navigator.geolocation.clearWatch(idInput);
         } else {
-            navigator.geolocation.clearWatch(id);           
+            navigator.geolocation.clearWatch(id);
         }
     }
 
