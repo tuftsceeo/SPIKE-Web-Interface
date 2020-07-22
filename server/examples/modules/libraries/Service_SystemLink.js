@@ -2,7 +2,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: Service_SystemLink.js
 Author: Jeremy Jung
-Last update: 7/20/20
+Last update: 7/22/20
 Description: SystemLink Service Library (OOP)
 History:
     Created by Jeremy on 7/15/20
@@ -28,6 +28,9 @@ function Service_SystemLink() {
     let serviceActive = false; // set to true when service goes through init
 
     let pollInterval = 1000;
+
+    var funcAtInit = undefined; // function to call after init
+
     //////////////////////////////////////////
     //                                      //
     //           Public Functions           //
@@ -69,6 +72,14 @@ function Service_SystemLink() {
             // initialize the tagsInfo global variable
             updateTagsInfo();
             active = true;
+
+            await sleep(2000); // wait for service to init
+
+            // call funcAtInit if defined
+            if (funcAtInit !== undefined) {
+                funcAtInit();
+            }
+
             return true;
         }
         else {
@@ -76,11 +87,29 @@ function Service_SystemLink() {
         }
     }
 
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
+    }
+
 
     /* getTagsInfo() - return the tagsInfo global variable
     *
     * Returns:
     * {tagsInfo} (object) - object containing basic information about currently existing tags in the cloud
+    * // USAGE //
+    * var tagsInfo = await getTagsInfo();
+    * tagsInfo[{string of tag name}].value for value of tag 
+    * tagsInfo[{string of tag name}].value for datatype of tag
     */
     async function getTagsInfo() {
         return tagsInfo;
@@ -109,6 +138,11 @@ function Service_SystemLink() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
+
+    //sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     /* checkAPIKey() - check if Systemlink API key is valid for use
     * 
@@ -200,18 +234,37 @@ function Service_SystemLink() {
                 for (var i = 0; i < tagsAmount; i++) {
 
                     // parse information of the tags
-                    var value = tagsInfoArray[i].current.value.value;
-                    var valueType = tagsInfoArray[i].current.value.type;
-                    var tagName = tagsInfoArray[i].tag.path;
 
-                    var valueToAdd = await getValueFromType(valueType, value);
-                    // store tag information
-                    var pathInfo = {};
-                    pathInfo["value"] = valueToAdd;
-                    pathInfo["type"] = valueType;
+                    try {
+                        var value = tagsInfoArray[i].current.value.value;
+                        var valueType = tagsInfoArray[i].current.value.type;
+                        var tagName = tagsInfoArray[i].tag.path;
 
-                    // add a tag info to the return object
-                    collectedTagsInfo[tagName] = pathInfo;
+                        var valueToAdd = await getValueFromType(valueType, value);
+
+                        // store tag information
+                        var pathInfo = {};
+                        pathInfo["value"] = valueToAdd;
+                        pathInfo["type"] = valueType;
+
+                        // add a tag info to the return object
+                        collectedTagsInfo[tagName] = pathInfo;
+                    }
+                    // when value is not yet assigned to tag
+                    catch (e) {
+                        var value = "NONE"
+                        var valueType = tagsInfoArray[i].tag.type;
+                        var tagName = tagsInfoArray[i].tag.path;
+
+                        var valueToAdd = await getValueFromType(valueType, value);
+                        // store tag information
+                        var pathInfo = {};
+                        pathInfo["value"] = valueToAdd;
+                        pathInfo["type"] = valueType;
+
+                        // add a tag info to the return object
+                        collectedTagsInfo[tagName] = pathInfo;
+                    }
                 }
 
                 resolve(collectedTagsInfo)
@@ -238,7 +291,7 @@ function Service_SystemLink() {
         return new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
-            var data = { "value": { "type": getValueType(newValue), "value": newValue } };
+            var data = { "value": { "type": getValueType(newValue), "value": JSON.stringify(newValue) } };
             var requestBody = data;
 
             var request = await sendXMLHTTPRequest("PUT", URL, APIKey, requestBody);
@@ -252,7 +305,6 @@ function Service_SystemLink() {
             }
         })
     }
-
 
     /* sendXMLHTTPRequest() - helper function for sending XMLHTTPRequests
     *
@@ -279,7 +331,12 @@ function Service_SystemLink() {
         else {
             request.setRequestHeader("Content-type", "application/json");
             var requestBody = JSON.stringify(body);
-            request.send(requestBody);
+            try {
+
+                request.send(requestBody);
+            } catch (e) {
+                console.log("error sending request:", request.response);
+            }
         }
 
         return request;
@@ -348,6 +405,7 @@ function Service_SystemLink() {
         init: init,
         getTagsInfo: getTagsInfo,
         setTagValue: setTagValue,
+        executeAfterInit: executeAfterInit,
         isActive: isActive
     }
 }

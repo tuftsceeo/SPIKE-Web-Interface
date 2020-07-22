@@ -25,11 +25,33 @@ function Service_Google() {
     var API_KEY = 'AIzaSyCAYc49qBvn6aY2nPPskx5yqx811kzDubU';
     
     var googleSignedIn = false;
+    
+    var funcAtInit = undefined; // function to call after init
+
     async function init() {
         // initialize Google API client  load the auth2 library and API client library.
         await gapi.load("client:auth2", initClient);
-        // see if Google suite user is signed in 
-        console.log(gapi);
+
+        await sleep(2000); // wait for service to init
+
+        // call funcAtInit if defined
+        if (funcAtInit !== undefined) {
+            funcAtInit();
+        }
+    }
+
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
     }
 
     function signInProcess( isSignedIn, cb ) {
@@ -71,9 +93,15 @@ function Service_Google() {
             appendPre(JSON.stringify(error, null, 2));
         }); */
     }
+
+    //sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     
     return {
-        init: init
+        init: init,
+        executeAfterInit: executeAfterInit
     }
 }
 

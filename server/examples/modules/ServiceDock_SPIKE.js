@@ -122,7 +122,7 @@ window.customElements.define('service-spike', servicespike);
 Project Name: SPIKE Prime Web Interface
 File name: Service_SPIKE.js
 Author: Jeremy Jung
-Last update: 7/15/20
+Last update: 7/22/20
 Description: SPIKE Service Library (OOP)
 Credits/inspirations:
     Based on code wrriten by Ethan Danahy, Chris Rogers
@@ -169,12 +169,12 @@ function Service_SPIKE() {
     // object containing real-time info on devices connected to each port of SPIKE Prime 
     let ports =
     {
-        "A": { "None": {} },
-        "B": { "None": {} },
-        "C": { "None": {} },
-        "D": { "None": {} },
-        "E": { "None": {} },
-        "F": { "None": {} }
+        "A": { "device": "none", "data": {} },
+        "B": { "device": "none", "data": {} },
+        "C": { "device": "none", "data": {} },
+        "D": { "device": "none", "data": {} },
+        "E": { "device": "none", "data": {} },
+        "F": { "device": "none", "data": {} }
     }
     let hub = 
     {
@@ -186,6 +186,8 @@ function Service_SPIKE() {
     var micropython_interpreter = false; // whether micropython was reached or not
 
     let serviceActive = false; //serviceActive flag
+
+    var funcAtInit = undefined; // function to call after init
 
     //////////////////////////////////////////
     //                                      //
@@ -202,7 +204,7 @@ function Service_SPIKE() {
     * - Starts streaming UJSONRPC
     * 
     * Note:
-    * This function needs to be executed first before executing any other public functions of this class
+    * - this function needs to be executed after executeAfterInit but before all other public functions
     */
     async function init() {
         // initialize web serial connection
@@ -212,11 +214,32 @@ function Service_SPIKE() {
             // start streaming UJSONRPC
             streamUJSONRPC();
             serviceActive = true;
+            
+            await sleep(2000); // wait for service to init
+            
+            // call funcAtInit if defined
+            if ( funcAtInit !== undefined ) {
+                funcAtInit();
+            }
             return true;
         }
         else {
             return false;
         }
+    }
+
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
     }
 
     /* sendDATA() - send UJSON RPC command to the SPIKE Prime
@@ -749,6 +772,7 @@ function Service_SPIKE() {
         rebootHub: rebootHub,
         reachMicroPy: reachMicroPy,
         sendPythonDATA: sendPythonDATA,
+        executeAfterInit: executeAfterInit,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
         getHubInfo: getHubInfo,
