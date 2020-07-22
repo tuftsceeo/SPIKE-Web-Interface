@@ -122,7 +122,7 @@ window.customElements.define('service-spike', servicespike);
 Project Name: SPIKE Prime Web Interface
 File name: Service_SPIKE.js
 Author: Jeremy Jung
-Last update: 7/15/20
+Last update: 7/22/20
 Description: SPIKE Service Library (OOP)
 Credits/inspirations:
     Based on code wrriten by Ethan Danahy, Chris Rogers
@@ -169,12 +169,12 @@ function Service_SPIKE() {
     // object containing real-time info on devices connected to each port of SPIKE Prime 
     let ports =
     {
-        "A": { "None": {} },
-        "B": { "None": {} },
-        "C": { "None": {} },
-        "D": { "None": {} },
-        "E": { "None": {} },
-        "F": { "None": {} }
+        "A": { "device": "none", "data": {} },
+        "B": { "device": "none", "data": {} },
+        "C": { "device": "none", "data": {} },
+        "D": { "device": "none", "data": {} },
+        "E": { "device": "none", "data": {} },
+        "F": { "device": "none", "data": {} }
     }
     let hub = 
     {
@@ -186,6 +186,8 @@ function Service_SPIKE() {
     var micropython_interpreter = false; // whether micropython was reached or not
 
     let serviceActive = false; //serviceActive flag
+
+    var funcAtInit = undefined; // function to call after init
 
     //////////////////////////////////////////
     //                                      //
@@ -202,7 +204,7 @@ function Service_SPIKE() {
     * - Starts streaming UJSONRPC
     * 
     * Note:
-    * This function needs to be executed first before executing any other public functions of this class
+    * - this function needs to be executed after executeAfterInit but before all other public functions
     */
     async function init() {
         // initialize web serial connection
@@ -212,11 +214,32 @@ function Service_SPIKE() {
             // start streaming UJSONRPC
             streamUJSONRPC();
             serviceActive = true;
+            
+            await sleep(2000); // wait for service to init
+            
+            // call funcAtInit if defined
+            if ( funcAtInit !== undefined ) {
+                funcAtInit();
+            }
             return true;
         }
         else {
             return false;
         }
+    }
+
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
     }
 
     /* sendDATA() - send UJSON RPC command to the SPIKE Prime
@@ -379,9 +402,10 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    async function displayImage(image) {
+    async function displaySetPixel ( x, y, brightness ) {
         var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.display_image", "p": {"image":' + '"' + image + '"' + '} }'
+        var command = '{"i":' + randomId + ', "m": "scratch.display_set_pixel", "p": {"x":' + x +
+            ', "y":' + y + ', "brightness":' + brightness + '} }';
         sendDATA(command);
     }
 
@@ -392,43 +416,73 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    /* doesnt work, runtime_error a KeyError at handling motor_stop in python firmware */
-    async function motorStop(port) {
+    async function motorGoRelPos(port, position, speed) {
         var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.motor_stop", "p": {"port":' + '"' + port + '"' + '} }';
+        var command = '{"i":' + randomId + 
+                    ', "m": "scratch.motor_go_to_relative_position"' + 
+                    ', "p": {' + 
+                        '"port":' + '"' + port + '"' +
+                        ', "position":' + position + 
+                        ', "speed":' + speed + 
+                        ', "stall":' + 0 +
+                        ', "stop":' + 0 + 
+                    '} }';
         sendDATA(command);
     }
+
+    async function motorRunTimed(port, time, speed) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.motor_run_timed"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "time":' + time +
+            ', "speed":' + speed +
+            ', "stall":' + 0 +
+            ', "stop":' + 0 +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function motorRunDegrees(port, degrees, speed) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.motor_run_for_degrees"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "degrees":' + degrees +
+            ', "speed":' + speed +
+            ', "stall":' + 0 +
+            ', "stop":' + 0 +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function soundBeep(volume, note) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.sound_beep"' +
+            ', "p": {' +
+            ', "volume":' + volume +
+            ', "note":' + note +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function soundStop(volume, note) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.sound_off"' +
+            '}';
+        sendDATA(command);
+    }
+    
 
     async function motorPwm(port, power, stall) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
             ', "power":' + power + ', "stall":' + stall + '} }';
         sendDATA(command);
-    }
-
-    async function lightUltrasonic(port, lights) {
-        var lightsOptions = ['upper-left', 'upper-right', 'lower-left', 'lower-right'];
-        var validLights = false;
-        console.log("lights", lights)
-        // check if the lights parameter is correctly given
-        for ( var option in lightsOptions ) {
-            console.log("option", option)
-            if ( lightsOptions[option] == lights ) {
-                validLights = true;
-                break;
-            }
-        }
-        // throw error when invalid parameter
-        if ( !validLights ) {
-            throw Error("lights parameter is not valid, choose from: 'upper-left', 'upper-right', 'lower-left', 'lower-right'")
-        }
-        else {
-            var randomId = Math.floor((Math.random() * 10000));
-            var command = '{"i":' + randomId + ', "m": "scratch.ultrasonic_light_up", "p": {"port":' + '"' + port
-                + '", ' + '"lights":' + '"' + lights + '"' + '} }';
-            sendDATA(command);
-        }
-    
     }
 
     async function getFirmwareInfo() {
@@ -749,15 +803,20 @@ function Service_SPIKE() {
         rebootHub: rebootHub,
         reachMicroPy: reachMicroPy,
         sendPythonDATA: sendPythonDATA,
+        executeAfterInit: executeAfterInit,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
         getHubInfo: getHubInfo,
         displayText: displayText,
-        displayImage: displayImage,
+        soundStop: soundStop,
+        soundBeep: soundBeep,
+        motorGoRelPos: motorGoRelPos,
+        motorRunDegrees: motorRunDegrees,
+        motorRunTimed: motorRunTimed,
+        displaySetPixel: displaySetPixel,
         motorStart: motorStart,
         getFirmwareInfo: getFirmwareInfo,
         motorPwm: motorPwm,
-        lightUltrasonic: lightUltrasonic,
         isActive: isActive,
         getLatestUJSON: getLatestUJSON
     };

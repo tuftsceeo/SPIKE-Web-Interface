@@ -48,9 +48,56 @@ LICENSE: MIT
         var mySENDSPIKE = document.getElementById("service_spike_sending").getService();
         var mySL = document.getElementById("service_systemlink").getService();
 
-        dragElement("receiving")
-        dragElement("sending")
+        myRECVSPIKE.executeAfterInit(RecvMain); //execute argument after Service button pressed
+        mySENDSPIKE.executeAfterInit(SendMain); //execute argument after Service button pressed
 
+        // main function to call for the sending SPIKE after its init
+        async function SendMain() {
+                    receiving = false; //set the "receiving" flag
+
+                    var motorPorts = await getMotorPorts(); // get ports connected to motors
+                    initPortSelect(motorPorts); // append ports to <select>
+
+                    // when the "select" button is clicked
+                    $("#sending").find("#selectport").on("click", async () => {
+                        var sendToCloudInt = setInterval(async function () {
+                            // get the selected port
+                            var port = await $("#sending").find("#portSelect option:selected").val();
+
+                            // parse the motor's speed value 
+                            var portInfo = await mySENDSPIKE.getPortInfo(port);
+                            var toSend = portInfo.data.speed;
+
+                            // change the tag value in the cloud
+                            mySL.setTagValue("testInt", toSend);
+                        }, 500)
+                    })
+        }
+
+        // main function to call for the receiving SPIKE after its init
+        async function RecvMain() {
+            receiving = true; //set the "receiving" flag
+
+            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            initPortSelect(motorPorts); // append ports to <select>
+
+            // when the "select" button is clicked
+            $("#receiving").find("#selectport").on("click", async () => {
+                var motorInt = setInterval(async function () {
+                    // get the selected port
+                    var port = await $("#receiving").find("#portSelect option:selected").val();
+
+                    // parse "testInt" tag's value 
+                    var tagsInfo = await mySL.getTagsInfo();
+                    var motorSpeed = tagsInfo["testInt"]["value"];
+
+                    // change the motor's speed
+                    myRECVSPIKE.motorStart(port, motorSpeed, 0);
+                }, 500);
+            })
+        }
+
+        /* get the ports of selected SPIKE to which motors are connected to*/
         async function getMotorPorts() {
             if ( receiving ) {
                 var portsInfo = await myRECVSPIKE.getPortsInfo();
@@ -92,26 +139,15 @@ LICENSE: MIT
             }
         }
 
-        window.addEventListener("load", async function () {
-
-            SENDbutton.addEventListener("click", async function () {
-                await sleep(5000);
-                var motorPorts = await getMotorPorts();
-                initPortSelect(motorPorts);
-
-                $("#sending").find("#selectport").on("click", async () => {
-                    var port = await $("#portSelect option:selected").val();
-                    var portInfo = await mySENDSPIKE.getPortInfo(port);
-                    var toSend = portInfo.data.power;
-                    mySL.setTagValue("testInt", toSend);
-                })
-            })
-
-        })
         //sleep function
         function sleep(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+
+        // make divs draggable
+        dragElement("receiving")
+        dragElement("sending")
 
     </script>
 </html>

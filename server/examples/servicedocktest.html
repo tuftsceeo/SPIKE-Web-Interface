@@ -121,16 +121,25 @@
         window.addEventListener("load", async function() {
 
             $("#delay_amount").on("change", async () => {
-                console.log("hi")
-                var newInterval = await $("#delay_amount").val();
-                clearInterval(streamInt);
-                var streamInt = setInterval(async function () {
-                    REPL.value = await mySPIKE.getLatestUJSON();
-                }, newInterval * 1000)
+                change_retrieval_interval();
             })
+
+            $("#send").on("click", async () => {
+                var toSend = await $("#data").val()
+                console.log(toSend);
+                mySPIKE.sendDATA(toSend);
+            })
+
+            $("#reboot").on("click", async () => {
+                mySPIKE.rebootHub();
+            })
+
+            change_retrieval_interval();
 
             dragElement("ujsonrpcbox")
         })
+
+
     </script>
     <style>
         #REPL {

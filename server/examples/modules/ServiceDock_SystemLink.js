@@ -115,7 +115,7 @@ window.customElements.define('service-systemlink', servicesystemlink);
 Project Name: SPIKE Prime Web Interface
 File name: Service_SystemLink.js
 Author: Jeremy Jung
-Last update: 7/15/20
+Last update: 7/22/20
 Description: SystemLink Service Library (OOP)
 History:
     Created by Jeremy on 7/15/20
@@ -141,6 +141,9 @@ function Service_SystemLink() {
     let serviceActive = false; // set to true when service goes through init
 
     let pollInterval = 1000;
+
+    var funcAtInit = undefined; // function to call after init
+
     //////////////////////////////////////////
     //                                      //
     //           Public Functions           //
@@ -182,11 +185,33 @@ function Service_SystemLink() {
             // initialize the tagsInfo global variable
             updateTagsInfo();
             active = true;
+            
+            await sleep(2000); // wait for service to init
+
+            // call funcAtInit if defined
+            if (funcAtInit !== undefined) {
+                funcAtInit();
+            }
+
             return true;
         }
         else {
             return false;
         }
+    }
+
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
     }
 
 
@@ -222,6 +247,11 @@ function Service_SystemLink() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
+
+    //sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     /* checkAPIKey() - check if Systemlink API key is valid for use
     * 
@@ -461,6 +491,7 @@ function Service_SystemLink() {
         init: init,
         getTagsInfo: getTagsInfo,
         setTagValue: setTagValue,
+        executeAfterInit: executeAfterInit,
         isActive: isActive
     }
 }

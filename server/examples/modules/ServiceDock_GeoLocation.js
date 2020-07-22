@@ -108,7 +108,7 @@ window.customElements.define('service-geolocation', servicegeolocation);
 Project Name: SPIKE Prime Web Interface
 File name: Service_GeoLocation.js
 Author: Jeremy Jung
-Last update: 7/20/20
+Last update: 7/22/20
 Description: GeoLocation service library. Gets the location of the device.
 Credits/inspirations:
     https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API
@@ -122,6 +122,7 @@ needs to be used with a navigator
 
 
 function Service_GeoLocation() {
+
     //////////////////////////////////////////
     //                                      //
     //          Global Variables            //
@@ -133,6 +134,7 @@ function Service_GeoLocation() {
     var id; // id for watchPosition
     var watchPositionActive = false;
 
+    var funcAtInit = undefined; // function to call after init
 
     //////////////////////////////////////////
     //                                      //
@@ -155,11 +157,33 @@ function Service_GeoLocation() {
         if ('geolocation' in navigator) {
             /* geolocation is available */
             await setCurrentPosition();
+
+            await sleep(2000); // wait for service to init
+
+            // call funcAtInit if defined
+            if (funcAtInit !== undefined) {
+                funcAtInit();
+            }
+
             return true;
         } else {
             /* geolocation IS NOT available */
             throw Error("geolocation is not available on this browser or device");
         }
+    }
+
+    /* executeAfterInit() - get the callback function to execute after service is initialized
+    *
+    * Parameter:
+    * {callback} (function) - function to execute after initialization
+    * Effect:
+    * - assigns global variable funcAtInit a pointer to callback function
+    *
+    * Note:
+    * This function needs to be executed before calling init()
+    */
+    function executeAfterInit(callback) {
+        funcAtInit = callback;
     }
 
     /* getPosition() - get the latitude and longitude in an array
@@ -226,6 +250,11 @@ function Service_GeoLocation() {
     //                                      //
     //////////////////////////////////////////
 
+    //sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     /* setCurrentPosition() - set the current position of device to latitude, longitude global vars
     */
     async function setCurrentPosition() {
@@ -256,7 +285,8 @@ function Service_GeoLocation() {
         getPosition: getPosition,
         getLatitude: getLatitude,
         getLongitude: getLongitude,
-        watchPosition: watchPosition
+        watchPosition: watchPosition,
+        executeAfterInit: executeAfterInit
     }
 
 

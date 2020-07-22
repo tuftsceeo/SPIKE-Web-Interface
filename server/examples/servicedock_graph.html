@@ -60,17 +60,17 @@ LICENSE: MIT
     function graphInterface() {
 
         let graphBoxId;
-        let Service_SPIKE;
+        let Service_SPIKE_Object;
 
-        // first param: Service_SPIKE object
+        // first param: Service_SPIKE_Object object
         // second param: #graphbox element id
         function init(serviceSPIKEInput, graphBoxInput) {
             graphBoxId = graphBoxInput;
-            Service_SPIKE = serviceSPIKEInput;
+            Service_SPIKE_Object = serviceSPIKEInput;
         }
 
         async function ports_to_selects() {
-            var portsInfo = await Service_SPIKE.getPortsInfo();
+            var portsInfo = await Service_SPIKE_Object.getPortsInfo();
             console.log("portsInfo",portsInfo)
 
             // iterate through all ports and assign its device types to options
@@ -123,9 +123,12 @@ LICENSE: MIT
             var selected_port = $("#" + graphBoxId).find(selectedPortHTML).attr('id');
             var selected_data = $("#" + graphBoxId).find(selectedDataHTML).attr('id');
 
-            var info = await Service_SPIKE.getPortInfo(selected_port);
-            var y_variable = info.data[selected_data];
-            return y_variable;
+            var info = await Service_SPIKE_Object.getPortInfo(selected_port);
+            if (info.device != "none") {
+                var y_variable = info.data[selected_data];
+                return y_variable;
+            }
+            return null;
         }
 
         return {
@@ -141,15 +144,46 @@ LICENSE: MIT
 <script>
 
         var service_spike1 = document.getElementById("service_spike1");
-        //var servie_spike2 = document.getElementById("service_spike2");
         var mySPIKE1 = service_spike1.getService();
-        // var mySPIKE2 = service_spike2.getService();
+        mySPIKE1.executeAfterInit(SPIKE1afterInit);
 
         var graphInterfaceOne = new graphInterface();
-        graphInterfaceOne.init(mySPIKE1,"mySPIKE1_graphbox");
-        // var graphInterfaceTwo = new graphInterface();
-        // graphInterfaceTwo.init(mySPIKE2,"mySPIKE2_graphbox");
+        graphInterfaceOne.init(mySPIKE1, "mySPIKE1_graphbox");
 
+        async function SPIKE1afterInit() {
+            console.log("service active");
+            await graphInterfaceOne.ports_to_selects();
+            // start graphing
+            // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
+            $(function () {
+                Plotly.plot('chart', [{
+                    y: [graphInterfaceOne.graph_it()],
+                    type: 'line'
+                }]);
+
+                var cnt = 0;
+                setInterval(async function () {
+                    var datapoint;
+                    try {
+                        datapoint = await graphInterfaceOne.graph_it();
+                    }
+                    catch (error) {
+
+                    }
+                    Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
+                    cnt++;
+                    if (cnt > 500) {
+                        Plotly.relayout('chart', {
+                            xaxis: {
+                                range: [cnt - 500, cnt]
+                            }
+                        });
+                    }
+                }, 15);
+            })
+            graphInterfaceOne.change_dataSelect()
+        }
+        
         window.addEventListener("load", function () {
 
 
@@ -160,91 +194,7 @@ LICENSE: MIT
                 graphInterfaceOne.graph_it();
             }) 
 
-            service_spike.addEventListener("click", async () => {
-                await sleep(5000); // wait for user to select port
-                console.log("clicked")
-                if ( await mySPIKE1.isActive() ) {
-                    console.log("service active")
-                    graphInterfaceOne.ports_to_selects();
-                    // start graphing
-                    // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
-                    $(function () {
-                        Plotly.plot('chart', [{
-                            y: [graphInterfaceOne.graph_it()],
-                            type: 'line'
-                        }]);
-
-                        var cnt = 0;
-                        setInterval(async function () {
-                            var datapoint;
-                            try {
-                                datapoint = await graphInterfaceOne.graph_it();
-                            }
-                            catch (error) {
-
-                            }
-                            Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
-                            cnt++;
-                            if (cnt > 500) {
-                                Plotly.relayout('chart', {
-                                    xaxis: {
-                                        range: [cnt - 500, cnt]
-                                    }
-                                });
-                            }
-                        }, 15);
-                    })
-                }
-            })
             dragElement("mySPIKE1_graphbox");
-
-            /*
-            $("#mySPIKE2_graphbox").find($("#portSelect")).on("change", () => {
-                graphInterfaceOne.change_dataSelect()
-            })
-            $("#mySPIKE2_graphbox").find($("#dataSelect")).on("change", () => {
-                graphInterfaceOne.graph_it();
-            })
-
-            service_spike2.addEventListener("click", async () => {
-                await sleep(5000); // wait for user to select port
-                console.log("clicked")
-                if (await mySPIKE2.isActive()) {
-                    console.log("service active")
-                    graphInterfaceOne.ports_to_selects();
-                    // start graphing
-                    // Note: graphs every 15 miliseconds (ASYNC INTERVAL)
-                    $(function () {
-                        Plotly.plot('chart', [{
-                            y: [graphInterfaceOne.graph_it()],
-                            type: 'line'
-                        }]);
-
-                        var cnt = 0;
-                        setInterval(async function () {
-                            var datapoint;
-                            try {
-                                datapoint = await graphInterfaceOne.graph_it();
-                            }
-                            catch (error) {
-
-                            }
-                            Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
-                            cnt++;
-                            if (cnt > 500) {
-                                Plotly.relayout('chart', {
-                                    xaxis: {
-                                        range: [cnt - 500, cnt]
-                                    }
-                                });
-                            }
-                        }, 15);
-                    })
-                }
-            }) 
-            
-            dragElement("mySPIKE2_graphbox");
-            */
 
             // copy and paste commented section for every additional spike, and change variables accordingly
         })
