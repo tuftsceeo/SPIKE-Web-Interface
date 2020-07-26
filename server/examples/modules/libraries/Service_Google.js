@@ -112,7 +112,14 @@ function Service_Google() {
         
         return toReturn;
     }
-
+    /* readLatestUnreadFrom() - get the content of the latest unread message in inbox from an address
+    *
+    * Parameters:
+    * - 
+    *
+    * Returns:
+    * - decoded content of the latest unread message in inbox
+    */
     async function readLatestUnreadFrom (emailAddr) {
 
         var toReturn;
