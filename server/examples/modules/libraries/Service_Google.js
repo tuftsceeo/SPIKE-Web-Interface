@@ -20,6 +20,12 @@ https://console.developers.google.com/apis/credentials/consent/edit?authuser=1&p
 
 function Service_Google() {
 
+    //////////////////////////////////////////
+    //                                      //
+    //          Global Variables            //
+    //                                      //
+    //////////////////////////////////////////
+
     // Client ID and API key from the Developer Console
     var CLIENT_ID = '488852657628-hdh5rfov7mm1n5ta4lcpcr3gk1n4890m.apps.googleusercontent.com';
     var API_KEY = 'AIzaSyCAYc49qBvn6aY2nPPskx5yqx811kzDubU';
@@ -28,11 +34,29 @@ function Service_Google() {
     
     var funcAtInit = undefined; // function to call after init
 
+    var userEmailAddr;
+
+    //////////////////////////////////////////
+    //                                      //
+    //           Public Functions           //
+    //                                      //
+    //////////////////////////////////////////
+
+    /* init() - initialize service
+    *
+    * Effect:
+    * - executes the callback function
+    *
+    * Note:
+    * This function needs to be executed after executeAfterInit() but before all other functions
+    */
     async function init() {
         // initialize Google API client  load the auth2 library and API client library.
         await gapi.load("client:auth2", initClient);
 
         await sleep(2000); // wait for service to init
+
+        getUserEmail();
 
         // call funcAtInit if defined
         if (funcAtInit !== undefined) {
@@ -44,15 +68,152 @@ function Service_Google() {
     *
     * Parameter:
     * {callback} (function) - function to execute after initialization
+    * 
     * Effect:
     * - assigns global variable funcAtInit a pointer to callback function
-    *
+    * 
     * Note:
     * This function needs to be executed before calling init()
     */
-    function executeAfterInit(callback) {
+    function executeAfterInit (callback) {
         funcAtInit = callback;
     }
+
+    /* getLabels()
+    *
+    */
+    function getLabels () {
+        var result = listLabels(); 
+        console.log("labels", result.labels); 
+    }
+
+    /* readLatestUnread() - get the content of the latest unread message in inbox
+    * 
+    * Returns:
+    * - decoded content of the latest unread message in inbox
+    */
+    async function readLatestUnread () {
+        var params = {
+            "q": "is:unread",
+            "labelIds": ["INBOX"] 
+        }
+        var msgInfo = await listMessagesID(params);
+        
+        var id = msgInfo.messages[0].id; // get the info of the latest message
+        
+        var msgBodyInfo = await readMessage(id);
+        
+        var rawMessage = msgBodyInfo.payload.body.data;
+        
+        var d = rawMessage.replace(/-/g, '+').replace(/_/g, '/');
+        var decoded = base64.decode(d)
+        
+        toReturn = decoded;
+        
+        return toReturn;
+    }
+
+    async function readLatestUnreadFrom (emailAddr) {
+
+        var toReturn;
+
+        var query = "from: " + emailAddr + " is:unread";
+        
+        var params = {
+            "q": query,
+            "labelIds": ["INBOX"]
+        }
+
+        var msgInfo = await listMessagesID(params);
+        
+        var id = msgInfo.messages[0].id; // get the info of the latest message
+        
+        var msgBodyInfo = await readMessage(id);
+
+        var rawMessage = msgBodyInfo.payload.parts[0].body.data;
+        var d = rawMessage.replace(/-/g, '+').replace(/_/g, '/'); 
+        
+        var decoded = base64.decode(d)
+
+        toReturn = decoded;
+
+        return toReturn;
+    }
+
+    async function readRandomMessage () {
+        
+        var params = {
+            "labelIds": ["INBOX"]
+        }
+
+        var msgInfo = await listMessagesID(params);
+        console.log("msgInfo", msgInfo);
+
+        var randIndex = Math.floor((Math.random() * length));
+        var id = msgInfo.messages[randIndex].id; // get the info of the latest message
+
+        var msgBodyInfo = await readMessage(id);
+        console.log("msgBodyInfo", msgBodyInfo);
+
+        var rawMessage;
+        
+        if (msgBodyInfo.payload.parts !== undefined ) {
+            rawMessage = msgBodyInfo.payload.parts[0].body.data;
+        } 
+        else if (msgBodyInfo.payload.body.data) {
+            rawMessage = msgBodyInfo.payload.body.data;
+        }
+
+        var d = rawMessage.replace(/-/g, '+').replace(/_/g, '/');
+        var decoded = base64.decode(d);
+
+        toReturn = decoded;
+
+        return toReturn;
+    }
+
+    async function readRandomThread () {
+        var params = {
+            "labelIds": ["INBOX"]
+        }
+
+        var msgInfo = await listMessagesID(params);
+        console.log("msgInfo", msgInfo);
+
+        var randIndex = Math.floor((Math.random() * length));
+        var id = msgInfo.messages[randIndex].threadId; // get the info of the latest message
+
+        var threadBodyInfo = await readThread(id);
+        console.log("threadBodyInfo", threadBodyInfo);
+
+    }
+
+    async function sendMessage (messageInput, recipient, subject) { 
+        
+        var fromLine = "From: " + userEmailAddr + "\r\n";
+        var toLine = "To: " + recipient + "\r\n";
+        var subjectLine = "Subject: " + subject + "\r\n\r\n";
+        var messageLine = messageInput;
+        var messageRFC = fromLine + toLine + subjectLine + messageLine;
+        
+        var encoded = window.btoa(messageRFC);
+        
+        var encodedGoogle = encoded.replace(/-/g, '+').replace(/_/g, '/');
+        
+        var msgInfo = await requestMessageSend(encodedGoogle);
+
+        console.log("message Sent", msgInfo);
+
+    }
+
+    async function signOut () {
+        gapi.auth2.getAuthInstance().signOut();
+    }
+    //////////////////////////////////////////
+    //                                      //
+    //          Private Functions           //
+    //                                      //
+    //////////////////////////////////////////
 
     function signInProcess( isSignedIn, cb ) {
         // if Google user already signed in
@@ -73,35 +234,171 @@ function Service_Google() {
         gapi.client.init({
             apiKey: API_KEY,
             clientId: CLIENT_ID,
-            scope: 'profile'
+            scope: 'https://mail.google.com/'
         }).then( function() {
             signInProcess(gapi.auth2.getAuthInstance().isSignedIn.get(), function () {
                 console.log("googleSignedIn", googleSignedIn);
                 console.log("Signed in")
             });
         })
-        /*
-        .then(function () {
-            // Listen for sign-in state changes.
-            gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-
-            // Handle the initial sign-in state.
-            updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-            authorizeButton.onclick = handleAuthClick;
-            signoutButton.onclick = handleSignoutClick;
-        }, function (error) {
-            appendPre(JSON.stringify(error, null, 2));
-        }); */
     }
 
+    
     //sleep function
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+
+    async function getUserEmail () {
+
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/profile";
+    
+        var profile = await sendGAPIrequest(requestInfo);
+        
+        userEmailAddr = profile.emailAddress;
+
+    }
+
+    async function requestMessageSend(rawMessageInput) {
+        
+        var toReturn;
+
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/messages/send";
+        requestInfo["method"] = "POST";
+        requestInfo["body"] = { "raw": rawMessageInput };
+        //var message =  {"message": {"raw": rawMessageInput}};
+        //requestInfo["body"] = message;
+        console.log(rawMessageInput)
+
+        toReturn = await sendGAPIrequest(requestInfo);
+
+        return toReturn;
+    }
+
+
+    async function listMessagesID (paramsInput) {
+        
+        var toReturn;
+
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/messages";
+        if ( paramsInput != undefined ) {
+            requestInfo["params"] = paramsInput
+        }
+        
+        toReturn = await sendGAPIrequest(requestInfo);
+
+        return toReturn;
+    }
+
+    
+    async function readMessage(messageID) {
+        
+        var toReturn;
+        
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/messages/" + messageID;
+        requestInfo["params"] = {"format": "full"};
+        
+        toReturn = await sendGAPIrequest(requestInfo);
+
+        return toReturn;
+
+    }
+
+    async function readThread (threadID) {
+        var toReturn;
+
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/threads/" + threadID;
+        requestInfo["params"] = { "format": "full" };
+        toReturn = await sendGAPIrequest(requestInfo);
+
+        return toReturn;
+    
+    }
+
+
+    async function listLabels() {
+        
+        var toReturn;
+        
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/labels";
+        toReturn = await sendGAPIrequest(requestInfo);
+    
+        return toReturn;
+    }
+
+    /* send the Google API request
+    *
+    * Parameters - 
+    * - {options} (Object) - Information to put in request
+    * options = { "path": path, "params": params, "method": method, "body": body, "headers": headers }
+    * - {callback} (Function) - callback function
+    *
+    * Effect:
+    * - Sends API request
+    */
+    async function sendGAPIrequest(options) {
+        // var path = options.path || undefined;
+        // var params = options.params || undefined;
+        // var method = options.method || undefined;
+        // var body = options.body || undefined;
+        // var headers = options.headers || undefined;
+        // 
+        // var requestInfo = generateRequestInfo(path, params, method, body, headers);
+        var toReturn;
+        await gapi.client.request(
+            options
+        ).then(function (response) {
+            toReturn = response.result;
+        }, function (error) {
+            console.log(error);
+            throw Error("Error at sendGAPIrequest", error);
+        })
+
+        return toReturn;
+
+    }
+    
+    function generateRequestInfo(path, params, method, body, headers) {
+        var requestInfo = {};
+
+        if (path) {
+            requestInfo["path"] = path
+        }
+        if (method) {
+            requestInfo["method"] = method;
+        }
+        if (params) {
+            requestInfo["params"] = params;
+        }
+        if (headers) {
+            requestInfo["headers"] = headers;
+        }
+        if (body) {
+            requestInfo["body"] = body;
+        }
+
+        return requestInfo;
+    }
     
     return {
         init: init,
-        executeAfterInit: executeAfterInit
+        executeAfterInit: executeAfterInit,
+        listMessagesID: listMessagesID,
+        readMessage: readMessage,
+        listLabels: listLabels,
+        getLabels: getLabels,
+        readLatestUnread, readLatestUnread,
+        readLatestUnreadFrom, readLatestUnreadFrom,
+        readRandomMessage: readRandomMessage,
+        readRandomThread: readRandomThread,
+        sendMessage: sendMessage,
+        signOut: signOut
     }
 }
 
@@ -170,3 +467,182 @@ var gapi = window.gapi = window.gapi || {}; gapi._bs = new Date().getTime(); (fu
         }, Ca; var Da = null, Z = g.trustedTypes; if (Z && Z.createPolicy) try { Da = Z.createPolicy("gapi#gapi", { createHTML: h, createScript: h, createScriptURL: h }) } catch (a) { g.console && g.console.error(a.message) } Ca = Da; var Y = Ca; var ya = function (a, b) { if (E.hee && 0 < E.hel) try { return a() } catch (c) { b && b(c), E.hel--, Ba("debug_error", function () { try { window.___jsl.hefn(c) } catch (d) { throw c; } }) } else try { return a() } catch (c) { throw b && b(c), c; } }; D.load = function (a, b) { return ya(function () { return Ba(a, b) }) }; K.bs0 = window.gapi._bs || (new Date).getTime(); L("bs0"); K.bs1 = (new Date).getTime(); L("bs1"); delete window.gapi._bs;
 }).call(this);
 gapi.load("", { callback: window["gapi_onload"], _c: { "jsl": { "ci": { "deviceType": "desktop", "oauth-flow": { "authUrl": "https://accounts.google.com/o/oauth2/auth", "proxyUrl": "https://accounts.google.com/o/oauth2/postmessageRelay", "disableOpt": true, "idpIframeUrl": "https://accounts.google.com/o/oauth2/iframe", "usegapi": false }, "debug": { "reportExceptionRate": 0.05, "forceIm": false, "rethrowException": false, "host": "https://apis.google.com" }, "enableMultilogin": true, "googleapis.config": { "auth": { "useFirstPartyAuthV2": true } }, "isPlusUser": false, "inline": { "css": 1 }, "disableRealtimeCallback": false, "drive_share": { "skipInitCommand": true }, "csi": { "rate": 0.01 }, "client": { "cors": false }, "isLoggedIn": true, "signInDeprecation": { "rate": 0.0 }, "include_granted_scopes": true, "llang": "en", "iframes": { "youtube": { "params": { "location": ["search", "hash"] }, "url": ":socialhost:/:session_prefix:_/widget/render/youtube?usegapi\u003d1", "methods": ["scroll", "openwindow"] }, "ytsubscribe": { "url": "https://www.youtube.com/subscribe_embed?usegapi\u003d1" }, "plus_circle": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix::se:_/widget/plus/circle?usegapi\u003d1" }, "plus_share": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix::se:_/+1/sharebutton?plusShare\u003dtrue\u0026usegapi\u003d1" }, "rbr_s": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix::se:_/widget/render/recobarsimplescroller" }, ":source:": "3p", "playemm": { "url": "https://play.google.com/work/embedded/search?usegapi\u003d1\u0026usegapi\u003d1" }, "savetoandroidpay": { "url": "https://pay.google.com/gp/v/widget/save" }, "blogger": { "params": { "location": ["search", "hash"] }, "url": ":socialhost:/:session_prefix:_/widget/render/blogger?usegapi\u003d1", "methods": ["scroll", "openwindow"] }, "evwidget": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix:_/events/widget?usegapi\u003d1" }, "partnersbadge": { "url": "https://www.gstatic.com/partners/badge/templates/badge.html?usegapi\u003d1" }, "dataconnector": { "url": "https://dataconnector.corp.google.com/:session_prefix:ui/widgetview?usegapi\u003d1" }, "surveyoptin": { "url": "https://www.google.com/shopping/customerreviews/optin?usegapi\u003d1" }, ":socialhost:": "https://apis.google.com", "shortlists": { "url": "" }, "hangout": { "url": "https://talkgadget.google.com/:session_prefix:talkgadget/_/widget" }, "plus_followers": { "params": { "url": "" }, "url": ":socialhost:/_/im/_/widget/render/plus/followers?usegapi\u003d1" }, "post": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix::im_prefix:_/widget/render/post?usegapi\u003d1" }, ":gplus_url:": "https://plus.google.com", "signin": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix:_/widget/render/signin?usegapi\u003d1", "methods": ["onauth"] }, "rbr_i": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix::se:_/widget/render/recobarinvitation" }, "share": { "url": ":socialhost:/:session_prefix::im_prefix:_/widget/render/share?usegapi\u003d1" }, "plusone": { "params": { "count": "", "size": "", "url": "" }, "url": ":socialhost:/:session_prefix::se:_/+1/fastbutton?usegapi\u003d1" }, "comments": { "params": { "location": ["search", "hash"] }, "url": ":socialhost:/:session_prefix:_/widget/render/comments?usegapi\u003d1", "methods": ["scroll", "openwindow"] }, ":im_socialhost:": "https://plus.googleapis.com", "backdrop": { "url": "https://clients3.google.com/cast/chromecast/home/widget/backdrop?usegapi\u003d1" }, "visibility": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix:_/widget/render/visibility?usegapi\u003d1" }, "autocomplete": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix:_/widget/render/autocomplete" }, "additnow": { "url": "https://apis.google.com/marketplace/button?usegapi\u003d1", "methods": ["launchurl"] }, ":signuphost:": "https://plus.google.com", "ratingbadge": { "url": "https://www.google.com/shopping/customerreviews/badge?usegapi\u003d1" }, "appcirclepicker": { "url": ":socialhost:/:session_prefix:_/widget/render/appcirclepicker" }, "follow": { "url": ":socialhost:/:session_prefix:_/widget/render/follow?usegapi\u003d1" }, "community": { "url": ":ctx_socialhost:/:session_prefix::im_prefix:_/widget/render/community?usegapi\u003d1" }, "sharetoclassroom": { "url": "https://www.gstatic.com/classroom/sharewidget/widget_stable.html?usegapi\u003d1" }, "ytshare": { "params": { "url": "" }, "url": ":socialhost:/:session_prefix:_/widget/render/ytshare?usegapi\u003d1" }, "plus": { "url": ":socialhost:/:session_prefix:_/widget/render/badge?usegapi\u003d1" }, "family_creation": { "params": { "url": "" }, "url": "https://families.google.com/webcreation?usegapi\u003d1\u0026usegapi\u003d1" }, "commentcount": { "url": ":socialhost:/:session_prefix:_/widget/render/commentcount?usegapi\u003d1" }, "configurator": { "url": ":socialhost:/:session_prefix:_/plusbuttonconfigurator?usegapi\u003d1" }, "zoomableimage": { "url": "https://ssl.gstatic.com/microscope/embed/" }, "appfinder": { "url": "https://gsuite.google.com/:session_prefix:marketplace/appfinder?usegapi\u003d1" }, "savetowallet": { "url": "https://pay.google.com/gp/v/widget/save" }, "person": { "url": ":socialhost:/:session_prefix:_/widget/render/person?usegapi\u003d1" }, "savetodrive": { "url": "https://drive.google.com/savetodrivebutton?usegapi\u003d1", "methods": ["save"] }, "page": { "url": ":socialhost:/:session_prefix:_/widget/render/page?usegapi\u003d1" }, "card": { "url": ":socialhost:/:session_prefix:_/hovercard/card" } } }, "h": "m;/_/scs/apps-static/_/js/k\u003doz.gapi.en.cDdhVphf8T0.O/am\u003dwQc/d\u003d1/ct\u003dzgms/rs\u003dAGLTcCPgxnVLH-m1Wb1NpO4DLY9DNtv-bQ/m\u003d__features__", "u": "https://apis.google.com/js/api.js", "hee": true, "fp": "40e311032f69167abdbc28a2945cbe12bded4ed0", "dpo": false }, "fp": "40e311032f69167abdbc28a2945cbe12bded4ed0", "annotation": ["interactivepost", "recobar", "signin2", "autocomplete", "profile"], "bimodal": ["signin", "share"] } });
+
+/*
+ * Copyright (c) 2010 Nick Galbreath
+ * http://code.google.com/p/stringencoders/source/browse/#svn/trunk/javascript
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/* base64 encode/decode compatible with window.btoa/atob
+ *
+ * window.atob/btoa is a Firefox extension to convert binary data (the "b")
+ * to base64 (ascii, the "a").
+ *
+ * It is also found in Safari and Chrome.  It is not available in IE.
+ *
+ * if (!window.btoa) window.btoa = base64.encode
+ * if (!window.atob) window.atob = base64.decode
+ *
+ * The original spec's for atob/btoa are a bit lacking
+ * https://developer.mozilla.org/en/DOM/window.atob
+ * https://developer.mozilla.org/en/DOM/window.btoa
+ *
+ * window.btoa and base64.encode takes a string where charCodeAt is [0,255]
+ * If any character is not [0,255], then an DOMException(5) is thrown.
+ *
+ * window.atob and base64.decode take a base64-encoded string
+ * If the input length is not a multiple of 4, or contains invalid characters
+ *   then an DOMException(5) is thrown.
+ */
+var base64 = {};
+base64.PADCHAR = '=';
+base64.ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+base64.makeDOMException = function () {
+    // sadly in FF,Safari,Chrome you can't make a DOMException
+    var e, tmp;
+
+    try {
+        return new DOMException(DOMException.INVALID_CHARACTER_ERR);
+    } catch (tmp) {
+        // not available, just passback a duck-typed equiv
+        // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Error
+        // https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Error/prototype
+        var ex = new Error("DOM Exception 5");
+
+        // ex.number and ex.description is IE-specific.
+        ex.code = ex.number = 5;
+        ex.name = ex.description = "INVALID_CHARACTER_ERR";
+
+        // Safari/Chrome output format
+        ex.toString = function () { return 'Error: ' + ex.name + ': ' + ex.message; };
+        return ex;
+    }
+}
+
+base64.getbyte64 = function (s, i) {
+    // This is oddly fast, except on Chrome/V8.
+    //  Minimal or no improvement in performance by using a
+    //   object with properties mapping chars to value (eg. 'A': 0)
+    var idx = base64.ALPHA.indexOf(s.charAt(i));
+    if (idx === -1) {
+        throw base64.makeDOMException();
+    }
+    return idx;
+}
+
+base64.decode = function (s) {
+    // convert to string
+    s = '' + s;
+    var getbyte64 = base64.getbyte64;
+    var pads, i, b10;
+    var imax = s.length
+    if (imax === 0) {
+        return s;
+    }
+
+    if (imax % 4 !== 0) {
+        throw base64.makeDOMException();
+    }
+
+    pads = 0
+    if (s.charAt(imax - 1) === base64.PADCHAR) {
+        pads = 1;
+        if (s.charAt(imax - 2) === base64.PADCHAR) {
+            pads = 2;
+        }
+        // either way, we want to ignore this last block
+        imax -= 4;
+    }
+
+    var x = [];
+    for (i = 0; i < imax; i += 4) {
+        b10 = (getbyte64(s, i) << 18) | (getbyte64(s, i + 1) << 12) |
+            (getbyte64(s, i + 2) << 6) | getbyte64(s, i + 3);
+        x.push(String.fromCharCode(b10 >> 16, (b10 >> 8) & 0xff, b10 & 0xff));
+    }
+
+    switch (pads) {
+        case 1:
+            b10 = (getbyte64(s, i) << 18) | (getbyte64(s, i + 1) << 12) | (getbyte64(s, i + 2) << 6);
+            x.push(String.fromCharCode(b10 >> 16, (b10 >> 8) & 0xff));
+            break;
+        case 2:
+            b10 = (getbyte64(s, i) << 18) | (getbyte64(s, i + 1) << 12);
+            x.push(String.fromCharCode(b10 >> 16));
+            break;
+    }
+    return x.join('');
+}
+
+base64.getbyte = function (s, i) {
+    var x = s.charCodeAt(i);
+    if (x > 255) {
+        throw base64.makeDOMException();
+    }
+    return x;
+}
+
+base64.encode = function (s) {
+    if (arguments.length !== 1) {
+        throw new SyntaxError("Not enough arguments");
+    }
+    var padchar = base64.PADCHAR;
+    var alpha = base64.ALPHA;
+    var getbyte = base64.getbyte;
+
+    var i, b10;
+    var x = [];
+
+    // convert to string
+    s = '' + s;
+
+    var imax = s.length - s.length % 3;
+
+    if (s.length === 0) {
+        return s;
+    }
+    for (i = 0; i < imax; i += 3) {
+        b10 = (getbyte(s, i) << 16) | (getbyte(s, i + 1) << 8) | getbyte(s, i + 2);
+        x.push(alpha.charAt(b10 >> 18));
+        x.push(alpha.charAt((b10 >> 12) & 0x3F));
+        x.push(alpha.charAt((b10 >> 6) & 0x3f));
+        x.push(alpha.charAt(b10 & 0x3f));
+    }
+    switch (s.length - imax) {
+        case 1:
+            b10 = getbyte(s, i) << 16;
+            x.push(alpha.charAt(b10 >> 18) + alpha.charAt((b10 >> 12) & 0x3F) +
+                padchar + padchar);
+            break;
+        case 2:
+            b10 = (getbyte(s, i) << 16) | (getbyte(s, i + 1) << 8);
+            x.push(alpha.charAt(b10 >> 18) + alpha.charAt((b10 >> 12) & 0x3F) +
+                alpha.charAt((b10 >> 6) & 0x3f) + padchar);
+            break;
+    }
+    return x.join('');
+}
+
+// (function (r) { if (typeof exports === "object" && typeof module !== "undefined") { module.exports = r() } else if (typeof define === "function" && define.amd) { define([], r) } else { var e; if (typeof window !== "undefined") { e = window } else if (typeof global !== "undefined") { e = global } else if (typeof self !== "undefined") { e = self } else { e = this } e.base64js = r() } })(function () { var r, e, n; return function () { function d(a, f, i) { function u(n, r) { if (!f[n]) { if (!a[n]) { var e = "function" == typeof require && require; if (!r && e) return e(n, !0); if (v) return v(n, !0); var t = new Error("Cannot find module '" + n + "'"); throw t.code = "MODULE_NOT_FOUND", t } var o = f[n] = { exports: {} }; a[n][0].call(o.exports, function (r) { var e = a[n][1][r]; return u(e || r) }, o, o.exports, d, a, f, i) } return f[n].exports } for (var v = "function" == typeof require && require, r = 0; r < i.length; r++)u(i[r]); return u } return d }()({ "/": [function (r, e, n) { "use strict"; n.byteLength = f; n.toByteArray = i; n.fromByteArray = p; var u = []; var v = []; var d = typeof Uint8Array !== "undefined" ? Uint8Array : Array; var t = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; for (var o = 0, a = t.length; o < a; ++o) { u[o] = t[o]; v[t.charCodeAt(o)] = o } v["-".charCodeAt(0)] = 62; v["_".charCodeAt(0)] = 63; function c(r) { var e = r.length; if (e % 4 > 0) { throw new Error("Invalid string. Length must be a multiple of 4") } var n = r.indexOf("="); if (n === -1) n = e; var t = n === e ? 0 : 4 - n % 4; return [n, t] } function f(r) { var e = c(r); var n = e[0]; var t = e[1]; return (n + t) * 3 / 4 - t } function h(r, e, n) { return (e + n) * 3 / 4 - n } function i(r) { var e; var n = c(r); var t = n[0]; var o = n[1]; var a = new d(h(r, t, o)); var f = 0; var i = o > 0 ? t - 4 : t; var u; for (u = 0; u < i; u += 4) { e = v[r.charCodeAt(u)] << 18 | v[r.charCodeAt(u + 1)] << 12 | v[r.charCodeAt(u + 2)] << 6 | v[r.charCodeAt(u + 3)]; a[f++] = e >> 16 & 255; a[f++] = e >> 8 & 255; a[f++] = e & 255 } if (o === 2) { e = v[r.charCodeAt(u)] << 2 | v[r.charCodeAt(u + 1)] >> 4; a[f++] = e & 255 } if (o === 1) { e = v[r.charCodeAt(u)] << 10 | v[r.charCodeAt(u + 1)] << 4 | v[r.charCodeAt(u + 2)] >> 2; a[f++] = e >> 8 & 255; a[f++] = e & 255 } return a } function s(r) { return u[r >> 18 & 63] + u[r >> 12 & 63] + u[r >> 6 & 63] + u[r & 63] } function l(r, e, n) { var t; var o = []; for (var a = e; a < n; a += 3) { t = (r[a] << 16 & 16711680) + (r[a + 1] << 8 & 65280) + (r[a + 2] & 255); o.push(s(t)) } return o.join("") } function p(r) { var e; var n = r.length; var t = n % 3; var o = []; var a = 16383; for (var f = 0, i = n - t; f < i; f += a) { o.push(l(r, f, f + a > i ? i : f + a)) } if (t === 1) { e = r[n - 1]; o.push(u[e >> 2] + u[e << 4 & 63] + "==") } else if (t === 2) { e = (r[n - 2] << 8) + r[n - 1]; o.push(u[e >> 10] + u[e >> 4 & 63] + u[e << 2 & 63] + "=") } return o.join("") } }, {}] }, {}, [])("/") });
