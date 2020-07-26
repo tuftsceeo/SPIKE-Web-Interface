@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_gmail.html
+Author: Jeremy Jung
+Last update: 6/26/20
+Description: Gmail Service example
+Credits/inspirations:
+    Based on ServiceDock by Ethan Danahy
+History: 
+    Created by Jeremy on 6/26/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+    </head>
+    <div id="servicedock" style="float:left;">
+        <service-spike id="service_spike"></service-spike>
+        <service-gmail id="service_gmail"></service-gmail>
+    </div>
+    <div id = "interface">
+        
+    </div>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var myGmail = document.getElementById("service_gmail").getService();
+
+        mySPIKE.executeAtinit();
+        myGmail.executeAtinit();
+
+        async function SPIKEfunc() {
+            
+        }
+
+
+    </script>
+
+</html>
