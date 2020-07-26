@@ -90,7 +90,7 @@ function Service_Google() {
     /* readLatestUnread() - get the content of the latest unread message in inbox
     * 
     * Returns:
-    * - decoded content of the latest unread message in inbox
+    * {toReturn} (string) decoded content of the latest unread message in inbox
     */
     async function readLatestUnread () {
         var params = {
@@ -113,6 +113,14 @@ function Service_Google() {
         return toReturn;
     }
 
+    /* readLatestUnreadFrom() - get the content of the latest unread message from an email address
+    *
+    * Parameter:
+    * {emailAddr} (string) - the address that sent the email
+    *
+    * Returns:
+    * {toReturn} (string) decoded content of the latest unread message in inbox
+    */
     async function readLatestUnreadFrom (emailAddr) {
 
         var toReturn;
@@ -140,6 +148,11 @@ function Service_Google() {
         return toReturn;
     }
 
+    /* readRandomMessage() - get the content of a random message in the inbox
+    *
+    * Returns:
+    * {toReturn} (string) decoded content of the message
+    */
     async function readRandomMessage () {
         
         var params = {
@@ -172,6 +185,10 @@ function Service_Google() {
         return toReturn;
     }
 
+    /* readRandomThread() - get a random thread in the inbox
+    * 
+    * Note: for testing purposes
+    */
     async function readRandomThread () {
         var params = {
             "labelIds": ["INBOX"]
@@ -188,6 +205,13 @@ function Service_Google() {
 
     }
 
+    /* sendMessage() - send a GMail message
+    *
+    * Parameters:
+    * {messageInput} (string) - ASCII message to send
+    * {recipient} (string) - recipient's email address
+    * {subject} (string) - subject of the message
+    */
     async function sendMessage (messageInput, recipient, subject) { 
         
         var fromLine = "From: " + userEmailAddr + "\r\n";
@@ -197,7 +221,8 @@ function Service_Google() {
         var messageRFC = fromLine + toLine + subjectLine + messageLine;
         
         var encoded = window.btoa(messageRFC);
-        
+
+        //replace so UTF-8 encoded Unicode characters may be used within the header.
         var encodedGoogle = encoded.replace(/-/g, '+').replace(/_/g, '/');
         
         var msgInfo = await requestMessageSend(encodedGoogle);
@@ -206,6 +231,8 @@ function Service_Google() {
 
     }
 
+    /* signOut() - sign a Google user out
+    */
     async function signOut () {
         gapi.auth2.getAuthInstance().signOut();
     }
@@ -215,6 +242,15 @@ function Service_Google() {
     //                                      //
     //////////////////////////////////////////
 
+    /* signInProcess() - sign the user in
+    *
+    * Parameters:
+    * {isSignedIn} (boolean) - whether Google user is signed in or not
+    * {cb} (function) - callback
+    * 
+    * Effect:
+    * - shows consent screen when signing in
+    */
     function signInProcess( isSignedIn, cb ) {
         // if Google user already signed in
         if ( isSignedIn ) {
@@ -226,10 +262,8 @@ function Service_Google() {
         cb ( googleSignedIn );
     }
 
-    /**
-         *  Initializes the API client library and sets up sign-in state
-         *  listeners.
-         */
+    /* initClient() - initialize google API client
+    */
     function initClient() {
         gapi.client.init({
             apiKey: API_KEY,
@@ -249,6 +283,9 @@ function Service_Google() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    /* getUserEmail() - get the email address of the signed in Google User
+    *
+    */
     async function getUserEmail () {
 
         var requestInfo = {};
@@ -260,6 +297,14 @@ function Service_Google() {
 
     }
 
+    /* requestMessageSend() - make Send message API request
+    *
+    * Parameters:
+    * {rawMessageInput} (string) - base64url encoded message in RFC 2822
+    *
+    * Effect:
+    * - Sends API request
+    */
     async function requestMessageSend(rawMessageInput) {
         
         var toReturn;
@@ -277,7 +322,14 @@ function Service_Google() {
         return toReturn;
     }
 
-
+    /* listMessagesID() - list the ID information of all messages
+    *
+    * Parameters:
+    * {paramsInput} (object) - parameters for the request
+    *
+    * Effect:
+    * - Sends API request
+    */
     async function listMessagesID (paramsInput) {
         
         var toReturn;
@@ -293,7 +345,14 @@ function Service_Google() {
         return toReturn;
     }
 
-    
+    /* readMessage() - read the message given an ID
+    *
+    * Parameters:
+    * {messageID} (string) - ID of the message to read
+    *
+    * Effect:
+    * - Sends API request
+    */
     async function readMessage(messageID) {
         
         var toReturn;
@@ -308,6 +367,14 @@ function Service_Google() {
 
     }
 
+    /* readThread() - read the message given a ThreadID
+    *
+    * Parameters:
+    * {threadID} (string) - ThreadID of the message to read
+    *
+    * Effect:
+    * - Sends API request
+    */
     async function readThread (threadID) {
         var toReturn;
 
@@ -320,7 +387,11 @@ function Service_Google() {
     
     }
 
-
+    /* listLabels() - list the labels in the inbox
+    *
+    * Effect:
+    * - Sends API request
+    */
     async function listLabels() {
         
         var toReturn;
@@ -332,7 +403,7 @@ function Service_Google() {
         return toReturn;
     }
 
-    /* send the Google API request
+    /* sendGAPIrequest - Helper function for sending the Google API request
     *
     * Parameters - 
     * - {options} (Object) - Information to put in request
@@ -343,13 +414,6 @@ function Service_Google() {
     * - Sends API request
     */
     async function sendGAPIrequest(options) {
-        // var path = options.path || undefined;
-        // var params = options.params || undefined;
-        // var method = options.method || undefined;
-        // var body = options.body || undefined;
-        // var headers = options.headers || undefined;
-        // 
-        // var requestInfo = generateRequestInfo(path, params, method, body, headers);
         var toReturn;
         await gapi.client.request(
             options
@@ -364,34 +428,9 @@ function Service_Google() {
 
     }
     
-    function generateRequestInfo(path, params, method, body, headers) {
-        var requestInfo = {};
-
-        if (path) {
-            requestInfo["path"] = path
-        }
-        if (method) {
-            requestInfo["method"] = method;
-        }
-        if (params) {
-            requestInfo["params"] = params;
-        }
-        if (headers) {
-            requestInfo["headers"] = headers;
-        }
-        if (body) {
-            requestInfo["body"] = body;
-        }
-
-        return requestInfo;
-    }
-    
     return {
         init: init,
         executeAfterInit: executeAfterInit,
-        listMessagesID: listMessagesID,
-        readMessage: readMessage,
-        listLabels: listLabels,
         getLabels: getLabels,
         readLatestUnread, readLatestUnread,
         readLatestUnreadFrom, readLatestUnreadFrom,
