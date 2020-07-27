@@ -25,14 +25,13 @@ NOTE: the main() function is where service dock's already declared variables
 #pongbody {
   height: 100%;
   margin: 0;
-}
-#pongbody {
+  background: black;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 body {
-  background: black;
+  background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');
 }
 </style>
 <style>
@@ -57,7 +56,8 @@ body {
   <service-spike id = "Service_SPIKE"></service-spike>
 </div>
 <div id = "pongbody">
-<canvas width="750" height="585" id="game"></canvas>
+  <canvas width="750" height="585" id="game"></canvas>
+</div>
 <script>
 const canvas = document.getElementById('game');
 // get the SPIKE_Service object linked to its service dock element
@@ -298,4 +298,3 @@ document.addEventListener('keyup', function(e) {
 requestAnimationFrame(loop);
 
 </script>
-</div>
