@@ -242,7 +242,7 @@ function Service_SPIKE() {
         funcAtInit = callback;
     }
 
-    /* sendDATA() - send UJSON RPC command to the SPIKE Prime
+    /* sendDATA() - send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter)
      * 
      * Parameters:
      * {command} (string) - a string to send (or sequence of commands, separated by new lines)
@@ -259,21 +259,39 @@ function Service_SPIKE() {
         // make sure ready to write to device
         setupWriter();
 
-        // go through each line of the command
-        // trim it, send it, and send a return...
-        for (var i = 0; i < commands.length; i++) {
-            console.log("commands.length", commands.length)
-            current = commands[i].trim();
-            //console.log("current", current);
-            // turn string into JSON
+        // send it in micropy if micropy reached
+        if (micropython_interpreter) {
+            
+            for (var i = 0; i < commands.length; i++) {
+                console.log("commands.length", commands.length)
 
-            //string_current = (JSON.stringify(current));
-            //myobj = JSON.parse(string_current);
-            var myobj = await JSON.parse(current);
+                // trim trailing, leading whitespaces
+                var current = commands[i].trim();
 
-            // turn JSON back into string and write it out
-            writer.write(JSON.stringify(myobj));
-            writer.write(RETURN); // extra return at the end
+                writer.write(current);
+                writer.write(RETURN); // extra return at the end
+            }
+        }
+        // expect json scripts if micropy not reached
+        else {
+            // go through each line of the command
+            // trim it, send it, and send a return...
+            for (var i = 0; i < commands.length; i++) {
+                
+                console.log("commands.length", commands.length)
+                
+                current = commands[i].trim();
+                //console.log("current", current);
+                // turn string into JSON
+
+                //string_current = (JSON.stringify(current));
+                //myobj = JSON.parse(string_current);
+                var myobj = await JSON.parse(current);
+
+                // turn JSON back into string and write it out
+                writer.write(JSON.stringify(myobj));
+                writer.write(RETURN); // extra return at the end
+            }
         }
     }
 
@@ -356,29 +374,6 @@ function Service_SPIKE() {
         setupWriter();
         writer.write(CONTROL_C);
         micropython_interpreter = true;
-    }
-
-    /* sendPythonDATA() - send micropy commands to hub
-    * 
-    * Effect:
-    * may make the hub do something
-    * 
-    */
-    function sendPythonDATA(command) {
-        if (micropython_interpreter) {
-            var commands = command.split("\n"); // split on new line
-            setupWriter();
-            console.log("sendpythonDATA: " + commands);
-            for (var i = 0; i < commands.length; i++) {
-                console.log("commands.length", commands.length)
-
-                // trim trailing, leading whitespaces
-                var current = commands[i].trim();
-
-                writer.write(current);
-                writer.write(RETURN); // extra return at the end
-            }
-        }
     }
 
     /* isActive() - get whether the Service was initialized or not
@@ -771,7 +766,6 @@ function Service_SPIKE() {
         sendDATA: sendDATA,
         rebootHub: rebootHub,
         reachMicroPy: reachMicroPy,
-        sendPythonDATA: sendPythonDATA,
         executeAfterInit: executeAfterInit,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
