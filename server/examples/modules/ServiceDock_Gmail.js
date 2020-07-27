@@ -17,7 +17,7 @@ class servicegmail extends HTMLElement {
         super();
 
         this.active = false; // whether the service was activated
-        this.service = new Service_Google(); // instantiate a service object ( one object per button )
+        this.service = new Service_Gmail(); // instantiate a service object ( one object per button )
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -130,7 +130,7 @@ https://developers.google.com/gmail/api/quickstart/js?authuser=1
 https://console.developers.google.com/apis/credentials/consent/edit?authuser=1&project=dogwood-seeker-284007&supportedpurview=project&duration=P1D
 */
 
-function Service_Google() {
+function Service_Gmail() {
 
     //////////////////////////////////////////
     //                                      //
@@ -147,6 +147,8 @@ function Service_Google() {
     var funcAtInit = undefined; // function to call after init
 
     var userEmailAddr;
+
+    var serviceActive = false;
 
     //////////////////////////////////////////
     //                                      //
@@ -251,7 +253,15 @@ function Service_Google() {
 
         var msgBodyInfo = await readMessage(id);
 
-        var rawMessage = msgBodyInfo.payload.parts[0].body.data;
+        var rawMessage;
+
+        if (msgBodyInfo.payload.parts !== undefined) {
+            rawMessage = msgBodyInfo.payload.parts[0].body.data;
+        }
+        else if (msgBodyInfo.payload.body.data) {
+            rawMessage = msgBodyInfo.payload.body.data;
+        }
+
         var d = rawMessage.replace(/-/g, '+').replace(/_/g, '/');
 
         var decoded = base64.decode(d)
@@ -349,6 +359,33 @@ function Service_Google() {
     async function signOut() {
         gapi.auth2.getAuthInstance().signOut();
     }
+
+    /* isActive() - get whether the Service was initialized or not
+    *
+    * Returns:
+    * {serviceActive} (boolean) - whether Service was initialized or not
+    */
+    function isActive() {
+        return serviceActive;
+    }
+
+    /* getUserEmail() - get the email address of the signed in Google User
+    *
+    */
+    async function getUserEmail() {
+
+        var requestInfo = {};
+        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/profile";
+
+        var profile = await sendGAPIrequest(requestInfo);
+
+        var emailAddr = profile.emailAddress;
+        userEmailAddr = emailAddr;
+
+        return emailAddr; 
+
+    }
+
     //////////////////////////////////////////
     //                                      //
     //          Private Functions           //
@@ -394,20 +431,6 @@ function Service_Google() {
     //sleep function
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    /* getUserEmail() - get the email address of the signed in Google User
-    *
-    */
-    async function getUserEmail() {
-
-        var requestInfo = {};
-        requestInfo["path"] = "https://www.googleapis.com/gmail/v1/users/me/profile";
-
-        var profile = await sendGAPIrequest(requestInfo);
-
-        userEmailAddr = profile.emailAddress;
-
     }
 
     /* requestMessageSend() - make Send message API request
@@ -550,7 +573,10 @@ function Service_Google() {
         readRandomMessage: readRandomMessage,
         readRandomThread: readRandomThread,
         sendMessage: sendMessage,
-        signOut: signOut
+        signOut: signOut,
+        isActive: isActive,
+        getUserEmail: getUserEmail
+    
     }
 }
 
