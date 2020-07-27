@@ -222,7 +222,7 @@ function Service_SystemLink() {
     * // USAGE //
     * var tagsInfo = await getTagsInfo();
     * tagsInfo[{string of tag name}].value for value of tag 
-    * tagsInfo[{string of tag name}].value for datatype of tag
+    * tagsInfo[{string of tag name}].type for datatype of tag
     */
     async function getTagsInfo() {
         return tagsInfo;
