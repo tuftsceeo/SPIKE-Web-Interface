@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+    <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+    <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+    <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+    <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+</head>
+<div id="servicedock" style="float:left;">
+    <service-systemlink id="service_systemlink"></service-systemlink>
+    <service-spike id="service_spike"></service-spike>
+    <service-geolocation id="service_geo"></service-geolocation>
+</div>
+<input type="button" id="button1" value="buttonONE">
+<input type="button" id="button2" value="buttonTWO">
+<input type="button" id="button3" value="buttonTHREE">
+<div id="ujsonrpcbox">
+    <!-- put "ignore"-->
+    <center class="target_ignore">
+        <p class="target_ignore">
+            UJSON RPC
+        </p>
+    </center>
+    <div id="ujsonrpcbox_panel" class="target_ignore">
+        <input type=button id="reboot" name="Send Hub Reboot" value="Send Hub Reboot">
+        <em>Live Feed refresh every <input type="text" value="1" size="4" id="delay_amount"
+                onchange=change_retrieval_interval() /> seconds</em>
+        <button id="toggleStream">toggleStream</button>
+        <button id="reachmicropy">micropy</button>
+    </div>
+    <div id="include_SL_service">
+
+    </div>
+    <div id="datastream" style="display:block">
+        <textarea id="REPL" name="REPL" value=""
+            style="font-size: 15px; font-family: Courier;position: relative; left: 20px" /></textarea>
+    </div>
+    <div id="portdatastream" style="display:none">
+        <div id="porthub" class="portData">
+            <div id="gyroInfo">
+                gyro:
+                <div id="gyro">
+                </div>
+            </div>
+            <div id="accelInfo">
+                accel:
+                <div id="accel"></div>
+            </div>
+            <div id="posiInfo">
+                position:
+                <div id="posi"></div>
+            </div>
+        </div>
+        <div id="portA" class="portData">
+            <div>port A</div>
+            <div id="portAinfo"></div>
+        </div>
+        <div id="portB" class="portData">
+            <div>port B</div>
+            <div id="portBinfo"></div>
+        </div>
+        <div id="portC" class="portData">
+            <div>port C</div>
+            <div id="portCinfo"></div>
+        </div>
+        <div id="portD" class="portData">
+            <div>port D</div>
+            <div id="portDinfo"></div>
+        </div>
+        <div id="portE" class="portData">
+            <div>port E</div>
+            <div id="portEinfo"></div>
+        </div>
+        <div id="portF" class="portData">
+            <div>port F</div>
+            <div id="portFinfo"></div>
+        </div>
+    </div>
+    <div id="ujsonrpc_send" style="display:block">
+        <textarea cols=120 rows=5 id="data" name="data" value=""
+            style="font-family: Courier; position: relative; left: 20px" /></textarea>
+        <input type=button id="send" name="Send" value="Send"
+            style="font-family: Courier; position: relative; left: 20px">
+    </div>
+</div>
+<script>
+    mySPIKE = document.getElementById("service_spike").getService();
+    mySL = document.getElementById("service_systemlink").getService();
+    REPL = document.getElementById("REPL");
+
+    buttonOne = document.getElementById("button1");
+    buttonTwo = document.getElementById("button2");
+    buttonThree = document.getElementById("button3");
+
+    buttonOne.addEventListener("click", async function () {
+        var print = await mySL.getTagsInfo();
+        console.log(print);
+    })
+    buttonTwo.addEventListener("click", async function () {
+        var print = await mySPIKE.getPortsInfo();
+        console.log(print);
+    })
+    buttonThree.addEventListener("click", async function () {
+        var print = await mySPIKE.getHubInfo();
+        console.log(print);
+
+    })
+</script>
+<script>
+    async function change_retrieval_interval() {
+        console.log("hi")
+        var newInterval = await $("#delay_amount").val();
+        clearInterval(streamInt);
+        var streamInt = setInterval(async function () {
+            REPL.value = await mySPIKE.getLatestUJSON();
+        }, newInterval * 1000)
+    }
+
+    window.addEventListener("load", async function () {
+
+        $("#delay_amount").on("change", async () => {
+            change_retrieval_interval();
+        })
+
+        $("#send").on("click", async () => {
+            var toSend = await $("#data").val()
+            console.log(toSend);
+            mySPIKE.sendDATA(toSend);
+        })
+
+        $("#reboot").on("click", async () => {
+            mySPIKE.rebootHub();
+        })
+
+        change_retrieval_interval();
+
+        dragElement("ujsonrpcbox")
+    })
+
+
+</script>
+<style>
+    #REPL {
+        width: 1300px;
+        height: 20px;
+    }
+
+    #ujsonrpcbox {
+        position: absolute;
+        top: 300px;
+        left: 20px;
+        width: 1400px;
+        height: 300px;
+        background-color: #4CE0D2;
+        border: solid;
+    }
+
+    #ujsonrpcbox_panel {
+        position: relative;
+        left: 20px;
+    }
+
+    #portdatastream {
+        position: absolute;
+        height: 120px;
+        width: 1350px;
+        left: 20px;
+    }
+
+    #ujsonrpc_send {
+        position: absolute;
+        top: 200px;
+    }
+
+    .portData {
+        background-color: white;
+        width: 190px;
+        height: 120px;
+        float: left;
+        margin: 0px 2px 0px 0px;
+    }
+</style>
+
+</html>
