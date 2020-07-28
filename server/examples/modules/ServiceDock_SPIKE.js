@@ -486,7 +486,7 @@ function Service_SPIKE() {
                 data_stream = data_stream.p;
             }
             catch (e) {
-                console.log("error parsing one_Line at get_devices", one_line);
+                console.log("error parsing one_Line at updatePortsInfo", one_line);
             }
 
 
@@ -620,6 +620,17 @@ function Service_SPIKE() {
             //catch this mysterious thing
             else if (result["m"] == 2) {
                  //console.log(one_line);
+            }
+            // give center button click
+            else if (result["m"] == 3) {
+                console.log(one_line);
+            }
+            else if (result["m"] == 11) {
+                console.log(one_line);
+            }
+            // gives orientation of the hub (leftside, up,..), tapping of hub, 
+            else if (result["m"] == 4) {
+                console.log(one_line);
             }
         }
         catch (error) {
