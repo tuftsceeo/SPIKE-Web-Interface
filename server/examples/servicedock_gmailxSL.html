@@ -324,8 +324,8 @@ hub.light_matrix.write(cloudTagValue(message))
                     stage++;
                     break;
                 case 3:
-                    explanation2.innerHTML = "You will send Micropython instructions to an email address"
-                    explanation.innerHTML = "Write the email address to send to and the subject of the email"
+                    explanation.innerHTML = "You will send Micropython instructions to an email address"
+                    explanation2.innerHTML = "Write the email address you logged in with and the subject of the email"
                     var triangleBefore = document.getElementById("systemlink_triangle");
                     triangleBefore.style.display = "none";
                     var triangle = document.getElementById("recipient_triangle");
@@ -333,8 +333,8 @@ hub.light_matrix.write(cloudTagValue(message))
                     stage++;
                     break;
                 case 4:
-                    explanation2.innerHTML = "Write a micropython instruction. You can use cloudTagValue(tagName) to substitue for values from the cloud"
-                    explanation.innerHTML = ""
+                    explanation.innerHTML = "Write a micropython instruction. You can use cloudTagValue(tagName) to substitue for values from the cloud"
+                    explanation3.innerHTML = ""
                     var triangleBefore = document.getElementById("recipient_triangle");
                     triangleBefore.style.display = "none";
                     var triangle = document.getElementById("content_triangle");
@@ -351,8 +351,8 @@ hub.light_matrix.write(cloudTagValue(message))
                     stage++;
                     break;
                 case 6:
-                    explanation2.innerHTML = "Now, you will receive the email and execute the instructions"
-                    explanation.innerHTML = "Write the email of the sender ( the address of the Google user that's logged in )"
+                    explanation.innerHTML = "Now, you will receive the email and execute the instructions"
+                    explanation2.innerHTML = "Write the email of the sender ( the address of the Google user that's logged in )"
                     var triangleBefore = document.getElementById("send_triangle");
                     triangleBefore.style.display = "none";
                     var triangle = document.getElementById("sender_triangle");
@@ -360,8 +360,8 @@ hub.light_matrix.write(cloudTagValue(message))
                     stage++;
                     break;
                 case 7:
-                    explanation2.innerHTML = "Read your inbox"
-                    explanation.innerHTML = ""
+                    explanation.innerHTML = "Read your inbox"
+                    explanation2.innerHTML = ""
                     var triangleBefore = document.getElementById("sender_triangle");
                     triangleBefore.style.display = "none";
                     var triangle = document.getElementById("read_triangle");
@@ -369,8 +369,8 @@ hub.light_matrix.write(cloudTagValue(message))
                     stage++;
                     break;
                 case 8:
-                    explanation2.innerHTML = "The cloudTagValue() has been replaced with the value from the cloud"
-                    explanation.innerHTML = "Execute the script"
+                    explanation.innerHTML = "The cloudTagValue() has been replaced with the value from the cloud"
+                    explanation2.innerHTML = "Execute the script"
                     var triangleBefore = document.getElementById("read_triangle");
                     triangleBefore.style.display = "none";
                     var triangle = document.getElementById("execute_triangle");
