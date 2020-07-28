@@ -68,14 +68,19 @@ class servicesystemlink extends HTMLElement {
         })
 
         this.addEventListener("click", async function() {
+            
             // check active flag so once activated, the service doesnt reinit
             if ( !this.active ) {
+                
                 console.log("activating service");
+                
                 var initSuccessful = await this.service.init();
+                
                 if (initSuccessful) {
                     this.active = true;
                     status.style.backgroundColor = "green";
                 }
+                
             }
         });
 
@@ -135,8 +140,7 @@ function Service_SystemLink() {
 
     let tagsInfo = {}; // contains real-time information of the tags in the cloud
 
-    // defined during init
-    let APIKey; // string of the valid APIkey
+    let APIKey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7";
 
     let serviceActive = false; // set to true when service goes through init
 
@@ -168,14 +172,10 @@ function Service_SystemLink() {
 
         // if an APIKey was specified
         if ( APIKeyInput !== undefined ) {
-            var response = await checkAPIKey(APIKeyInput);
             APIKey = APIKeyInput;
         }
-        // if no APIkey was specified, use an already existing one
-        else {
-            APIKey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7";
-            var response = await checkAPIKey(APIKey);
-        }
+
+        var response = await checkAPIKey(APIKey);
 
         // if response from checkAPIKey is valid
         if ( response ) {
@@ -244,6 +244,16 @@ function Service_SystemLink() {
     */
     function isActive(){
         return serviceActive;
+    }
+
+    /* setAPIKey() - change the APIKey
+    *
+    * Effect:
+    * - changes the global variable APIKey
+    * 
+    */
+    function setAPIKey(APIKeyInput) {
+        APIKey = APIKeyInput;
     }
 
     //////////////////////////////////////////
@@ -519,6 +529,7 @@ function Service_SystemLink() {
         getTagsInfo: getTagsInfo,
         setTagValue: setTagValue,
         executeAfterInit: executeAfterInit,
+        setAPIKey: setAPIKey,
         isActive: isActive
     }
 }
