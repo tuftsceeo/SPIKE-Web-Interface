@@ -21,8 +21,20 @@ LICENSE: MIT
         <service-spike id = "service_spike1"></service-spike>
         <!-- add more servicedock buttons when needed, change id accordingly-->
     </div>
+    <!-- The Explanation Modal box -->
+    <div id="servicedockexplain" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="explanation"> You need: A SPIKE Prime hub, various SPIKE Prime devices</p>
+            <p id="explanation2"> Connect the hub to this computer</p>
+        </div>
+    </div>
+    <div id="SPIKE_triangle" class="triangle-left triangle" style="display: none; position: absolute; left: 70px; top: 20px;"></div>
+    <div id="interface_triangle" class="triangle-right triangle" style="display: none; position: absolute; left: 750px; top: 40px;"></div>
+    <div id="interface_triangle2" class="triangle-down triangle" style="display: none; position: absolute; left: 900px; top: 10px;">
+    </div>
     <!-- copy and paste the graphbox for every additional SPIKE. Change id's number to its indices-->
-    <div id="mySPIKE1_graphbox" class = "graphbox">
+    <div id="mySPIKE1_graphbox" class = "graphbox" style = "position: absolute; left: 800px; top: 50px;">
         <div id="selectbox" class="target_ignore">
             <select id="portSelect" class="select_components target_ignore">
                 <option id="A">A</option>
@@ -166,17 +178,26 @@ LICENSE: MIT
                 }, 15);
             })
             graphInterfaceOne.change_dataSelect()
+            if (stage == 1) {
+                moveToNextExplain();
+            }
         }
         
         window.addEventListener("load", function () {
 
 
             $("#mySPIKE1_graphbox").find($("#portSelect")).on("change", () => {
-                graphInterfaceOne.change_dataSelect()
+                graphInterfaceOne.change_dataSelect();
+                if (stage == 2) {
+                    moveToNextExplain();
+                }
             }) 
 
             $("#mySPIKE1_graphbox").find($("#dataSelect")).on("change", () => {
                 graphInterfaceOne.graph_it();
+                if (stage == 3) {
+                    moveToNextExplain();
+                }
             }) 
 
             dragElement("mySPIKE1_graphbox");
@@ -196,5 +217,148 @@ LICENSE: MIT
         height: 600px;
         width: 400px;
         border: solid;
+    }
+</style>
+
+<!-- EXPLANATION SCRIPT -->
+<script>
+    var stage = 0; // for explanation
+    var closeClicked = false; // for toggle explanation
+
+    // Get the modal
+    var modal = document.getElementById("servicedockexplain");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close all modals, and hide all triangles
+    span.onclick = function () {
+        modal.style.display = "none";
+        closeClicked = true;
+        var triangles = document.getElementsByClassName("triangle");
+        for ( var i = 0; i < triangles.length; i++ ) {
+            triangles[i].style.display = "none";
+        }
+    }
+
+    window.addEventListener("click", function () {
+        if ( stage == 0 ) {
+            moveToNextExplain();
+        }
+    })
+
+    async function moveToNextExplain() {
+        var explanation = document.getElementById("explanation");
+        var explanation2 = document.getElementById("explanation2");
+        // only show explanation when close button hasnt been clicked
+        if (!closeClicked) {
+            switch (stage) {
+                case 0:
+                    explanation.innerHTML = "Activate SPIKE service"
+                    explanation2.innerHTML = ""
+                    var triangle = document.getElementById("SPIKE_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 1:
+                    explanation2.innerHTML = "Choose a port on the hub"
+                    explanation.innerHTML = ""
+                    var triangleBefore = document.getElementById("SPIKE_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("interface_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 2:
+                    explanation2.innerHTML = "Choose the type of data to graph"
+                    explanation.innerHTML = ""
+                    var triangleBefore = document.getElementById("interface_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("interface_triangle2");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 3:
+                    var triangleBefore = document.getElementById("interface_triangle2");
+                    triangleBefore.style.display = "none";
+                    stage++;
+                    break;
+                case 4:
+
+                    stage++;
+                    break;
+            }
+        }
+    }
+</script>
+
+<!-- EXPLANATION CSS -->
+<style>
+    /* triangles CSS */
+
+    .triangle-left {
+	    width: 0;
+	    height: 0;
+	    border-top: 20px solid transparent;
+	    border-right: 30px solid #555;
+	    border-bottom: 20px solid transparent;
+    }
+
+    .triangle-right {
+	    width: 0;
+	    height: 0;
+	    border-top: 20px solid transparent;
+	    border-left: 30px solid #555;
+	    border-bottom: 20px solid transparent;
+    }
+
+    .triangle-down {
+	    width: 0;
+	    height: 0;
+	    border-left: 20px solid transparent;
+	    border-right: 20px solid transparent;
+	    border-top: 30px solid #555;
+    }
+
+    /* modal boxes CSS */
+
+     /* The Modal (background) */
+    #servicedockexplain{
+        left: 110px;
+        top: -10px;
+        width: 300px; /* Full width */
+        height: 300px;/* Full height */
+        /* background-color: rgb(0,0,0); */ /* Fallback color */
+        /* background-color: rgba(0,0,0,0.4); */ /* Black w/ opacity */
+    }
+
+    .modal {
+        display: block; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover, 
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
     }
 </style>

@@ -55,6 +55,14 @@ body {
 <div id="servicedock">
   <service-spike id = "Service_SPIKE"></service-spike>
 </div>
+<div id="servicedockexplain" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p id="explanation"> You need: A SPIKE Prime hub, and two motors.</p>
+    <p id="explanation2"> Connect a motor on each side of the hub, and connect the hub to this computer</p>
+  </div>
+</div>
+<div id="SPIKE_triangle" class="triangle-left triangle" style="display: none; position: absolute; left: 70px; top: 20px;"></div>
 <div id = "pongbody">
   <canvas width="750" height="585" id="game"></canvas>
 </div>
@@ -125,6 +133,9 @@ async function loop() {
   context.clearRect(0,0,canvas.width,canvas.height);
   // check if the SPIKE Service is active (initialized)
   if (await my_SPIKE.isActive()) {
+    if (stage == 1) {
+      moveToNextExplain();
+    }
     main();
   }
   
@@ -298,3 +309,134 @@ document.addEventListener('keyup', function(e) {
 requestAnimationFrame(loop);
 
 </script>
+<!-- EXPLANATION SCRIPT -->
+<script>
+  var stage = 0; // for explanation
+  var closeClicked = false; // for toggle explanation
+
+  // Get the modal
+  var modal = document.getElementById("servicedockexplain");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on <span> (x), close all modals, and hide all triangles
+  span.onclick = function () {
+    modal.style.display = "none";
+    closeClicked = true;
+    var triangles = document.getElementsByClassName("triangle");
+    for (var i = 0; i < triangles.length; i++) {
+      triangles[i].style.display = "none";
+    }
+  }
+
+  window.addEventListener("click", function () {
+    if (stage == 0) {
+      moveToNextExplain();
+    }
+  })
+
+  async function moveToNextExplain() {
+    var explanation = document.getElementById("explanation");
+    var explanation2 = document.getElementById("explanation2");
+    // only show explanation when close button hasnt been clicked
+    if (!closeClicked) {
+      switch (stage) {
+        case 0:
+          explanation.innerHTML = "Activate SPIKE service"
+          explanation2.innerHTML = ""
+          var triangle = document.getElementById("SPIKE_triangle");
+          triangle.style.display = "block";
+          stage++;
+          break;
+        case 1:
+          explanation2.innerHTML = "Move the motors and play Pong!"
+          explanation.innerHTML = ""
+          var triangleBefore = document.getElementById("SPIKE_triangle");
+          triangleBefore.style.display = "none";
+          stage++;
+          break;
+      }
+    }
+  }
+</script>
+
+<!-- EXPLANATION CSS -->
+<style>
+  /* triangles CSS */
+
+  .triangle-left {
+    width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-right: 30px solid #555;
+    border-bottom: 20px solid transparent;
+  }
+
+  .triangle-right {
+    width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-left: 30px solid #555;
+    border-bottom: 20px solid transparent;
+  }
+
+  .triangle-down {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #555;
+  }
+
+  /* modal boxes CSS */
+
+  /* The Modal (background) */
+  #servicedockexplain {
+    left: 110px;
+    top: -10px;
+    width: 300px;
+    /* Full width */
+    height: 300px;
+    /* Full height */
+    /* background-color: rgb(0,0,0); */
+    /* Fallback color */
+    /* background-color: rgba(0,0,0,0.4); */
+    /* Black w/ opacity */
+  }
+
+  .modal {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+  }
+
+  /* Modal Content/Box */
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    /* Could be more or less, depending on screen size */
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>
