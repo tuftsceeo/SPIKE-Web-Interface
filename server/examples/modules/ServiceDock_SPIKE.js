@@ -397,9 +397,10 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    async function displayImage(image) {
+    async function displaySetPixel(x, y, brightness) {
         var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.display_image", "p": {"image":' + '"' + image + '"' + '} }'
+        var command = '{"i":' + randomId + ', "m": "scratch.display_set_pixel", "p": {"x":' + x +
+            ', "y":' + y + ', "brightness":' + brightness + '} }';
         sendDATA(command);
     }
 
@@ -410,43 +411,73 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    /* doesnt work, runtime_error a KeyError at handling motor_stop in python firmware */
-    async function motorStop(port) {
+    async function motorGoRelPos(port, position, speed) {
         var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.motor_stop", "p": {"port":' + '"' + port + '"' + '} }';
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.motor_go_to_relative_position"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "position":' + position +
+            ', "speed":' + speed +
+            ', "stall":' + 0 +
+            ', "stop":' + 0 +
+            '} }';
         sendDATA(command);
     }
+
+    async function motorRunTimed(port, time, speed) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.motor_run_timed"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "time":' + time +
+            ', "speed":' + speed +
+            ', "stall":' + 0 +
+            ', "stop":' + 0 +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function motorRunDegrees(port, degrees, speed) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.motor_run_for_degrees"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "degrees":' + degrees +
+            ', "speed":' + speed +
+            ', "stall":' + 0 +
+            ', "stop":' + 0 +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function soundBeep(volume, note) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.sound_beep"' +
+            ', "p": {' +
+            ', "volume":' + volume +
+            ', "note":' + note +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function soundStop(volume, note) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.sound_off"' +
+            '}';
+        sendDATA(command);
+    }
+
 
     async function motorPwm(port, power, stall) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
             ', "power":' + power + ', "stall":' + stall + '} }';
         sendDATA(command);
-    }
-
-    async function lightUltrasonic(port, lights) {
-        var lightsOptions = ['upper-left', 'upper-right', 'lower-left', 'lower-right'];
-        var validLights = false;
-        console.log("lights", lights)
-        // check if the lights parameter is correctly given
-        for ( var option in lightsOptions ) {
-            console.log("option", option)
-            if ( lightsOptions[option] == lights ) {
-                validLights = true;
-                break;
-            }
-        }
-        // throw error when invalid parameter
-        if ( !validLights ) {
-            throw Error("lights parameter is not valid, choose from: 'upper-left', 'upper-right', 'lower-left', 'lower-right'")
-        }
-        else {
-            var randomId = Math.floor((Math.random() * 10000));
-            var command = '{"i":' + randomId + ', "m": "scratch.ultrasonic_light_up", "p": {"port":' + '"' + port
-                + '", ' + '"lights":' + '"' + lights + '"' + '} }';
-            sendDATA(command);
-        }
-    
     }
 
     async function getFirmwareInfo() {
@@ -782,11 +813,15 @@ function Service_SPIKE() {
         getPortInfo: getPortInfo,
         getHubInfo: getHubInfo,
         displayText: displayText,
-        displayImage: displayImage,
+        soundStop: soundStop, 
+        soundBeep: soundBeep, 
+        motorRunDegrees: motorRunDegrees, 
+        motorRunTimed: motorRunTimed, 
+        motorGoRelPos: motorGoRelPos, 
+        displaySetPixel: displaySetPixel,
         motorStart: motorStart,
         getFirmwareInfo: getFirmwareInfo,
         motorPwm: motorPwm,
-        lightUltrasonic: lightUltrasonic,
         isActive: isActive,
         getLatestUJSON: getLatestUJSON
     };
