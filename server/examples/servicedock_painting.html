@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+
+        <script src="https://unpkg.com/konva@7.0.4/konva.min.js"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "demobox">
+            Tool:
+            <select id="tool">
+                <option value="brush">Brush</option>
+                <option value="eraser">Eraser</option>
+            </select>
+            <div id="container"></div>
+        </div> 
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        mySPIKE.executeAfterInit(SPIKE_main);
+        var colorSensorPort;
+        var colorSensor
+        async function SPIKE_main(){
+            var portsInfo = await mySPIKE.getPortsInfo();
+
+            // find the port to which  color sensor are connected
+            for (var key in portsInfo) {
+                // get color sensor device
+                if (portsInfo[key].device == "color") {
+                    // assign the port
+                    colorSensorPort = key;
+                }
+            }
+
+            var mainInterval = setInterval(doDrawing, 100);
+        }
+
+        async function doDrawing() {
+            //read in new info
+            colorSensor = await mySPIKE.getPortInfo(colorSensorPort);
+
+            // get color sensor's RGB value
+            var R = colorSensor.data.RGB[0];
+            var G = colorSensor.data.RGB[1];
+            var B = colorSensor.data.RGB[2];
+
+            // assign rgb value for brush's new color
+            var newColor = "rgb(" + R + "," + G + "," + B;
+
+            context.strokeStyle = newColor;
+
+        }
+    </script>
+    <!-- knovja.js source code-->
+    <script>
+            var width = 800
+            var height = 400
+
+            // first we need Konva core things: stage and layer
+            var stage = new Konva.Stage({
+                container: 'container',
+                width: width,
+                height: height,
+            });
+
+            var layer = new Konva.Layer();
+            stage.add(layer);
+
+            // then we are going to draw into special canvas element
+            var canvas = document.createElement('canvas');
+            canvas.width = stage.width();
+            canvas.height = stage.height();
+
+            // created canvas we can add to layer as "Konva.Image" element
+            var image = new Konva.Image({
+                image: canvas,
+                x: 0,
+                y: 0
+            });
+            layer.add(image);
+            stage.draw();
+
+            // Good. Now we need to get access to context element
+            var context = canvas.getContext('2d');
+            context.strokeStyle = '#df4b26';
+            context.lineJoin = 'round';
+            context.lineWidth = 5;
+
+            var isPaint = false;
+            var lastPointerPosition;
+            var mode = 'brush';
+
+            // now we need to bind some events
+            // we need to start drawing on mousedown
+            // and stop drawing on mouseup
+            image.on('mousedown touchstart', function () {
+                isPaint = true;
+                lastPointerPosition = stage.getPointerPosition();
+                console.log(lastPointerPosition);
+            });
+
+            // will it be better to listen move/end events on the window?
+
+            stage.on('mouseup touchend', function () {
+                isPaint = false;
+            });
+
+            // and core function - drawing
+            stage.on('mousemove touchmove', function () {
+                if (!isPaint) {
+                    return;
+                }
+
+                if (mode === 'brush') {
+                    context.globalCompositeOperation = 'source-over';
+                }
+                if (mode === 'eraser') {
+                    context.globalCompositeOperation = 'destination-out';
+                }
+                context.beginPath();
+
+                var localPos = {
+                    x: lastPointerPosition.x - image.x(),
+                    y: lastPointerPosition.y - image.y()
+                };
+                context.moveTo(localPos.x, localPos.y);
+                var pos = stage.getPointerPosition();
+                localPos = {
+                    x: pos.x - image.x(),
+                    y: pos.y - image.y()
+                };
+                context.lineTo(localPos.x, localPos.y);
+                context.closePath();
+                context.stroke();
+
+                lastPointerPosition = pos;
+                layer.batchDraw();
+            });
+
+            var select = document.getElementById('tool');
+            select.addEventListener('change', function () {
+                mode = select.value;
+            });
+    </script>
+    <style>
+
+        #demobox {
+            position: absolute;
+            background-color: #4CE0D2;
+            color: black;
+            height: 500px;
+            width: 800px;
+            top: 100px;
+            left: 400px;
+            border: solid;
+        }
+    
+        #text {
+            height: 80px;
+            width: 400px;
+        }
+    
+        .pixel {
+            height: 50px;
+            width: 50px;
+            background-color: white;
+        }
+
+        #container {
+            background-color:white;
+        }
+    </style>
+</html>

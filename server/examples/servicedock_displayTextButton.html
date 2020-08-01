@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <!-- from w3schools -->
+        <div id="demobox" class="slidecontainer">
+            <p>Show text on the SPIKE Prime display ( press force sensor to display) </p>
+            <textarea id="text">Hello World!</textarea>
+        </div>
+    </body>
+    <script>
+        /* SPIKE service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var displayButton = document.getElementById("display");
+        var textArea = document.getElementById("text");
+        var forceSensorPressInterval;
+        var forceSensorPort;
+        mySPIKE.executeAfterInit(async function() {
+            var portsInfo = await mySPIKE.getPortsInfo();
+            
+            // find the port to which force sensor is connected
+            for (var key in portsInfo) {
+                if (portsInfo[key].device == "force") {
+                    // assign the port
+                    forceSensorPort = key;
+                    console.log("force sensor port", forceSensorPort);
+
+                    // continuously check for when the force sensor is pressed
+                    forceSensorPressInterval = setInterval(async function () {
+
+                        var forceSensor = await mySPIKE.getPortInfo(forceSensorPort);
+
+                        if (forceSensor.data.pressed) {
+                            var messageToDisplay = textArea.value;
+                            mySPIKE.displayText(messageToDisplay);
+                        }
+
+                    }, 500);
+                }
+            }
+
+
+        })
+        
+        window.addEventListener("load", function () {
+                dragElement("demobox");
+        })
+
+    </script>
+    <style>
+        #demobox {
+            position: absolute;
+            background-color: #4CE0D2;
+            color: black;
+            height: 300px;
+            width: 500px;
+            top: 200px;
+            left: 400px;
+            border: solid;
+        }
+
+        #text {
+            height: 80px;
+            width: 400px;
+        }
+    </style>
+</html>

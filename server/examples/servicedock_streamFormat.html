@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "demoBox">
+            <div id = "hub" class = "portInfo">
+                <div id="gyroInfo">
+                    gyro:
+                    <div id="gyro">
+                    </div>
+                </div>
+                <div id="accelInfo">
+                    accel:
+                    <div id="accel"></div>
+                </div>
+                <div id="posiInfo">
+                    position:
+                    <div id="posi"></div>
+                </div>
+            </div>
+            <div id="A" class = "portInfo">
+                <div>Port A</div>
+                <div id = "portAInfo"></div>
+            </div>
+            <div id="B" class = "portInfo">
+                <div>Port B</div>
+                <div id="portBInfo"></div>
+            </div>
+            <div id="C" class = "portInfo">
+                <div>Port C</div>
+                <div id="portCInfo"></div>
+            </div>
+            <div id="D" class = "portInfo">
+                <div>Port D</div>
+                <div id="portDInfo"></div>
+            </div>
+            <div id="E" class = "portInfo">
+                <div>Port E</div>
+                <div id="portEInfo"></div>
+            </div>
+            <div id="F" class = "portInfo">
+                <div>Port F</div>
+                <div id="portFInfo"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        //html table elements for all device types (declared to be appeneded for sensor display)
+        var motorInfo = "<div id = \"motorInfo\">" + "<span>MOTOR</span>" + "<table id = \"motorTable\">" + "<tr>" + "<th>Speed:</th>" + "<td id = \"Mspeed\"> 0</td>" + "</tr>" +
+            "<tr>" + "<th>Angle:</th>" + "<td id = \"Mangle\"> 0</td>" + "</tr>" + "<tr>" + "<th>Angle (unit circle):</th>" + "<td id = \"Muangle\" > 0</td>" +
+            "</tr>" + "<tr>" + "<th> Power: </th>" + "<td id = \"Mpower\"> 0</td>" + "</tr>" + "</table>" + "</div>";
+        var ultraInfo = "<div id = \"ultraInfo\">" + "<span>ULTRASONIC</span>" + "<table id = \"ultraTable\">" + "<tr>" + "<th>Distance:</th>" + "<td id = \"Udist\"> 0</td>" + "</tr>" +
+            "</table>" + "</div>";
+        var forceInfo = "<div id = \"forceInfo\">" + "<span>FORCE</span>" + "<table id = \"forceTable\">" + "<tr>" + "<th>Force (1-10):</th>" +
+            "<td id = \"Famount\"> 0</td>" + "</tr>" + "<tr>" + "<th>Binary</th>" + "<td id = \"Fbinary\"> 0</td>" + "</tr>" +
+            "<tr>" + "<th>Force (Sensitive):</th>" + "<td id = \"Fbigamount\" > 0</td>" + "</tr>" + "</table>" + "</div>";
+        var colorInfo = "<div id = \"colorInfo\">" + "<span>COLOR</span>" + "<table id = \"colorTable\">" + "<tr>" + "<th> Reflectivity:</th>" + "<td id = \"Cdist\"> 0</td>" +
+            "</tr>" + "<tr>" + "<th>Ambient Light:</th>" + "<td id = \"Cunknown\"> 0</td>" + "</tr>" + "<tr>" + "<th> Color (RGB):</th>" +
+            "<td id = \"Crgb\">" + "<div id = \"rgbbox\" data-r = \"0\", data-g = \"0\", data-b = \"0\" style = \"height:30px;width:30px;\"> </div> " + "</td>" +
+            "</tr>" + "</table>" + "</div>";
+        
+        var mySPIKE = document.getElementById("service_spike").getService();
+        
+        var displayInterval = setInterval(displayData, 100);
+
+        async function displayData() {
+            
+            // get sensor information from the SPIKE Prime
+            var portsInfo = await mySPIKE.getPortsInfo();
+            var hubInfo = await mySPIKE.getHubInfo();
+            // console.log(portsInfo);
+            // console.log(hubInfo);
+
+            // iterate through each port
+            for ( var key in portsInfo ) {
+
+                // get the type of device
+                var device = portsInfo[key].device;
+
+                // get the HTML element of the portInfo
+                var idString = "port" + key + "Info";
+                var portInfoHTML = document.getElementById(idString);
+
+                // display data formatted specifically for each type of device
+
+                if ( device == "smallMotor" || device == "bigMotor" ) {
+                    portInfoHTML.innerHTML = motorInfo;
+                    
+                    var Mspeed = portsInfo[key].data.speed;
+                    var Mangle = portsInfo[key].data.angle;
+                    var Muangle = portsInfo[key].data.uAngle;
+                    var Mpower = portsInfo[key].data.power;
+
+                    $("#" + idString).find("#Mspeed").text(Mspeed);
+                    $("#" + idString).find("#Mangle").text(Mangle);
+                    $("#" + idString).find("#Muangle").text(Muangle);
+                    $("#" + idString).find("#Mpower").text(Mpower);
+
+                }
+                else if ( device == "ultrasonic") {
+                    portInfoHTML.innerHTML = ultraInfo;
+
+                    var Udist = portsInfo[key].data.distance;
+                    $("#" + idString).find("#Udist").text(Udist);
+                }
+                else if ( device == "force") {
+                    portInfoHTML.innerHTML = forceInfo;
+
+                    var Famount = portsInfo[key].data.force;
+                    var Fbinary = portsInfo[key].data.pressed;
+                    var Fbigamount = portsInfo[key].data.forceSensitive;
+
+                    $("#" + idString).find("#Famount").text(Famount);
+                    $("#" + idString).find("#Fbinary").text(Fbinary);
+                    $("#" + idString).find("#Fbigamount").text(Fbigamount);
+                }
+                else if ( device == "color" ) {
+                    portInfoHTML.innerHTML = colorInfo;
+
+                    var Cdist = portsInfo[key].data.reflected;
+                    var Cunknown = portsInfo[key].data.ambient;
+                    var Cr = portsInfo[key].data.RGB[0];
+                    var Cg = portsInfo[key].data.RGB[1];
+                    var Cb = portsInfo[key].data.RGB[2];
+
+                    $("#" + idString).find("#Cdist").text(Cdist);
+                    $("#" + idString).find("#Cunknown").text(Cunknown);
+                    $("#" + idString).find("#rgbbox").css("background-color", "rgb(" + Cr + "," + Cg + "," + Cb + ")");
+                }
+                // no device connected to this port
+                else {
+                    portInfoHTML.innerHTML = "No device connected";
+                }
+            }
+            var gyro_x = hubInfo.gyro[0];
+            var gyro_y = hubInfo.gyro[1];
+            var gyro_z = hubInfo.gyro[2];
+
+            $("#gyro").text(gyro_x + ", " + gyro_y + "," + gyro_z);
+
+            var accel_x = hubInfo.accel[0];
+            var accel_y = hubInfo.accel[1];
+            var accel_z = hubInfo.accel[2];
+
+            $("#accel").text(accel_x + ", " + accel_y + ", " + accel_z);
+
+            var posi_x = hubInfo.pos[0];
+            var posi_y = hubInfo.pos[1];
+            var posi_z = hubInfo.pos[2];
+
+            $("#posi").text(posi_x + ", " + posi_y + ", " + posi_z);
+
+        }   
+
+        window.addEventListener("load", function () {
+            dragElement("demoBox")
+        })
+    </script>
+    <style>
+        #demoBox {
+            background-color: #4CE0D2;
+            color: black;
+            height: 200px;
+            width: 1400px;
+            border: solid;
+            position: absolute;
+            left: 10px; 
+            top: 250px;
+        }
+    
+        .portInfo {
+            background-color: rgb(202, 224, 76);
+            color: black;
+            height: 150px;
+            width: 190px;
+            border: solid;
+            position: relative;
+            float: left;
+            left: 10px; 
+            top: 30px;
+        }
+
+    </style>
+</html>

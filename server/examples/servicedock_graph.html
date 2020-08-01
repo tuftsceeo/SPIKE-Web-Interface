@@ -43,6 +43,7 @@ LICENSE: MIT
                 <option id="D">D</option>
                 <option id="E">E</option>
                 <option id="F">F</option>
+                <option id="hub">Hub</option>
             </select>
             <select id="dataSelect" class="select_components target_ignore"></select>
         </div>
@@ -83,7 +84,11 @@ LICENSE: MIT
             //get the device type
             var selectedPortHTML = $("#portSelect option:selected")
             var str_length = $("#" + graphBoxId).find(selectedPortHTML).text().length
+            // only for ports
             var device_type = await $("#" + graphBoxId).find(selectedPortHTML).text().substring(0, str_length - 3);
+
+            // for hub
+            var device = await $("#" + graphBoxId).find(selectedPortHTML).text();
             var dataHTML = $("#dataSelect")
             //change options of available sensor data by device type
             if (device_type == "smallMotor" || device_type == "bigMotor") {
@@ -108,6 +113,18 @@ LICENSE: MIT
                 $("#" + graphBoxId).find(dataHTML).append("<option id = 'reflected'>reflected</option>")
                 $("#" + graphBoxId).find(dataHTML).append("<option id = 'ambient'>ambient light</option>")
             }
+            if (device == "Hub") {
+                $("#" + graphBoxId).find(dataHTML).empty();
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'gyro[0]'>gyro[0]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'gyro[1]'>gyro[1]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'gyro[2]'>gyro[2]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'accel[0]'>accel[0]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'accel[1]'>accel[1]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'accel[2]'>accel[2]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'pos[0]'>pos[0]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'pos[1]'>pos[1]</option>")
+                $("#" + graphBoxId).find(dataHTML).append("<option id = 'pos[2]'>pos[2]</option>")
+            }
         }
 
         // gets selected data to display from html element and returns its value
@@ -118,13 +135,24 @@ LICENSE: MIT
             var selectedDataHTML = $("#dataSelect option:selected")
             var selected_port = $("#" + graphBoxId).find(selectedPortHTML).attr('id');
             var selected_data = $("#" + graphBoxId).find(selectedDataHTML).attr('id');
+            if (selected_port == "hub") {
+                var index = selected_data.substring(selected_data.length-2, selected_data.length-1);
 
-            var info = await Service_SPIKE_Object.getPortInfo(selected_port);
-            if (info.device != "none") {
-                var y_variable = info.data[selected_data];
+                var key = selected_data.substring(0, selected_data.length-3);
+
+                var info = await Service_SPIKE_Object.getHubInfo();
+                var y_variable = info[key][index];
+ 
                 return y_variable;
             }
-            return null;
+            else {
+                var info = await Service_SPIKE_Object.getPortInfo(selected_port);
+                if (info.device != "none") {
+                    var y_variable = info.data[selected_data];
+                    return y_variable;
+                }
+                return null;
+            }
         }
 
         return {
