@@ -1,0 +1,64 @@
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <script src="./modules/libraries/ace.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "demobox">
+            <input type="button" id="execute" value="Execute">
+            <div id="editor"></div>
+        </div>
+    </body>
+    <!-- SPIKE Prime -->
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+
+        mySPIKE.executeAfterInit( function() {
+            mySPIKE.reachMicroPy();
+        })
+
+    </script>
+    <script>
+        var editor = ace.edit("editor");
+        
+        var buttonExecute = document.getElementById("execute");
+        buttonExecute.addEventListener("click", function () {
+            var editSession = editor.getSession();
+
+            var codeSession = editSession.getValue();
+            
+            mySPIKE.sendDATA(codeSession);
+        })
+    </script>
+
+    <style type="text/css" media="screen">
+
+        #editor {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            bottom: 0;
+            left: 200px;
+            height: 600px;
+            width: 400px;
+        }
+
+        #button1 {
+            position: absolute;
+            height: 30px;
+            width: 60px;
+        }
+    </style>
+</html>

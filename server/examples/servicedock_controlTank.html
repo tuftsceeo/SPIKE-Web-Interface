@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id ="portsInterface">
+            <div id="leftMotor">
+                <p>Control left motor</p>
+                <select id="leftMotorPort" class="select_components target_ignore">
+                </select>
+                <input id="leftMotorPortChoose" type="button" value="select">
+            </div>
+            <div id="rightMotor">
+                <p>Control right motor</p>
+                <select id="rightMotorPort" class="select_components target_ignore">
+                </select>
+                <input id="rightMotorPortChoose" type="button" value="select">
+            </div>
+            <div id="ultrasonic">
+                <p>Control Ultrasonic sensor</p>
+                <select id = "ultrasonicPort" class="select_components target_ignore">
+                </select>
+                <input id = "ultrasonicPortChoose" type="button" value="select">
+            </div>
+            <div id="color">
+                <p>Control Color sensor</p>
+                <select id="colorPort" class="select_components target_ignore">
+                </select>
+                <input id="colorPortChoose" type="button" value="select">
+            </div>
+            <div>
+                Start Controlling
+                <input id = "startControl" type="button" value="start">
+            </div>
+            <div id = "controlInterface">
+                <div id = "speedControl">
+                    <div id = "speed">Speed: 0</div>
+                    <input type="range" min="0" max="100" value="0" class="slider" id="speedRange">
+                </div>
+                <div id="visionSpace">
+                </div>
+                <div id="objectBox">
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var leftMotorPort;
+        var rightMotorPort;
+        var ultrasonicPort;
+        var colorPort;
+        var speed;
+        var keyPressed = false;
+
+        mySPIKE.executeAfterInit(SPIKE_main);
+
+        /* get the ports to which motors are connected to*/
+        async function getMotorPorts() {
+
+            var portsInfo = await mySPIKE.getPortsInfo();
+            var motorPorts = [];
+            for (var key in portsInfo) {
+                if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
+                    motorPorts.push(key);
+                }
+            }
+            return motorPorts;
+        }
+        
+        /* get the ports to which ultrasonic sensors are connected to*/
+        async function getUltrasonicPorts() {
+            
+            var portsInfo = await mySPIKE.getPortsInfo();
+            var ultrasonicPorts = [];
+            
+            for (var key in portsInfo) {
+                if (portsInfo[key].device == "ultrasonic") {
+                    ultrasonicPorts.push(key);
+                }
+            }
+            
+            return ultrasonicPorts;
+        }
+
+        /* get the ports to which ultrasonic sensors are connected to*/
+        async function getColorPorts() {
+
+            var portsInfo = await mySPIKE.getPortsInfo();
+            var colorPorts = [];
+
+            for (var key in portsInfo) {
+                if (portsInfo[key].device == "color") {
+                    colorPorts.push(key);
+                }
+            }
+
+            return colorPorts;
+        }
+
+        /* append the motor ports to select HTML element */
+        async function initPortSelect(motorPorts, ultrasonicPorts, colorPorts) {
+            
+            for (var port in motorPorts) {
+                $("#leftMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+                $("#rightMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+            }
+
+            for (var port in ultrasonicPorts) {
+                $("#ultrasonicPort").append("<option id = " + ultrasonicPorts[port] + ">" + ultrasonicPorts[port] + "</option>");
+            }
+
+            for (var port in colorPorts) {
+                $("#colorPort").append("<option id = " + colorPorts[port] + ">" + colorPorts[port] + "</option>");
+            }
+
+        }
+
+        async function SPIKE_main() {
+
+            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            var ultrasonicPorts = await getUltrasonicPorts();
+            var colorPorts = await getColorPorts();
+
+            initPortSelect(motorPorts, ultrasonicPorts, colorPorts); // append ports to <select>
+
+            $("#leftMotorPortChoose").on("click", async function () {
+                // get the selected port
+                console.log($("#leftMotorPort option:selected"))
+                leftMotorPort = await $("#leftMotorPort option:selected").val();
+            })
+
+            $("#rightMotorPortChoose").on("click", async function () {
+                // get the selected port
+                rightMotorPort = await $("#rightMotorPort option:selected").val();
+            })
+
+
+            $("#ultrasonicPortChoose").on("click", async function () {
+                // get the selected port
+                ultrasonicPort = await $("#ultrasonicPort option:selected").val();
+            })
+
+
+            $("#colorPortChoose").on("click", async function () {
+                // get the selected port
+                colorPort = await $("#colorPort option:selected").val();
+            })
+
+            $("#startControl").on("click", function() {
+                defineListeners();
+                var visualInterval = setInterval(getDistance, 10);
+            })
+
+        }
+
+        function defineListeners() {
+            // listen to keyboard events to move the tank
+            document.addEventListener('keydown', function (e) {
+                if (!keyPressed) {
+                    // up arrow key
+                    if (e.which === 38) {
+                        mySPIKE.moveTankSpeeds(speed, speed, leftMotorPort, rightMotorPort);
+                    }
+                    // down arrow key
+                    else if (e.which === 40) {
+                        mySPIKE.moveTankSpeeds(-speed, -speed, leftMotorPort, rightMotorPort);
+                    }
+                    // left arrow key
+                    else if (e.which === 37) {
+                        mySPIKE.moveTankSpeeds(-speed, speed, leftMotorPort, rightMotorPort);
+                    }
+                    // right arrow key
+                    else if (e.which === 39) {
+                        mySPIKE.moveTankSpeeds(speed, -speed, leftMotorPort, rightMotorPort);
+                    }
+                    keyPressed = true;
+                }
+        });
+
+            // listen to keyboard events to stop the tank if key is released
+            document.addEventListener('keyup', function (e) {
+                if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39) {
+                    mySPIKE.moveTankSpeeds(0, 0, leftMotorPort, rightMotorPort);
+                    keyPressed = false;
+                }
+            });
+        }
+
+        // max 150? min 4
+        async function getDistance() {
+            getColor();
+            var portInfo = await mySPIKE.getPortInfo(ultrasonicPort);
+            var distance = portInfo.data.distance;
+
+            if ( distance !== null) {
+                $("#dist").html(distance + "cm");
+
+                // calculate pixels dimensions (13.6 = 3.4 * 4, where 4 is the minimum distance)
+                var pixels = (500) - (distance * 3.4);  // 1 unit of distance -> 3.4 pixels
+
+                $("#objectBox").css("height", pixels + "px");
+                $("#objectBox").css("width", pixels + "px");
+
+                var redDistance = 20 // border red when distance <= 20cm
+                var yellowDistance = 40 // border yellow when 20cm <  distance < 40cm
+
+                // convert to pixels
+                var redPixels = (500) - (redDistance * 3.4);
+                var yellowPixels = (500) - (yellowDistance * 3.4);
+
+                // change border colors when target distances are reached
+                if (pixels > redPixels) {
+                    $("#objectBox").css("border-color", "red");
+                } else if (pixels <= redPixels && pixels > yellowPixels) {
+                    $("#objectBox").css("border-color", "yellow");
+                }
+                else {
+                    $("#objectBox").css("border-color", "black");
+                }
+            } else {
+                console.log("is null")
+                $("#objectBox").css("height", 0 + "px");
+                $("#objectBox").css("width", 0 + "px");
+            }
+        }
+
+        async function getColor() {
+            var portInfo = await mySPIKE.getPortInfo(colorPort);
+            var R = portInfo.data.RGB[0];
+            var G = portInfo.data.RGB[1];
+            var B = portInfo.data.RGB[2];
+            $("#objectBox").css("background-color", "RGB(" + R + "," + G + "," + B + ")");
+
+        }
+
+
+        var slider = document.getElementById("speedRange");
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            speed = this.value;
+            $("#speed").html("Speed: " + speed);
+        }
+    </script>
+    <style>
+        #portsInterface {
+            position: absolute;
+            top: 50px;
+            left: 200px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+
+        #controlInterface {
+            position: absolute;
+            top: 50px;
+            left: 500px;
+            height: 550px;
+            width: 550px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+
+        #objectBox {
+            position: absolute;
+            height: 100px;
+            width: 100px;
+            left: 35;
+            top: 20;
+            border: solid;
+        }
+
+        #visionSpace {
+            position: absolute;
+            height: 500px;
+            width: 500px;
+            left: 35;
+            top: 20;
+            border: solid;
+            text-align: center;
+        }
+    </style>
+</html>
