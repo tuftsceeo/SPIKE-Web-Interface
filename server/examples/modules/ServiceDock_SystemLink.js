@@ -234,7 +234,7 @@ function Service_SystemLink() {
     * - changes the value of a tag on the cloud
     */
     async function setTagValue(tagName, newValue) {
-        return updateTagValue(tagName, newValue);
+        return changeValue(tagName, newValue);
     }
 
     /* isActive() - get whether the Service was initialized or not
@@ -400,7 +400,7 @@ function Service_SystemLink() {
     }
 
 
-    /* updateTagValue() - send PUT request to SL cloud API and change the value of a tag
+    /* changeValue() - send PUT request to SL cloud API and change the value of a tag
     *
     * Parameters:
     * {tagPath} - string of the name of the tag
@@ -410,7 +410,7 @@ function Service_SystemLink() {
     * {Promise} - if success: resolve(true)
     *           - if fail: reject(error)
     */
-    async function updateTagValue(tagPath, newValue) {
+    async function changeValue(tagPath, newValue) {
         return new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
