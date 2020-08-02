@@ -165,6 +165,7 @@ function Service_SPIKE() {
 
     // contains latest full json object from SPIKE readings
     let one_line;
+    let readFrom = 0;
 
     // object containing real-time info on devices connected to each port of SPIKE Prime 
     let ports =
@@ -176,12 +177,64 @@ function Service_SPIKE() {
         "E": { "device": "none", "data": {} },
         "F": { "device": "none", "data": {} }
     }
+
+    // object containing real-time info on hub sensor values
+    /*
+        !say the usb wire is the nose of the spike prime
+
+        ( looks at which side of the hub is facing up)
+        gyro[0] - top/bottom detector ( top: 1000, bottom: -1000, neutral: 0)
+        gyro[1] - rightside/leftside detector ( leftside : -1000 , rightside: 1000, neutal: 0 )
+        gyro[2] - front/back detector ( front: 1000, back: 1000, neutral: 0 )
+
+        ( assume the usb wire port is the nose of the spike prime )
+        accel[0] - roll acceleration (roll to right: -, roll to left: +)
+        accel[1] - pitch acceleration (up: +, down: -)
+        accel[2] - yaw acceleration (counterclockwise: +. clockwise: -)
+
+        ()
+        pos[0] - yaw angle
+        pos[1] - pitch angle
+        pos[2] - roll angle
+
+    */
     let hub = 
     {
         "gyro": [0,0,0],
         "accel": [0,0,0],
         "pos": [0,0,0]
     }
+
+    // string containing real-time info on hub events
+    let hubFrontEvent;
+    
+    /*
+        up: hub is upright/standing, with the display looking horizontally
+        down: hub is upsidedown with the display, with the display looking horizontally
+        front: hub's display facing towards the sky
+        back: hub's display facing towards the earth
+        leftside: hub rotated so that the side to the left of the display is facing the earth
+        rightside: hub rotated so that the side to the right of the display is facing the earth
+        shake:
+    */
+    let hubOrientation; 
+
+    /*
+        shake
+        freefall
+    */
+    let hubEvent;
+
+    let hubMainButton = {"pressed": false, "duration": 0};
+
+    let hubBluetoothButton = { "pressed": false, "duration": 0 };
+
+    let hubLeftButton = { "pressed": false, "duration": 0 };
+
+    let hubRightButton = { "pressed": false, "duration": 0 };
+
+
+
 
     var micropython_interpreter = false; // whether micropython was reached or not
 
@@ -322,19 +375,19 @@ function Service_SPIKE() {
     * ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic")
     * ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) 
     *
-    * MOTOR_INFO = { "speed": motor speed, 
+    * MOTOR_INFO (smallMotor/bigMotor) = { "speed": motor speed, 
     *               "angle": motor angle , 
     *               "uAngle": motor angle in unit circle ( -180 ~ 180 ), 
     *               "power": motor power }
     * 
-    * ULTRASONIC_INFO = { "distance": distance from surface }
+    * ULTRASONIC_INFO (ultrasonic) = { "distance": distance from surface }
     * 
-    * COLOR_SENSOR_INFO = { "reflected": reflected luminosity,
+    * COLOR_SENSOR_INFO (color) = { "reflected": reflected luminosity,
     *                       "ambient": ambient luminosity, 
     *                       "RGB": [R, G, B] }
     * 
-    * FORCE_SENSOR_INFO = { "force": pressed force amount ( 1 ~ 10 ), 
-    *                       "pressed": whether pressed or not ( 0 or 1 ), 
+    * FORCE_SENSOR_INFO (force) = { "force": pressed force amount ( 1 ~ 10 ), 
+    *                       "pressed": whether pressed or not ( true or false), 
     *                       "forceSensitive": a more sesntiive pressed force amount ( 0 ~ 900 ) }
     */
     async function getPortsInfo() {
@@ -385,6 +438,34 @@ function Service_SPIKE() {
         return serviceActive;
     }
 
+    async function getHubOrientation() {
+        return hubOrientation;
+    }
+
+    async function getHubFrontEvent() {
+        return hubFrontEvent;
+    }
+
+    async function getHubEvent() {
+        return hubEvent;
+    }
+
+    async function getBluetoothButton() {
+        return hubBluetoothButton;
+    }
+
+    async function getMainButton() {
+        return hubMainButton;
+    }
+
+    async function getLeftButton() {
+        return hubLeftButton;
+    }
+
+    async function getRightButton() {
+        return hubRightButton;
+    }
+
     //////////////////////////////////////////
     //                                      //
     //          UJSONRPC Functions          //
@@ -401,6 +482,12 @@ function Service_SPIKE() {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId + ', "m": "scratch.display_set_pixel", "p": {"x":' + x +
             ', "y":' + y + ', "brightness":' + brightness + '} }';
+        sendDATA(command);
+    }
+
+    async function displayClear() {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId + ', "m": "scratch.display_clear" }';
         sendDATA(command);
     }
 
@@ -453,12 +540,68 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
+    async function moveTankTime(time, lspeed, rspeed, lmotor, rmotor, stop) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.move_tank_time"' +
+            ', "p": {' +
+            '"time":' + time + 
+            ', "lspeed":' + lspeed +
+            ', "rspeed":' + rspeed +
+            ', "lmotor":' + '"' + lmotor + '"' + 
+            ', "rmotor":' + '"' + rmotor + '"' + 
+            ', "stop":' + stop   +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function moveTankDegrees(degrees, lspeed, rspeed, lmotor, rmotor, stop) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.move_tank_degrees"' +
+            ', "p": {' +
+            '"degrees":' + degrees + 
+            ', "lspeed":' + lspeed +
+            ', "rspeed":' + rspeed +
+            ', "lmotor":' + '"' + lmotor + '"' + 
+            ', "rmotor":' + '"' + rmotor + '"' + 
+            ', "stop":' + stop +
+            '} }';
+        sendDATA(command);
+    }
+
+    async function moveTankSpeeds(lspeed, rspeed, lmotor, rmotor) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.move_start_speeds"' +
+            ', "p": {' +
+            '"lspeed":' + lspeed +
+            ', "rspeed":' + rspeed +
+            ', "lmotor":' + '"' + lmotor + '"' + 
+            ', "rmotor":' + '"' + rmotor + '"' + 
+            '} }';
+        sendDATA(command);
+    }
+
+    async function moveTankPowers(lpower, rpower, lmotor, rmotor) {
+        var randomId = Math.floor((Math.random() * 10000));
+        var command = '{"i":' + randomId +
+            ', "m": "scratch.move_start_powers"' +
+            ', "p": {' +
+            '"lpower":' + lpower +
+            ', "rpower":' + rpower +
+            ', "lmotor":' + '"' + lmotor + '"' + 
+            ', "rmotor":' + '"' +  rmotor + '"' + 
+            '} }';
+        sendDATA(command);
+    }
+
     async function soundBeep(volume, note) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.sound_beep"' +
             ', "p": {' +
-            ', "volume":' + volume +
+            '"volume":' + volume +
             ', "note":' + note +
             '} }';
         sendDATA(command);
@@ -475,7 +618,7 @@ function Service_SPIKE() {
 
     async function motorPwm(port, power, stall) {
         var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":' + '"' + port + '"' +
+        var command = '{"i":' + randomId + ', "m": "scratch.motor_pwm", "p": {"port":' + '"' + port + '"' +
             ', "power":' + power + ', "stall":' + stall + '} }';
         sendDATA(command);
     }
@@ -577,10 +720,16 @@ function Service_SPIKE() {
                         var Famount = await data_stream[key][1][0];
                         var Fbinary = await data_stream[key][1][1];
                         var Fbigamount = await data_stream[key][1][2];
-
+                        
+                        // convert the binary output to boolean for "pressed" key
+                        if ( Fbinary == 1 ) {
+                            var Fboolean = true;
+                        } else {
+                            var Fboolean = false;
+                        }
                         // populate value object
                         device_value.device = "force";
-                        device_value.data = { "force": Famount, "pressed": Fbinary, "forceSensitive": Fbigamount }
+                        device_value.data = { "force": Famount, "pressed": Fboolean, "forceSensitive": Fbigamount }
                         ports[letter] = device_value;
                     }
                     // get COLOR sensor information
@@ -635,7 +784,7 @@ function Service_SPIKE() {
     * 
     * Effect:
     * Logs in the console when some particular messages are caught
-    * 
+    * Assigns the hub events global variables
     *  Returns:
     * {one_line} (string) - a string represent a JSON object from UJSON RPC
     * 
@@ -652,16 +801,73 @@ function Service_SPIKE() {
             else if (result["m"] == 2) {
                  //console.log(one_line);
             }
-            // give center button click
+            // give center button click, left, right (?)
             else if (result["m"] == 3) {
                 console.log(one_line);
+                if (result.p[0] == "center") {
+                    hubMainButton.pressed = true;
+                    if (result.p[1] > 0) {
+                        hubMainButton.pressed = false;
+                        hubMainButton.duration = result.p[1];
+                    }
+                }
+                else if (result.p[0] == "connect") {
+                    hubBluetoothButton.pressed = true;
+                    if (result.p[1] > 0) {
+                        hubBluetoothButton.pressed = false;
+                        hubBluetoothButton.duration = result.p[1];
+                    }
+                }
+                else if (result.p[0] == "left") {
+                    hubLeftButton.pressed = true;
+                    if (result.p[1] > 0) {
+                        hubLeftButton.pressed = false;
+                        hubLeftButton.duration = result.p[1];
+                    }
+                }
+                else if (result.p[0] == "right") {
+                    hubRightButton.pressed = true;
+                    if (result.p[1] > 0) {
+                        hubRightButton.pressed = false;
+                        hubRightButton.duration = result.p[1];
+                    }
+                }
+                
             }
             else if (result["m"] == 11) {
                 console.log(one_line);
             }
             // gives orientation of the hub (leftside, up,..), tapping of hub, 
             else if (result["m"] == 4) {
+                if ( result.p == "tapped" ) {
+                    hubFrontEvent = "tapped";
+                }
+                else if ( result.p == "doubletapped") {
+                    hubFrontEvent = "doubletapped";
+                }
+                else if (result.p == "up") {
+                    hubOrientation = "up";
+                }
+                else if (result.p == "down") {
+                    hubOrientation = "down";
+                }
+                else if (result.p == "front") {
+                    hubOrientation = "front";
+                }
+                else if (result.p == "back") {
+                    hubOrientation = "back";
+                }
+                else if (result.p == "freefall") {
+                    hubEvent = "freefall";
+                }
+                else if (result.p == "shake") {
+                    hubEvent = "shake";
+                }
                 console.log(one_line);
+            }
+            else {
+                hubEvent = "";
+                hubFrontEvent = "";
             }
         }
         catch (error) {
@@ -700,7 +906,7 @@ function Service_SPIKE() {
         try {
             // select device
             port = await navigator.serial.requestPort({
-                filters: [filter]
+                //filters: [filter]
             });
             // wait for the port to open.
             await port.open({ baudrate: 115200 });
@@ -747,28 +953,35 @@ function Service_SPIKE() {
                             jsonline = jsonline + value
 
                             /* parse jsonline where the JSON object starts and ends */
-                            var rcb_index = json_string.indexOf('}')
+                            var rcb_index = json_string.indexOf('}', readFrom)
                             var lcb_index = json_string.indexOf('{')
 
                             // if the right curly brace exists (end of json)
                             if (rcb_index > -1) {
+                                if (json_string.substring(rcb_index-1,rcb_index) != '{') {
+                                    // if the first index is a left curly brace (start of json)
+                                    if (jsonline[0] === "{") {
 
-                                // if the first index is a left curly brace (start of json)
-                                if (jsonline[0] === "{") {
+                                        /* get substring until instance of }\r */
 
-                                    /* get substring until instance of }\r */
+                                        // when REPL is declared with vanilla js (ex) document.getElementById
+                                        one_line = jsonline.substring(0, jsonline.indexOf('}') + 2)
 
-                                    // when REPL is declared with vanilla js (ex) document.getElementById
-                                    one_line = jsonline.substring(0, jsonline.indexOf('}') + 2)
+                                        // when REPL is decalred with jquery (ex) $("#REPL")
+                                        //one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
 
-                                    // when REPL is decalred with jquery (ex) $("#REPL")
-                                    //one_line = jsonline.substring(0,jsonline.indexOf('}')+4)
+                                        updateHubPortsInfo();
+                                    }
 
-                                    updateHubPortsInfo();
+                                    // reset jsonline to concatenate next stream
+                                    jsonline = ""
+                                    readFrom = 0;
                                 }
-
-                                // reset jsonline to concatenate next stream
-                                jsonline = ""
+                                else {
+                                    readFrom = jsonline.length - json_string.length + rcb_index+1;
+                                    console.log("jsonline", jsonline);
+                                    console.log("reading from", JSON.stringify(jsonline).substring(readFrom, jsonline.length));
+                                }
                             }
                         }
                         if (done) {
@@ -813,6 +1026,7 @@ function Service_SPIKE() {
         getPortInfo: getPortInfo,
         getHubInfo: getHubInfo,
         displayText: displayText,
+        displayClear: displayClear,
         soundStop: soundStop, 
         soundBeep: soundBeep, 
         motorRunDegrees: motorRunDegrees, 
@@ -822,7 +1036,18 @@ function Service_SPIKE() {
         motorStart: motorStart,
         getFirmwareInfo: getFirmwareInfo,
         motorPwm: motorPwm,
+        moveTankDegrees: moveTankDegrees,
+        moveTankSpeeds: moveTankSpeeds,
+        moveTankTime: moveTankTime,
+        moveTankPowers: moveTankPowers,
         isActive: isActive,
-        getLatestUJSON: getLatestUJSON
+        getLatestUJSON: getLatestUJSON,
+        getBluetoothButton: getBluetoothButton,
+        getMainButton: getMainButton,
+        getLeftButton: getLeftButton,
+        getRightButton: getRightButton,
+        getHubEvent: getHubEvent,
+        getHubFrontEvent: getHubFrontEvent,
+        getHubOrientation: getHubOrientation
     };
 }
