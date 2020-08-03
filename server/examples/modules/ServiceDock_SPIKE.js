@@ -466,6 +466,88 @@ function Service_SPIKE() {
         return hubRightButton;
     }
 
+    async function getMotorPorts() {
+
+        var portsInfo = await mySPIKE.getPortsInfo();
+        var motorPorts = [];
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
+                motorPorts.push(key);
+            }
+        }
+        return motorPorts;
+
+    }
+
+    async function getSmallMotorPorts() {
+        
+        var portsInfo = await mySPIKE.getPortsInfo();
+        var motorPorts = [];
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "smallMotor" ) {
+                motorPorts.push(key);
+            }
+        }
+        return motorPorts;
+
+    }
+
+    async function getBigMotorPorts() {
+        var portsInfo = await mySPIKE.getPortsInfo();
+        var motorPorts = [];
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "bigMotor") {
+                motorPorts.push(key);
+            }
+        }
+        return motorPorts;
+    }
+
+    async function getUltrasonicPorts() {
+
+        var portsInfo = await this.getPortsInfo();
+        var ultrasonicPorts = [];
+
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "ultrasonic") {
+                ultrasonicPorts.push(key);
+            }
+        }
+
+        return ultrasonicPorts;
+
+    }
+
+    async function getColorPorts() {
+
+        var portsInfo = await this.getPortsInfo();
+        var colorPorts = [];
+
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "color") {
+                colorPorts.push(key);
+            }
+        }
+
+        return colorPorts;
+
+    }
+
+    async function getForcePorts() {
+
+        var portsInfo = await this.getPortsInfo();
+        var forcePorts = [];
+
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "force") {
+                forcePorts.push(key);
+            }
+        }
+
+        return forcePorts;
+
+    }
+
     //////////////////////////////////////////
     //                                      //
     //          UJSONRPC Functions          //
@@ -607,7 +689,7 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    async function soundStop(volume, note) {
+    async function soundStop() {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.sound_off"' +
@@ -1041,6 +1123,12 @@ function Service_SPIKE() {
         moveTankTime: moveTankTime,
         moveTankPowers: moveTankPowers,
         isActive: isActive,
+        getBigMotorPorts: getBigMotorPorts,
+        getSmallMotorPorts: getSmallMotorPorts,
+        getUltrasonicPorts: getUltrasonicPorts,
+        getColorPorts: getColorPorts,
+        getForcePorts: getForcePorts,
+        getMotorPorts: getMotorPorts,
         getLatestUJSON: getLatestUJSON,
         getBluetoothButton: getBluetoothButton,
         getMainButton: getMainButton,

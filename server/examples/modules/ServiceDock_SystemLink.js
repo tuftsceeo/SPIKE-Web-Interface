@@ -228,7 +228,7 @@ function Service_SystemLink() {
         return tagsInfo;
     }
 
-    /* setTagValue() - change the current value of a tag on system link cloud
+    /* setTagValue() - change the current value of a tag on SystemLink cloud
     *
     * Effect:
     * - changes the value of a tag on the cloud
@@ -236,6 +236,20 @@ function Service_SystemLink() {
     async function setTagValue(tagName, newValue) {
         return changeValue(tagName, newValue);
     }
+
+    /* getTagValue() - get the current value of a tag on SystemLink cloud
+    *
+    */
+    async function getTagValue(tagName) {
+
+        var tagsInfo = await getTagsInfo();   
+        
+        var currentValue = tagsInfo[tagName].value;
+
+        return currentValue;
+    }
+
+
 
     /* isActive() - get whether the Service was initialized or not
     *
@@ -375,14 +389,13 @@ function Service_SystemLink() {
                     }
                     // when value is not yet assigned to tag
                     catch (e) {
-                        var value = "NONE"
+                        var value = null
                         var valueType = tagsInfoArray[i].tag.type;
                         var tagName = tagsInfoArray[i].tag.path;
 
-                        var valueToAdd = await getValueFromType(valueType, value);
                         // store tag information
                         var pathInfo = {};
-                        pathInfo["value"] = valueToAdd;
+                        pathInfo["value"] = value;
                         pathInfo["type"] = valueType;
 
                         // add a tag info to the return object
@@ -414,7 +427,23 @@ function Service_SystemLink() {
         return new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
-            var data = { "value": { "type": getValueType(newValue), "value": JSON.stringify(newValue) } };
+            
+            var valueType = getValueType(newValue);
+
+            // value is not a string
+            if (valueType != "STRING") {
+                // newValue will have no quotation marks before being stringified
+                var stringifiedValue = JSON.stringify(newValue);
+
+                var data = { "value": { "type": valueType, "value": stringifiedValue } };
+
+            } 
+            // value is a string
+            else {
+                // newValue will already have quotation marks before being stringified, so don't stringify
+                var data = { "value": { "type": valueType, "value": newValue } };
+            }
+
             var requestBody = data;
 
             var request = await sendXMLHTTPRequest("PUT", URL, APIKey, requestBody);
@@ -455,7 +484,6 @@ function Service_SystemLink() {
             request.setRequestHeader("Content-type", "application/json");
             var requestBody = JSON.stringify(body);
             try {
-
                 request.send(requestBody);
             } catch(e) {
                 console.log("error sending request:", request.response);
@@ -528,6 +556,7 @@ function Service_SystemLink() {
         init: init,
         getTagsInfo: getTagsInfo,
         setTagValue: setTagValue,
+        getTagValue: getTagValue,
         executeAfterInit: executeAfterInit,
         setAPIKey: setAPIKey,
         isActive: isActive
