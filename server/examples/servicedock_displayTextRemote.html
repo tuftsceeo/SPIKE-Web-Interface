@@ -1,0 +1,84 @@
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+            <service-systemlink id="service_systemlink"></service-systemlink>
+        </div>
+        <div id="demobox" class="slidecontainer">
+            <p>Show text on the SPIKE Prime display</p>
+            <div>
+                <input type="button" id="display" value="display">
+            </div>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var mySL = document.getElementById("service_systemlink").getService();
+        
+        var message;
+        var displayButton = document.getElementById("display");
+
+        mySPIKE.executeAfterInit(function() {
+            
+            displayButton.addEventListener("click", function () {
+                
+                mySPIKE.displayText(message);
+            
+            });
+
+        })
+
+        mySL.executeAfterInit(function() {
+            
+            var getTagInterval = setInterval(async function() {
+                
+                var tagsInfo = await mySL.getTagsInfo();
+                
+                var newMessage = tagsInfo.message.value;
+                
+                if ( newMessage != message ) {
+                    
+                    message = newMessage;
+                    
+                    mySPIKE.displayText(message);
+                }
+
+            }, 100);
+
+        })
+        
+        window.addEventListener("load", function () {
+                dragElement("demobox");
+        })
+
+    </script>
+    <style>
+        #demobox {
+            position: absolute;
+            background-color: #4CE0D2;
+            color: black;
+            height: 300px;
+            width: 500px;
+            top: 200px;
+            left: 400px;
+            border: solid;
+        }
+
+        #text {
+            height: 80px;
+            width: 400px;
+        }
+    </style>
+</html>

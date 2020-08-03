@@ -94,32 +94,32 @@ Note:
 
         // main function to call for the sending SPIKE after its init
         async function SendMain() {
-                    receiving = false; //set the "receiving" flag
+            receiving = false; //set the "receiving" flag
 
-                    var motorPorts = await getMotorPorts(); // get ports connected to motors
-                    initPortSelect(motorPorts); // append ports to <select>
+            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            initPortSelect(motorPorts); // append ports to <select>
 
-                    // when the "select" button is clicked
-                    $("#sending").find("#selectport").on("click", async () => {
-                        var sendToCloudInt = setInterval(async function () {
-                            // get the selected port
-                            var port = await $("#sending").find("#portSelect option:selected").val();
+            // when the "select" button is clicked
+            $("#sending").find("#selectport").on("click", async () => {
+                var sendToCloudInt = setInterval(async function () {
+                    // get the selected port
+                    var port = await $("#sending").find("#portSelect option:selected").val();
 
-                            // parse the motor's speed value 
-                            var portInfo = await mySENDSPIKE.getPortInfo(port);
-                            var toSend = portInfo.data.speed;
+                    // parse the motor's speed value 
+                    var portInfo = await mySENDSPIKE.getPortInfo(port);
+                    var toSend = portInfo.data.speed;
 
-                            // change the tag value in the cloud
-                            mySL.setTagValue("testInt", toSend);
-                        }, 500)
-                        if ( stage == 4 ) {
-                            moveToNextExplain();
-                        }
-                    })
+                    // change the tag value in the cloud
+                    mySL.setTagValue("testInt", toSend);
+                }, 500)
+                if ( stage == 4 ) {
+                    moveToNextExplain();
+                }
+            })
 
-                    if (stage == 2) {
-                        moveToNextExplain();
-                    }
+            if (stage == 2) {
+                moveToNextExplain();
+            }
         }
 
         // main function to call for the receiving SPIKE after its init

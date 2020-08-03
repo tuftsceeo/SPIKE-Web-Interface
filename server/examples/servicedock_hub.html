@@ -39,6 +39,7 @@
             setInterval(getData, 1);
         }
         async function getData() {
+
             var hubInfo = await mySPIKE.getHubInfo();
             
             var hubDeg = hubInfo.pos[0];
@@ -57,8 +58,11 @@
                 $("#back").css("display", "none");
             }
             
-
-            HTMLElement.css("transform", "rotate(" + hubDeg + "deg)");
+            if (HTMLElement !== undefined) {
+                HTMLElement.css("transform", "rotate(" + hubDeg + "deg)");
+            } else {
+                $("#front").css("transform", "rotate(" + hubDeg + "deg)");
+            }
             // var hubYaccel = hubInfo.accel[2];
 
         }

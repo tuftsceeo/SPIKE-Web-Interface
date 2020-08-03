@@ -58,8 +58,8 @@ body {
 <div id="servicedockexplain" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
-    <p id="explanation"> You need: A SPIKE Prime hub, and two motors.</p>
-    <p id="explanation2"> Connect a motor on each side of the hub, and connect the hub to this computer</p>
+    <p id="explanation"> You need: A SPIKE Prime hub</p>
+    <p id="explanation2"></p>
   </div>
 </div>
 <div id="SPIKE_triangle" class="triangle-left triangle" style="display: none; position: absolute; left: 70px; top: 20px;"></div>
@@ -279,7 +279,7 @@ requestAnimationFrame(loop);
           stage++;
           break;
         case 1:
-          explanation2.innerHTML = "Move the motors and play Pong!"
+          explanation2.innerHTML = "Move the hub and play Pong!"
           explanation.innerHTML = ""
           var triangleBefore = document.getElementById("SPIKE_triangle");
           triangleBefore.style.display = "none";

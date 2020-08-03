@@ -22,47 +22,37 @@
             <input id="roleChoose" type="button" value="select">
         </div>
         <div id ="RECVportsInterface">
-            <div id="leftMotor">
-                <p>Control left motor</p>
-                <select id="leftMotorPort" class="select_components target_ignore">
+            <div id="motor" class = "target_ignore">
+                <p class = "target_ignore"> Select motor</p>
+                <select id="motorPort" class="select_components target_ignore">
                 </select>
-                <input id="leftMotorPortChoose" type="button" value="select">
+                <input id="motorPortChoose" type="button" value="select">
             </div>
-            <div id="rightMotor">
-                <p>Control right motor</p>
-                <select id="rightMotorPort" class="select_components target_ignore">
-                </select>
-                <input id="rightMotorPortChoose" type="button" value="select">
-            </div>
-            <div id="ultrasonic">
-                <p>Control Ultrasonic sensor</p>
-                <select id = "ultrasonicPort" class="select_components target_ignore">
-                </select>
-                <input id = "ultrasonicPortChoose" type="button" value="select">
-            </div>
-            <div>
+            <div class = "target_ignore">
                 Start Controlling
                 <input id = "startControl" type="button" value="start">
             </div>
         </div>
         <div id="controlInterface">
-            Ultrasonic Sensor data
+            Motor data
+            <div id="selectbox" class="target_ignore">
+                <select id="dataSelect" class="select_components target_ignore">
+                    <option id = "motorSpeed">Motor Speed</option>
+                    <option id="motorPower">Motor Power</option>
+                    <option id="motorAngle">Motor Displacement</option>
+                    <option id="motorUAngle">Motor Position</option>
+                </select>
+            </div>
             <div id="chart"></div>
         </div>
         <div id = "SENDportsInterface">
-            <div id="steerMotor">
-                <p>Choose motor to steer car</p>
-                <select id="steerMotorPort" class="select_components target_ignore">
-                </select>
-                <input id="steerMotorPortChoose" type="button" value="select">
-            </div>
-            <div id="forceSensor">
-                <p>Choose force Sensor to accelerate car</p>
+            <div id="forceSensor" class = "target_ignore">
+                <p class = "target_ignore" >Choose force Sensor to move motor</p>
                 <select id="forceSensorPort" class="select_components target_ignore">
                 </select>
                 <input id="forceSensorPortChoose" type="button" value="select">
             </div>
-            <div>
+            <div class = "target_ignore">
                 Start Controlling
                 <input id="startControl" type="button" value="start">
             </div>
@@ -72,17 +62,16 @@
         /* SPIKE Service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
         var mySL = document.getElementById("service_systemlink").getService();
-        var leftMotorPort;
-        var rightMotorPort;
-        var ultrasonicPort;
-        var colorPort;
-        var speed;
-        var keyPressed = false;
+        var motorPort;
+        var forceSensorPort;
+
         var receiving = false;
 
-        var steerMotorPort;
-        var forceSensorPort;
-        var ultrasonicDistance;
+        /* for graphing*/
+        var motorSpeed;
+        var motorAngle;
+        var motorUAngle;
+        var motorPower;
 
         /* when roles are chosen, display relevant divs and populate port selects */
         $("#roleChoose").on("click", async function () {
@@ -97,8 +86,6 @@
                 receiving = false;
                 $("#controlInterface").css("display", "block");
                 $("#SENDportsInterface").css("display", "block");
-                
-                // start graphing
                 graphValue();
             }
 
@@ -107,25 +94,16 @@
         })
 
         /* append the ports to select HTML element when receiving values*/
-        async function initRECVPortSelects(motorPorts, ultrasonicPorts, colorPorts) {
+        async function initRECVPortSelects(motorPorts) {
 
             for (var port in motorPorts) {
-                $("#leftMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
-                $("#rightMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
-            }
-
-            for (var port in ultrasonicPorts) {
-                $("#ultrasonicPort").append("<option id = " + ultrasonicPorts[port] + ">" + ultrasonicPorts[port] + "</option>");
+                $("#motorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
             }
             
         }
 
         /* append the motor ports to select HTML element sending values */
-        async function initSENDPortSelects(motorPorts, forcePorts) {
-
-            for (var port in motorPorts) {
-                $("#steerMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
-            }
+        async function initSENDPortSelects(forcePorts) {
 
             for (var port in forcePorts) {
                 $("#forceSensorPort").append("<option id = " + forcePorts[port] + ">" + forcePorts[port] + "</option>");
@@ -135,25 +113,13 @@
         async function initPortsByRole() {
             if (receiving) {
                 var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
-                var ultrasonicPorts = await mySPIKE.getUltrasonicPorts();
 
-                initRECVPortSelects(motorPorts, ultrasonicPorts); // append ports to <select>
+                initRECVPortSelects(motorPorts); // append ports to <select>
 
-                $("#leftMotorPortChoose").on("click", async function () {
+                $("#motorPortChoose").on("click", async function () {
                     // get the selected port
-                    console.log($("#leftMotorPort option:selected"))
-                    leftMotorPort = await $("#leftMotorPort option:selected").val();
-                })
-
-                $("#rightMotorPortChoose").on("click", async function () {
-                    // get the selected port
-                    rightMotorPort = await $("#rightMotorPort option:selected").val();
-                })
-
-
-                $("#ultrasonicPortChoose").on("click", async function () {
-                    // get the selected port
-                    ultrasonicPort = await $("#ultrasonicPort option:selected").val();
+                    console.log($("#motorPort option:selected"))
+                    motorPort = await $("#motorPort option:selected").val();
                 })
 
                 /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
@@ -161,47 +127,33 @@
 
                     var sendInterval = setInterval(async function () {
 
-                        /* send ultrasonic sensor value to cloud */
-                        var info = await mySPIKE.getPortInfo(ultrasonicPort);
-                        var distance = info.data.distance;
+                        /* send motor sensor value to cloud */
+                        var info = await mySPIKE.getPortInfo(motorPort);
+                        var speed = info.data.speed;
+                        var power = info.data.power;
+                        var angle = info.data.angle;
+                        var uangle = info.data.uAngle;
 
-                        mySL.setTagValue("distance", distance);
+                        mySL.setTagValue("motorSpeed", speed);
+                        mySL.setTagValue("motorPower", power);
+                        mySL.setTagValue("motorAngle", angle);
+                        mySL.setTagValue("motorUAngle", uangle);
 
-                        /* receive steer motor values and force sensor values from cloud */
-                        var steerSpeed = await mySl.getTagValue("steerSpeed");
-                        var buttonForce = await mySl.getTagValue("buttonForce");
+                        /* receive force sensor values from cloud */
+                        var steerSpeed = await mySL.getTagValue("buttonForce");
+                        steerSpeed = steerSpeed * 10;
                         
-                        // only turn when button wasn't pressed
-                        if ( buttonForce == 0 ) {
-                            // steerwheel was rotated counterclockwise
-                            if (steerSpeed < 0) {
-                                // turn tank counterclockwise
-                                mySPIKE.moveTankSpeeds(steerSpeed, -steerSpeed, leftMotorPort, rightMotorPort);
-                            }
-                            // steerwheel was rotated clockwise 
-                            else if (steerSpeed > 0) {
-                                mySPIKE.moveTankSpeeds(-steerSpeed, steerSpeed, leftMotorPort, rightMotorPort);
-                            }
-                        } 
-                        // move forward when button was pressed
-                        else {
-                            var speed = buttonForce * 10;
-                            mySPIKE.moveTankSpeeds(speed, speed, leftMotorPort, rightMotorPort);
-                        }
+                        /* move motor */ 
+                        mySPIKE.motorStart(motorPort, steerSpeed, 0);
 
                     }, 100)
                 })
             }
             else {
-                var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
-                var forcePorts = await mySPIKE.getForcePorts();
+                var forceSensorPorts = await mySPIKE.getForcePorts(); // get ports connected to motors
                 
-                initSENDPortSelects(motorPorts, forcePorts); // append ports to <select>
+                initSENDPortSelects(forceSensorPorts); // append ports to <select>
                 
-                $("#steerMotorPortChoose").on("click", async function () {
-                    // get the selected port
-                    steerMotorPort = await $("#steerMotorPort option:selected").val();
-                })
 
                 $("#forceSensorPortChoose").on("click", async function () {
                     // get the selected port
@@ -211,23 +163,43 @@
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
                     var sendInterval = setInterval(async function () {
                         
-                        /* send steerMotor values and buttonForce valeus to cloud */
+                        /* send buttonForce valeus to cloud */
 
-                        var motorPortInfo = await mySPIKE.getPortInfo(steerMotorPort);
                         var forceSensorInfo = await mySPIKE.getPortInfo(forceSensorPort);
 
-                        var steerSpeed = motorPortInfo.data.speed;
                         var buttonForce = forceSensorInfo.data.force;
 
-                        mySL.setTagValue("steerSpeed", steerSpeed);
                         mySL.setTagValue("buttonForce", buttonForce);
 
-                        /* receive distance value from cloud */
-                        ultrasonicDistance = await mySL.getTagValue("distance");
-                        
+                        /* receive motor values from cloud */
+                        motorSpeed = await mySL.getTagValue("motorSpeed");
+                        motorAngle = await mySL.getTagValue("motorAngle");
+                        motorUAngle = await mySL.getTagValue("motorUAngle");
+                        motorPower = await mySL.getTagValue("motorPower");
+
                     }, 100)
                 })
 
+            }
+        }
+        // gets selected data to display from html element and returns its value
+        async function graph_it() {
+            //get ids of selected port and data to display
+            var selectedDataHTML = $("#dataSelect option:selected")
+
+            var selected_data = selectedDataHTML.attr('id');
+
+            if ( selected_data == "motorSpeed" ) {
+                return motorSpeed;
+            }
+            else if (selected_data == "motorPower") {
+                return motorPower;
+            }
+            else if (selected_data == "motorAngle") {
+                return motorAngle;
+            }
+            else if (selected_data == "motorUAngle") {
+                return motorUAngle;
             }
         }
 
@@ -235,7 +207,7 @@
             /* graph ultrasonic sensor value */
             $(function () {
                 Plotly.plot('chart', [{
-                    y: [ultrasonicDistance],
+                    y: [graph_it()],
                     type: 'line'
                 }]);
 
@@ -243,7 +215,7 @@
                 setInterval(async function () {
                     var datapoint;
                     try {
-                        datapoint = ultrasonicDistance;
+                        datapoint = await graph_it();
                     }
                     catch (error) {
 

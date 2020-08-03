@@ -64,49 +64,6 @@
 
         mySPIKE.executeAfterInit(SPIKE_main);
 
-        /* get the ports to which motors are connected to*/
-        async function getMotorPorts() {
-
-            var portsInfo = await mySPIKE.getPortsInfo();
-            var motorPorts = [];
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                    motorPorts.push(key);
-                }
-            }
-            return motorPorts;
-        }
-        
-        /* get the ports to which ultrasonic sensors are connected to*/
-        async function getUltrasonicPorts() {
-            
-            var portsInfo = await mySPIKE.getPortsInfo();
-            var ultrasonicPorts = [];
-            
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "ultrasonic") {
-                    ultrasonicPorts.push(key);
-                }
-            }
-            
-            return ultrasonicPorts;
-        }
-
-        /* get the ports to which ultrasonic sensors are connected to*/
-        async function getColorPorts() {
-
-            var portsInfo = await mySPIKE.getPortsInfo();
-            var colorPorts = [];
-
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "color") {
-                    colorPorts.push(key);
-                }
-            }
-
-            return colorPorts;
-        }
-
         /* append the motor ports to select HTML element */
         async function initPortSelect(motorPorts, ultrasonicPorts, colorPorts) {
             
@@ -127,9 +84,9 @@
 
         async function SPIKE_main() {
 
-            var motorPorts = await getMotorPorts(); // get ports connected to motors
-            var ultrasonicPorts = await getUltrasonicPorts();
-            var colorPorts = await getColorPorts();
+            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+            var ultrasonicPorts = await mySPIKE.getUltrasonicPorts();
+            var colorPorts = await mySPIKE.getColorPorts();
 
             initPortSelect(motorPorts, ultrasonicPorts, colorPorts); // append ports to <select>
 

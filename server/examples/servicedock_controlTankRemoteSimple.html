@@ -14,6 +14,9 @@
             <service-spike id="service_spike"></service-spike>
             <service-systemlink id = "service_systemlink"></service-systemlink>
         </div>
+        <div>
+            <input type="button" value="Reboot Hub after Demo" id="reboot">
+        </div>
         <div id = "chooseRoleDiv">
             <select id="selectRole" class="select_components target_ignore">
                 <option id = "RECV">Receive Control</option>
@@ -51,16 +54,10 @@
         </div>
         <div id = "SENDportsInterface">
             <div id="steerMotor">
-                <p>Choose motor to steer car</p>
+                <p>Choose motor to move car</p>
                 <select id="steerMotorPort" class="select_components target_ignore">
                 </select>
                 <input id="steerMotorPortChoose" type="button" value="select">
-            </div>
-            <div id="forceSensor">
-                <p>Choose force Sensor to accelerate car</p>
-                <select id="forceSensorPort" class="select_components target_ignore">
-                </select>
-                <input id="forceSensorPortChoose" type="button" value="select">
             </div>
             <div>
                 Start Controlling
@@ -69,20 +66,23 @@
         </div>
     </body>
     <script>
-        /* SPIKE Service code*/
+        
+        /* instantiate Service objects */
         var mySPIKE = document.getElementById("service_spike").getService();
         var mySL = document.getElementById("service_systemlink").getService();
+        
+        // variables for receiving 
         var leftMotorPort;
         var rightMotorPort;
         var ultrasonicPort;
-        var colorPort;
-        var speed;
-        var keyPressed = false;
+        
+        // variables for sender
+        var steerMotorPort;
+        var ultrasonicDistance;
+
+        // flag for receiving or sending
         var receiving = false;
 
-        var steerMotorPort;
-        var forceSensorPort;
-        var ultrasonicDistance;
 
         /* when roles are chosen, display relevant divs and populate port selects */
         $("#roleChoose").on("click", async function () {
@@ -121,19 +121,19 @@
         }
 
         /* append the motor ports to select HTML element sending values */
-        async function initSENDPortSelects(motorPorts, forcePorts) {
+        async function initSENDPortSelects(motorPorts) {
 
             for (var port in motorPorts) {
                 $("#steerMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
             }
-
-            for (var port in forcePorts) {
-                $("#forceSensorPort").append("<option id = " + forcePorts[port] + ">" + forcePorts[port] + "</option>");
-            }            
+   
         }
 
+        // after receiving or sending role is chosen, add relevant event listeners and init SPIKE variables
         async function initPortsByRole() {
+
             if (receiving) {
+
                 var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
                 var ultrasonicPorts = await mySPIKE.getUltrasonicPorts();
 
@@ -141,7 +141,6 @@
 
                 $("#leftMotorPortChoose").on("click", async function () {
                     // get the selected port
-                    console.log($("#leftMotorPort option:selected"))
                     leftMotorPort = await $("#leftMotorPort option:selected").val();
                 })
 
@@ -167,70 +166,47 @@
 
                         mySL.setTagValue("distance", distance);
 
-                        /* receive steer motor values and force sensor values from cloud */
-                        var steerSpeed = await mySl.getTagValue("steerSpeed");
-                        var buttonForce = await mySl.getTagValue("buttonForce");
-                        
-                        // only turn when button wasn't pressed
-                        if ( buttonForce == 0 ) {
-                            // steerwheel was rotated counterclockwise
-                            if (steerSpeed < 0) {
-                                // turn tank counterclockwise
-                                mySPIKE.moveTankSpeeds(steerSpeed, -steerSpeed, leftMotorPort, rightMotorPort);
-                            }
-                            // steerwheel was rotated clockwise 
-                            else if (steerSpeed > 0) {
-                                mySPIKE.moveTankSpeeds(-steerSpeed, steerSpeed, leftMotorPort, rightMotorPort);
-                            }
-                        } 
-                        // move forward when button was pressed
-                        else {
-                            var speed = buttonForce * 10;
-                            mySPIKE.moveTankSpeeds(speed, speed, leftMotorPort, rightMotorPort);
-                        }
+                        /* receive steer motor values from cloud */
+                        var steerSpeed = await mySL.getTagValue("steerSpeed");
+
+                        mySPIKE.moveTankSpeeds(steerSpeed, steerSpeed, leftMotorPort, rightMotorPort)
 
                     }, 100)
                 })
             }
+
             else {
+
                 var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
-                var forcePorts = await mySPIKE.getForcePorts();
                 
-                initSENDPortSelects(motorPorts, forcePorts); // append ports to <select>
+                initSENDPortSelects(motorPorts); // append ports to <select>
                 
                 $("#steerMotorPortChoose").on("click", async function () {
                     // get the selected port
                     steerMotorPort = await $("#steerMotorPort option:selected").val();
                 })
 
-                $("#forceSensorPortChoose").on("click", async function () {
-                    // get the selected port
-                    forceSensorPort = await $("#forceSensorPort option:selected").val();
-                })
-
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
                     var sendInterval = setInterval(async function () {
                         
-                        /* send steerMotor values and buttonForce valeus to cloud */
+                        /* send steerMotor values to cloud */
 
                         var motorPortInfo = await mySPIKE.getPortInfo(steerMotorPort);
-                        var forceSensorInfo = await mySPIKE.getPortInfo(forceSensorPort);
 
                         var steerSpeed = motorPortInfo.data.speed;
-                        var buttonForce = forceSensorInfo.data.force;
 
                         mySL.setTagValue("steerSpeed", steerSpeed);
-                        mySL.setTagValue("buttonForce", buttonForce);
 
                         /* receive distance value from cloud */
                         ultrasonicDistance = await mySL.getTagValue("distance");
-                        
+    
                     }, 100)
                 })
 
             }
         }
 
+        /* start graphing */
         async function graphValue() {
             /* graph ultrasonic sensor value */
             $(function () {
@@ -260,12 +236,15 @@
                 }, 15);
             })
         }
-
+        var rebootButton = document.getElementById("reboot");
         window.addEventListener("load", async function() {
             dragElement("RECVportsInterface");
             dragElement("SENDportsInterface");
             dragElement("controlInterface");
             dragElement("chooseRoleDiv");
+            rebootButton.addEventListener("click", function () {
+                mySPIKE.rebootHub();
+            })
         })
     </script>
 
