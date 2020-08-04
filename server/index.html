@@ -12,8 +12,67 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 -->
 <html>
-    <p>SPIKE Prime Web Interface EXAMPLES</p>
-    <h><b>> Simple Examples:</b></h>
+
+    <head>
+
+        <style>
+            body{
+                background-color: #c4fff9;
+                margin: 5%;
+                text-align: center;
+            }
+
+            h1{
+                height: auto;
+                font-size: 150px;
+                font-weight: 20000;
+                padding: 10% 2%;
+                text-align: left;
+                
+            }
+
+            h3{
+                font-size: 40px;
+                color: #1a535c;
+                text-align: left;
+            }
+            div{
+                display: inline-flex; 
+                background-color: #ddfff7;
+                flex-flow: column wrap;
+                flex-direction: row;
+                align-items: baseline; 
+                margin: 1% 0.5%;
+                /* align-self: flex-start; */
+                
+                justify-content: center;
+                /* align-items: center; */
+                /* margin: 1%; */
+            }
+
+            a:link{
+                text-decoration: none;
+            }
+
+            a{
+                display: block;
+                text-align: center; 
+                height: 100px;
+                width: 180px;
+                color: #137547;
+                font-weight: 600;
+                padding: 10%;
+                /* margin: auto 5%; */
+            }
+
+
+        </style>
+    </head>
+    <h1>Service Dock for SPIKE Prime</h1>
+
+
+
+    <h3><b>> Simple Examples:</b></h3>
     <div>
         <a href="./examples/servicedock_test.html"> Raw UJSON RPC Stream and Commands</a>
     </div>
@@ -32,7 +91,7 @@ LICENSE: MIT
     <div>
         <a href="./examples/servicedock_displayTextButton.html"> Display Text With Force Sensor </a>
     </div>
-    <h><b>> Medium Examples:</b></h>
+    <h3><b>> Medium Examples:</b></h3>
     <div>
         <a href="./examples/servicedock_ultraVisual.html"> Ultrasonic Sensor Visualization </a>
     </div>
@@ -60,7 +119,7 @@ LICENSE: MIT
     <div>
         <a href="./examples/servicedock_pongTwoPTwoS.html"> Multiplayer Pong ( Motors on TWO SPIKE's) </a>
     </div>
-    <h><b>> Advanced Examples:</b></h>
+    <h3><b>> Advanced Examples:</b></h3>
     <div>
         <a href="./examples/servicedock_motor.html"> Use Motor to Remotely Control a Motor </a>
     </div>
@@ -86,7 +145,7 @@ LICENSE: MIT
     <div>
         <a href="./examples/servicedock_gmailxSL.html"> Execute Python Scripts from Gmail Inbox ( Also Retrieve Variables from SystemLink )</a>
     </div>
-    <h><b>> Aug 4th Demos:</b></h>
+    <h3><b>> Aug 4th Demos:</b></h3>
     <div>
         <a href="./examples/servicedock_controlTankRemoteSimple.html"> Use Motor to Remotely Move a Car ( w/ Ultrasonic
             Sensor Graphical Feed)</a>
