@@ -38,12 +38,14 @@
             <div>
                 Start Demo
                 <input id="startControl" type="button" value="start">
+                <div id="demoStarted"></div>
             </div>
         </div>
         <div id="JEREMYportsInterface">
             <div>
                 Start Demo
                 <input id="startControl" type="button" value="start">
+                <div id = "demoStarted"></div>
             </div>
         </div>
     </body>
@@ -94,10 +96,12 @@
                 /* when control button is clicked, start receiving speed value and run motor */
                 $("#ETHANportsInterface").find("#startControl").on("click", function () {
 
+                    $("#ETHANportInterface").find("#demoStarted").html("Demo has been started!")
+                    
                     var EthanInterval = setInterval(async function () {
 
                         /* receive LEGOSpeed tag value from cloud */
-                        var steerSpeed = await mySL.getTagValue("LEGOSpeed");
+                        var steerSpeed = await mySL.getTagValue("LEGODEMOSpeed");
 
                         mySPIKE.motorStart(motorPort, steerSpeed, 0);
 
@@ -108,6 +112,7 @@
 
                 $("#JEREMYportsInterface").find("#startControl").on("click", async function () {
                     
+                    $("#JEREMYportInterface").find("#demoStarted").html("Demo has been started!")
                     // get default message tag value
                     message = await mySL.getTagValue("message");
                     
