@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_controlTankRemoteSimple.html
+Author: Jeremy Jung
+Last update: 8/4/20
+Description: move a tank remotely through SystemLink Cloud and get ultrasonic live feed
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+Person controlling tank:
+1) use motor to accelerate the tank
+Person with the tank:
+the tank needs two motors to move
+an ultrasoinc sensor at the front
+Tags in use:
+steerSpeed
+distance
+-->
 <html>
 
     <head>
@@ -15,7 +36,7 @@
             <service-systemlink id = "service_systemlink"></service-systemlink>
         </div>
         <div>
-            <input type="button" value="Reboot Hub after Demo" id="reboot">
+            <input type="button" value="END DEMO" id="reboot">
         </div>
         <div id = "chooseRoleDiv">
             <select id="selectRole" class="select_components target_ignore">
@@ -83,6 +104,8 @@
         // flag for receiving or sending
         var receiving = false;
 
+        var SENDInterval;
+        var RECVInterval;
 
         /* when roles are chosen, display relevant divs and populate port selects */
         $("#roleChoose").on("click", async function () {
@@ -158,7 +181,7 @@
                 /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
                 $("#RECVportsInterface").find("#startControl").on("click", function () {
 
-                    var sendInterval = setInterval(async function () {
+                    RECVInterval = setInterval(async function () {
 
                         /* send ultrasonic sensor value to cloud */
                         var info = await mySPIKE.getPortInfo(ultrasonicPort);
@@ -187,7 +210,7 @@
                 })
 
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
-                    var sendInterval = setInterval(async function () {
+                    SENDInterval = setInterval(async function () {
                         
                         /* send steerMotor values to cloud */
 
@@ -243,6 +266,13 @@
             dragElement("controlInterface");
             dragElement("chooseRoleDiv");
             rebootButton.addEventListener("click", function () {
+                
+                if ( receiving ) {
+                    clearInterval(RECVInterval)
+                } else {
+                    clearInterval(SENDInterval);
+                }
+
                 mySPIKE.rebootHub();
             })
         })

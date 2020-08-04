@@ -53,7 +53,9 @@ body {
 <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
 <div id="servicedock" style="float:left;">
   <service-spike id = "Service_SPIKE1"></service-spike>
+  <div style = "margin: 5px;">Player 1</div>
   <service-spike id="Service_SPIKE2"></service-spike>
+  <div style = "margin: 5px;" >Player 2</div>
 </div>
 <div id="servicedockexplain" class="modal">
   <div class="modal-content">
@@ -127,13 +129,12 @@ async function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
   // check if the SPIKE Service is active (initialized)
-  if (await mySPIKE1.isActive() && await mySPIKE2.isActive()) {
+  if (mySPIKE1.isActive() && mySPIKE2.isActive()) {
     if (stage == 1) {
       moveToNextExplain();
     }
     main();
   }
-  
   // move paddles by their velocity
   leftPaddle.y += leftPaddle.dy;
   rightPaddle.y += rightPaddle.dy;
@@ -214,41 +215,36 @@ async function loop() {
   }
 }
 
-// listen to keyboard events to stop the paddle if key is released
-document.addEventListener('keyup', function(e) {
-  if (e.which === 38 || e.which === 40) {
-    rightPaddle.dy = 0;
-    //JSON_script = '{"i":' + Math.floor((Math.random()*10000)) + ', "m": "scratch.motor_start", "p": {"port":' + '"'  + rightPlayermotor + '"'  + ',' +'"speed":' + rightPaddle.dy + ',' + '"stall":0'+ '} }'
-  }
-
-  if (e.which === 83 || e.which === 87) {
-    leftPaddle.dy = 0;
-  }
-});
   // get the SPIKE_Service object linked to its service dock element
   const mySPIKE1 = document.getElementById("Service_SPIKE1").getService();
   const mySPIKE2 = document.getElementById("Service_SPIKE2").getService();
+  mySPIKE1.executeAfterInit(function () {
+    mySPIKE1.displayText("1");
+  })
+  mySPIKE2.executeAfterInit(function () {
+    mySPIKE2.displayText("2");
+  })
   var leftPlayermotor;
   var rightPlayermotor;
   async function SPIKE1LeftPaddle() {
-    var portsInfo = await mySPIKE1.getPortsInfo();
-    for ( key in portsInfo ) {
-      if ( portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor" ) {
-        var motor = portsInfo[key].data;
-        leftPaddle.dy = motor.speed;
-        break;
-      }
-    }
+    var motorPorts = await mySPIKE1.getMotorPorts();
+
+    var motorPort = motorPorts[0];
+
+    var motorInfo = await mySPIKE1.getPortInfo(motorPort);
+    var motor = motorInfo.data;
+    
+    leftPaddle.dy = motor.speed;
   }
   async function SPIKE2RightPaddle() {
-      var portsInfo = await mySPIKE2.getPortsInfo();
-      for (key in portsInfo) {
-        if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-          var motor = portsInfo[key].data;
-          rightPaddle.dy = motor.speed;
-          break;
-        }
-      }
+    var motorPorts = await mySPIKE1.getMotorPorts();
+
+    var motorPort = motorPorts[0];
+
+    var motorInfo = await mySPIKE1.getPortInfo(motorPort);
+    var motor = motorInfo.data;
+    
+    rightPaddle.dy = motor.speed;
     }
   // sync motor speed with respective Pong paddles
   async function main() {

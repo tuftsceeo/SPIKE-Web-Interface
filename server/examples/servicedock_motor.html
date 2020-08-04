@@ -96,7 +96,7 @@ Note:
         async function SendMain() {
             receiving = false; //set the "receiving" flag
 
-            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            var motorPorts = await mySENDSPIKE.getMotorPorts(); // get ports connected to motors
             initPortSelect(motorPorts); // append ports to <select>
 
             // when the "select" button is clicked
@@ -126,7 +126,7 @@ Note:
         async function RecvMain() {
             receiving = true; //set the "receiving" flag
 
-            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            var motorPorts = await myRECVSPIKE.getMotorPorts(); // get ports connected to motors
             initPortSelect(motorPorts); // append ports to <select>
 
             // when the "select" button is clicked
@@ -149,34 +149,6 @@ Note:
 
             if (stage == 2) {
                 moveToNextExplain();
-            }
-        }
-
-        /* get the ports of selected SPIKE to which motors are connected to*/
-        async function getMotorPorts() {
-            // if receiving motor values            
-            if ( receiving ) {
-                console.log("receiving")
-                var portsInfo = await myRECVSPIKE.getPortsInfo();
-                var motorPorts = [];
-                for (var key in portsInfo) {
-                    if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                        motorPorts.push(key);
-                    }
-                }
-                return motorPorts;
-            }
-            // if sending motor values
-            else {
-                console.log("sending")
-                var portsInfo = await mySENDSPIKE.getPortsInfo();
-                var motorPorts = [];
-                for (var key in portsInfo) {
-                    if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                        motorPorts.push(key);
-                    }
-                }
-                return motorPorts;
             }
         }
 

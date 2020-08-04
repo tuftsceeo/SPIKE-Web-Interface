@@ -17,7 +17,7 @@
             <service-systemlink id="service_systemlink"></service-systemlink>
         </div>
         <div>
-            <input type="button" value="Reboot Hub after Demo" id="reboot">
+            <input type="button" value="END DEMO" id="reboot">
         </div>
         <div id="chooseRoleDiv">
             Who are you?
@@ -57,6 +57,10 @@
         var message;
         
         var motorPort;
+
+        var EthanInterval;
+        var JeremyInterval;
+
         
         var ethan = false;
         /* when roles are chosen, display relevant divs and populate port selects */
@@ -97,9 +101,9 @@
                 /* when control button is clicked, start receiving speed value and run motor */
                 $("#ETHANportsInterface").find("#startControl").on("click", function () {
 
-                    $("#ETHANportInterface").find("#demoStarted").html("Demo has been started!")
+                    $("#ETHANportsInterface").find("#demoStarted").html("Demo has been started!")
                     
-                    var EthanInterval = setInterval(async function () {
+                    EthanInterval = setInterval(async function () {
 
                         /* receive LEGOSpeed tag value from cloud */
                         var steerSpeed = await mySL.getTagValue("LEGODEMOSpeed");
@@ -113,14 +117,15 @@
 
                 $("#JEREMYportsInterface").find("#startControl").on("click", async function () {
                     
-                    $("#JEREMYportInterface").find("#demoStarted").html("Demo has been started!")
+                    $("#JEREMYportsInterface").find("#demoStarted").html("Demo has been started!");
+                    
                     // get default message tag value
                     message = await mySL.getTagValue("message");
                     
                     // display default value
                     mySPIKE.displayText(message);
 
-                    var sendInterval = setInterval(async function () {
+                    JeremyInterval = setInterval(async function () {
                         /* get message tag and display on hub when different */
 
                         var newMessage = await mySL.getTagValue("message");
@@ -144,6 +149,13 @@
         window.addEventListener("load", function () {
             dragElement("demobox");
             rebootButton.addEventListener("click", function() {
+                
+                if (ethan) {
+                    clearInterval(EthanInterval);
+                } else {
+                    clearInterval(JeremyInterval);
+                }
+
                 mySPIKE.rebootHub();
             })
         })

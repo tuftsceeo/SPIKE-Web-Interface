@@ -48,11 +48,11 @@
         
         mySL.executeAfterInit( async function () {
 
+            /* update tag values */
+            await mySL.setTagValue("LEGODEMOSpeed", LEGOSpeed);
+
             currentSpeed = await mySL.getTagValue("LEGODEMOSpeed");
             currentMessage = await mySL.getTagValue("message");
-
-            /* update tag values */
-            mySL.setTagValue("LEGODEMOSpeed", LEGOSpeed);
 
             /* update and get "LEGOSpeed" and "message" tag values every 100 miliseconds */
             var SLInterval = setInterval(async function () {
@@ -61,7 +61,7 @@
                 var tagsInfo = await mySL.getTagsInfo();
 
                 /* get "LEGOSpeed" and "message" tag values */
-                currentSpeed = tagsInfo.LEGOSpeed.value;
+                currentSpeed = tagsInfo.LEGODEMOSpeed.value;
                 currentMessage = tagsInfo.message.value;
 
                 currentSpeedDIV.innerHTML = "Ethan's Current Motor Speed: " + currentSpeed;
@@ -76,10 +76,10 @@
                 console.log("typeof message", typeof message);
                 mySL.setTagValue("message", message);
             })
-        });
 
-        function Service_SystemLink() { let e = {}, t = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7", n = !1, a = 1e3; var r = void 0; async function o() { return e } async function i(e, t, n, a) { var r = new XMLHttpRequest; if (r.open(e, t, !0), r.setRequestHeader("x-ni-api-key", n), void 0 === a) r.setRequestHeader("Accept", "application/json"), r.send(); else { r.setRequestHeader("Content-type", "application/json"); var o = JSON.stringify(a); try { r.send(o) } catch (e) { console.log("error sending request:", r.response) } } return r } function s(e, t) { return "BOOLEAN" == e ? "true" == t : "STRING" == e ? t : "INT" == e || "DOUBLE" == e ? parseFloat(t) : t } return { init: async function (n, o) { var u; return void 0 !== n && (t = n), !!await async function (e) { return new Promise(async function (t, n) { var a = await i("GET", "https://api.systemlinkcloud.com/niauth/v1/auth", e); a.onload = function () { var e = JSON.parse(a.response); e.error ? n(new Error("Error at apikey auth:", e)) : (console.log("APIkey is valid"), t(!0)) }, a.onerror = function () { var e = JSON.parse(a.response); n(new Error("Error at apikey auth:", e)) } }) }(t) && (void 0 !== o && (a = await o), async function () { setInterval(async function () { var n = await async function () { return new Promise(async function (e, n) { var a = {}, r = await i("GET", "https://api.systemlinkcloud.com/nitag/v2/tags-with-values", t); r.onload = async function () { for (var t = JSON.parse(this.response), n = t.tagsWithValues, r = t.totalCount, o = 0; o < r; o++)try { var i = n[o].current.value.value, u = n[o].current.value.type, c = n[o].tag.path, l = await s(u, i), v = {}; v.value = l, v.type = u, a[c] = v } catch (e) { var i = null, u = n[o].tag.type, c = n[o].tag.path, v = {}; v.value = i, v.type = u, a[c] = v } e(a) }, r.onerror = function () { n(new Error("Error at getTagsInfoFromCloud")) } }) }(); n && (e = n) }, a) }(), active = !0, await (u = 2e3, new Promise(e => setTimeout(e, u))), void 0 !== r && r(), !0) }, getTagsInfo: o, setTagValue: async function (e, n) { return async function (e, n) { return new Promise(async function (a, r) { var o, s = "https://api.systemlinkcloud.com/nitag/v2/tags/" + e + "/values/current", u = (o = n, isNaN(o) ? "true" == o || "false" == o ? "BOOLEAN" : "STRING" : Number.isInteger(parseFloat(o)) ? "INT" : "DOUBLE"); if ("STRING" != u) var c = JSON.stringify(n), l = { value: { type: u, value: c } }; else var l = { value: { type: u, value: n } }; var v = l, p = await i("PUT", s, t, v); p.onload = function () { a(!0) }, p.onerror = function () { r(new Error("Error at updateTAagValue")) } }) }(e, n) }, getTagValue: async function (e) { return (await o())[e].value }, executeAfterInit: function (e) { r = e }, setAPIKey: function (e) { t = e }, isActive: function () { return n } } }
-    
+        });
+        
+        function Service_SystemLink() { let n = {}, e = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7", t = !1, a = 1e3; var r = void 0; async function o(n) { new Promise(async function (n, t) { var a = {}, r = await i("GET", "https://api.systemlinkcloud.com/nitag/v2/tags-with-values", e); r.onload = async function () { for (var e = JSON.parse(this.response), t = e.tagsWithValues, r = e.totalCount, o = 0; o < r; o++)try { var i = t[o].current.value.value, u = t[o].current.value.type, c = t[o].tag.path, l = await s(u, i); (v = {}).value = l, v.type = u, a[c] = v } catch (n) { var v; i = null, u = t[o].tag.type, c = t[o].tag.path; (v = {}).value = i, v.type = u, a[c] = v } n(a) }, r.onerror = function () { console.log(this.response), t(new Error("Error at getTagsInfoFromCloud")) } }).then(function (e) { n(e) }, function (e) { n(e) }) } async function i(n, e, t, a) { var r = new XMLHttpRequest; if (r.open(n, e, !0), r.setRequestHeader("x-ni-api-key", t), void 0 === a) r.setRequestHeader("Accept", "application/json"), r.send(); else { r.setRequestHeader("Content-type", "application/json"); var o = JSON.stringify(a); try { r.send(o) } catch (n) { console.log("error sending request:", r.response) } } return r } function s(n, e) { return "BOOLEAN" == n ? "true" == e : "STRING" == n ? e : "INT" == n || "DOUBLE" == n ? parseFloat(e) : e } return { init: async function (t, s) { return void 0 !== t && (e = t), !!await async function (n) { return new Promise(async function (e, t) { var a = await i("GET", "https://api.systemlinkcloud.com/niauth/v1/auth", n); a.onload = function () { var n = JSON.parse(a.response); n.error ? t(new Error("Error at apikey auth:", n)) : (console.log("APIkey is valid"), e(!0)) }, a.onerror = function () { var n = JSON.parse(a.response); t(new Error("Error at apikey auth:", n)) } }) }(e) && (void 0 !== s && (a = await s), async function (e) { o(function (t) { t && (n = t), setInterval(async function () { o(function (e) { e && (n = e) }) }, a), e() }) }(function () { active = !0, void 0 !== r && r() }), !0) }, getTagsInfo: async function () { return n }, setTagValue: async function (n, t) { return async function (n, t) { return new Promise(async function (a, r) { var o, s = "https://api.systemlinkcloud.com/nitag/v2/tags/" + n + "/values/current", u = (o = t, isNaN(o) ? "true" == o || "false" == o ? "BOOLEAN" : "STRING" : Number.isInteger(parseFloat(o)) ? "INT" : "DOUBLE"); if ("STRING" != u) var c = JSON.stringify(t), l = { value: { type: u, value: c } }; else var l = { value: { type: u, value: t } }; var v = l, f = await i("PUT", s, e, v); f.onload = function () { a(!0) }, f.onerror = function () { r(new Error("Error at updateTAagValue")) } }) }(n, t) }, getTagValue: async function (e) { return n[e].value }, executeAfterInit: function (n) { r = n }, setAPIKey: function (n) { e = n }, isActive: function () { return t } } }
     </script>
     <style>
 
