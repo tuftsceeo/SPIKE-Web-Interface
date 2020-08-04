@@ -468,7 +468,7 @@ function Service_SPIKE() {
 
     async function getMotorPorts() {
 
-        var portsInfo = await mySPIKE.getPortsInfo();
+        var portsInfo = ports;
         var motorPorts = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
@@ -481,7 +481,7 @@ function Service_SPIKE() {
 
     async function getSmallMotorPorts() {
         
-        var portsInfo = await mySPIKE.getPortsInfo();
+        var portsInfo = ports;
         var motorPorts = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "smallMotor" ) {
@@ -493,7 +493,7 @@ function Service_SPIKE() {
     }
 
     async function getBigMotorPorts() {
-        var portsInfo = await mySPIKE.getPortsInfo();
+        var portsInfo = ports;
         var motorPorts = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "bigMotor") {
