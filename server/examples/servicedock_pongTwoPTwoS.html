@@ -129,12 +129,10 @@ async function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
   // check if the SPIKE Service is active (initialized)
-  if (mySPIKE1.isActive() && mySPIKE2.isActive()) {
-    if (stage == 1) {
-      moveToNextExplain();
-    }
-    main();
+  if (stage == 1) {
+    moveToNextExplain();
   }
+  main();
   // move paddles by their velocity
   leftPaddle.y += leftPaddle.dy;
   rightPaddle.y += rightPaddle.dy;
@@ -218,14 +216,17 @@ async function loop() {
   // get the SPIKE_Service object linked to its service dock element
   const mySPIKE1 = document.getElementById("Service_SPIKE1").getService();
   const mySPIKE2 = document.getElementById("Service_SPIKE2").getService();
+
+  var leftPlayermotor;
+  var rightPlayermotor;
+
   mySPIKE1.executeAfterInit(function () {
     mySPIKE1.displayText("1");
   })
   mySPIKE2.executeAfterInit(function () {
     mySPIKE2.displayText("2");
   })
-  var leftPlayermotor;
-  var rightPlayermotor;
+
   async function SPIKE1LeftPaddle() {
     var motorPorts = await mySPIKE1.getMotorPorts();
 
@@ -245,11 +246,15 @@ async function loop() {
     var motor = motorInfo.data;
     
     rightPaddle.dy = motor.speed;
-    }
+  }
   // sync motor speed with respective Pong paddles
   async function main() {
-    SPIKE1LeftPaddle();
-    SPIKE2RightPaddle();
+    if (mySPIKE1.isActive()) {
+      SPIKE1LeftPaddle();
+    }
+    if (mySPIKE2.isActive()) {
+      SPIKE2RightPaddle();
+    }
   }
 // start the game
 requestAnimationFrame(loop);
