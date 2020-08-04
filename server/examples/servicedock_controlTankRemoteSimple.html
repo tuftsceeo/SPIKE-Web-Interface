@@ -68,6 +68,7 @@ distance
                 Start Controlling
                 <input id = "startControl" type="button" value="start">
             </div>
+            <div id="demoStarted"></div>
         </div>
         <div id="controlInterface">
             Ultrasonic Sensor data
@@ -84,6 +85,7 @@ distance
                 Start Controlling
                 <input id="startControl" type="button" value="start">
             </div>
+            <div id="demoStarted"></div>
         </div>
     </body>
     <script>
@@ -180,7 +182,7 @@ distance
 
                 /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
                 $("#RECVportsInterface").find("#startControl").on("click", function () {
-
+                    $("#RECVportsInterface").find("#demoStarted").html("Demo has been started!");
                     RECVInterval = setInterval(async function () {
 
                         /* send ultrasonic sensor value to cloud */
@@ -210,6 +212,7 @@ distance
                 })
 
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
+                    $("#SENDportsInterface").find("#demoStarted").html("Demo has been started!");
                     SENDInterval = setInterval(async function () {
                         
                         /* send steerMotor values to cloud */
@@ -269,10 +272,12 @@ distance
                 
                 if ( receiving ) {
                     clearInterval(RECVInterval)
+                    $("#RECVportsInterface").find("#demoStarted").html("Demo has ended");
                 } else {
                     clearInterval(SENDInterval);
+                    $("#SENDportsInterface").find("#demoStarted").html("Demo has ended");
                 }
-
+                
                 mySPIKE.rebootHub();
             })
         })
