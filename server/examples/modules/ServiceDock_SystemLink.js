@@ -120,7 +120,7 @@ window.customElements.define('service-systemlink', servicesystemlink);
 Project Name: SPIKE Prime Web Interface
 File name: Service_SystemLink.js
 Author: Jeremy Jung
-Last update: 7/22/20
+Last update: 8/04/20
 Description: SystemLink Service Library (OOP)
 History:
     Created by Jeremy on 7/15/20
@@ -171,27 +171,30 @@ function Service_SystemLink() {
     async function init(APIKeyInput, pollIntervalInput) {
 
         // if an APIKey was specified
-        if ( APIKeyInput !== undefined ) {
+        if (APIKeyInput !== undefined) {
             APIKey = APIKeyInput;
         }
 
         var response = await checkAPIKey(APIKey);
 
         // if response from checkAPIKey is valid
-        if ( response ) {
-            if ( pollIntervalInput !== undefined ) {
+        if (response) {
+
+            if (pollIntervalInput !== undefined) {
                 pollInterval = await pollIntervalInput;
             }
-            // initialize the tagsInfo global variable
-            updateTagsInfo();
-            active = true;
-            
-            await sleep(2000); // wait for service to init
 
-            // call funcAtInit if defined
-            if (funcAtInit !== undefined) {
-                funcAtInit();
-            }
+            // initialize the tagsInfo global variable
+            updateTagsInfo(function () {
+
+                active = true;
+
+                // call funcAtInit if defined
+                if (funcAtInit !== undefined) {
+
+                    funcAtInit();
+                }
+            });
 
             return true;
         }
@@ -242,8 +245,6 @@ function Service_SystemLink() {
     */
     async function getTagValue(tagName) {
 
-        var tagsInfo = await getTagsInfo();   
-        
         var currentValue = tagsInfo[tagName].value;
 
         return currentValue;
@@ -256,7 +257,7 @@ function Service_SystemLink() {
     * Returns:
     * {serviceActive} (boolean) - whether Service was initialized or not
     */
-    function isActive(){
+    function isActive() {
         return serviceActive;
     }
 
@@ -320,37 +321,62 @@ function Service_SystemLink() {
 
     /* updateTagsInfo() - assign list of tags existing in the cloud to {tagPaths} global variable
     * 
+    * Parameters:
+    * - callback {function} rest of init after tagsInfo is initialized
+    * 
     * Effect:
     * modifies global variable {tagPaths}
     * continuously send HTTP requests to SL Cloud (ASYNC INTERVAL)
     * 
     */
-    async function updateTagsInfo() {
-        setInterval(async function () {
+    async function updateTagsInfo(callback) {
 
-            var collectedTagsInfo = await getTagsInfoFromCloud();
+        // get the tags the first time before running callback
+        getTagsInfoFromCloud(function (collectedTagsInfo) {
 
-            // if the object is defined and not boolean false
+            // if the collectedTagsInfo is defined and not boolean false
             if (collectedTagsInfo) {
                 tagsInfo = collectedTagsInfo;
             }
 
-        }, pollInterval)
+            // after tagsInfo is initialized, begin the interval to update it
+            setInterval(async function () {
+
+                getTagsInfoFromCloud(function (collectedTagsInfo) {
+
+                    // if the object is defined and not boolean false
+                    if (collectedTagsInfo) {
+                        tagsInfo = collectedTagsInfo;
+                    }
+                });
+
+            }, pollInterval)
+
+            // run the callback of updateTagsInfo inside init()
+            callback();
+
+        });
+
     }
 
     /* getTagsInfoFromCloud() - get the info of a tag in the cloud
     * 
+    * Parameters:
+    * Callback {Function}
+    *
     * Return: 
-    * {Promise} - if success: resolve(collectedTagsInfo)
+    * callback(resolve, reject) { Function (Promise) } - if success: resolve(collectedTagsInfo)
     *           - if fail: reject(error)
-    * ex) response_data = { type: "BOOLEAN", value: TRUE }
+    * ex) a tag object = { type: "BOOLEAN", value: TRUE }
     * 
     * Note:
     * The return is not the actual value, but an object, in which 
     * there is the value of the tag and the value's datatype
     */
-    async function getTagsInfoFromCloud() {
-        return new Promise(async function (resolve, reject) {
+    async function getTagsInfoFromCloud(callback) {
+
+        // make a new promise
+        new Promise(async function (resolve, reject) {
 
             var collectedTagsInfo = {}; // to return
 
@@ -364,7 +390,9 @@ function Service_SystemLink() {
 
                 // parse response (string) into JSON object
                 var responseJSON = JSON.parse(this.response)
+
                 var tagsInfoArray = responseJSON.tagsWithValues;
+
                 // get total number of tags
                 var tagsAmount = responseJSON.totalCount;
 
@@ -376,9 +404,9 @@ function Service_SystemLink() {
                         var value = tagsInfoArray[i].current.value.value;
                         var valueType = tagsInfoArray[i].current.value.type;
                         var tagName = tagsInfoArray[i].tag.path;
-                        
+
                         var valueToAdd = await getValueFromType(valueType, value);
-                        
+
                         // store tag information
                         var pathInfo = {};
                         pathInfo["value"] = valueToAdd;
@@ -386,6 +414,7 @@ function Service_SystemLink() {
 
                         // add a tag info to the return object
                         collectedTagsInfo[tagName] = pathInfo;
+
                     }
                     // when value is not yet assigned to tag
                     catch (e) {
@@ -407,9 +436,24 @@ function Service_SystemLink() {
 
             }
             request.onerror = function () {
+
+                console.log(this.response);
+
                 reject(new Error("Error at getTagsInfoFromCloud"));
+
             }
-        })
+        }).then(
+            // success handler 
+            function (resolve) {
+                //run callback with resolve object
+                callback(resolve);
+            },
+            // failure handler
+            function (reject) {
+                // run calllback with reject object
+                callback(reject);
+            }
+        )
     }
 
 
@@ -427,7 +471,7 @@ function Service_SystemLink() {
         return new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
-            
+
             var valueType = getValueType(newValue);
 
             // value is not a string
@@ -437,7 +481,7 @@ function Service_SystemLink() {
 
                 var data = { "value": { "type": valueType, "value": stringifiedValue } };
 
-            } 
+            }
             // value is a string
             else {
                 // newValue will already have quotation marks before being stringified, so don't stringify
@@ -453,7 +497,7 @@ function Service_SystemLink() {
             }
 
             request.onerror = function () {
-                reject( new Error("Error at updateTAagValue"));
+                reject(new Error("Error at updateTAagValue"));
             }
         })
     }
@@ -485,7 +529,7 @@ function Service_SystemLink() {
             var requestBody = JSON.stringify(body);
             try {
                 request.send(requestBody);
-            } catch(e) {
+            } catch (e) {
                 console.log("error sending request:", request.response);
             }
         }
