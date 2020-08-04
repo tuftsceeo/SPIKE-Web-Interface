@@ -63,6 +63,7 @@
 
         
         var ethan = false;
+
         /* when roles are chosen, display relevant divs and populate port selects */
         $("#roleChoose").on("click", async function () {
             var role = await $("#selectRole option:selected").attr('id');
@@ -152,8 +153,11 @@
                 
                 if (ethan) {
                     clearInterval(EthanInterval);
+                    $("#ETHANportsInterface").find("#demoStarted").html("Demo has ended");
+                    console.log($("#ETHANportsInterface").find("#demoStarted"));
                 } else {
                     clearInterval(JeremyInterval);
+                    $("#JEREMYportsInterface").find("#demoStarted").html("Demo has ended");
                 }
 
                 mySPIKE.rebootHub();
