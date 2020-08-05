@@ -233,11 +233,20 @@ function Service_SystemLink() {
 
     /* setTagValue() - change the current value of a tag on SystemLink cloud
     *
+    * Parameters:
+    * tagName {string} - name of tag to change
+    * newValue {any var} - value to assign
+    * callback {function} - optional callback
+    * 
     * Effect:
     * - changes the value of a tag on the cloud
     */
-    async function setTagValue(tagName, newValue) {
-        return changeValue(tagName, newValue);
+    async function setTagValue(tagName, newValue, callback) {
+        changeValue(tagName, newValue, function(valueChanged) {
+            if (valueChanged) {
+                typeof callback === 'function' && callback();
+            }
+        });
     }
 
     /* getTagValue() - get the current value of a tag on SystemLink cloud
@@ -269,6 +278,51 @@ function Service_SystemLink() {
     */
     function setAPIKey(APIKeyInput) {
         APIKey = APIKeyInput;
+    }
+
+    /* createTag() - create a new tag
+    *
+    * Parameter:
+    * tagName {sting} - name of tag to create
+    * tagValue {object} - value of tag to assign tag after creation
+    * callback {function} - optional callback function
+    * 
+    * Effect:
+    * - Creates new tag if it the tagName doesn't exist
+    * - updates tag if the tagName exists
+    * 
+    */
+    async function createTag(tagName, tagValue, callback) {
+        
+        var valueType = getValueType(tagValue);
+
+        createNewTagHelper(tagName, valueType, function (newTagCreated) {
+            changeValue(tagName, tagValue, function (newTagValueAssigned) {
+                if (newTagCreated) {
+                    if (newTagValueAssigned) {
+                        console.log("ah");
+                        typeof callback === 'function' && callback();
+                    }
+                }
+            })
+        })
+    }
+
+    /* deleteTag() - delete tag
+    *
+    * Parameter:
+    * tagName {sting} - name of tag to delete
+    * 
+    * Effect:
+    * deletes a tag on SystemLink cloud
+    * 
+    */
+    async function deleteTag(tagName, callback) {
+        deleteTagHelper(tagName, function (tagDeleted) {
+            if ( tagDeleted ) {
+                typeof callback === 'function' && callback();
+            }
+        });
     }
 
     //////////////////////////////////////////
@@ -364,9 +418,9 @@ function Service_SystemLink() {
     * Parameters:
     * Callback {Function}
     *
-    * Return: 
-    * callback(resolve, reject) { Function (Promise) } - if success: resolve(collectedTagsInfo)
-    *           - if fail: reject(error)
+    * Effect:
+    * callback(collectedTagsInfo) if success
+    * callback(false) if fail
     * ex) a tag object = { type: "BOOLEAN", value: TRUE }
     * 
     * Note:
@@ -439,7 +493,7 @@ function Service_SystemLink() {
 
                 console.log(this.response);
 
-                reject(new Error("Error at getTagsInfoFromCloud"));
+                reject(false);
 
             }
         }).then(
@@ -463,12 +517,13 @@ function Service_SystemLink() {
     * {tagPath} - string of the name of the tag
     * {newValue} - value to assign tag
     * 
-    * Returns:
-    * {Promise} - if success: resolve(true)
-    *           - if fail: reject(error)
+    * Effect:
+    * callback(true) if success
+    * callback(false) if fail
+    * 
     */
-    async function changeValue(tagPath, newValue) {
-        return new Promise(async function (resolve, reject) {
+    async function changeValue(tagPath, newValue, callback) {
+        new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
 
@@ -497,9 +552,111 @@ function Service_SystemLink() {
             }
 
             request.onerror = function () {
-                reject(new Error("Error at updateTAagValue"));
+                reject(false);
             }
-        })
+
+            // catch error
+            request.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE && (this.status != 200) ) {
+                    console.log(this.status + " Error at changeValue: ", this.response)
+                }
+            }
+
+
+        }).then(
+            // success handler
+            function (resolve) {
+                callback(resolve);
+            },
+            function (reject) {
+                callback(reject);
+            }
+        )
+    }
+
+    /* createNewTagHelper() - send PUT request to SL cloud API and change the value of a tag
+    *
+    * Parameters:
+    * tagPath {string} - string of the name of the tag
+    * tagType {string} - SystemLink format dataType of tag
+    * callback {function} - callback function 
+    * 
+    * Effect:
+    * callback(true) if success
+    * callback(false) if fail
+    */
+    async function createNewTagHelper(tagPath, tagType, callback) {
+        new Promise(async function (resolve, reject) {
+
+            var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/";
+
+            var data = { "type": tagType, "properties": {}, "path": tagPath, "keywords": [], "collectAggregates": false };
+
+            var requestBody = data;
+
+            var request = await sendXMLHTTPRequest("POST", URL, APIKey, requestBody);
+
+            request.onload = function () {
+                resolve(true);
+            }
+
+            request.onerror = function () {
+                console.log("Error at createNewTagHelper", request.response);
+                reject(false);
+            }
+
+            // catch error
+            request.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE && (this.status != 200 && this.status != 201)) {
+                    console.log(this.status + " Error at createNewTagHelper: ", this.response)
+                }
+            }
+
+        }).then(
+            // success handler
+            function (resolve) {
+                callback(resolve)
+            },
+            // error handler
+            function (reject) {
+                callback(reject)
+            }
+        )
+    }
+
+    async function deleteTagHelper ( tagName, callback ) {
+        new Promise(async function (resolve, reject) {
+
+            var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagName;
+
+            var request = await sendXMLHTTPRequest("DELETE", URL, APIKey);
+
+            request.onload = function () {
+                resolve(true);
+            }
+
+            request.onerror = function () {
+                console.log("Error at deleteTagHelper", request.response);
+                reject(false);
+            }
+
+            // catch error
+            request.onreadystatechange = function () {
+                if (this.readyState === XMLHttpRequest.DONE && this.status != 200) {
+                    console.log(this.status + " Error at deleteTagHelper: ", this.response)
+                }
+            }
+
+        }).then(
+            // success handler
+            function (resolve) {
+                callback(resolve)
+            },
+            // error handler
+            function (reject) {
+                callback(reject)
+            }
+        )
     }
 
     /* sendXMLHTTPRequest() - helper function for sending XMLHTTPRequests
@@ -522,6 +679,7 @@ function Service_SystemLink() {
 
         if (body === undefined) {
             request.setRequestHeader("Accept", "application/json");
+            
             request.send();
         }
         else {
@@ -603,6 +761,8 @@ function Service_SystemLink() {
         getTagValue: getTagValue,
         executeAfterInit: executeAfterInit,
         setAPIKey: setAPIKey,
-        isActive: isActive
+        isActive: isActive,
+        createTag: createTag,
+        deleteTag: deleteTag
     }
 }

@@ -1,0 +1,298 @@
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+            <service-systemlink id="service_systemlink"></service-systemlink>
+        </div>
+        <div id = "output"></div>
+        <div id = "SPIKEbox">
+            <input type = "button" id = "getMotorPorts" value = "get motorports">
+        </div>
+        <div id="SLbox">
+            <div>
+                <select id="selectTest">
+                    <option id="getTagsInfoOPTION">getTagsInfo</option>
+                    <option id="createNewTagOPTION"> createNewTag </option>
+                    <option id="deleteTagOPTION"> deleteTag </option>
+                    <option id="setTagValueOPTION"> setTagValue </option>
+                </select>
+                <input type = "button" id = "SL_test_select" value = "display test cases for this function">
+            </div>
+            <div id = "SLtests">
+                <!--      getTagsInfo CASES      -->
+                <input type="button" id="getTagsInfo"  class = "testCase getTagsInfo" value="getTagsInfo"> <!-- regular -->
+                
+                <!-- (when there are no tags)-->
+                <input type="button" id="getTagsInfo1" class = "testCase getTagsInfo" value="getTagsInfo when there are no tags">
+                
+                <!-- createNewTag CASES-->
+                <input type="button" id="createNewTag" class = "testCase createNewTag" value="create new tag ('newTag')">
+                
+                <!--deleteTag CASES -->
+                <!-- (when tag to delete exists -->
+                <input type="button" id="deleteTag"    class = "testCase deleteTag" value="delete tag ('newTag')">
+                
+                <!-- (when tag to delete doesn't exist)-->
+                <input type="button" id="deleteTag1" class="testCase deleteTag" value= "delete tag ('newTag') when it doesnt exist">
+
+                <!-- (when tag to delete doesn't exist)-->
+                <input type="button" id="deleteTag2" class="testCase deleteTag" value="jsut delete tag ('newTag')">
+                
+                <!-- setTagValue CASES -->
+                <!-- setTagValue without callback-->
+                <input type="button" id="setTagValue" class="testCase setTagValue" value="create 'newTag' with value 4 and change it to 5">
+
+            </div>
+            
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var mySL = document.getElementById("service_systemlink").getService();
+        var output = document.getElementById("output");
+
+        /* test mySPIKE.getMotorPorts() */
+        var test_getMotorPorts = document.getElementById("getMotorPorts");
+        test_getMotorPorts.addEventListener("click", async function() {
+            var motorPorts = await mySPIKE.getMotorPorts();
+            output.innerHTML = motorPorts;
+        })
+
+        /* test getTagsInfo */
+        var getTagsInfo = document.getElementById("getTagsInfo");
+        getTagsInfo.addEventListener("click", async function () {
+            var tagsInfo = await mySL.getTagsInfo();
+            console.log(tagsInfo);
+        })
+
+        /* test createNewTag */
+        var createNewTag = document.getElementById("createNewTag");
+        createNewTag.addEventListener("click", async function () {
+            mySL.createTag("newTag", 4, async function () {
+                var tagsInfo = await mySL.getTagsInfo();
+                console.log(tagsInfo);
+            });
+        })
+
+        /* test deleteTag */
+
+        // create "newTag" and delete it
+        var deleteTag = document.getElementById("deleteTag");
+        deleteTag.addEventListener("click", async function () {
+            console.log("creating 'newTag' with value 4 "); 
+            
+            // create 'newTag'
+            mySL.createTag("newTag", 4, async function () {
+
+                console.log("'newTag' was created");
+                
+                await sleep(1000);
+
+                console.log(await mySL.getTagsInfo());
+                //delete 'newTag'
+
+                mySL.deleteTag("newTag", async function () {
+
+                    console.log("'newTag' has been deleted")
+                    console.log(await mySL.getTagsInfo());
+
+                });
+            });
+        });
+
+        // delete "newTag" once if it doesnt exist, twice if it does
+        var deleteTag = document.getElementById("deleteTag1");
+        deleteTag.addEventListener("click", async function () {
+            console.log("checking if 'newTag' exists");
+            
+            var tagsInfo = await mySL.getTagsInfo();
+            var newTagExists = false;
+
+            for ( key in tagsInfo ) {
+                if ( key == "newTag" ) {
+                    newTagExists = true;
+                }
+            }
+
+            if ( newTagExists ) {
+
+                console.log("newTag exists, deleting it twice")
+
+                mySL.deleteTag("newTag", async function() {
+                    console.log("newTag deleted");
+
+                    await sleep(2000);
+
+                    tagsInfo = await mySL.getTagsInfo();
+
+                    console.log(tagsInfo);
+
+                    mySL.deleteTag("newTag", async function() 
+                    {
+                        console.log("newTag deleted again");
+
+                        await sleep(2000);
+
+                        tagsInfo = await mySL.getTagsInfo();
+
+                        console.log(tagsInfo);
+                    })
+                })
+            } else {
+                console.log("newTag doesn't exist, deleting it");
+                mySL.deleteTag("newTag", async function () {
+                    console.log("newTag deleted");
+
+                    await sleep(2000);
+
+                    tagsInfo = await mySL.getTagsInfo();
+
+                    console.log(tagsInfo);
+                })
+            }
+        });
+
+
+        // just delete
+        var deleteTag = document.getElementById("deleteTag2");
+        deleteTag.addEventListener("click", async function () {
+            mySL.deleteTag("newTag", async function () {
+                console.log("newTag deleted");
+
+                await sleep(2000);
+
+                tagsInfo = await mySL.getTagsInfo();
+
+                console.log(tagsInfo);
+            })
+        });
+
+        /* TEST setTagValue CASES*/
+
+        var setTagValue = document.getElementById("setTagValue");
+        setTagValue.addEventListener("click", async function () {
+            console.log("creating 'newTag' with value 4 ");
+            
+            // create 'newTag'
+            mySL.createTag("newTag", 4, async function () {
+                
+                console.log("'newTag' was created")
+                
+                await sleep(2000);
+
+                console.log(await mySL.getTagsInfo());
+                
+                //set tag value to 5
+                mySL.setTagValue("newTag", 5);
+                console.log("'newTag' value was changed to 5. run tagsinfo to check");
+            });
+        })
+
+        window.addEventListener("load", function () {
+            var selectTest = document.getElementById("SL_test_select");
+            
+            selectTest.addEventListener("click", function () {
+                
+                var testFunction = $("#selectTest option:selected").attr('id');
+                
+                if ( testFunction == "getTagsInfoOPTION" ) {
+                    var testCases = document.getElementsByClassName("testCase");
+                    for ( var index = 0; index < testCases.length; index++ ) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("getTagsInfo");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+                else if (testFunction == "deleteTagOPTION") {
+                    var testCases = document.getElementsByClassName("testCase");
+                    for (var index = 0; index < testCases.length; index++) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("deleteTag");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+                else if (testFunction == "createNewTagOPTION") {
+                    var testCases = document.getElementsByClassName("testCase");
+                    for (var index = 0; index < testCases.length; index++) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("createNewTag");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+                else if (testFunction == "setTagValueOPTION") {
+                    var testCases = document.getElementsByClassName("testCase");
+                    for (var index = 0; index < testCases.length; index++) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("setTagValue");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+            })
+        })
+
+        //sleep function
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+    </script>
+    <style>
+        #SPIKEbox {
+            position: absolute;
+            top: 200px;
+            left: 50px;
+            height: 400px;
+            width: 300px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+        #SLbox {
+            position: absolute;
+            top: 200px;
+            left: 400px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+
+        #output {
+            position: absolute;
+            top: 10px;
+            left: 100px;
+            height: 100px;
+            width: 300px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+
+        .testCase {
+            display:flex;
+            flex-direction: column;
+            display:none;
+        }
+    </style>
+</html>
