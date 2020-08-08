@@ -14,11 +14,28 @@
         </div>
         <div id = "output"></div>
         <div id = "SPIKEbox">
-            <input type = "button" id = "getMotorPorts" value = "get motorports">
+            <select id="SPIKEselectTest">
+                <option id="motorOPTION"> motor functions </option>
+                <option id="motionOPTION"> motion sensor functions </option>
+            </select>
+            <input type="button" id="SPIKE_test_select" value="display test cases for this function">
+            <div id="SPIKEtests">
+                <!-- motor functions -->
+                <input type="button" id="getMotorPorts" class="SPIKEtestCase motor" value="get motorports">
+                <input type="button" id="motorrelpos" class="SPIKEtestCase motor" value="motor go to rel pos ( with stall detection )">
+                <input type="button" id="motorrelpos1" class="SPIKEtestCase motor" value="motor go to rel pos ( NO stall detection )">
+                <!-- motion sensor functions-->
+                <input type="button" id="waitForNewGesture" class="SPIKEtestCase motion" value="wait_for_new_gesture test">
+                <input type="button" id="wasGesture" class="SPIKEtestCase motion" value="was_gesture test">
+                <input type="button" id="waitForNewOri" class="SPIKEtestCase motion" value="wait_for_new_orientation test">
+            </div>
         </div>
+
+
+
         <div id="SLbox">
             <div>
-                <select id="selectTest">
+                <select id="SLselectTest">
                     <option id="getTagsInfoOPTION">getTagsInfo</option>
                     <option id="createNewTagOPTION"> createNewTag </option>
                     <option id="deleteTagOPTION"> deleteTag </option>
@@ -27,28 +44,29 @@
                 <input type = "button" id = "SL_test_select" value = "display test cases for this function">
             </div>
             <div id = "SLtests">
+
                 <!--      getTagsInfo CASES      -->
-                <input type="button" id="getTagsInfo"  class = "testCase getTagsInfo" value="getTagsInfo"> <!-- regular -->
+                <input type="button" id="getTagsInfo"  class = "SLtestCase getTagsInfo" value="getTagsInfo"> <!-- regular -->
                 
                 <!-- (when there are no tags)-->
-                <input type="button" id="getTagsInfo1" class = "testCase getTagsInfo" value="getTagsInfo when there are no tags">
+                <input type="button" id="getTagsInfo1" class = "SLtestCase getTagsInfo" value="getTagsInfo when there are no tags">
                 
                 <!-- createNewTag CASES-->
-                <input type="button" id="createNewTag" class = "testCase createNewTag" value="create new tag ('newTag')">
+                <input type="button" id="createNewTag" class = "SLtestCase createNewTag" value="create new tag ('newTag')">
                 
                 <!--deleteTag CASES -->
                 <!-- (when tag to delete exists -->
-                <input type="button" id="deleteTag"    class = "testCase deleteTag" value="delete tag ('newTag')">
+                <input type="button" id="deleteTag"    class = "SLtestCase deleteTag" value="delete tag ('newTag')">
                 
                 <!-- (when tag to delete doesn't exist)-->
-                <input type="button" id="deleteTag1" class="testCase deleteTag" value= "delete tag ('newTag') when it doesnt exist">
+                <input type="button" id="deleteTag1" class="SLtestCase deleteTag" value= "delete tag ('newTag') when it doesnt exist">
 
                 <!-- (when tag to delete doesn't exist)-->
-                <input type="button" id="deleteTag2" class="testCase deleteTag" value="jsut delete tag ('newTag')">
+                <input type="button" id="deleteTag2" class="SLtestCase deleteTag" value="jsut delete tag ('newTag')">
                 
                 <!-- setTagValue CASES -->
                 <!-- setTagValue without callback-->
-                <input type="button" id="setTagValue" class="testCase setTagValue" value="create 'newTag' with value 4 and change it to 5">
+                <input type="button" id="setTagValue" class="SLtestCase setTagValue" value="create 'newTag' with value 4 and change it to 5">
 
             </div>
             
@@ -59,12 +77,125 @@
         var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
 
+        //////////////////////////////////////////
+        //                                      //
+        //             SPIKE Testing            //
+        //                                      //
+        //////////////////////////////////////////
+
         /* test mySPIKE.getMotorPorts() */
         var test_getMotorPorts = document.getElementById("getMotorPorts");
         test_getMotorPorts.addEventListener("click", async function() {
+
             var motorPorts = await mySPIKE.getMotorPorts();
-            output.innerHTML = motorPorts;
+            console.log(motorPorts);
         })
+        
+        //                                      //
+        //              Motor Tests             //
+        //                                      //
+
+        var testMotorRelPos = document.getElementById("motorrelpos");
+        testMotorRelPos.addEventListener("click", async function () {
+
+            var motor = new mySPIKE.Motor("A");
+            motor.set_default_speed(50);
+
+            motor.set_stall_detection(true);
+            
+            motor.run_to_position(180);
+
+            console.log(motor.get_default_speed());
+
+        })
+
+        /* go to rel pos without stall detection */
+        var testMotorRelPos1 = document.getElementById("motorrelpos1");
+        testMotorRelPos1.addEventListener("click", async function () {
+
+            var motor = new mySPIKE.Motor("A");
+            motor.set_default_speed(50);
+            
+            motor.set_stall_detection(false);
+            
+            motor.run_to_position(180);
+
+            console.log(motor.get_default_speed());
+
+        })
+
+        //                                      //
+        //         Motion Sensor Tests          //
+        //                                      //
+
+        /* wait for new gesture */
+        var testWaitForNewGesture = document.getElementById("waitForNewGesture");
+        testWaitForNewGesture.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
+            
+            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
+            motionSensor.wait_for_new_gesture( function(gesture) {
+
+                console.log(">>> in callback")
+                
+                console.log(">>> gesture argument in callback, ", gesture);
+                
+                if (gesture == "tapped") {
+                    console.log(">>> tapped event handler");
+                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
+                }
+                else if ( gesture == "doubletapped" ) {
+                    console.log(">>> doubletapped event handler");
+                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
+                }
+                else {
+                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
+                }
+            })
+            
+        })
+
+        /* was gesture */
+        var testWasGesture = document.getElementById("wasGesture");
+        testWasGesture.addEventListener("click", async function () {
+            
+            console.log("###### BEGINNING UNIT TEST ON motionSensor.was_gesture('doubletapped') #######")
+            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
+            var thisNewGesture = motionSensor.was_gesture("doubletapped");
+
+            if (motionSensor.was_gesture("doubletapped")) {
+                console.log(">>> last gesture was doubletapped");
+            } else {
+                console.log(">>> last gesture was NOT doubletapped");
+            }
+
+            console.log("###### ENDING UNIT TEST ON motionSensor.was_gesture('doubletapped') #######")
+
+        })
+
+        /* wait for new orientation */
+        var testWaitForNewOri = document.getElementById("waitForNewOri");
+        testWaitForNewOri.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motion_sensor.wait_for_new_orientation(callback) #######")
+            
+            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
+            
+            console.log()
+            motionSensor.wait_for_new_orientation( function ( orientation ) {
+                if ( orientation ) {
+                    console.log(">>> the orientation is ", orientation)
+                }
+            })
+            
+            console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_orientation(callback)#######")
+        })
+
+
+        //////////////////////////////////////////
+        //                                      //
+        //           SystemLink Testing         //
+        //                                      //
+        //////////////////////////////////////////
 
         /* test getTagsInfo */
         var getTagsInfo = document.getElementById("getTagsInfo");
@@ -197,14 +328,15 @@
         })
 
         window.addEventListener("load", function () {
+            
             var selectTest = document.getElementById("SL_test_select");
             
             selectTest.addEventListener("click", function () {
                 
-                var testFunction = $("#selectTest option:selected").attr('id');
+                var testFunction = $("#SLselectTest option:selected").attr('id');
                 
                 if ( testFunction == "getTagsInfoOPTION" ) {
-                    var testCases = document.getElementsByClassName("testCase");
+                    var testCases = document.getElementsByClassName("SLtestCase");
                     for ( var index = 0; index < testCases.length; index++ ) {
                         testCases[index].style.display = "none";
                     }
@@ -216,7 +348,7 @@
                     }
                 }
                 else if (testFunction == "deleteTagOPTION") {
-                    var testCases = document.getElementsByClassName("testCase");
+                    var testCases = document.getElementsByClassName("SLtestCase");
                     for (var index = 0; index < testCases.length; index++) {
                         testCases[index].style.display = "none";
                     }
@@ -228,7 +360,7 @@
                     }
                 }
                 else if (testFunction == "createNewTagOPTION") {
-                    var testCases = document.getElementsByClassName("testCase");
+                    var testCases = document.getElementsByClassName("SLtestCase");
                     for (var index = 0; index < testCases.length; index++) {
                         testCases[index].style.display = "none";
                     }
@@ -240,7 +372,7 @@
                     }
                 }
                 else if (testFunction == "setTagValueOPTION") {
-                    var testCases = document.getElementsByClassName("testCase");
+                    var testCases = document.getElementsByClassName("SLtestCase");
                     for (var index = 0; index < testCases.length; index++) {
                         testCases[index].style.display = "none";
                     }
@@ -251,6 +383,40 @@
                         aCase.style.display = "block";
                     }
                 }
+            })
+
+
+            var SPIKEselectTest = document.getElementById("SPIKE_test_select");
+
+            SPIKEselectTest.addEventListener("click", function () {
+                var testCases = undefined;
+                var testFunction = $("#SPIKEselectTest option:selected").attr('id');
+
+                if (testFunction == "motorOPTION") {
+                    var testCases = document.getElementsByClassName("SPIKEtestCase");
+                    for (var index = 0; index < testCases.length; index++) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("motor");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+                else if (testFunction == "motionOPTION") {
+                    var testCases = document.getElementsByClassName("SPIKEtestCase");
+                    for (var index = 0; index < testCases.length; index++) {
+                        testCases[index].style.display = "none";
+                    }
+
+                    var selectedCases = document.getElementsByClassName("motion");
+                    for (var index = 0; index < selectedCases.length; index++) {
+                        var aCase = selectedCases[index];
+                        aCase.style.display = "block";
+                    }
+                }
+                
             })
         })
 
@@ -265,34 +431,29 @@
             top: 200px;
             left: 50px;
             height: 400px;
-            width: 300px;
+            width: 400px;
             background-color: #4CE0D2;
             border: solid;
         }
+
         #SLbox {
             position: absolute;
             top: 200px;
-            left: 400px;
+            left: 500px;
             height: 400px;
             width: 400px;
             background-color: #4CE0D2;
             border: solid;
         }
 
-        #output {
-            position: absolute;
-            top: 10px;
-            left: 100px;
-            height: 100px;
-            width: 300px;
-            background-color: #4CE0D2;
-            border: solid;
-        }
-
         .testCase {
+            display:none;
             display:flex;
             flex-direction: column;
-            display:none;
+        }
+
+        #SPIKE_test_select, #SL_test_select {
+            background-color: rgb(247, 250, 48);
         }
     </style>
 </html>
