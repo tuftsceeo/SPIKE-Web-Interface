@@ -17,6 +17,7 @@
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
                 <option id="motionOPTION"> motion sensor functions </option>
+                <option id="speakerOPTION"> Primehub.speaker functions </option>
             </select>
             <input type="button" id="SPIKE_test_select" value="display test cases for this function">
             <div id="SPIKEtests">
@@ -28,6 +29,10 @@
                 <input type="button" id="waitForNewGesture" class="SPIKEtestCase motion" value="wait_for_new_gesture test">
                 <input type="button" id="wasGesture" class="SPIKEtestCase motion" value="was_gesture test">
                 <input type="button" id="waitForNewOri" class="SPIKEtestCase motion" value="wait_for_new_orientation test">
+                <!-- speaker functions-->
+                <input type="button" id="beep" class="SPIKEtestCase speaker" value="beep(note,seconds) test">
+                <input type="button" id="startBeep" class="SPIKEtestCase speaker" value="startBeep(note) test">
+                <input type="button" id="stopBeep" class="SPIKEtestCase speaker" value="speaker.stop() test">
             </div>
         </div>
 
@@ -95,9 +100,13 @@
         //              Motor Tests             //
         //                                      //
 
+        /* go to rel pos stall detection */
         var testMotorRelPos = document.getElementById("motorrelpos");
         testMotorRelPos.addEventListener("click", async function () {
-
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_position(100) #######");
+            console.log("Test: motor connected to port A will move to a certain position.\n" +
+            "Check stall detection: Hold the motor. Because stall detect is on, the motor will stop after it being unable to move for some time" + "\n" +
+            "Check stall detection response: (example response that detected stall: {'i':4973,'r':2})" + "if not detect stall: {'i':2117,'r':0}");
             var motor = new mySPIKE.Motor("A");
             motor.set_default_speed(50);
 
@@ -105,7 +114,9 @@
             
             motor.run_to_position(180);
 
-            console.log(motor.get_default_speed());
+            console.log("default speed", motor.get_default_speed());
+
+            console.log("###### ENDING UNIT TEST ON motor.run_to_position(100) #######");
 
         })
 
@@ -132,9 +143,10 @@
         var testWaitForNewGesture = document.getElementById("waitForNewGesture");
         testWaitForNewGesture.addEventListener("click", async function () {
             console.log("###### BEGINNING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
-            
-            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
-            motionSensor.wait_for_new_gesture( function(gesture) {
+            console.log("Test: Program will detect either 'tapped' or 'doubletapped' gestures. Tap the hub display");
+
+            var hub = mySPIKE.PrimeHub();
+            hub.motion_sensor.wait_for_new_gesture( function(gesture) {
 
                 console.log(">>> in callback")
                 
@@ -159,36 +171,79 @@
         var testWasGesture = document.getElementById("wasGesture");
         testWasGesture.addEventListener("click", async function () {
             
-            console.log("###### BEGINNING UNIT TEST ON motionSensor.was_gesture('doubletapped') #######")
-            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
-            var thisNewGesture = motionSensor.was_gesture("doubletapped");
-
-            if (motionSensor.was_gesture("doubletapped")) {
-                console.log(">>> last gesture was doubletapped");
+            console.log("###### BEGINNING UNIT TEST ON motion_sensor.was_gesture('doubletapped') #######")
+            console.log("Test (First Time): Sees if 'doubletapped' gesture has occurred since the beginning of the program (for the first use).");
+            console.log("Test (Second Time): Sees if 'doubletapped' gesture has occurred since the last execution of was_gesture().");
+            
+            var hub = mySPIKE.PrimeHub();
+            
+            if (hub.motion_sensor.was_gesture("doubletapped")) {
+                console.log(">>> doubletapped did occur");
             } else {
-                console.log(">>> last gesture was NOT doubletapped");
+                console.log(">>> doubletapped did NOT occur ");
             }
 
-            console.log("###### ENDING UNIT TEST ON motionSensor.was_gesture('doubletapped') #######")
-
+            console.log("###### ENDING UNIT TEST ON motion_sensor.was_gesture('doubletapped') #######")
         })
 
         /* wait for new orientation */
         var testWaitForNewOri = document.getElementById("waitForNewOri");
         testWaitForNewOri.addEventListener("click", async function () {
             console.log("###### BEGINNING UNIT TEST ON motion_sensor.wait_for_new_orientation(callback) #######")
-            
-            var motionSensor = mySPIKE.PrimeHub().motion_sensor();
-            
-            console.log()
-            motionSensor.wait_for_new_orientation( function ( orientation ) {
+            console.log("Test (First Time): the returned orientation will be the current orientation.");
+            console.log("Test (Second Time): Sees if there's a new orientation different from the previously detected");
+            var hub = mySPIKE.PrimeHub();
+
+            console.log(">>> change the orientation of the hub");
+            hub.motion_sensor.wait_for_new_orientation( function ( orientation ) {
                 if ( orientation ) {
-                    console.log(">>> the orientation is ", orientation)
+                    console.log(">>> the orientation is ", orientation);
+                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_orientation(callback)#######");
                 }
             })
             
-            console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_orientation(callback)#######")
         })
+
+        /* wait for new orientation the second time its executed */
+
+        //                                      //
+        //            Speaker Tests             //
+        //                                      //
+
+        
+        var testBeep = document.getElementById("beep");
+        testBeep.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.beep(100,3) #######")
+            console.log("Test: Hub will beep for 3 seconds")
+            var hub = mySPIKE.PrimeHub();
+            var speaker = hub.speaker;
+            console.log("speaker object", speaker);
+            speaker.beep(100, 3);
+            console.log("###### ENDING UNIT TEST ON Primehub.speaker.beep(100,3)#######")
+        })
+        
+        var testStartBeep = document.getElementById("startBeep");
+        testStartBeep.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.start_beep(100) #######")
+            console.log("Test: Hub will beep unless stopped (use speaker.stop())");
+            var hub = mySPIKE.PrimeHub();
+            var speaker = hub.speaker;
+            speaker.start_beep(100);
+            console.log("###### ENDING UNIT TEST ON Primehub.speaker.start_beep(100)#######")
+        })
+
+        var testStopBeep = document.getElementById("stopBeep");
+        testStopBeep.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.stop() #######")
+            console.log("hub beeping will stop");
+            var hub = mySPIKE.PrimeHub();
+            var speaker = hub.speaker;
+            speaker.stop();
+            console.log("###### ENDING UNIT TEST ON Primehub.speaker.stop() #######")
+        })
+
+
+
 
 
         //////////////////////////////////////////
@@ -240,8 +295,8 @@
         });
 
         // delete "newTag" once if it doesnt exist, twice if it does
-        var deleteTag = document.getElementById("deleteTag1");
-        deleteTag.addEventListener("click", async function () {
+        var deleteTag1 = document.getElementById("deleteTag1");
+        deleteTag1.addEventListener("click", async function () {
             console.log("checking if 'newTag' exists");
             
             var tagsInfo = await mySL.getTagsInfo();
@@ -293,8 +348,8 @@
 
 
         // just delete
-        var deleteTag = document.getElementById("deleteTag2");
-        deleteTag.addEventListener("click", async function () {
+        var deleteTag2 = document.getElementById("deleteTag2");
+        deleteTag2.addEventListener("click", async function () {
             mySL.deleteTag("newTag", async function () {
                 console.log("newTag deleted");
 
@@ -328,97 +383,133 @@
         })
 
         window.addEventListener("load", function () {
-            
+
+            test_getMotorPorts.style.backgroundColor = "lightgreen";
+            testBeep.style.backgroundColor = "lightgreen";
+            testStartBeep.style.backgroundColor = "lightgreen";
+            testStopBeep.style.backgroundColor = "lightgreen";
+            testMotorRelPos.style.backgroundColor = "lightgreen";
+            testMotorRelPos1.style.backgroundColor = "lightgreen";
+            testWasGesture.style.backgroundColor = "lightgreen";
+            testWaitForNewGesture.style.backgroundColor = "lightgreen";
+            testWaitForNewOri.style.backgroundColor = "red";
+
+            getTagsInfo.style.backgroundColor = "lightgreen";
+            createNewTag.style.backgroundColor = "lightgreen";
+            setTagValue.style.backgroundColor = "lightgreen";
+
+            SLTestDecisionHandler();
+            SPIKETestDecisionHandler();
+
             var selectTest = document.getElementById("SL_test_select");
             
             selectTest.addEventListener("click", function () {
-                
-                var testFunction = $("#SLselectTest option:selected").attr('id');
-                
-                if ( testFunction == "getTagsInfoOPTION" ) {
-                    var testCases = document.getElementsByClassName("SLtestCase");
-                    for ( var index = 0; index < testCases.length; index++ ) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("getTagsInfo");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
-                else if (testFunction == "deleteTagOPTION") {
-                    var testCases = document.getElementsByClassName("SLtestCase");
-                    for (var index = 0; index < testCases.length; index++) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("deleteTag");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
-                else if (testFunction == "createNewTagOPTION") {
-                    var testCases = document.getElementsByClassName("SLtestCase");
-                    for (var index = 0; index < testCases.length; index++) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("createNewTag");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
-                else if (testFunction == "setTagValueOPTION") {
-                    var testCases = document.getElementsByClassName("SLtestCase");
-                    for (var index = 0; index < testCases.length; index++) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("setTagValue");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
+                SLTestDecisionHandler();
             })
 
 
             var SPIKEselectTest = document.getElementById("SPIKE_test_select");
 
             SPIKEselectTest.addEventListener("click", function () {
-                var testCases = undefined;
-                var testFunction = $("#SPIKEselectTest option:selected").attr('id');
-
-                if (testFunction == "motorOPTION") {
-                    var testCases = document.getElementsByClassName("SPIKEtestCase");
-                    for (var index = 0; index < testCases.length; index++) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("motor");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
-                else if (testFunction == "motionOPTION") {
-                    var testCases = document.getElementsByClassName("SPIKEtestCase");
-                    for (var index = 0; index < testCases.length; index++) {
-                        testCases[index].style.display = "none";
-                    }
-
-                    var selectedCases = document.getElementsByClassName("motion");
-                    for (var index = 0; index < selectedCases.length; index++) {
-                        var aCase = selectedCases[index];
-                        aCase.style.display = "block";
-                    }
-                }
-                
+                SPIKETestDecisionHandler();
             })
         })
+
+        function SLTestDecisionHandler() {
+                            var testFunction = $("#SLselectTest option:selected").attr('id');
+
+            if (testFunction == "getTagsInfoOPTION") {
+                var testCases = document.getElementsByClassName("SLtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("getTagsInfo");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "deleteTagOPTION") {
+                var testCases = document.getElementsByClassName("SLtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("deleteTag");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "createNewTagOPTION") {
+                var testCases = document.getElementsByClassName("SLtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("createNewTag");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "setTagValueOPTION") {
+                var testCases = document.getElementsByClassName("SLtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("setTagValue");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+        }
+
+        function SPIKETestDecisionHandler() {
+                            var testCases = undefined;
+            var testFunction = $("#SPIKEselectTest option:selected").attr('id');
+
+            if (testFunction == "motorOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("motor");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "motionOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("motion");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "speakerOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("speaker");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+
+        }
 
         //sleep function
             function sleep(ms) {
