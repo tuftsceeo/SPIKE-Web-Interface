@@ -39,6 +39,7 @@ Note:
     <script>
         /* SPIKE Service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = mySPIKE.PrimeHub();
         var pitch; // pitch at which the hub beeps
         var beepingInterval; // interval at which hub is beeping
         mySPIKE.executeAfterInit(SPIKE_main);
@@ -51,12 +52,12 @@ Note:
 
             $("#stop").on("click", function () {
                 clearInterval(beepingInterval);
-                mySPIKE.soundStop();
+                hub.speaker.stop();
             })
         }
 
         function startBeeping() {
-            mySPIKE.soundBeep(50, pitch);
+            hub.speaker.start_beep(pitch);
         }
 
 
