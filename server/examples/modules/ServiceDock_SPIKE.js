@@ -147,6 +147,7 @@ function Service_SPIKE() {
     const CONTROL_D = '\x04'; // CTRL-D character (EOT character)
     const RETURN = '\x0D';	// RETURN key (enter, new line)
 
+    /* using this filter in webserial setup will only take serial ports*/
     const filter = {
         usbVendorId: VENDOR_ID
     };
@@ -159,7 +160,7 @@ function Service_SPIKE() {
     let done;
 
     //define for json concatenation
-    let jsonline = ""
+    let jsonline = "";
 
     // contains latest full json object from SPIKE readings
     let lastUJSONRPC;
@@ -174,7 +175,7 @@ function Service_SPIKE() {
         "D": { "device": "none", "data": {} },
         "E": { "device": "none", "data": {} },
         "F": { "device": "none", "data": {} }
-    }
+    };
 
     // object containing real-time info on hub sensor values
     /*
@@ -242,10 +243,10 @@ function Service_SPIKE() {
 
     let serviceActive = false; //serviceActive flag
 
+    var waitForNewOriFirst = true; //whether the wait_for_new_orientation method would be the first time called
 
-    /* stored callback functions */
-
-    var funcAtInit = undefined; // function to call after init
+    /* stored callback functions from wait_until functions and etc. */
+    var funcAtInit = undefined; // function to call after init of SPIKE Service
 
     var funcAfterNewGesture = undefined;
     var funcAfterNewOrientation = undefined;
@@ -261,6 +262,9 @@ function Service_SPIKE() {
     var funcAfterForceSensorPress = undefined;
     var funcAfterForceSensorRelease = undefined;
 
+    /* flags to destruct callbacks from wait_until functions */
+    var destructFuncAfterForceSensorPress = true;
+    var destructFuncAfterForceSensorRelease = true;
 
     //////////////////////////////////////////
     //                                      //
@@ -316,7 +320,7 @@ function Service_SPIKE() {
         // look up the command to send
         commands = command.split("\n"); // split on new line
         //commands = command
-        console.log("sendDATA: " + commands);
+        //console.log("sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
@@ -325,7 +329,7 @@ function Service_SPIKE() {
         if (micropython_interpreter) {
             
             for (var i = 0; i < commands.length; i++) {
-                console.log("commands.length", commands.length)
+                // console.log("commands.length", commands.length)
 
                 // trim trailing, leading whitespaces
                 var current = commands[i].trim();
@@ -340,7 +344,7 @@ function Service_SPIKE() {
             // trim it, send it, and send a return...
             for (var i = 0; i < commands.length; i++) {
                 
-                console.log("commands.length", commands.length)
+                //console.log("commands.length", commands.length)
                 
                 current = commands[i].trim();
                 //console.log("current", current);
@@ -647,56 +651,44 @@ function Service_SPIKE() {
         * @class
         * @returns {functions} - functions from PrimeHub.left_button
         */
-        left_button = function () {
+        var left_button = {};
 
-            /** execute callback after this button is pressed
-            * @param {function} callback
-            */
-            function wait_until_pressed (callback) {
-
-                funcAfterLeftButtonPress = callback;
+        /** execute callback after this button is pressed
+        * @param {function} callback
+        */
+        left_button.wait_until_pressed = function wait_until_pressed (callback) {
+            funcAfterLeftButtonPress = callback;
+        }
+        /** execute callback after this button is released
+         *
+         * @param {function} callback
+         */
+        left_button.wait_until_released = function wait_until_released (callback) {
+            funcAfterLeftButtonRelease = callback;
+        }
+        /** Tests to see whether the button has been pressed since the last time this method called.
+         *
+         * @returns {boolean} - True if was pressed, false otherwise
+         */
+        left_button.was_pressed = function was_pressed () {
+            if ( hubLeftButton.duration > 0 ) {
+                hubLeftButton.duration = 0;
+                return true;
+            } else {
+                return false;
             }
-
-            /** execute callback after this button is released
-             *
-             * @param {function} callback
-             */
-            function wait_until_released (callback) {
-
-                funcAfterLeftButtonRelease = callback;
+        }
+        
+        /** Tests to see whether the button is pressed
+        *
+        * @returns {boolean} True if pressed, false otherwise
+        */
+        left_button.is_pressed = function is_pressed() {
+            if (hubLeftButton.pressed) {
+                return true;
             }
-
-            /** Tests to see whether the button has been pressed since the last time this method called.
-             *
-             * @returns {boolean} - True if was pressed, false otherwise
-             */
-            function was_pressed () {
-                if ( hubLeftButton.duration > 0 ) {
-                    hubLeftButton.duration = 0;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            
-            /** Tests to see whether the button is pressed
-            *
-            * @returns {boolean} True if pressed, false otherwise
-            */
-            function is_pressed() {
-                if (hubLeftButton.pressed) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-
-            return {
-                wait_until_pressed: wait_until_pressed,
-                wait_until_released: wait_until_released,
-                was_pressed: was_pressed,
-                is_pressed: is_pressed
+            else {
+                return false;
             }
         }
         
@@ -704,57 +696,49 @@ function Service_SPIKE() {
          * @class
          * @returns {functions} functions from PrimeHub.right_button
          */
-        right_button = function () {
+        var right_button = {};
 
-            /** execute callback after this button is pressed
-            *
-            * @param {function} callback
-            */
-            function wait_until_pressed(callback) {
+        /** execute callback after this button is pressed
+        *
+        * @param {function} callback
+        */
+        right_button.wait_until_pressed = function wait_until_pressed(callback) {
 
-                funcAfterRightButtonPress = callback;
+            funcAfterRightButtonPress = callback;
+        }
+
+        /** execute callback after this button is released
+         * 
+         * @param {function} callback 
+         */
+        right_button.wait_until_released = function wait_until_released(callback) {
+
+            functAfterRightButtonRelease = callback;
+        }
+
+        /** Tests to see whether the button has been pressed since the last time this method called.
+         * 
+         * @returns {boolean} - True if was pressed, false otherwise
+         */
+        right_button.was_pressed = function was_pressed() {
+            if (hubRightButton.duration > 0) {
+                hubRightButton.duration = 0;
+                return true;
+            } else {
+                return false;
             }
+        }
 
-            /** execute callback after this button is released
-             * 
-             * @param {function} callback 
-             */
-            function wait_until_released(callback) {
-
-                functAfterRightButtonRelease = callback;
+        /** Tests to see whether the button is pressed
+         * 
+         * @returns {boolean} True if pressed, false otherwise
+         */
+        right_button.is_pressed = function is_pressed() {
+            if ( hubRightButton.pressed ) {
+                return true;
             }
-
-            /** Tests to see whether the button has been pressed since the last time this method called.
-             * 
-             * @returns {boolean} - True if was pressed, false otherwise
-             */
-            function was_pressed() {
-                if (hubRightButton.duration > 0) {
-                    hubRightButton.duration = 0;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            /** Tests to see whether the button is pressed
-             * 
-             * @returns {boolean} True if pressed, false otherwise
-             */
-            function is_pressed() {
-                if ( hubRightButton.pressed ) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-
-            return {
-                wait_until_pressed: wait_until_pressed,
-                wait_until_released: wait_until_released,
-                was_pressed: was_pressed,
-                is_pressed: is_pressed
+            else {
+                return false;
             }
         }
 
@@ -762,51 +746,40 @@ function Service_SPIKE() {
          * @class
          * @returns {functions} - functions from PrimeHub.light_matrix
          */
-        light_matrix = function () {
+        var light_matrix = {};
 
-            /**
-             * @todo Implement this function
-             * @param {string}
-             */
-            function show_image(image) {
-
+        /**
+         * @todo Implement this function
+         * @param {string}
+         */
+        light_matrix.show_image = function show_image(image) {
+        }
+        /** Sets the brightness of one pixel (one of the 25 LED) on the Light Matrix.
+         * 
+         * @param {integer} x [0 to 4]
+         * @param {integer} y [0 to 4]
+         * @param {integer} brightness [0 to 100]
+         */
+        light_matrix.set_pixel = function set_pixel (x, y, brightness) {
+            if (typeof brightness == "number") {
+                UJSONRPC.displayText(x,y,brightness);
             }
-
-            /** Sets the brightness of one pixel (one of the 25 LED) on the Light Matrix.
-             * 
-             * @param {integer} x [0 to 4]
-             * @param {integer} y [0 to 4]
-             * @param {integer} brightness [0 to 100]
-             */
-            function set_pixel (x, y, brightness) {
-                if (typeof brightness == "number") {
-                    UJSONRPC.displayText(x,y,brightness);
-                }
-                else {
-                    UJSONRPC.displayText(x, y, 100);
-                }
+            else {
+                UJSONRPC.displayText(x, y, 100);
             }
-
-            /** Writes text on the Light Matrix, one letter at a time, scrolling from right to left.
-             * 
-             * @param {string} message 
-             */
-            function write (message) {
-                UJSONRPC.displayText(message);
-            }
-
-            /** Turns off all the pixels on the Light Matrix.
-             * 
-             */
-            function off () {
-                UJSONRPC.displayClear();
-            }
-
-            return {
-                set_pixel: set_pixel,
-                write: write,
-                off: off
-            }
+        }
+        /** Writes text on the Light Matrix, one letter at a time, scrolling from right to left.
+         * 
+         * @param {string} message 
+         */
+        light_matrix.write = function write (message) {
+            UJSONRPC.displayText(message);
+        }
+        /** Turns off all the pixels on the Light Matrix.
+         * 
+         */
+        light_matrix.off = function off () {
+            UJSONRPC.displayClear();
         }
 
         /** speaker
@@ -863,8 +836,6 @@ function Service_SPIKE() {
          */
         var motion_sensor = {};
 
-            motion_sensor.waitForNewOriFirst = true; //whether the wait_for_new_orientation method would be the first time called
-
             /** Sees whether a gesture has occurred since the last time was_gesture() 
              * was used or since the beginning of the program (for the first use).
              * 
@@ -887,7 +858,7 @@ function Service_SPIKE() {
                         break;
                     }
                 }   
-                // reinitialize hubGestures so it has gestures after this was_gesture() execution
+                // reinitialize hubGestures so it only holds gestures that occurred after this was_gesture() execution
                 hubGestures = [];
 
                 return gestureWasMade;
@@ -899,7 +870,7 @@ function Service_SPIKE() {
              * @param  {function(string)} callback - A callback whose signature is name of the gesture
              */
             motion_sensor.wait_for_new_gesture = function wait_for_new_gesture(callback) {
-                
+
                 funcAfterNewGesture = callback;
 
             }
@@ -909,14 +880,16 @@ function Service_SPIKE() {
              * @param  {function(string)} callback - A callback whose signature is name of the orientation
              */
             motion_sensor.wait_for_new_orientation = function wait_for_new_orientation(callback) {
-
-                if ( motion_sensor.waitForNewOriFirst ) {
-                    motion_sensor.waitForNewOriFirst = false;
+                // immediately return current orientation if the method was called for the first time
+                if (waitForNewOriFirst) {
+                    waitForNewOriFirst = false;
                     callback(lastHubOrientation);
-                }
+                } 
+                // for future executions, wait until new orientation
                 else {
                     funcAfterNewOrientation = callback;                
                 }
+                
             }
 
             /** “Yaw” is the rotation around the front-back (vertical) axis.
@@ -977,7 +950,7 @@ function Service_SPIKE() {
      */
     Motor = function (port) {
         
-        var motor = getPortInfo(port); // get the motor info by port
+        var motor = ports[port]; // get the motor info by port
         var motorInfo = motor.data;
 
         // default settings
@@ -986,7 +959,7 @@ function Service_SPIKE() {
         var stallSetting = true;
 
         // check if device is a motor
-        if ( motor.device == "smallMotor" || motor.device == "bigMotor" ) {
+        if ( motor.device != "smallMotor" && motor.device != "bigMotor" ) {
             throw new Error("No motor detected at port " + port);
         }
 
@@ -1081,13 +1054,15 @@ function Service_SPIKE() {
          * 
          * @param {integer} speed [-100 to 100]
          */
-        function start (speed) {
-            if (speed !== undefined && typeof speed == "number") {
-                UJSONRPC.motorStart (port, speed, stallSetting);
-            }
-            else {
-                UJSONRPC.motorStart(port, defaultSpeed, stallSetting);
-            }
+        function start (speed = defaultSpeed) {
+            // if (speed !== undefined && typeof speed == "number") {
+                // UJSONRPC.motorStart (port, speed, stallSetting);
+            // }
+            // else {
+                // UJSONRPC.motorStart(port, defaultSpeed, stallSetting);
+            // }
+
+            UJSONRPC.motorStart(port, speed, stallSetting);
         }
 
         /** Run the motor for some seconds
@@ -1151,11 +1126,11 @@ function Service_SPIKE() {
     ColorSensor = function(port) {
         var waitForNewColorFirst = false;
 
-        var colorsensor = getPortInfo(port); // get the motor info by port
+        var colorsensor = ports[port]; // get the color sensor info by port
         var colorsensorData = colorsensor.data;
 
         // check if device is a color sensor
-        if (colorsensor.device == "color") {
+        if (colorsensor.device != "color") {
             throw new Error("No Color Sensor detected at port " + port);
         }
 
@@ -1286,11 +1261,11 @@ function Service_SPIKE() {
      */
     DistanceSensor = function (port) {
 
-        var distanceSensor = getPortInfo(port); // get the motor info by port
+        var distanceSensor = ports[port] // get the distance sensor info by port
         var distanceSensorData = distanceSensor.data;
 
-        // check if device is a motor
-        if (distanceSensor.device == "ultrasonic") {
+        // check if device is a distance sensor
+        if (distanceSensor.device != "ultrasonic") {
             throw new Error("No Distance Sensor detected at port " + port);
         }
 
@@ -1366,10 +1341,9 @@ function Service_SPIKE() {
      */
     ForceSensor = function (port) {
         
-        var ForceSensor = getPortInfo(port); // get the motor info by port
-        var ForceSensorData = ForceSensor.data;
+        var sensor = ports[port]; // get the force sensor info by port
 
-        if (ForceSensor.device == "force") {
+        if (sensor.device != "force") {
             throw new Error("No Force Sensor detected at port " + port);
         }
         
@@ -1378,6 +1352,9 @@ function Service_SPIKE() {
          * @returns {boolean} true if force sensor is pressed, false otherwise
          */
         function is_pressed() {
+            var sensor = ports[port]; // get the force sensor info by port
+            var ForceSensorData = sensor.data;
+
             return ForceSensorData.pressed;
         }
 
@@ -1386,7 +1363,10 @@ function Service_SPIKE() {
          * @returns {number}  Force in newtons [0 to 10]
          */
         function get_force_newton() {
-            return ForceSensorData.Fbigamount;
+            var sensor = ports[port]; // get the force sensor info by port
+            var ForceSensorData = sensor.data;
+
+            return ForceSensorData.force;
         }
         
         /** Retrieves the measured force as a percentage of the maximum force.
@@ -1394,7 +1374,13 @@ function Service_SPIKE() {
          * @returns {number} percentage [0 to 100]
          */
         function get_force_percentage() {
-            return ForceSensorData.Famount;
+            var sensor = ports[port]; // get the force sensor info by port
+            var ForceSensorData = sensor.data;
+
+            var denominator = 704 - 384 // highest detected - lowest detected forceSensitive values
+            var numerator = ForceSensorData.forceSensitive - 384 // 384 is the forceSensitive value when not pressed
+            var percentage = Math.round((numerator / denominator) * 100);
+            return percentage;
         }
 
         /** Executes callback when Force Sensor is pressed
@@ -1436,8 +1422,8 @@ function Service_SPIKE() {
         // settings 
         var defaultSpeed = 100;
 
-        var leftMotor = getPortInfo(leftPort);
-        var rightMotor = getPortInfo(rightPort);
+        var leftMotor = ports[leftPort];
+        var rightMotor = ports[rightPort];
 
         var leftMotorData = leftMotor.data;
         var rightMotorData = rightMotor.data;
@@ -2202,8 +2188,12 @@ function Service_SPIKE() {
                         }
                         // execute callback from ForceSensor.wait_until_pressed() 
                         if (Fboolean) {
+                            // execute call back from wait_until_pressed() if it is defined
                             funcAfterForceSensorPress !== undefined && funcAfterForceSensorPress();
+                            
+                            // destruct callback function
                             funcAfterForceSensorPress = undefined;
+
                             // indicate that the ForceSensor was pressed
                             ForceSensorWasPressed = true;
                         } 
@@ -2254,8 +2244,15 @@ function Service_SPIKE() {
                     var gyro_z = data_stream[6][2];
                     var gyro = [gyro_x, gyro_y, gyro_z]; 
                     hub["gyro"] = gyro;
+                    
+                    var newOri = setHubOrientation(gyro);
+                    // see if currently detected orientation is different from the last detected orientation
+                    if ( newOri !== lastHubOrientation ) {
+                        lastHubOrientation = newOri;
 
-                    setHubOrientation(gyro);
+                        typeof funcAfterNewOrientation == "function" && funcAfterNewOrientation(newOri);
+                        funcAfterNewOrientation = undefined;
+                    }
 
                     var accel_x = data_stream[7][0];
                     var accel_y = data_stream[7][1];
@@ -2373,8 +2370,6 @@ function Service_SPIKE() {
                 else if (newOrientation == "rightSide") {
                     lastHubOrientation = "rightSide";
                 }
-
-                typeof funcAfterNewOrientation == "function" && funcAfterNewOrientation(newOrientation);
             }
             /* this data stream is about hub gesture */
             else if (isGestureData) {
@@ -2417,34 +2412,36 @@ function Service_SPIKE() {
     }
 
     /** Get the orientation of the hub based on gyroscope values
-     *  Temporarily made public for unit testing
+     * 
      * @private
      * @param {(number|Array)} gyro 
      */
     function setHubOrientation(gyro) {
+        var newOrientation;
         if (gyro[0] < 500 && gyro[0] > -500) {
             if (gyro[1] < 500 && gyro[1] > -500) {
 
                 if (gyro[2] > 500) {
-                    lastHubOrientation = "front";
+                    newOrientation = "front";
                 }
                 else if (gyro[2] < -500) {
-                    lastHubOrientation = "back";
+                    newOrientation = "back";
                 }
             }
             else if (gyro[1] > 500) {
-                lastHubOrientation = "leftside";
+                newOrientation = "leftside";
             }
             else if (gyro[1] < -500) {
-                lastHubOrientation = "rightside";
+                newOrientation = "rightside";
             }
         } else if (gyro[0] > 500) {
-            lastHubOrientation = "down";
+            newOrientation = "down";
         }
         else if (gyro[0] < -500) {
-            lastHubOrientation = "up";
+            newOrientation = "up";
         }
-        console.log(lastHubOrientation);
+
+        return newOrientation;
     }
 
     // public members
@@ -2475,7 +2472,9 @@ function Service_SPIKE() {
         Motor: Motor,
         PrimeHub: PrimeHub,
         UJSONRPC: UJSONRPC,
-        setHubOrientation: setHubOrientation
+        ForceSensor: ForceSensor,
+        DistanceSensor: DistanceSensor,
+        ColorSensor: ColorSensor
     };
 }
 
