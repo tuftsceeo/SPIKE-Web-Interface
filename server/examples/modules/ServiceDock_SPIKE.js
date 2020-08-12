@@ -320,7 +320,7 @@ function Service_SPIKE() {
         // look up the command to send
         commands = command.split("\n"); // split on new line
         //commands = command
-        //console.log("sendDATA: " + commands);
+        console.log("sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
@@ -760,13 +760,9 @@ function Service_SPIKE() {
          * @param {integer} y [0 to 4]
          * @param {integer} brightness [0 to 100]
          */
-        light_matrix.set_pixel = function set_pixel (x, y, brightness) {
-            if (typeof brightness == "number") {
-                UJSONRPC.displayText(x,y,brightness);
-            }
-            else {
-                UJSONRPC.displayText(x, y, 100);
-            }
+        light_matrix.set_pixel = function set_pixel (x, y, brightness = 100) {
+            UJSONRPC.displaySetPixel(x,y,brightness);
+            
         }
         /** Writes text on the Light Matrix, one letter at a time, scrolling from right to left.
          * 
@@ -836,102 +832,102 @@ function Service_SPIKE() {
          */
         var motion_sensor = {};
 
-            /** Sees whether a gesture has occurred since the last time was_gesture() 
-             * was used or since the beginning of the program (for the first use).
-             * 
-             * @param  {string} gesture
-             * @returns {boolean} true if the gesture was made, false otherwise
-             */
-            motion_sensor.was_gesture = function was_gesture (gesture) {
+        /** Sees whether a gesture has occurred since the last time was_gesture() 
+         * was used or since the beginning of the program (for the first use).
+         * 
+         * @param  {string} gesture
+         * @returns {boolean} true if the gesture was made, false otherwise
+         */
+        motion_sensor.was_gesture = function was_gesture (gesture) {
+            
+            var gestureWasMade = false;
+            
+            // iterate over the hubGestures array
+            for ( index in hubGestures ) {
                 
-                var gestureWasMade = false;
+                // pick a gesture from the array
+                var oneGesture = hubGestures[index];
                 
-                // iterate over the hubGestures array
-                for ( index in hubGestures ) {
-                    
-                    // pick a gesture from the array
-                    var oneGesture = hubGestures[index];
-                    
-                    // switch the flag that gesture existed
-                    if ( oneGesture == gesture ) {
-                        gestureWasMade = true;
-                        break;
-                    }
-                }   
-                // reinitialize hubGestures so it only holds gestures that occurred after this was_gesture() execution
-                hubGestures = [];
-
-                return gestureWasMade;
-
-            }
-
-            /** Executes callback when a new gesture happens
-             * 
-             * @param  {function(string)} callback - A callback whose signature is name of the gesture
-             */
-            motion_sensor.wait_for_new_gesture = function wait_for_new_gesture(callback) {
-
-                funcAfterNewGesture = callback;
-
-            }
-
-            /** Executes callback when the orientation of the Hub changes or when function was first called
-             * 
-             * @param  {function(string)} callback - A callback whose signature is name of the orientation
-             */
-            motion_sensor.wait_for_new_orientation = function wait_for_new_orientation(callback) {
-                // immediately return current orientation if the method was called for the first time
-                if (waitForNewOriFirst) {
-                    waitForNewOriFirst = false;
-                    callback(lastHubOrientation);
-                } 
-                // for future executions, wait until new orientation
-                else {
-                    funcAfterNewOrientation = callback;                
+                // switch the flag that gesture existed
+                if ( oneGesture == gesture ) {
+                    gestureWasMade = true;
+                    break;
                 }
-                
-            }
+            }   
+            // reinitialize hubGestures so it only holds gestures that occurred after this was_gesture() execution
+            hubGestures = [];
 
-            /** “Yaw” is the rotation around the front-back (vertical) axis.
-             * 
-             * @returns {integer} yaw angle
-             */
-            motion_sensor.get_yaw_angle = function get_yaw_angle() {
-                return hub.pos[0];
-            }
- 
-            /** “Pitch” the is rotation around the left-right (transverse) axis.
-             * 
-             * @returns {integer} pitch angle
-             */
-            motion_sensor.get_pitch_angle = function get_pitch_angle() {
-                return hub.pos[1];
-            }
+            return gestureWasMade;
 
-            /** “Roll” the is rotation around the front-back (longitudinal) axis.
-             * 
-             * @returns {integer} roll angle
-             */
-            motion_sensor.get_roll_angle = function get_roll_angle() {
-                return hub.pos[2];
-            }
+        }
 
-            /** Retrieves the most recently detected gesture.
-             * 
-             * @returns {string} the name of gesture
-             */
-            motion_sensor.get_gesture = function get_gesture() {
-                return hubGesture;
-            }
+        /** Executes callback when a new gesture happens
+         * 
+         * @param  {function(string)} callback - A callback whose signature is name of the gesture
+         */
+        motion_sensor.wait_for_new_gesture = function wait_for_new_gesture(callback) {
 
-            /** Retrieves the most recently detected orientation
-             * Note: Hub does not detect orientation of when it was connected
-             * 
-             * @returns {string} the name of orientation
-             */
-            motion_sensor.get_orientation = function get_orientation() {
-                return lastHubOrientation;
+            funcAfterNewGesture = callback;
+
+        }
+
+        /** Executes callback when the orientation of the Hub changes or when function was first called
+         * 
+         * @param  {function(string)} callback - A callback whose signature is name of the orientation
+         */
+        motion_sensor.wait_for_new_orientation = function wait_for_new_orientation(callback) {
+            // immediately return current orientation if the method was called for the first time
+            if (waitForNewOriFirst) {
+                waitForNewOriFirst = false;
+                callback(lastHubOrientation);
+            } 
+            // for future executions, wait until new orientation
+            else {
+                funcAfterNewOrientation = callback;                
             }
+            
+        }
+
+        /** “Yaw” is the rotation around the front-back (vertical) axis.
+         * 
+         * @returns {integer} yaw angle
+         */
+        motion_sensor.get_yaw_angle = function get_yaw_angle() {
+            return hub.pos[0];
+        }
+
+        /** “Pitch” the is rotation around the left-right (transverse) axis.
+         * 
+         * @returns {integer} pitch angle
+         */
+        motion_sensor.get_pitch_angle = function get_pitch_angle() {
+            return hub.pos[1];
+        }
+
+        /** “Roll” the is rotation around the front-back (longitudinal) axis.
+         * 
+         * @returns {integer} roll angle
+         */
+        motion_sensor.get_roll_angle = function get_roll_angle() {
+            return hub.pos[2];
+        }
+
+        /** Retrieves the most recently detected gesture.
+         * 
+         * @returns {string} the name of gesture
+         */
+        motion_sensor.get_gesture = function get_gesture() {
+            return hubGesture;
+        }
+
+        /** Retrieves the most recently detected orientation
+         * Note: Hub does not detect orientation of when it was connected
+         * 
+         * @returns {string} the name of orientation
+         */
+        motion_sensor.get_orientation = function get_orientation() {
+            return lastHubOrientation;
+        }
 
         return {
             motion_sensor: motion_sensor,
@@ -951,7 +947,6 @@ function Service_SPIKE() {
     Motor = function (port) {
         
         var motor = ports[port]; // get the motor info by port
-        var motorInfo = motor.data;
 
         // default settings
         var defaultSpeed = 100;
@@ -968,7 +963,10 @@ function Service_SPIKE() {
          * @returns {number} speed of motor [-100 to 100]
          */
         function get_speed() {
+            var motor = ports[port]; // get the motor info by port
+            var motorInfo = motor.data;
             return motorInfo.speed;
+            
         }
 
         /** Get current position of the motor
@@ -976,6 +974,8 @@ function Service_SPIKE() {
          * @returns {number} position of motor [0 to 359]
          */
         function get_position() {
+            var motor = ports[port]; // get the motor info by port
+            var motorInfo = motor.data;
             return motorInfo.angle;
         }
 
@@ -984,6 +984,8 @@ function Service_SPIKE() {
          * @returns {number} counted degrees of the motor [any number]
          */
         function get_degrees_counted() {
+            var motor = ports[port]; // get the motor info by port
+            var motorInfo = motor.data;
             return motorInfo.uAngle;
         }
 
@@ -992,6 +994,8 @@ function Service_SPIKE() {
          * @returns {number} motor power
          */
         function get_power() {
+            var motor = ports[port]; // get the motor info by port
+            var motorInfo = motor.data;
             return motorInfo.power;
         }
 
@@ -1139,6 +1143,9 @@ function Service_SPIKE() {
          * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
          */
         function get_color() {
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
             var r = colorsensorData.Cr;
             var g = colorsensorData.Cg;
             var b = colorsensorData.Cb;
@@ -1154,6 +1161,9 @@ function Service_SPIKE() {
          * @returns {number} The ambient light intensity. [0 to 100]
          */
         function get_ambient_light() {
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
             return colorsensorData.Cambient;
         }
 
@@ -1162,6 +1172,9 @@ function Service_SPIKE() {
          * @returns {number} The reflected light intensity. [0 to 100]
          */
         function get_reflected_light() {
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
             return colorsensorData.Creflected;
         }
 
@@ -1170,6 +1183,9 @@ function Service_SPIKE() {
          * @returns {(number|Array)} Red, green, blue, and overall intensity (0-1024)
          */
         function get_rgb_intensity() {
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
             var toReturn = [];
             toReturn.push(colorsensorData.Cr);
             toReturn.push(colorsensorData.Cg);
@@ -1182,7 +1198,10 @@ function Service_SPIKE() {
         * @returns {number} [0 to 1024]
          */
         function get_red() {
-            return colorsensorData.Cr;
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
+            return colorsensorData.RGB[0];
         }
 
         /** Retrieves the green color intensity.
@@ -1190,7 +1209,10 @@ function Service_SPIKE() {
          * @returns {number} [0 to 1024]
          */
         function get_green() {
-            return colorsensorData.Cg;
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
+            return colorsensorData.RGB[1];
         }
 
         /** Retrieves the blue color intensity.
@@ -1198,7 +1220,10 @@ function Service_SPIKE() {
          * @returns {number} [0 to 1024]
          */
         function get_blue() {
-            return colorsensorData.Cb;
+            var colorsensor = ports[port]; // get the color sensor info by port
+            var colorsensorData = colorsensor.data;
+
+            return colorsensorData.RGB[2];
         }
 
 
@@ -1275,6 +1300,9 @@ function Service_SPIKE() {
          * @todo find the short_range handling ujsonrpc script
          */
         function get_distance_cm (short_range) {
+            var distanceSensor = ports[port] // get the distance sensor info by port
+            var distanceSensorData = distanceSensor.data;
+
             return distanceSensorData.distance;
         }
 
@@ -1285,6 +1313,9 @@ function Service_SPIKE() {
          * @todo find the short_range handling ujsonrpc script
          */
         function get_distance_inches (short_range) {
+            var distanceSensor = ports[port] // get the distance sensor info by port
+            var distanceSensorData = distanceSensor.data;
+
             var inches = distanceSensorData.distance * 0.393701;
             return inches;
         }
@@ -1296,6 +1327,9 @@ function Service_SPIKE() {
          * @todo find the short_range handling ujsonrpc script
          */
         function get_distance_percentage(short_range) {
+            var distanceSensor = ports[port] // get the distance sensor info by port
+            var distanceSensorData = distanceSensor.data;
+
             if ( distanceSensorData.distance == null ) {
                 return "none"
             }
@@ -1429,11 +1463,12 @@ function Service_SPIKE() {
         var rightMotorData = rightMotor.data;
 
         var DistanceTravelToRevolutionRatio = undefined;
+        
         // check if device is a motor
-        if (leftMotor.device == "smallMotor" || leftMotor.device == "bigMotor") {
+        if (leftMotor.device != "smallMotor" && leftMotor.device != "bigMotor") {
             throw new Error("No motor detected at port " + port);
         }
-        if (rightMotor.device == "smallMotor" || rightMotor.device == "bigMotor") {
+        if (rightMotor.device != "smallMotor" && rightMotor.device != "bigMotor") {
             throw new Error("No motor detected at port " + port);
         }
 
@@ -1642,15 +1677,15 @@ function Service_SPIKE() {
             UJSONRPC.moveTankSpeeds(left_speed, right_speed, leftPort, rightPort);
         }
 
-        /** Starts moving the Driving Base without speed control.
-         * 
-         * @param {any} power 
-         * @param {any} steering 
-         * @todo Implement this function
-         */
-        function start_at_power (power, steering) {
+        // /** Starts moving the Driving Base without speed control.
+        //  * 
+        //  * @param {any} power 
+        //  * @param {any} steering 
+        //  * @todo Implement this function
+        //  */
+        // function start_at_power (power, steering) {
 
-        }
+        // }
 
         /** Starts moving the Driving Base
          * 
@@ -1673,7 +1708,7 @@ function Service_SPIKE() {
             start: start,
             move: move,
             set_motor_rotation: set_motor_rotation,
-            start_tank_at_power: start_tank_at_power
+            start_tank: start_tank
         }
 
     }
@@ -2474,7 +2509,8 @@ function Service_SPIKE() {
         UJSONRPC: UJSONRPC,
         ForceSensor: ForceSensor,
         DistanceSensor: DistanceSensor,
-        ColorSensor: ColorSensor
+        ColorSensor: ColorSensor,
+        MotorPair: MotorPair
     };
 }
 
