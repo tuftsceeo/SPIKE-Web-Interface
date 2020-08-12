@@ -129,6 +129,13 @@ LICENSE: MIT
 
 /**
  * @class Service_SPIKE 
+ * @example
+ * // if you're using ServiceDock
+ * var mySPIKE = document.getElemenyById("service_spike").getService();
+ * // if you're not using ServiceDock
+ * var mySPIKE = new Service_SPIKE();
+ * 
+ * mySPIKE.init();
  */
 function Service_SPIKE() {
 
@@ -306,6 +313,10 @@ function Service_SPIKE() {
      * <p> <em> This function needs to be executed before calling init() </em> </p>
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
+     * @example
+     * mySPIKE.executeAfterInit( function () {
+     *     var portsInfo = await mySPIKE.getPortsInfo();
+     * })
      */
     function executeAfterInit(callback) {
         funcAtInit = callback;
@@ -365,6 +376,8 @@ function Service_SPIKE() {
     /** <h4> Send character sequences to reboot SPIKE Prime </h4>
      * <p> <em> Run this function to exit micropython interpreter </em> </p>
      * @public
+     * @example
+     * mySPIKE.rebootHub();
      */
     async function rebootHub() {
         console.log("rebooting")
@@ -382,30 +395,31 @@ function Service_SPIKE() {
     /** <h4> Get the information of all the ports and devices connected to them </h4>
      * @public
      * @returns {object} <p> An object with keys as port letters and values as objects of device type and info </p>
-     * <p> ///USAGE/// </p>
-     * <p> ports = await getPortsInfo(); </p>
-     * <p> ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic") </p>
-     * <p> ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) </p>
-     * <p> </p>
-     * <p> MOTOR_INFO (smallMotor/bigMotor) = { </p>
-     * <p>                    <em>  "speed": motor speed, </p> </em>
-     * <p>                    <em>  "angle": motor angle , </p> </em>
-     * <p>                    <em>  "uAngle": motor angle in unit circle ( -180 ~ 180 ), </p> </em>
-     * <p>                    <em>  "power": motor power } </p> </em>
-     * <p> 
-     * <p> ULTRASONIC_INFO (ultrasonic) = { </p>
-     * <p>                    <em>  "distance": distance from surface } </p> </em>
-     * <p> 
-     * <p> COLOR_SENSOR_INFO (color) = { </p> 
-     * <p>                    <em>   "reflected": reflected luminosity, </p> </em>
-     * <p>                    <em>   "ambient": ambient luminosity, </p> </em>
-     * <p>                    <em>   "RGB": [R, G, B] } </p> </em>
-     * <p> 
-     * <p> FORCE_SENSOR_INFO (force) = { </p>
-     * <p>                    <em>   "force": Force in Newtons ( 1 ~ 10 ), </p> </em>
-     * <p>                    <em>   "pressed": whether pressed or not ( true or false), </p> </em>
-     * <p>                    <em>   "forceSensitive": More sensitive force output( 0 ~ 900 ) } </p> </em>
+     * @example
+     * // USAGE 
      * 
+     * var portsInfo = await mySPIKE.getPortsInfo();
+     * // ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic") </p>
+     * // ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) </p>
+     * 
+     * // Motor on port A
+     * var motorSpeed = portsInfo["A"]["speed"]; // motor speed
+     * var motorDegreesCounted = portsInfo["A"]["angle"]; // motor angle
+     * var motorPosition = portsInfo["A"]["uAngle"]; // motor angle in unit circle ( -180 ~ 180 )
+     * var motorPower = portsInfo["A"]["power"]; // motor power
+     * 
+     * // Ultrasonic Sensor on port A
+     * var distance = portsInfo["A"]["distance"] // distance value from ultrasonic sensor
+     * 
+     * // Color Sensor on port A
+     * var reflectedLight = portsInfo["A"]["reflected"]; // reflected light
+     * var ambientLight = portsInfo["A"]["ambient"]; // ambient light
+     * var RGB = portsInfo["A"]["RGB"]; // [R, G, B]
+     * 
+     * // Force Sensor on port A
+     * var forceNewtons = portsInfo["A"]["force"]; // Force in Newtons ( 1 ~ 10 ) 
+     * var pressedBool = portsInfo["A"]["pressed"] // whether pressed or not ( true or false )
+     * var forceSensitive = portsInfo["A"]["forceSensitive"] // More sensitive force output( 0 ~ 900 )
      */
     async function getPortsInfo() {
         return ports;
@@ -423,6 +437,22 @@ function Service_SPIKE() {
     /** <h4> Get info of the hub </h4>
      * @public
      * @returns {object} Info of the hub
+     * @example
+     * var hubInfo = await mySPIKE.getHubInfo();
+     * 
+     * var upDownDetector = hubInfo["gyro"][0];
+     * var rightSideLeftSideDetector = hubInfo["gyro"][1];
+     * var frontBackDetector = hubInfo["gyro"][2];
+     * 
+     * var rollAcceleration = hubInfo["pos"][0];  
+     * var pitchAcceleration = hubInfo["pos"][1]; 
+     * var yawAcceleration = hubInfo["pos"][2];   
+     * 
+     * var yawAngle = hubInfo["pos"][0];
+     * var pitchAngle = hubInfo["pos"][1];
+     * var rollAngle = hubInfo["pos"][2];
+     * 
+     * 
      */
     async function getHubInfo() {
         return hub;
@@ -432,6 +462,11 @@ function Service_SPIKE() {
      * <p> Note: Stops UJSON RPC stream </p>
      * <p> hub needs to be rebooted to return to UJSONRPC stream</p>
      * @public
+     * @example
+     * mySPIKE.reachMicroPy();
+     * mySPIKE.sendDATA("from spike import PrimeHub");
+     * mySPIKE.sendDATA("hub = PrimeHub()");
+     * mySPIKE.sendDATA("hub.light_matrix.show_image('HAPPY')");
      */
     async function reachMicroPy() {
         console.log("starting micropy interpreter");
@@ -491,7 +526,10 @@ function Service_SPIKE() {
     /** <h4> Get the latest press event information on the "connect" button </h4>
      * @public
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
-     * <p> duration is miliseconds the button was pressed until release </p>
+     * @example
+     * var bluetoothButtonInfo = await mySPIKE.getBluetoothButton();
+     * var pressedBool = bluetoothButtonInfo["pressed"];
+     * var pressedDuration = bluetoothButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
     async function getBluetoothButton() {
         return hubBluetoothButton;
@@ -500,7 +538,11 @@ function Service_SPIKE() {
     /** <h4> Get the latest press event information on the "center" button </h4>
      * @public
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER }
-     * <p> duration is miliseconds the button was pressed until release </p>
+     * @example
+     * var mainButtonInfo = await mySPIKE.getMainButton();
+     * var pressedBool = mainButtonInfo["pressed"];
+     * var pressedDuration = mainButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
+     * 
      */
     async function getMainButton() {
         return hubMainButton;
@@ -509,7 +551,11 @@ function Service_SPIKE() {
     /** <h4> Get the latest press event information on the "left" button </h4>
      * @public
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
-     * <p> duration is miliseconds the button was pressed until release </p>
+     * @example
+     * var leftButtonInfo = await mySPIKE.getLeftButton();
+     * var pressedBool = leftButtonInfo["pressed"];
+     * var pressedDuration = leftButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
+     * 
      */
     async function getLeftButton() {
         return hubLeftButton;
@@ -518,7 +564,10 @@ function Service_SPIKE() {
     /** <h4> Get the latest press event information on the "right" button </h4>
      * @public
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
-     * <p> duration is miliseconds the button was pressed until release </p>
+     * @example
+     * var rightButtonInfo = await mySPIKE.getRightButton();
+     * var pressedBool = rightButtonInfo["pressed"];
+     * var pressedDuration = rightButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
     async function getRightButton() {
         return hubRightButton;
@@ -701,6 +750,12 @@ function Service_SPIKE() {
         /** execute callback after this button is pressed
         *
         * @param {function} callback
+        * @example
+        * var hub = new mySPIKE.PrimeHub();
+        * var right_button = mySPIKE.hub.right_button;
+        * right_button.wait_until_pressed ( function () {
+        *     console.log("right_button was pressed");
+        * })
         */
         right_button.wait_until_pressed = function wait_until_pressed(callback) {
 
