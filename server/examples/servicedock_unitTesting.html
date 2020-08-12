@@ -17,7 +17,10 @@
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
                 <option id="motionOPTION"> motion sensor functions </option>
+                <option id="forceOPTION"> force sensor functions </option>
                 <option id="speakerOPTION"> Primehub.speaker functions </option>
+                <option id="buttonOPTION"> Primehub.button functions </option>
+                <option id="miscOPTION"> miscellaneous functions </option>
             </select>
             <input type="button" id="SPIKE_test_select" value="display test cases for this function">
             <div id="SPIKEtests">
@@ -25,14 +28,37 @@
                 <input type="button" id="getMotorPorts" class="SPIKEtestCase motor" value="get motorports">
                 <input type="button" id="motorrelpos" class="SPIKEtestCase motor" value="motor go to rel pos ( with stall detection )">
                 <input type="button" id="motorrelpos1" class="SPIKEtestCase motor" value="motor go to rel pos ( NO stall detection )">
+                
                 <!-- motion sensor functions-->
                 <input type="button" id="waitForNewGesture" class="SPIKEtestCase motion" value="wait_for_new_gesture test">
                 <input type="button" id="wasGesture" class="SPIKEtestCase motion" value="was_gesture test">
                 <input type="button" id="waitForNewOri" class="SPIKEtestCase motion" value="wait_for_new_orientation test">
+                <input type="button" id="getAngles" class="SPIKEtestCase motion" value = "get angles test">
+                <input type="button" id="getGesture" class="SPIKEtestCase motion" value="getGesture() test">
+                <input type="button" id="getOrientation" class="SPIKEtestCase motion" value="getOrientation() test">
+                
+                <!-- Force sensor functions-->
+                <input type="button" id="getForceNewton" class="SPIKEtestCase force" value="get_force_newton() test">
+                <input type="button" id="getForcePercentage" class="SPIKEtestCase force" value="get_force_percentage() test">
+                <input type="button" id="forceSensorIsPressed" class="SPIKEtestCase force" value="is_pressed() test">
+                <input type="button" id="forceSensorWaitUntilPress" class="SPIKEtestCase force" value="wait_until_pressed() test">
+                <input type="button" id="forceSensorWaitUntilRelease" class="SPIKEtestCase force" value="wait_until_released() test">
+                
                 <!-- speaker functions-->
                 <input type="button" id="beep" class="SPIKEtestCase speaker" value="beep(note,seconds) test">
                 <input type="button" id="startBeep" class="SPIKEtestCase speaker" value="startBeep(note) test">
                 <input type="button" id="stopBeep" class="SPIKEtestCase speaker" value="speaker.stop() test">
+                
+                <!-- button functions-->
+                <input type="button" id="leftButtonWaitPress" class="SPIKEtestCase button" value="left_button.wait_until_pressed(callback)">
+                <input type="button" id="leftButtonWaitRelease" class="SPIKEtestCase button" value="left_button.wait_until_released(callback)">
+                <input type="button" id="leftButtonWasPress" class="SPIKEtestCase button" value="left_button.was_pressed()">
+                
+                <!-- SPIKE Library functions-->
+                <input type="button" id="setHubOri" class="SPIKEtestCase misc" value="setHubOrientation()">
+                <input type="button" id="testUJSONRPC" class="SPIKEtestCase misc" value="test UJSONRPC.displayText()">
+                <input type="button" id="testNewKeyword" class="SPIKEtestCase misc" value="new Motor() vs Motor()">
+                <input type="button" id="testNewKeyword1" class="SPIKEtestCase misc" value="Motor() vs Motor() declared without 'new' keyword">
             </div>
         </div>
 
@@ -196,6 +222,7 @@
 
             console.log(">>> change the orientation of the hub");
             hub.motion_sensor.wait_for_new_orientation( function ( orientation ) {
+
                 if ( orientation ) {
                     console.log(">>> the orientation is ", orientation);
                     console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_orientation(callback)#######");
@@ -204,8 +231,77 @@
             
         })
 
-        /* wait for new orientation the second time its executed */
+        var testGetAngles = document.getElementById("getAngles");
+        testGetAngles.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motion_sensor get_***_angle() functions #######");
+            var hub = new mySPIKE.PrimeHub();
+            console.log("yaw angle: ", hub.motion_sensor.get_yaw_angle());
+            console.log("pitch angle: ", hub.motion_sensor.get_pitch_angle());
+            console.log("roll angle: ", hub.motion_sensor.get_roll_angle());
+            console.log("###### ENDING UNIT TEST ON get_***_angle() functions #######");
+        })
 
+        //                                      //
+        //        Force Sensor Tests            //
+        //                                      //
+        
+        var testGetForceNewton = document.getElementById("getForceNewton");
+        testGetForceNewton.addEventListener("click", async function() {
+            console.log("###### BEGINNING UNIT TEST ON ForceSensor.get_force_newton() #######");
+            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
+            var force_sensor = new mySPIKE.ForceSensor("A");
+            var newtons = force_sensor.get_force_newton();
+            console.log("Force in Newtons: ", newtons);
+            console.log("Expected Result: [1 to 10] reading on force on sensor");
+            console.log("###### ENDING UNIT TEST ON ForceSensor.get_force_newton() #######");
+        })
+
+        var testGetForcePercentage = document.getElementById("getForcePercentage");
+        testGetForcePercentage.addEventListener("click", function() {
+            console.log("###### BEGINNING UNIT TEST ON ForceSensor.get_force_percentage() #######");
+            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
+            var force_sensor = new mySPIKE.ForceSensor("A");
+            var percentage = force_sensor.get_force_percentage();
+            console.log("Force in percentage: ", percentage);
+            console.log("Expected Result: [0 to 100] reading of force on sensor");
+            console.log("###### ENDING UNIT TEST ON ForceSensor.get_force_percentage() #######");
+        })
+
+        var testForceSensorIsPressed = document.getElementById("forceSensorIsPressed");
+        testForceSensorIsPressed.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON ForceSensor.is_pressed() #######");
+            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
+            var force_sensor = new mySPIKE.ForceSensor("A");
+            var isPressed = force_sensor.is_pressed();
+            console.log("is pressed? ", isPressed);
+            console.log("Expected Result: get true when force sensor is pressed, false otherwise");
+            console.log("###### ENDING UNIT TEST ON ForceSensor.is_pressed() #######");
+        })
+
+        var testForceSensorWaitUntilPress = document.getElementById("forceSensorWaitUntilPress");
+        testForceSensorWaitUntilPress.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON ForceSensor.wait_until_pressed() #######");
+            console.log("Test: Execute this test and then after some time press on a Force Sensor connected at port A");
+            var force_sensor = new mySPIKE.ForceSensor("A");
+            force_sensor.wait_until_pressed( function () {
+                console.log("Force Sensor press event handler");
+                console.log("###### ENDING UNIT TEST ON ForceSensor.wait_until_pressed() #######");
+            })
+            console.log("Expected Result: when pressed, console logs 'Force Sensor press event handler'");
+        })
+
+        var testForceSensorWaitUntilRelease = document.getElementById("forceSensorWaitUntilRelease");
+        testForceSensorWaitUntilRelease.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON ForceSensor.wait_until_released() #######");
+            console.log("Test: Execute this test and then after some time press on a Force Sensor connected at port A and then release it");
+            var force_sensor = new mySPIKE.ForceSensor("A");
+            force_sensor.wait_until_released( function() {
+                console.log("Force Sensor release event handler");
+                console.log("###### ENDING UNIT TEST ON ForceSensor.wait_until_released() #######");
+            })
+            console.log("Expected Result: when force sensor RELEASED, console logs 'Force Sensor release event handler'");
+        })
+        
         //                                      //
         //            Speaker Tests             //
         //                                      //
@@ -242,9 +338,73 @@
             console.log("###### ENDING UNIT TEST ON Primehub.speaker.stop() #######")
         })
 
+        //                                      //
+        //              Button Tests            //
+        //                                      //
 
 
 
+        //                                      //
+        //               Misc Tests             //
+        //                                      //
+
+        var testSetHubOrientation = document.getElementById("setHubOri");
+        testSetHubOrientation.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON setHubOrientation() #######");
+            console.log("Test: Move the hub to an orientation and press the test button to see if the measured orientation is correct");
+            mySPIKE.setHubOrientation();
+            console.log("###### ENDING UNIT TEST ON setHubOrientation() #######");
+        })
+
+        var testUJSONRPC = document.getElementById("testUJSONRPC");
+        testUJSONRPC.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON UJSONRPC.displayText #######");
+            console.log("Expected Result: 'hello' on hub display");
+            mySPIKE.UJSONRPC.displayText("hello");
+            console.log("###### ENDING UNIT TEST ON UJSONRPC.displayText #######");
+        })
+
+        var testNew = document.getElementById("testNewKeyword");
+        testNew.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON new keywords with Motor connected to port A #######");
+            console.log("Test: see the difference of using 'new' keyword on SPIKE device object instantiations");
+            console.log("motor1 = mySPIKE.Motor('A')")
+            console.log("motor2 = new mySPIKE.Motor('A')")
+            console.log("motor1's default speed changed to 50")
+            var motor1 = mySPIKE.Motor("A");
+            motor1.set_default_speed(50);
+
+            var motor1_defaultSpeed = motor1.get_default_speed();
+
+            console.log("motor1's default_speed, ", motor1_defaultSpeed);
+            
+            var motor2 = new mySPIKE.Motor("A");
+            var motor2_defaultSpeed = motor2.get_default_speed();
+            console.log("motor2's default_speed, ", motor2_defaultSpeed);
+
+            console.log("###### ENDING UNIT TEST ON new keywords with Motor connected to port A #######");
+        });
+
+        var testNew1 = document.getElementById("testNewKeyword1");
+            testNew1.addEventListener("click", async function () {
+                console.log("###### BEGINNING UNIT TEST ON two Motor objects declared without 'new' keywords #######");
+                console.log("Test: see if Motor objects defined without 'new' keywords cause issues");
+                console.log("motor1 = mySPIKE.Motor('A')")
+                console.log("motor2 = mySPIKE.Motor('B')")
+                console.log("motor1's default speed changed to 50")
+                var motor1 = mySPIKE.Motor("A");
+                motor1.set_default_speed(50);
+
+                var motor1_defaultSpeed = motor1.get_default_speed();
+
+                console.log("motor1's default_speed, ", motor1_defaultSpeed);
+
+                var motor2 = mySPIKE.Motor("B");
+                var motor2_defaultSpeed = motor2.get_default_speed();
+                console.log("motor2's default_speed, ", motor2_defaultSpeed);
+
+                console.log("###### ENDING UNIT TEST ON two Motor objects declared without 'new' keywords #######");
+            });
 
         //////////////////////////////////////////
         //                                      //
@@ -392,7 +552,15 @@
             testMotorRelPos1.style.backgroundColor = "lightgreen";
             testWasGesture.style.backgroundColor = "lightgreen";
             testWaitForNewGesture.style.backgroundColor = "lightgreen";
-            testWaitForNewOri.style.backgroundColor = "red";
+            testWaitForNewOri.style.backgroundColor = "lightgreen";
+            testSetHubOrientation.style.backgroundColor = "lightgreen";
+            testForceSensorIsPressed.style.backgroundColor = "lightgreen";
+            testForceSensorWaitUntilPress.style.backgroundColor = "lightgreen";
+            testForceSensorWaitUntilRelease.style.backgroundColor = "lightgreen";
+            testGetForceNewton.style.backgroundColor = "lightgreen";
+            testGetForcePercentage.style.backgroundColor = "lightgreen";
+            testGetAngles.style.backgroundColor = "lightgreen";
+            testUJSONRPC.style.backgroundColor = "lightgreen";
 
             getTagsInfo.style.backgroundColor = "lightgreen";
             createNewTag.style.backgroundColor = "lightgreen";
@@ -503,6 +671,42 @@
                 }
 
                 var selectedCases = document.getElementsByClassName("speaker");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "miscOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("misc");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "buttonOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("button");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "forceOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("force");
                 for (var index = 0; index < selectedCases.length; index++) {
                     var aCase = selectedCases[index];
                     aCase.style.display = "block";
