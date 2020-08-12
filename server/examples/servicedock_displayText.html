@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_displayText.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: display custom text on the SPIKE Prime
 Credits/inspirations:
 History: 
@@ -39,13 +39,15 @@ Note:
     <script>
         /* SPIKE service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = new mySPIKE.PrimeHub();
+
         var displayButton = document.getElementById("display");
         var textArea = document.getElementById("text");
 
         mySPIKE.executeAfterInit(function() {
             displayButton.addEventListener("click", function () {
                 var messageToDisplay = textArea.value;
-                mySPIKE.displayText(messageToDisplay);
+                hub.light_matrix.write(messageToDisplay);
             })
         })
         

@@ -68,8 +68,6 @@ body {
 </div>
 <script>
 const canvas = document.getElementById('game');
-// get the SPIKE_Service object linked to its service dock element
-const mySPIKE = document.getElementById("Service_SPIKE").getService();
 
 const context = canvas.getContext('2d');
 const grid = 15;
@@ -219,13 +217,14 @@ document.addEventListener('keyup', function(e) {
   }
 
 });
-
+  // get the SPIKE_Service object linked to its service dock element
+  const mySPIKE = document.getElementById("Service_SPIKE").getService();
+  const hub = new mySPIKE.PrimeHub();
   // sync motor speed with respective Pong paddles
   async function main() {
-    var hubInfo = await mySPIKE.getHubInfo();
 
     // get the gyro sensor data of front/back pitching
-    var gyroPitch = hubInfo.gyro[0];
+    var gyroPitch = hub.motion_sensor.get_pitch_angle();
     
     // convert data to speed
     var gyroToPaddleSpeed = gyroPitch/100 * -1;

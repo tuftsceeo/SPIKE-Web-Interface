@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_controlTank.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: control a tank (at least 2 motors) with arrow keys and get ultrasonic and color sensor visual feed
 Credits/inspirations:
 History: 
@@ -68,10 +68,16 @@ Note:
     <script>
         /* SPIKE Service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+
         var leftMotorPort;
         var rightMotorPort;
         var ultrasonicPort;
         var colorPort;
+
+        var ultrasonicSensor;
+        var colorSensor;
+        var motorPair;
+
         var speed;
         var keyPressed = false;
 
@@ -106,11 +112,13 @@ Note:
             $("#leftMotorPortChoose").on("click", async function () {
                 // get the selected port
                 leftMotorPort = await $("#leftMotorPort option:selected").val();
+                console.log(leftMotorPort);
             })
 
             $("#rightMotorPortChoose").on("click", async function () {
                 // get the selected port
                 rightMotorPort = await $("#rightMotorPort option:selected").val();
+                console.log(rightMotorPort);
             })
 
 
@@ -126,6 +134,16 @@ Note:
             })
 
             $("#startControl").on("click", function() {
+                ultrasonicSensor = new mySPIKE.DistanceSensor(ultrasonicPort);
+                
+                // optional color sensor
+                try {
+                    colorSensor = new mySPIKE.ColorSensor(colorPort);
+                }
+                catch(e) {}
+
+                motorPair = new mySPIKE.MotorPair(leftMotorPort, rightMotorPort);
+
                 defineListeners();
                 var visualInterval = setInterval(getDistance, 10);
             })
@@ -138,19 +156,19 @@ Note:
                 if (!keyPressed) {
                     // up arrow key
                     if (e.which === 38) {
-                        mySPIKE.moveTankSpeeds(speed, speed, leftMotorPort, rightMotorPort);
+                        motorPair.start_tank(speed, speed);
                     }
                     // down arrow key
                     else if (e.which === 40) {
-                        mySPIKE.moveTankSpeeds(-speed, -speed, leftMotorPort, rightMotorPort);
+                        motorPair.start_tank(-speed, -speed);
                     }
                     // left arrow key
                     else if (e.which === 37) {
-                        mySPIKE.moveTankSpeeds(-speed, speed, leftMotorPort, rightMotorPort);
+                        motorPair.start_tank(-speed, speed);
                     }
                     // right arrow key
                     else if (e.which === 39) {
-                        mySPIKE.moveTankSpeeds(speed, -speed, leftMotorPort, rightMotorPort);
+                        motorPair.start_tank(speed, -speed);
                     }
                     keyPressed = true;
                 }
@@ -159,7 +177,7 @@ Note:
             // listen to keyboard events to stop the tank if key is released
             document.addEventListener('keyup', function (e) {
                 if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39) {
-                    mySPIKE.moveTankSpeeds(0, 0, leftMotorPort, rightMotorPort);
+                    motorPair.start_tank(0, 0);
                     keyPressed = false;
                 }
             });
@@ -168,8 +186,7 @@ Note:
         // max 150? min 4
         async function getDistance() {
             getColor();
-            var portInfo = await mySPIKE.getPortInfo(ultrasonicPort);
-            var distance = portInfo.data.distance;
+            var distance = ultrasonicSensor.get_distance_cm();
 
             if ( distance !== null) {
                 $("#dist").html(distance + "cm");
@@ -204,10 +221,9 @@ Note:
         }
 
         async function getColor() {
-            var portInfo = await mySPIKE.getPortInfo(colorPort);
-            var R = portInfo.data.RGB[0];
-            var G = portInfo.data.RGB[1];
-            var B = portInfo.data.RGB[2];
+            var R = colorSensor.get_red();
+            var G = colorSensor.get_green();
+            var B = colorSensor.get_blue();
             $("#objectBox").css("background-color", "RGB(" + R + "," + G + "," + B + ")");
 
         }

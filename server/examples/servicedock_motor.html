@@ -76,6 +76,9 @@ Note:
         var mySENDSPIKE = document.getElementById("service_spike_sending").getService();
         var mySL = document.getElementById("service_systemlink").getService();
 
+        var RECVMotor;
+        var SENDMotor;
+
         mySL.executeAfterInit( function() {
             if ( stage == 1 ) {
                 moveToNextExplain();
@@ -101,13 +104,15 @@ Note:
 
             // when the "select" button is clicked
             $("#sending").find("#selectport").on("click", async () => {
+                // get the selected port
+                var port = await $("#sending").find("#portSelect option:selected").val();
+
+                SENDMotor = new mySENDSPIKE.Motor(port);
+
                 var sendToCloudInt = setInterval(async function () {
-                    // get the selected port
-                    var port = await $("#sending").find("#portSelect option:selected").val();
 
                     // parse the motor's speed value 
-                    var portInfo = await mySENDSPIKE.getPortInfo(port);
-                    var toSend = portInfo.data.speed;
+                    var toSend = SENDMotor.get_speed();
 
                     // change the tag value in the cloud
                     mySL.setTagValue("testInt", toSend);
@@ -131,17 +136,21 @@ Note:
 
             // when the "select" button is clicked
             $("#receiving").find("#selectport").on("click", async () => {
+                // get the selected port
+                var port = await $("#receiving").find("#portSelect option:selected").val();
+
+                RECVMotor = new myRECVSPIKE.Motor(port);
+
                 var motorInt = setInterval(async function () {
-                    // get the selected port
-                    var port = await $("#receiving").find("#portSelect option:selected").val();
 
                     // parse "testInt" tag's value 
-                    var tagsInfo = await mySL.getTagsInfo();
-                    var motorSpeed = tagsInfo["testInt"]["value"];
+                    var motorSpeed = await mySL.getTagValue("testInt");
 
                     // change the motor's speed
-                    myRECVSPIKE.motorStart(port, motorSpeed, 0);
+                    RECVMotor.start(motorSpeed);
+
                 }, 500);
+                
                 if (stage == 4) {
                     moveToNextExplain();
                 }

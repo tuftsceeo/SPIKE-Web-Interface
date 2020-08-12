@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: pong.html
 Author: Jeremy Jung
-Last update: 6/24/20
+Last update: 8/11/20
 Description: example of using sensors to move around html elements
 Credits/inspirations:
     Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
@@ -68,8 +68,6 @@ body {
 </div>
 <script>
 const canvas = document.getElementById('game');
-// get the SPIKE_Service object linked to its service dock element
-const my_SPIKE = document.getElementById("Service_SPIKE").getService();
 
 const context = canvas.getContext('2d');
 const grid = 15;
@@ -259,52 +257,39 @@ document.addEventListener('keyup', function(e) {
   }
 });
 
-  // sync motor speed with respective Pong paddles
-  async function main() {
+// get the SPIKE_Service object linked to its service dock element
+const my_SPIKE = document.getElementById("Service_SPIKE").getService();
 
-    // left player ports
-    var portA = await my_SPIKE.getPortInfo("A");
-    var portC = await my_SPIKE.getPortInfo("C");
-    var portE = await my_SPIKE.getPortInfo("E");
+my_SPIKE.executeAfterInit(assignMotor);
 
-    var leftPlayerPorts = [portA, portC, portE];
+var leftMotor;
+var rightMotor;
+async function assignMotor () {
+  var motorPorts = await my_SPIKE.getMotorPorts();
 
-    // right player ports
-    var portB = await my_SPIKE.getPortInfo("B");
-    var portD = await my_SPIKE.getPortInfo("D");
-    var portF = await my_SPIKE.getPortInfo("F");
-
-    var rightPlayerPorts = [portB, portD, portF];
-
-    // get left motor speed
-    for (var i = 0; i < leftPlayerPorts.length; i++) {
-
-      //look for first instance of motor
-      if (leftPlayerPorts[i].device == "smallMotor" || leftPlayerPorts[i].device == "bigMotor") {
-        var leftMotor = leftPlayerPorts[i].data;
-        // sync leftPaddle speed with left motor speed
-        leftPaddle.dy = leftMotor["speed"];
-
-        break;
-      }
+  for (var index in motorPorts) {
+    var port = motorPorts[index];
+    // assign the left player port to the motor on the left side of the hub connected at the least in alphabetical order
+    if (port == "E" || port == "C" || port == "A") {
+      var leftPlayerport = port;
     }
-
-    // get right motor speed
-    for (var i = 0; i < rightPlayerPorts.length; i++) {
-
-      //look for first instance of motor
-      if (rightPlayerPorts[i].device == "smallMotor" || rightPlayerPorts[i].device == "bigMotor") {
-        var rightMotor = rightPlayerPorts[i].data;
-
-        // sync rightPaddle speed with right motor speed
-        rightPaddle.dy = rightMotor["speed"];
-
-        break;
-      }
-
+    // assign the right player port to the motor on the right side of the hub  at the least in alphabetical order
+    else if (port == "F" || port == "D" || port == "B") {
+      var rightPlayerport = port;
     }
-
   }
+
+  leftMotor = new my_SPIKE.Motor(leftPlayerport);
+  rightMotor = new my_SPIKE.Motor(rightPlayerport);
+
+}
+// sync motor speed with respective Pong paddles
+async function main() {
+
+  leftPaddle.dy = leftMotor.get_speed();
+  rightPaddle.dy = rightMotor.get_speed();
+
+}
 // start the game
 requestAnimationFrame(loop);
 

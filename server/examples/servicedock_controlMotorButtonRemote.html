@@ -81,8 +81,8 @@ buttonForce
         /* SPIKE Service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
         var mySL = document.getElementById("service_systemlink").getService();
-        var motorPort;
-        var forceSensorPort;
+        var motor
+        var forceSensor;
 
         var receiving = false;
 
@@ -138,7 +138,10 @@ buttonForce
                 $("#motorPortChoose").on("click", async function () {
                     // get the selected port
                     console.log($("#motorPort option:selected"))
-                    motorPort = await $("#motorPort option:selected").val();
+                    var motorPort = await $("#motorPort option:selected").val();
+
+                    // instantiate motor object
+                    motor = new mySPIKE.Motor(motorPort);
                 })
 
                 /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
@@ -147,11 +150,10 @@ buttonForce
                     var sendInterval = setInterval(async function () {
 
                         /* send motor sensor value to cloud */
-                        var info = await mySPIKE.getPortInfo(motorPort);
-                        var speed = info.data.speed;
-                        var power = info.data.power;
-                        var angle = info.data.angle;
-                        var uangle = info.data.uAngle;
+                        var speed = motor.get_speed();
+                        var power = motor.get_power();
+                        var angle = motor.get_degrees_counted();
+                        var uangle = motor.get_position();
 
                         mySL.setTagValue("motorSpeed", speed);
                         mySL.setTagValue("motorPower", power);
@@ -163,7 +165,7 @@ buttonForce
                         steerSpeed = steerSpeed * 10;
                         
                         /* move motor */ 
-                        mySPIKE.motorStart(motorPort, steerSpeed, 0);
+                        motor.start(steerSpeed);
 
                     }, 100)
                 })
@@ -177,16 +179,15 @@ buttonForce
                 $("#forceSensorPortChoose").on("click", async function () {
                     // get the selected port
                     forceSensorPort = await $("#forceSensorPort option:selected").val();
+
+                    forceSensor = new mySPIKE.ForceSensor(forceSensorPort);
                 })
 
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
                     var sendInterval = setInterval(async function () {
                         
                         /* send buttonForce valeus to cloud */
-
-                        var forceSensorInfo = await mySPIKE.getPortInfo(forceSensorPort);
-
-                        var buttonForce = forceSensorInfo.data.force;
+                        var buttonForce = forceSensor.get_force_percentage();
 
                         mySL.setTagValue("buttonForce", buttonForce);
 

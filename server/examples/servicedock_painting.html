@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_painting.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: use a color sensor to get the color of the brush
 Credits/inspirations:
 History: 
@@ -42,30 +42,24 @@ Note:
         var mySPIKE = document.getElementById("service_spike").getService();
         mySPIKE.executeAfterInit(SPIKE_main);
         var colorSensorPort;
-        var colorSensor
-        async function SPIKE_main(){
-            var portsInfo = await mySPIKE.getPortsInfo();
+        var colorSensor;
 
-            // find the port to which  color sensor are connected
-            for (var key in portsInfo) {
-                // get color sensor device
-                if (portsInfo[key].device == "color") {
-                    // assign the port
-                    colorSensorPort = key;
-                }
-            }
+        async function SPIKE_main(){
+
+            var colorSensorPorts = await mySPIKE.getColorPorts();
+
+            colorSensorPort = colorSensorPorts[0];
+
+            colorSensor = new mySPIKE.ColorSensor(colorSensorPort);
 
             var mainInterval = setInterval(doDrawing, 100);
         }
 
         async function doDrawing() {
-            //read in new info
-            colorSensor = await mySPIKE.getPortInfo(colorSensorPort);
-
             // get color sensor's RGB value
-            var R = colorSensor.data.RGB[0];
-            var G = colorSensor.data.RGB[1];
-            var B = colorSensor.data.RGB[2];
+            var R = colorSensor.get_red();
+            var G = colorSensor.get_green();
+            var B = colorSensor.get_blue();
 
             // assign rgb value for brush's new color
             var newColor = "rgb(" + R + "," + G + "," + B;

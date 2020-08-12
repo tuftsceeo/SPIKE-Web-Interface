@@ -37,8 +37,11 @@ message
             </div>
         </div>
     </body>
+
     <script>
         var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = new mySPIKE.PrimeHub();
+
         var mySL = document.getElementById("service_systemlink").getService();
         
         var message;
@@ -48,7 +51,7 @@ message
             
             displayButton.addEventListener("click", function () {
                 
-                mySPIKE.displayText(message);
+                hub.light_matrix.write(message);
             
             });
 
@@ -58,15 +61,13 @@ message
             
             var getTagInterval = setInterval(async function() {
                 
-                var tagsInfo = await mySL.getTagsInfo();
-                
-                var newMessage = tagsInfo.message.value;
+                var newMessage = await mySL.getTagValue("message");
                 
                 if ( newMessage != message ) {
                     
                     message = newMessage;
                     
-                    mySPIKE.displayText(message);
+                    hub.light_matrix.write(message);
                 }
 
             }, 100);

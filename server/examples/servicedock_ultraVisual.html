@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_ultravisual.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: get visualization of ultrasonic sensor
 Credits/inspirations:
 History: 
@@ -44,42 +44,36 @@ Note:
     <script>
         /* SPIKE service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+        var DistanceSensor;
         
         mySPIKE.executeAfterInit(SPIKE_main);
 
-         /* get the ports to which ultrasonic sensors are connected to*/
-        async function getUltrasonicPorts() {
-            var portsInfo = await mySPIKE.getPortsInfo();
-            var ultrasonicPorts = [];
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "ultrasonic") {
-                    ultrasonicPorts.push(key);
-                }
-            }
-            return ultrasonicPorts;
-        }
-        
         /* append the ultrasonic ports to select HTML element */
         async function initPortSelect(ultrasonicPorts) {
             for (var port in ultrasonicPorts) {
                 $("#portSelect").append("<option id = " + ultrasonicPorts[port] + ">" + ultrasonicPorts[port] + "</option>");
             }
         }
+
         async function SPIKE_main() {
-            var ultrasonicPorts = await getUltrasonicPorts(); // get ports connected to ultrasonics
+            var ultrasonicPorts = await mySPIKE.getUltrasonicPorts(); // get ports connected to ultrasonics
+
             initPortSelect(ultrasonicPorts); // append ports to <select>
+
             $("#selectport").on("click", async function () {
-                console.log("selected")
+
                 // get the selected port
                 port = await $("#portSelect option:selected").val();
+
+                DistanceSensor = new mySPIKE.DistanceSensor(port);
 
                 var visualInterval = setInterval(getDistance, 100);
             })
         }
         // max 150? min 4
         async function getDistance() {
-            var portInfo = await mySPIKE.getPortInfo(port);
-            var distance = portInfo.data.distance;
+            
+            var distance = DistanceSensor.get_distance_cm();
             $("#dist").html(distance + "cm");
 
             // calculate pixels dimensions (13.6 = 3.4 * 4, where 4 is the minimum distance)

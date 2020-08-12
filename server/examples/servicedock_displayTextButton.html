@@ -2,7 +2,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_displayTextButton.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: display text with a force sensor
 Credits/inspirations:
 History: 
@@ -40,30 +40,21 @@ Note:
         var textArea = document.getElementById("text");
         var forceSensorPressInterval;
         var forceSensorPort;
-        mySPIKE.executeAfterInit(async function() {
-            var portsInfo = await mySPIKE.getPortsInfo();
+        
+        mySPIKE.executeAfterInit( async function () {
             
-            // find the port to which force sensor is connected
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "force") {
-                    // assign the port
-                    forceSensorPort = key;
-                    console.log("force sensor port", forceSensorPort);
+            forceSensorPort = await mySPIKE.getForcePorts();    
+            var forceSensor = mySPIKE.ForceSensor(forceSensorPort);
 
-                    // continuously check for when the force sensor is pressed
-                    forceSensorPressInterval = setInterval(async function () {
+            // continuously check for when the force sensor is pressed
+            forceSensorPressInterval = setInterval(async function () {
 
-                        var forceSensor = await mySPIKE.getPortInfo(forceSensorPort);
-
-                        if (forceSensor.data.pressed) {
-                            var messageToDisplay = textArea.value;
-                            mySPIKE.displayText(messageToDisplay);
-                        }
-
-                    }, 500);
+                if ( forceSensor.is_pressed() ) {
+                    var messageToDisplay = textArea.value;
+                    mySPIKE.PrimeHub().light_matrix.write(messageToDisplay);
                 }
-            }
 
+            }, 500);
 
         })
         

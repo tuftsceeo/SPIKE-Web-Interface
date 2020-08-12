@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_pongTwoPTwoS.html
 Author: Jeremy Jung
-Last update: 6/24/20
+Last update: 8/11/20
 Description: example of using sensors to move around html elements. Demonstrates SPIKE Prime library scalability
 Credits/inspirations:
     Based on UJSONRPC Web Serial by Ethan Danahy, Olga Sans
@@ -220,40 +220,24 @@ async function loop() {
   var leftPlayermotor;
   var rightPlayermotor;
 
-  mySPIKE1.executeAfterInit(function () {
-    mySPIKE1.displayText("1");
-  })
-  mySPIKE2.executeAfterInit(function () {
-    mySPIKE2.displayText("2");
-  })
-
-  async function SPIKE1LeftPaddle() {
+  mySPIKE1.executeAfterInit( async function () {
+    mySPIKE1.PrimeHub().light_matrix.write("1");
     var motorPorts = await mySPIKE1.getMotorPorts();
+    leftPlayermotor = new mySPIKE1.Motor(motorPorts[0]);
+  })
+  mySPIKE2.executeAfterInit(async function () {
+    mySPIKE2.PrimeHub().light_matrix.write("2");
+    var motorPorts = await mySPIKE2.getMotorPorts();
+    rightPlayermotor = new mySPIKE2.Motor(motorPorts[0]);
+  })
 
-    var motorPort = motorPorts[0];
-
-    var motorInfo = await mySPIKE1.getPortInfo(motorPort);
-    var motor = motorInfo.data;
-    
-    leftPaddle.dy = motor.speed;
-  }
-  async function SPIKE2RightPaddle() {
-    var motorPorts = await mySPIKE1.getMotorPorts();
-
-    var motorPort = motorPorts[0];
-
-    var motorInfo = await mySPIKE1.getPortInfo(motorPort);
-    var motor = motorInfo.data;
-    
-    rightPaddle.dy = motor.speed;
-  }
   // sync motor speed with respective Pong paddles
   async function main() {
     if (mySPIKE1.isActive()) {
-      SPIKE1LeftPaddle();
+      leftPaddle.dy = leftPlayermotor.get_speed();
     }
     if (mySPIKE2.isActive()) {
-      SPIKE2RightPaddle();
+      rightPaddle.dy = rightPlayermotor.get_speed();
     }
   }
 // start the game

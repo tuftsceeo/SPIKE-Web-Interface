@@ -2,7 +2,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_motorSlider.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: control a motor with a slider
 Credits/inspirations:
 History: 
@@ -38,21 +38,10 @@ Note:
     <script>
         /* SPIKE Service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+        var motor;
         var port; // port to which motor is connected
         var power; // power to run motor with
         mySPIKE.executeAfterInit(SPIKE_main);
-
-        /* get the ports to which motors are connected to*/
-        async function getMotorPorts() {
-            var portsInfo = await mySPIKE.getPortsInfo();
-            var motorPorts = [];
-            for (var key in portsInfo) {
-                if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                    motorPorts.push(key);
-                }
-            }
-            return motorPorts;
-        }
 
         /* append the motor ports to select HTML element */
         async function initPortSelect(motorPorts) {
@@ -62,26 +51,25 @@ Note:
         }
 
         async function SPIKE_main() {
-            var motorPorts = await getMotorPorts(); // get ports connected to motors
+            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
 
             initPortSelect(motorPorts); // append ports to <select>
             
             $("#selectport").on("click", async function (){
                 // get the selected port
                 port = await $("#portSelect option:selected").val();
-                console.log(port);
+                motor = new mySPIKE.Motor(port);
                 
                 var motorPowerInterval = setInterval(changeMotorPower, 500);
                 // control motor's power
                 
-                
-                mySPIKE.motorPwm(port, power, 0);
+                motor.start_at_power(power)
 
             })
         }
 
         function changeMotorPower() {
-                mySPIKE.motorPwm(port, power, 0);
+            motor.start_at_power(power)
         }
 
 

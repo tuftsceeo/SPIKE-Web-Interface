@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_controlMotorButtonRemote.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: control a tank remotely through SystemLink cloud and get ultrasonic live feed
 Credits/inspirations:
 History: 
@@ -98,7 +98,12 @@ distance
         var leftMotorPort;
         var rightMotorPort;
         var ultrasonicPort;
-        var colorPort;
+    
+        var motorPair;
+        var ultrasonicSensor;
+        var forceSensor;
+        var steerMotor;
+
         var speed;
         var keyPressed = false;
         var receiving = false;
@@ -130,7 +135,7 @@ distance
         })
 
         /* append the ports to select HTML element when receiving values*/
-        async function initRECVPortSelects(motorPorts, ultrasonicPorts, colorPorts) {
+        async function initRECVPortSelects(motorPorts, ultrasonicPorts) {
 
             for (var port in motorPorts) {
                 $("#leftMotorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
@@ -164,7 +169,6 @@ distance
 
                 $("#leftMotorPortChoose").on("click", async function () {
                     // get the selected port
-                    console.log($("#leftMotorPort option:selected"))
                     leftMotorPort = await $("#leftMotorPort option:selected").val();
                 })
 
@@ -182,11 +186,14 @@ distance
                 /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
                 $("#RECVportsInterface").find("#startControl").on("click", function () {
 
+
+                    motorPair = new mySPIKE.MotorPair(leftMotorPort, rightMotorPort);
+                    ultrasonicSensor = new mySPIKE.DistanceSensor(ultrasonicPort);
+
                     var sendInterval = setInterval(async function () {
 
                         /* send ultrasonic sensor value to cloud */
-                        var info = await mySPIKE.getPortInfo(ultrasonicPort);
-                        var distance = info.data.distance;
+                        var distance = ultrasonicSensor.get_distance_cm();
 
                         mySL.setTagValue("distance", distance);
 
@@ -199,17 +206,17 @@ distance
                             // steerwheel was rotated counterclockwise
                             if (steerSpeed < 0) {
                                 // turn tank counterclockwise
-                                mySPIKE.moveTankSpeeds(steerSpeed, -steerSpeed, leftMotorPort, rightMotorPort);
+                                motorPair.start_tank(steerSpeed, -steerSpeed);
                             }
                             // steerwheel was rotated clockwise 
                             else if (steerSpeed > 0) {
-                                mySPIKE.moveTankSpeeds(-steerSpeed, steerSpeed, leftMotorPort, rightMotorPort);
+                                motorPair.start_tank(-steerSpeed, steerSpeed);
                             }
                         } 
                         // move forward when button was pressed
                         else {
                             var speed = buttonForce * 10;
-                            mySPIKE.moveTankSpeeds(speed, speed, leftMotorPort, rightMotorPort);
+                            motorPair.start_tank(speed,speed); 
                         }
 
                     }, 100)
@@ -232,15 +239,15 @@ distance
                 })
 
                 $("#SENDportsInterface").find("#startControl").on("click", function () {
+
+                    steerMotor = new mySPIKE.Motor(steerMotorPort);
+                    forceSensor = new mySPIKE.ForceSensor(forceSensorPort);
+
                     var sendInterval = setInterval(async function () {
                         
                         /* send steerMotor values and buttonForce valeus to cloud */
-
-                        var motorPortInfo = await mySPIKE.getPortInfo(steerMotorPort);
-                        var forceSensorInfo = await mySPIKE.getPortInfo(forceSensorPort);
-
-                        var steerSpeed = motorPortInfo.data.speed;
-                        var buttonForce = forceSensorInfo.data.force;
+                        var steerSpeed = steerMotor.get_speed();
+                        var buttonForce = forceSenso.get_force_percentage();
 
                         mySL.setTagValue("steerSpeed", steerSpeed);
                         mySL.setTagValue("buttonForce", buttonForce);

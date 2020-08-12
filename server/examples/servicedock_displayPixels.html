@@ -3,7 +3,7 @@
 Project Name: SPIKE Prime Web Interface
 File name: servicedock_displayPixels.html
 Author: Jeremy Jung
-Last update: 8/4/20
+Last update: 8/11/20
 Description: turn on or off the pixels on the display
 Credits/inspirations:
 History: 
@@ -69,6 +69,8 @@ Note:
     <script>
         /* SPIKE service code*/
         var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = new mySPIKE.PrimeHub();
+
         var pixelElements = document.getElementsByClassName("pixel");
         var displayMatrix = [[0, 0, 0, 0, 0], 
                              [0, 0, 0, 0, 0], 
@@ -77,10 +79,8 @@ Note:
                              [0, 0, 0, 0, 0]]
 
         mySPIKE.executeAfterInit(async function () {
-            mySPIKE.displayClear();
+            hub.light_matrix.off();
             for ( var i = 0; i < pixelElements.length; i++ ) {
-                
-                console.log(pixelElements[i]);
 
                 pixelElements[i].addEventListener("click", function() {
 
@@ -90,13 +90,13 @@ Note:
                     // the pixel is not on
                     if ( displayMatrix[yCoordinate][xCoordinate] == 0 ) {
                         displayMatrix[yCoordinate][xCoordinate] = 1;
-                        mySPIKE.displaySetPixel(xCoordinate, yCoordinate, 100);
+                        hub.light_matrix.set_pixel(xCoordinate, yCoordinate);
                         this.style.backgroundColor = "orange";
                     }
                     // pixel is on
                     else {
                         displayMatrix[yCoordinate][xCoordinate] = 0;
-                        mySPIKE.displaySetPixel(xCoordinate, yCoordinate, 0);
+                        hub.light_matrix.set_pixel(xCoordinate, yCoordinate, 0);
                         this.style.backgroundColor = "white";
                     }
                 })
