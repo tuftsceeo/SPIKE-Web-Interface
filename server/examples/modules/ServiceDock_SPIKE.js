@@ -695,6 +695,7 @@ function Service_SPIKE() {
     * <p> light_matrix </p>
     */
     PrimeHub = function() {
+        var yawDisplacement = 0;
         
         /** PrimeHub.left_button
         * @class
@@ -752,7 +753,7 @@ function Service_SPIKE() {
         * @param {function} callback
         * @example
         * var hub = new mySPIKE.PrimeHub();
-        * var right_button = mySPIKE.hub.right_button;
+        * var right_button = hub.right_button;
         * right_button.wait_until_pressed ( function () {
         *     console.log("right_button was pressed");
         * })
@@ -765,6 +766,12 @@ function Service_SPIKE() {
         /** execute callback after this button is released
          * 
          * @param {function} callback 
+         * @example
+         * var hub = new mySPIKE.PrimeHub();
+         * var right_button = hub.right_button;
+         * right_button.wait_until_released ( function () {
+         *     console.log("right_button was released");
+         * })
          */
         right_button.wait_until_released = function wait_until_released(callback) {
 
@@ -774,6 +781,11 @@ function Service_SPIKE() {
         /** Tests to see whether the button has been pressed since the last time this method called.
          * 
          * @returns {boolean} - True if was pressed, false otherwise
+         * @example
+         * var hub = new mySPIKE.PrimeHub();
+         * if ( hub.right_button.was_pressed() ) {
+         *     console.log("right_button was pressed");
+         * }
          */
         right_button.was_pressed = function was_pressed() {
             if (hubRightButton.duration > 0) {
@@ -982,6 +994,10 @@ function Service_SPIKE() {
          */
         motion_sensor.get_orientation = function get_orientation() {
             return lastHubOrientation;
+        }
+
+        motion_sensor.reset_yaw_angle = function reset_yaw_angle() {
+            
         }
 
         return {
