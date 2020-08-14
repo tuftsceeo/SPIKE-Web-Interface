@@ -20,6 +20,7 @@ class servicesystemlink extends HTMLElement {
 
         this.active = false; // whether the service was activated
         this.service = new Service_SystemLink(); // instantiate a service object ( one object per button )
+        this.proceed = false; // if there are credentials input
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -34,7 +35,8 @@ class servicesystemlink extends HTMLElement {
         var button = document.createElement("button");
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
-         /* CSS */
+        
+        /* CSS */
         var imageRelPath = "./modules/views/cloud.png" // relative to the document in which a servicesystemlink is created ( NOT this file )
         var length = 50; // for width and height of button
         var backgroundColor = "#A2E1EF" // background color of the button
@@ -46,6 +48,7 @@ class servicesystemlink extends HTMLElement {
 
         var status = document.createElement("div");
         status.setAttribute("class", "status");
+        
         /* CSS */
         var length = 20; // for width and height of circle
         var statusBackgroundColor = "red" // default background color of service (inactive color)
@@ -68,26 +71,74 @@ class servicesystemlink extends HTMLElement {
         })
 
         this.addEventListener("click", async function() {
-            
-            // check active flag so once activated, the service doesnt reinit
+
             if ( !this.active ) {
+                this.popUpBox();
+            }
+
+            // check active flag so once activated, the service doesnt reinit
+            if ( !this.active && this.proceed) {
                 
                 console.log("activating service");
                 
-                var initSuccessful = await this.service.init();
+                var initSuccessful = await this.service.init(this.APIKey);
                 
                 if (initSuccessful) {
                     this.active = true;
                     status.style.backgroundColor = "green";
                 }
-                
-            }
-        });
 
+            }
+
+        });
 
         shadow.appendChild(wrapper);
         button.appendChild(status);
         wrapper.appendChild(button);
+    }
+
+    /* Ask user for API credentials */
+    popUpBox() {
+        var APIKeyExists = true;
+
+        var APIKeyResult = prompt("Please enter your System Link Cloud API Key:", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7");
+        // APIkey 
+        if ( APIKeyResult == null || APIKeyResult == "" ) {
+            console.log("You inserted no API key");
+            APIKeyExists = false;
+        }
+        else {
+            APIKeyExists = true;
+            this.APIKey = APIKeyResult;
+        }
+
+        if ( APIKeyExists ) {
+            this.proceed = true;
+        }
+    }
+
+    /* for Service's API credentials */
+
+    static get observedAttributes() {
+        return ["apikey"];
+    }
+
+    get apikey() {
+        return this.getAttribute("apikey");
+    }
+
+    set apikey(val) {
+        console.log(val);
+        if ( val ) {
+            this.setAttribute("apikey", val);
+        }
+        else {
+            this.removeAttribute("apikey");
+        }
+    }
+
+    attributeChangedCallback (name, oldValue, newValue) {
+        this.APIKey = newValue;
     }
 
     /* get the Service_SystemLink object */
@@ -98,17 +149,6 @@ class servicesystemlink extends HTMLElement {
     /* get whether the ServiceDock button was clicked */
     getClicked() {
         return this.active;
-    }
-
-    // initialize the service (is not used in this class but available for use publicly)
-    async init() {
-        var initSuccess = await this.service.init();
-        if ( initSuccess ) {
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
 }
@@ -140,7 +180,7 @@ function Service_SystemLink() {
 
     let tagsInfo = {}; // contains real-time information of the tags in the cloud
 
-    let APIKey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7";
+    let APIKey = "API KEY";
 
     let serviceActive = false; // set to true when service goes through init
 
@@ -312,7 +352,7 @@ function Service_SystemLink() {
     *
     * Parameter:
     * tagName {sting} - name of tag to delete
-    * 
+    * callback {function} - optional callback
     * Effect:
     * deletes a tag on SystemLink cloud
     * 

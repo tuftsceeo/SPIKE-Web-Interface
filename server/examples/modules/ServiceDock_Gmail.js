@@ -18,6 +18,9 @@ class servicegmail extends HTMLElement {
 
         this.active = false; // whether the service was activated
         this.service = new Service_Gmail(); // instantiate a service object ( one object per button )
+        this.proceed = false; // if there are credentials input
+        this.APIKey;
+        this.clientID;
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -67,10 +70,16 @@ class servicegmail extends HTMLElement {
 
         // when ServiceDock button is double clicked
         this.addEventListener("click", async function () {
-            // check active flag so once activated, the service doesnt reinit
             if (!this.active) {
+                this.popUpBox();
+            }
+
+            // check active flag so once activated, the service doesnt reinit
+            if ( !this.active && this.proceed ) {
+
                 console.log("activating service");
-                var initSuccessful = await this.service.init();
+
+                var initSuccessful = await this.service.init(this.APIKey, this.clientID);
                 if (initSuccessful) {
                     this.active = true;
                     status.style.backgroundColor = "green";
@@ -85,6 +94,83 @@ class servicegmail extends HTMLElement {
 
     }
 
+    /* Ask user for API credentials */
+    popUpBox() {
+        
+        /* API credentials list (add for API accordingly)*/
+        var APIKeyExists = false;
+        var clientIDExists = false;
+
+        var APIKeyResult = prompt("Please enter your Gmail API Key:", "AIzaSyCAYc49qBvn6aY2nPPskx5yqx811kzDubU");
+        var clientIDResult = prompt("Please enter your Gmail API client ID:", "488852657628-hdh5rfov7mm1n5ta4lcpcr3gk1n4890m.apps.googleusercontent.com");
+        
+        // API key
+        if (APIKeyResult == null || APIKeyResult == "") {
+            console.log("You inserted no API key")
+            APIKeyExists = false;
+        }
+        else {
+            APIKeyExists = true;
+            this.APIKey = APIKeyResult;
+        }
+
+        // client ID
+        if ( clientIDResult == null || clientIDResult == "" ) {
+            console.log("You inserted no client ID");
+            clientIDExists = false;
+        }
+        else {
+            clientIDExists = true;
+            this.clientID = clientIDResult;
+        }
+
+        if ( APIKeyExists && clientIDExists ) {
+            this.proceed = true;
+        }
+
+    }
+
+    /* for Service's API credentials */
+
+    static get observedAttributes() {
+        return ["apikey", "clientid"];
+    }
+
+    get apikey() {
+        return this.getAttribute("apikey");
+    }
+
+    get clientid() {
+        return this.getAttribute("clientid");
+    }
+
+    set apikey(val) {
+        if (val) {
+            this.setAttribute("apikey", val);
+        }
+        else {
+            this.removeAttribute("apikey");
+        }
+    }
+
+    set clientid(val) {
+        if (val) {
+            this.setAttribute("clientid", val);
+        }
+        else {
+            this.removeAttribute("clientid");
+        }
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        if ( name == "apikey" ) {
+            this.APIKey = newValue;
+        }
+        else if ( name == "clientid" ) {
+            this.clientID = newValue;
+        }
+    }
+
     /* get the Service_SPIKE object */
     getService() {
         return this.service;
@@ -95,16 +181,6 @@ class servicegmail extends HTMLElement {
         return this.active;
     }
 
-    // initialize the service (is not used in this class but available for use publicly)
-    async init() {
-        var initSuccess = await this.service.init();
-        if (initSuccess) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
 }
 
 // when defining custom element, the name must have at least one - dash 
@@ -139,8 +215,8 @@ function Service_Gmail() {
     //////////////////////////////////////////
 
     // Client ID and API key from the Developer Console
-    var CLIENT_ID = '488852657628-hdh5rfov7mm1n5ta4lcpcr3gk1n4890m.apps.googleusercontent.com';
-    var API_KEY = 'AIzaSyCAYc49qBvn6aY2nPPskx5yqx811kzDubU';
+    var CLIENT_ID = 'CLIENT ID';
+    var API_KEY = 'API KEY';
 
     var googleSignedIn = false;
 
@@ -158,13 +234,25 @@ function Service_Gmail() {
 
     /* init() - initialize service
     *
+    * Parameters:
+    * APIKeyInput
+    * clientIDInput
+    * 
     * Effect:
     * - executes the callback function
     *
     * Note:
     * This function needs to be executed after executeAfterInit() but before all other functions
     */
-    async function init() {
+    async function init(APIKeyInput, clientIDInput) {
+
+        if ( APIKeyInput !== undefined ) {
+            API_KEY = APIKeyInput;
+        } 
+        if ( clientIDInput !== undefined ) {
+            CLIENT_ID = clientIDInput;
+        }
+
         // initialize Google API client  load the auth2 library and API client library.
         await gapi.load("client:auth2", initClient);
 
