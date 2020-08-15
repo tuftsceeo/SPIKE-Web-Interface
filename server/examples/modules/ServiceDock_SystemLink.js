@@ -168,6 +168,16 @@ LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 */
 
+/**
+ * 
+ * @class Service_SystemLink
+ * // if you're using ServiceDock
+ * var mySL = document.getElemenyById("service_systemlink").getService();
+ * // if you're not using ServiceDock
+ * var mySL = new Service_SystemLink();
+ * 
+ * mySL.init();
+ */
 function Service_SystemLink() {
 
     //////////////////////////////////////////
@@ -194,20 +204,16 @@ function Service_SystemLink() {
     //                                      //
     //////////////////////////////////////////
 
-    /* init() - initialize SystemLink_Service
-    *
-    * Parameters:
-    * OPTIONAL {APIKeyInput} (string) - SYstemlink APIkey to init service with
-    * OPTIONAL {pollIntervalInput} (int) - interval at which to get tags from the cloud in MILISECONDS
-    * Effect: 
-    * - defines global variable APIKey for use in other functions
-    * 
-    * Returns:
-    * {boolean} - true if initialization was successful, else false
-    * 
-    * Note:
-    * This function needs to be executed first before executing any other public functions of this class
-    */
+    /** <h4> initialize SystemLink_Service </h4>
+     * <p> Starts polling the System Link cloud </p>
+     * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
+     * 
+     * @public
+     * @param {string} APIKeyInput SYstemlink APIkey
+     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS
+     * @returns {boolean} True if service was successsfully initialized, false otherwise
+     * 
+     */
     async function init(APIKeyInput, pollIntervalInput) {
 
         // if an APIKey was specified
@@ -243,45 +249,43 @@ function Service_SystemLink() {
         }
     }
 
-    /* executeAfterInit() - get the callback function to execute after service is initialized
-    *
-    * Parameter:
-    * {callback} (function) - function to execute after initialization
-    * Effect:
-    * - assigns global variable funcAtInit a pointer to callback function
-    *
-    * Note:
-    * This function needs to be executed before calling init()
-    */
+    /** <h4> Get the callback function to execute after service is initialized </h4>
+     * <p> <em> This function needs to be executed before calling init() </em> </p>
+     * 
+     * @public
+     * @param {function} callback function to execute after initialization
+     * @example
+     * mySL.executeAfterInit( function () {
+     *     var tagsInfo = await getTagsInfo();
+     * })
+     */
     function executeAfterInit(callback) {
+        // Assigns global variable funcAtInit a pointer to callback function
         funcAtInit = callback;
     }
 
-
-    /* getTagsInfo() - return the tagsInfo global variable
-    *
-    * Returns:
-    * {tagsInfo} (object) - object containing basic information about currently existing tags in the cloud
-    * // USAGE //
-    * var tagsInfo = await getTagsInfo();
-    * tagsInfo[{string of tag name}].value for value of tag 
-    * tagsInfo[{string of tag name}].type for datatype of tag
-    */
+    /** <h4> Return the tagsInfo global variable </h4>
+     * 
+     * @public
+     * @returns basic information about currently existing tags in the cloud
+     * @example
+     * var tagsInfo = await mySL.getTagsInfo();
+     * var astringValue = tagsInfo["astring"]["value"];
+     * var astringType = tagsInfo["astring"]["type"];
+     */
     async function getTagsInfo() {
         return tagsInfo;
     }
 
-    /* setTagValue() - change the current value of a tag on SystemLink cloud
-    *
-    * Parameters:
-    * tagName {string} - name of tag to change
-    * newValue {any var} - value to assign
-    * callback {function} - optional callback
-    * 
-    * Effect:
-    * - changes the value of a tag on the cloud
-    */
+    /** <h4> Change the current value of a tag on SystemLink cloud </h4>
+     * 
+     * @public
+     * @param {string} tagName 
+     * @param {any} newValue 
+     * @param {function} callback 
+     */
     async function setTagValue(tagName, newValue, callback) {
+        // changes the value of a tag on the cloud
         changeValue(tagName, newValue, function(valueChanged) {
             if (valueChanged) {
                 typeof callback === 'function' && callback();
@@ -289,9 +293,12 @@ function Service_SystemLink() {
         });
     }
 
-    /* getTagValue() - get the current value of a tag on SystemLink cloud
-    *
-    */
+    /** <h4> Get the current value of a tag on SystemLink cloud </h4>
+     * 
+     * @public
+     * @param {string} tagName 
+     * @returns {any} current value of tag
+     */
     async function getTagValue(tagName) {
 
         var currentValue = tagsInfo[tagName].value;
@@ -299,48 +306,45 @@ function Service_SystemLink() {
         return currentValue;
     }
 
-
-
-    /* isActive() - get whether the Service was initialized or not
-    *
-    * Returns:
-    * {serviceActive} (boolean) - whether Service was initialized or not
-    */
+    /** <h4> Get whether the Service was initialized or not </h4>
+     * 
+     * @public
+     * @returns {boolean} whether Service was initialized or not
+     */
     function isActive() {
         return serviceActive;
     }
 
-    /* setAPIKey() - change the APIKey
-    *
-    * Effect:
-    * - changes the global variable APIKey
-    * 
-    */
+    /** <h4> Change the APIKey </h4>
+     * 
+     * @param {string} APIKeyInput 
+     */
     function setAPIKey(APIKeyInput) {
+        // changes the global variable APIKey
         APIKey = APIKeyInput;
     }
-
-    /* createTag() - create a new tag
-    *
-    * Parameter:
-    * tagName {sting} - name of tag to create
-    * tagValue {object} - value of tag to assign tag after creation
-    * callback {function} - optional callback function
-    * 
-    * Effect:
-    * - Creates new tag if it the tagName doesn't exist
-    * - updates tag if the tagName exists
-    * 
-    */
+    
+    /** <h4> Create a new tag </h4>
+     * 
+     * @public
+     * @param {string} tagName name of tag to create
+     * @param {any} tagValue value to assign the tag after creation
+     * @param {function} callback optional callback
+     */
     async function createTag(tagName, tagValue, callback) {
         
+        // get the SystemLink formatted data type of tag
         var valueType = getValueType(tagValue);
 
+        // create a tag with the name and data type. If tag exists, it still returns successful response
         createNewTagHelper(tagName, valueType, function (newTagCreated) {
+            
+            // after tag is created, assign a value to it
             changeValue(tagName, tagValue, function (newTagValueAssigned) {
+
+                // execute callback if successful
                 if (newTagCreated) {
                     if (newTagValueAssigned) {
-                        console.log("ah");
                         typeof callback === 'function' && callback();
                     }
                 }
@@ -348,16 +352,14 @@ function Service_SystemLink() {
         })
     }
 
-    /* deleteTag() - delete tag
-    *
-    * Parameter:
-    * tagName {sting} - name of tag to delete
-    * callback {function} - optional callback
-    * Effect:
-    * deletes a tag on SystemLink cloud
-    * 
-    */
+    /** <h4> Delete tag </h4>
+     * 
+     * @public
+     * @param {string} tagName name of tag to delete
+     * @param {function} callback optional callback
+     */
     async function deleteTag(tagName, callback) {
+        // delete the tag on System Link cloud
         deleteTagHelper(tagName, function (tagDeleted) {
             if ( tagDeleted ) {
                 typeof callback === 'function' && callback();
@@ -371,20 +373,23 @@ function Service_SystemLink() {
     //                                      //
     //////////////////////////////////////////
 
-    //sleep function
+
+    /** sleep function
+     * 
+     * @private
+     * @param {integer} ms 
+     * @returns {Promise}
+     */
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /* checkAPIKey() - check if Systemlink API key is valid for use
-    * 
-    * Parameters:
-    * {apikey} (string) - Systemlink API key
-    * 
-    * Return: 
-    * {Promise} - if success: resolve(true)
-    *           - if fail: reject(error)
-    */
+    /** <h4> Check if Systemlink API key is valid for use </h4>
+     * 
+     * @private
+     * @param {string} APIKeyInput 
+     * @returns {Promise} resolve(true) or reject(error)
+     */
     async function checkAPIKey(APIKeyInput) {
         return new Promise(async function (resolve, reject) {
             var apiKeyAuthURL = "https://api.systemlinkcloud.com/niauth/v1/auth";
@@ -413,16 +418,11 @@ function Service_SystemLink() {
         })
     }
 
-    /* updateTagsInfo() - assign list of tags existing in the cloud to {tagPaths} global variable
-    * 
-    * Parameters:
-    * - callback {function} rest of init after tagsInfo is initialized
-    * 
-    * Effect:
-    * modifies global variable {tagPaths}
-    * continuously send HTTP requests to SL Cloud (ASYNC INTERVAL)
-    * 
-    */
+    /** <h4> Assign list of tags existing in the cloud to {tagPaths} global variable </h4>
+     * 
+     * @private
+     * @param {function} callback 
+     */
     async function updateTagsInfo(callback) {
 
         // get the tags the first time before running callback
@@ -453,20 +453,11 @@ function Service_SystemLink() {
 
     }
 
-    /* getTagsInfoFromCloud() - get the info of a tag in the cloud
-    * 
-    * Parameters:
-    * Callback {Function}
-    *
-    * Effect:
-    * callback(collectedTagsInfo) if success
-    * callback(false) if fail
-    * ex) a tag object = { type: "BOOLEAN", value: TRUE }
-    * 
-    * Note:
-    * The return is not the actual value, but an object, in which 
-    * there is the value of the tag and the value's datatype
-    */
+    /** <h4> Get the info of a tag in the cloud </h4>
+     * 
+     * @private
+     * @param {function} callback 
+     */
     async function getTagsInfoFromCloud(callback) {
 
         // make a new promise
@@ -550,18 +541,13 @@ function Service_SystemLink() {
         )
     }
 
-
-    /* changeValue() - send PUT request to SL cloud API and change the value of a tag
-    *
-    * Parameters:
-    * {tagPath} - string of the name of the tag
-    * {newValue} - value to assign tag
-    * 
-    * Effect:
-    * callback(true) if success
-    * callback(false) if fail
-    * 
-    */
+    /** <h4> Send PUT request to SL cloud API and change the value of a tag </h4>
+     * 
+     * @private
+     * @param {string} tagPath string of the name of the tag
+     * @param {any} newValue value to assign tag
+     * @param {function} callback
+     */
     async function changeValue(tagPath, newValue, callback) {
         new Promise(async function (resolve, reject) {
 
@@ -614,17 +600,13 @@ function Service_SystemLink() {
         )
     }
 
-    /* createNewTagHelper() - send PUT request to SL cloud API and change the value of a tag
-    *
-    * Parameters:
-    * tagPath {string} - string of the name of the tag
-    * tagType {string} - SystemLink format dataType of tag
-    * callback {function} - callback function 
-    * 
-    * Effect:
-    * callback(true) if success
-    * callback(false) if fail
-    */
+    /** Send PUT request to SL cloud API and change the value of a tag
+     * 
+     * @private
+     * @param {string} tagPath name of the tag
+     * @param {string} tagType SystemLink format data type of tag
+     * @param {function} callback 
+     */
     async function createNewTagHelper(tagPath, tagType, callback) {
         new Promise(async function (resolve, reject) {
 
@@ -664,6 +646,12 @@ function Service_SystemLink() {
         )
     }
 
+    /** <h4> Delete the tag on the System Link cloud </h4>
+     * 
+     * @private
+     * @param {string} tagName 
+     * @param {function} callback 
+     */
     async function deleteTagHelper ( tagName, callback ) {
         new Promise(async function (resolve, reject) {
 
@@ -699,17 +687,15 @@ function Service_SystemLink() {
         )
     }
 
-    /* sendXMLHTTPRequest() - helper function for sending XMLHTTPRequests
-    *
-    * Parameters:
-    * {method} (string) - HTTP method (ex. "GET" or "PUT")
-    * {URL} (string) - the URL path to send the request to
-    * {APIKeyInput} - Systemlink APIKey to use in request for credentials
-    * 
-    * Return:
-    * {request} ( XMLHttpRequest object)
-    *
-    */
+    /** Helper function for sending XMLHTTPRequests
+     * 
+     * @private
+     * @param {string} method 
+     * @param {string} URL 
+     * @param {string} APIKeyInput 
+     * @param {object} body 
+     * @returns {object} XMLHttpRequest
+     */
     async function sendXMLHTTPRequest(method, URL, APIKeyInput, body) {
         var request = new XMLHttpRequest();
         request.open(method, URL, true);
@@ -735,14 +721,12 @@ function Service_SystemLink() {
         return request;
     }
 
-    /* getValueType() - helper function for getting data types in systemlink format
-    *
-    * Parameters:
-    * {new_value) - the variable containing the new value of a tag
-    *
-    * Return:
-    * (string) - data type of tag
-    */
+    /** <h4> Helper function for getting data types in systemlink format </h4>
+     * 
+     * @private
+     * @param {any} new_value the variable containing the new value of a tag
+     * @returns {string} data type of tag
+     */
     function getValueType(new_value) {
         //if the value is not a number
         if (isNaN(new_value)) {
@@ -766,15 +750,13 @@ function Service_SystemLink() {
         }
     }
 
-    /* getValueType() - helper function for converting values to correct type based on datatype
-    *
-    * Parameters:
-    * {valueType} - typeof value in systemlink format
-    * {value} - value to convert
-    * 
-    * Return:
-    * (value) - value in correct data type
-    */
+    /** <h4> Helper function for converting values to correct type based on data type </h4>
+     * 
+     * @private
+     * @param {string} valueType data type of value in systemlink format
+     * @param {string} value value to convert
+     * @returns {any} converted value
+     */
     function getValueFromType(valueType, value) {
         if (valueType == "BOOLEAN") {
             if (value == "true") {
