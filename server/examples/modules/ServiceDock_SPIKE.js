@@ -96,17 +96,7 @@ class servicespike extends HTMLElement {
     getClicked() {
         return this.active;
     }
-    
-    // initialize the service (is not used in this class but available for use publicly)
-    async init() {
-        var initSuccess = await this.service.init();
-        if (initSuccess) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+
 }
 
 // when defining custom element, the name must have at least one - dash 
@@ -309,7 +299,6 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the callback function to execute after service is initialized. </h4>
-     * <p> Assigns global variable funcAtInit a pointer to callback function. </p>
      * <p> <em> This function needs to be executed before calling init() </em> </p>
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
@@ -319,6 +308,7 @@ function Service_SPIKE() {
      * })
      */
     function executeAfterInit(callback) {
+        // Assigns global variable funcAtInit a pointer to callback function
         funcAtInit = callback;
     }
 
@@ -695,7 +685,7 @@ function Service_SPIKE() {
     * <p> light_matrix </p>
     */
     PrimeHub = function() {
-        var yawDisplacement = 0;
+        var newOrigin = 0;
         
         /** PrimeHub.left_button
         * @class
@@ -820,6 +810,7 @@ function Service_SPIKE() {
          * @param {string}
          */
         light_matrix.show_image = function show_image(image) {
+
         }
         /** Sets the brightness of one pixel (one of the 25 LED) on the Light Matrix.
          * 
@@ -960,7 +951,9 @@ function Service_SPIKE() {
          * @returns {integer} yaw angle
          */
         motion_sensor.get_yaw_angle = function get_yaw_angle() {
-            return hub.pos[0];
+            var currPos = hub.pos[0];
+
+            return currPos;
         }
 
         /** “Pitch” the is rotation around the left-right (transverse) axis.
@@ -994,10 +987,6 @@ function Service_SPIKE() {
          */
         motion_sensor.get_orientation = function get_orientation() {
             return lastHubOrientation;
-        }
-
-        motion_sensor.reset_yaw_angle = function reset_yaw_angle() {
-            
         }
 
         return {
@@ -1530,10 +1519,7 @@ function Service_SPIKE() {
         var leftMotor = ports[leftPort];
         var rightMotor = ports[rightPort];
 
-        var leftMotorData = leftMotor.data;
-        var rightMotorData = rightMotor.data;
-
-        var DistanceTravelToRevolutionRatio = undefined;
+        var DistanceTravelToRevolutionRatio = 17.6;
         
         // check if device is a motor
         if (leftMotor.device != "smallMotor" && leftMotor.device != "bigMotor") {
@@ -1564,179 +1550,6 @@ function Service_SPIKE() {
                 // convert to cm
                 DistanceTravelToRevolutionRatio = amount * 2.54;
             }
-        }
-        /** Start the 2 motors simultaneously to move a Driving Base.
-         * 
-         * @param {number} amount The quantity to move in relation to the specified unit of measurement.
-         * @param {string} [unit='cm'] 'cm','in','rotations','degrees','seconds'
-         * @param {integer} [steering=0] The direction and the quantity to steer the Driving Base. [-100 to 100]
-         * @param {integer} [speed=defaultSpeed] The motor speed. [-100 to 100]
-         * @todo implement travel by distance (how does this work when random sized wheels are used?)
-         */
-        function move (amount, unit, steering, speed) {
-            var steeringToUse;
-
-            var leftSpeed;
-            var rightSpeed;
-
-            // steering not set or 0, go straight
-            if ( typeof steering != "number" || steering == 0 ) {
-                steeringToUse = 0;
-            }
-            // steering setting was set 
-            else {
-                // turn left
-                if (steering < 0) {
-                    // floor/ceiling values when they are out of range
-                    if (steering < -100) {
-                        steeringToUse = -100;
-                    } else {
-                        steeringToUse = steering;
-                    }
-                }
-                // turn right
-                else {
-                    // floor/ceiling values when they are out of range
-                    if (steering > 100) {
-                        steeringToUse = 100;
-                    } else {
-                        steeringToUse = steering;
-                    }
-                }
-            }
-
-            /* assign leftSpeed and rightSpeed */
-            // see if speed is defined 
-            if (typeof speed != "number") {
-                leftSpeed = defaultSpeed;
-                rightSpeed = defaultSpeed;
-            }
-            else {
-                leftSpeed = speed;
-                rightSpeed = speed;
-            }
-
-            // set speed for turning left
-            if ( steeringToUse < 0 ) {
-                if (steeringToUse == -100) {
-                    leftSpeed *= -1;
-                }
-                else {
-                    rightSpeed = steeringToUse / rightSpeed;
-                }
-            }
-            // set speed for turning right
-            else if ( steeringToUse > 0 ) {
-                if (steeringToUse == 100) {
-                    rightSpeed *= -1;
-                }
-                else {
-                    leftSpeed = steeringToUse / leftSpeed;
-                }
-            }
-
-            // assume unit is 'cm' when undefined
-            if ( unit == "cm" || unit !== undefined ) {
-                // get revolutions to turn the wheel
-                var revolutions = DistanceTravelToRevolutionRatio / amount;
-                var degrees = revolutions * 360;
-
-                UJSONRPC.moveTankDegrees(degrees, leftSpeed, rightSpeed, leftPort, rightPort, 0);
-            } 
-            else if ( unit == "in" ) {
-                // get revolutions to turn the wheel from converted inches
-                var revolutions = ( DistanceTravelToRevolutionRatio/2.54 ) / amount;
-                var degrees = revolutions * 360;
-
-                UJSONRPC.moveTankDegrees(degrees, leftSpeed, rightSpeed, leftPort, rightPort, 0);
-            }
-            else if ( unit == "rotations" ) {
-                var revolutions = amount;
-                var degrees = revolutions * 360;
-
-                UJSONRPC.moveTankDegrees(degrees, leftSpeed, rightSpeed, leftPort, rightPort, 0);
-            }
-            else if ( unit == "degrees" ) {
-                var degrees = amount;
-
-                UJSONRPC.moveTankDegrees(degrees, leftSpeed, rightSpeed, leftPort, rightPort, 0);
-            }
-            else if ( unit == "seconds" ) {
-                var seconds = amount;
-
-                UJSONRPC.moveTankTime(seconds, leftSpeed, rightSpeed, leftPort, rightPort, 0);
-            }
-        }
-
-        /** Start the 2 motors simultaneously to move a Driving Base.
-         * 
-         * @param {integer} steering 
-         * @param {integer} speed 
-         * @todo Implement this function
-         */
-        function start (steering, speed) {
-            var steeringToUse;
-
-            var leftSpeed;
-            var rightSpeed;
-
-            // steering not set or 0, go straight
-            if (typeof steering != "number" || steering == 0) {
-                steeringToUse = 0;
-            }
-            // steering setting was set 
-            else {
-                // turn left
-                if (steering < 0) {
-                    // floor/ceiling values when they are out of range
-                    if (steering < -100) {
-                        steeringToUse = -100;
-                    } else {
-                        steeringToUse = steering;
-                    }
-                }
-                // turn right
-                else {
-                    // floor/ceiling values when they are out of range
-                    if (steering > 100) {
-                        steeringToUse = 100;
-                    } else {
-                        steeringToUse = steering;
-                    }
-                }
-            }
-
-            /* assign leftSpeed and rightSpeed */
-            // see if speed is defined 
-            if (typeof speed != "number") {
-                leftSpeed = defaultSpeed;
-                rightSpeed = defaultSpeed;
-            }
-            else {
-                leftSpeed = speed;
-                rightSpeed = speed;
-            }
-
-            // set speed for turning left
-            if (steeringToUse < 0) {
-                if (steeringToUse == -100) {
-                    leftSpeed *= -1;
-                }
-                else {
-                    rightSpeed = steeringToUse / rightSpeed;
-                }
-            }
-            // set speed for turning right
-            else if (steeringToUse > 0) {
-                if (steeringToUse == 100) {
-                    rightSpeed *= -1;
-                }
-                else {
-                    leftSpeed = steeringToUse / leftSpeed;
-                }
-            }
-
-            UJSONRPC.moveTankSpeeds(leftSpeed, rightSpeed, leftPort, rightPort);
         }
 
         /** Starts moving the Driving Base
@@ -1776,10 +1589,9 @@ function Service_SPIKE() {
 
         return {
             stop: stop,
-            start: start,
-            move: move,
             set_motor_rotation: set_motor_rotation,
-            start_tank: start_tank
+            start_tank: start_tank,
+            start_tank_at_power: start_tank_at_power
         }
 
     }
