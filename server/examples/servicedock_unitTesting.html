@@ -10,12 +10,13 @@
     <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
-            <service-systemlink id="service_systemlink"></service-systemlink>
+            <service-systemlink id="service_systemlink" ></service-systemlink>
         </div>
         <div id = "output"></div>
         <div id = "SPIKEbox">
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
+                <option id="motorPairOPTION"> motorPair functions </option>
                 <option id="motionOPTION"> motion sensor functions </option>
                 <option id="forceOPTION"> force sensor functions </option>
                 <option id="speakerOPTION"> Primehub.speaker functions </option>
@@ -31,12 +32,24 @@
                 <input type="button" id="motorPosition" class="SPIKEtestCase motor" value="motor get position">
                 <input type="button" id="getPower" class="SPIKEtestCase motor" value="motor get power">
                 <input type="button" id="getSpeed" class="SPIKEtestCase motor" value="motor get speed">
-                
+
+                <!-- motor pair functions -->
+                <input type="button" id="motorPairMove" class="SPIKEtestCase motorPair" value="motorPair move(100, 'cm', 0, 100)">
+                <input type="button" id="motorPairMoveLeft" class="SPIKEtestCase motorPair" value="motorPair move left (steering: -100) ">
+                <input type="button" id="motorPairMoveRight" class="SPIKEtestCase motorPair" value="motorPair move right (steering: 100)">
+                <input type="button" id="motorPairMoveLeftSlightly" class="SPIKEtestCase motorPair" value="motorPair move left (steering: -50) ">
+                <input type="button" id="motorPairMoveRightSlightly" class="SPIKEtestCase motorPair" value="motorPair move right (steering: 50)">
+                <input type="button" id="motorPairStart" class="SPIKEtestCase motorPair" value="motorPair start(0, 100)">
+                <input type="button" id="motorPairStartLeft" class="SPIKEtestCase motorPair" value="motorPair start left">
+                <input type="button" id="motorPairStartRight" class="SPIKEtestCase motorPair" value="motorPair start right">
+                <input type="button" id="motorPairStop" class="SPIKEtestCase motorPair" value="motorPair stop()">
                 <!-- motion sensor functions-->
                 <input type="button" id="waitForNewGesture" class="SPIKEtestCase motion" value="wait_for_new_gesture test">
                 <input type="button" id="wasGesture" class="SPIKEtestCase motion" value="was_gesture test">
                 <input type="button" id="waitForNewOri" class="SPIKEtestCase motion" value="wait_for_new_orientation test">
                 <input type="button" id="getAngles" class="SPIKEtestCase motion" value = "get angles test">
+                <input type="button" id="resetYaw" class="SPIKEtestCase motion" value="reset yaw angle() test">
+                <input type="button" id="resetYawSource" class="SPIKEtestCase motion" value="reset yaw angle() source code test">
                 <input type="button" id="getGesture" class="SPIKEtestCase motion" value="getGesture() test">
                 <input type="button" id="getOrientation" class="SPIKEtestCase motion" value="getOrientation() test">
                 
@@ -64,10 +77,10 @@
                 <input type="button" id="testNewKeyword" class="SPIKEtestCase misc" value="new Motor() vs Motor()">
                 <input type="button" id="testNewKeyword1" class="SPIKEtestCase misc" value="Motor() vs Motor() declared without 'new' keyword">
                 <input type="button" id="getMotorPorts" class="SPIKEtestCase misc" value="get motorports">
+            
+                <div id="chart"></div>
             </div>
         </div>
-
-
 
         <div id="SLbox">
             <div>
@@ -110,6 +123,7 @@
     </body>
     <script>
         var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = new mySPIKE.PrimeHub();
         var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
 
@@ -159,6 +173,101 @@
         })
 
         //                                      //
+        //           MotorPair Tests            //
+        //                                      //
+
+        var testMotorPairStop = document.getElementById("motorPairStop");
+        testMotorPairStop.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.stop() #######");
+            console.log("Test: stop the motorPair of motors connected to A and B");
+
+            var motorPair = new mySPIKE.MotorPair("A","B");
+
+            motorPair.stop();
+
+            console.log("###### ENDING UNIT TEST ON motorPair.stop() #######");
+        })
+
+        var testMotorPairMove = document.getElementById("motorPairMove");
+        testMotorPairMove.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 0, 100) #######");
+            console.log("Test: moving the driving base 100 cm with 0 steering on speed of 100");
+
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+
+            motorPair.move(100, "cm", 0, 100);
+
+            console.log("Expected result: base moving forward without turning and stopping at 100 cm");
+
+            console.log("###### ENDING UNIT TEST ON motorPair.move() #######");
+        })
+
+        var testMotorPairStart = document.getElementById("motorPairStart");
+        testMotorPairStart.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.start() #######");
+            console.log(" Test: moving the drving base with 0 steering on speed of 100");
+
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+
+            motorPair.start(0, 100);
+
+            console.log("Expected result: base moving forward without turning");
+
+            console.log("###### ENDING UNIT TEST ON motorPair.start() #######");
+        })
+
+        var testMotorPairMoveLeft = document.getElementById("motorPairMoveLeft");
+        testMotorPairMoveLeft.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', -100, 100) #######");
+            
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+
+            motorPair.move(100, "cm", -100, 100);
+
+            console.log("Expected result: driving base moving left and stopping")
+            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', -100, 100) #######");
+
+        })
+
+        var testMotorPairMoveRight = document.getElementById("motorPairMoveRight");
+        testMotorPairMoveRight.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 100, 100) #######");
+            
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+            
+            motorPair.move(100, "cm", 100, 100);
+            
+            console.log("Expected result: driving base moving right and stopping")
+            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', 100, 100) #######");
+        })
+
+
+        var testMotorPairMoveLeftSlightly = document.getElementById("motorPairMoveLeftSlightly");
+        testMotorPairMoveLeftSlightly.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', -50, 100) #######");
+
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+
+            motorPair.move(100, "cm", -50, 100);
+
+            console.log("Expected result: driving base moving left SLIGHTLY and stopping")
+            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', -50, 100) #######");
+
+        })
+
+        var testMotorPairMoveRightSlightly = document.getElementById("motorPairMoveRightSlightly");
+        testMotorPairMoveRightSlightly.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 50, 100) #######");
+
+            var motorPair = new mySPIKE.MotorPair("A", "B");
+
+            motorPair.move(100, "cm", 50, 100);
+
+            console.log("Expected result: driving base moving right SLIGHTLY and stopping")
+            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', 50, 100) #######");
+        })
+
+        //                                      //
         //         Motion Sensor Tests          //
         //                                      //
 
@@ -168,7 +277,7 @@
             console.log("###### BEGINNING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
             console.log("Test: Program will detect either 'tapped' or 'doubletapped' gestures. Tap the hub display");
 
-            var hub = mySPIKE.PrimeHub();
+            
             hub.motion_sensor.wait_for_new_gesture( function(gesture) {
 
                 console.log(">>> in callback")
@@ -198,8 +307,6 @@
             console.log("Test (First Time): Sees if 'doubletapped' gesture has occurred since the beginning of the program (for the first use).");
             console.log("Test (Second Time): Sees if 'doubletapped' gesture has occurred since the last execution of was_gesture().");
             
-            var hub = mySPIKE.PrimeHub();
-            
             if (hub.motion_sensor.was_gesture("doubletapped")) {
                 console.log(">>> doubletapped did occur");
             } else {
@@ -215,7 +322,6 @@
             console.log("###### BEGINNING UNIT TEST ON motion_sensor.wait_for_new_orientation(callback) #######")
             console.log("Test (First Time): the returned orientation will be the current orientation.");
             console.log("Test (Second Time): Sees if there's a new orientation different from the previously detected");
-            var hub = mySPIKE.PrimeHub();
 
             console.log(">>> change the orientation of the hub");
             hub.motion_sensor.wait_for_new_orientation( function ( orientation ) {
@@ -231,7 +337,7 @@
         var testGetAngles = document.getElementById("getAngles");
         testGetAngles.addEventListener("click", async function () {
             console.log("###### BEGINNING UNIT TEST ON motion_sensor get_***_angle() functions #######");
-            var hub = new mySPIKE.PrimeHub();
+            
             console.log("yaw angle: ", hub.motion_sensor.get_yaw_angle());
             console.log("pitch angle: ", hub.motion_sensor.get_pitch_angle());
             console.log("roll angle: ", hub.motion_sensor.get_roll_angle());
@@ -242,8 +348,6 @@
         testGetGesture.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON motion_sensor.get_gesture() #######");
             
-            var hub = new mySPIKE.PrimeHub();
-            
             var gesture = hub.motion_sensor.get_gesture();
             console.log("gesture: ", gesture);
             
@@ -253,13 +357,159 @@
         var testGetOrientation = document.getElementById("getOrientation");
         testGetOrientation.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON motion_sensor.get_orientation() #######");
-            
-            var hub = new mySPIKE.PrimeHub();
+
 
             var orientation = hub.motion_sensor.get_orientation();
             console.log("orientation: ", orientation);
 
             console.log("###### ENDING UNIT TEST ON motion_sensor.get_orientation() #######");
+        })
+
+        var testResetYaw = document.getElementById("resetYaw");
+        testResetYaw.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON motion_sensor.reset_yaw_angle() #######");
+            console.log("Test: reset yaw angle and get yaw angle after 3 seconds");
+            
+
+            hub.motion_sensor.reset_yaw_angle();
+
+            setTimeout(function () {
+                console.log(hub.motion_sensor.get_yaw_angle());
+            }, 3000 );
+
+            console.log("###### ENDING UNIT TEST ON motion_sensor.reset_yaw_angle() #######");
+        })
+
+        var testResetYawSource = document.getElementById("resetYawSource");
+        testResetYawSource.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST (logic) ON motion_sensor.reset_yaw_angle() #######");
+            /* randomly generate current position */
+            // get the digits
+            var currPos = Math.floor(Math.random() * 1000);
+            while ( currPos > 180 ) {
+                currPos = Math.floor(Math.random() * 1000)
+            }
+
+            // get the sign
+            var negativeOrPositive = Math.random() * 1000;
+            if (negativeOrPositive > 500) {
+                var currPos = currPos * -1;
+            }
+
+            console.log("current position: ", currPos)
+
+            /* randomly generate new origin */
+            // get the digits
+            var newOrigin = Math.floor(Math.random() * 1000);
+            while (newOrigin > 180) {
+                newOrigin = Math.floor(Math.random() * 1000);
+            }
+
+            // get the sign
+            var negativeOrPositive = Math.random() * 1000;
+            if (negativeOrPositive > 500) {
+                var newOrigin = newOrigin * -1;
+            }
+
+            console.log("new origin", newOrigin);
+
+            var difference = currPos - newOrigin;
+
+
+            if ( -180 > difference && difference > -360 ) {
+                var newPos = Math.abs(difference) % 180;
+            }
+            else if ( 180 < difference && difference < 360 ) {
+                var newPos = (Math.abs(difference) % 180) * -1;
+            }
+            else {
+                console.log("difference", difference);
+                var newPos = difference % 360;
+            }
+
+            /*
+            var tPos = (currPos - newOrigin) % 180;
+            // newOrigin is higher than currPos
+            if ((newOrigin - currPos) == 180) {
+                var tPos = -180;
+            }
+
+            // newOrigin is lower than currPos
+            else if ((newOrigin - currPos) == -180) {
+                var tPos = 180;
+            }
+
+            // the new origin is below 0 
+            if (newOrigin < 0) {
+                var top = 180 + newOrigin; // the value above newOrigin at which yaw_angle is considered -180
+                // tPos needs to be negative
+                if (currPos > top || currPos < newOrigin) {
+                    if (currPos > top) {
+                        // (top margin + bottom margin) * -1
+                        var tPos = ((180 - currPos) + (180 - newOrigin)) * -1;
+                    }
+                    // newOrigin < 0
+                    // currPos < newOrigin
+                    // Thus, currPos < 0
+                    else {
+                        var tPos = currPos - newOrigin;
+                    }
+                }
+                // tPos needs to be positive
+                else if (currPos < top && currPos > newOrigin) {
+                    if (currPos < 0) {
+                        var tPos = currPos - newOrigin;
+                    }
+                    else {
+                        var tPos = currPos - newOrigin;
+                    }
+                }
+                // tPos needs to be 0
+                else {
+
+                }
+            }
+            // the new origin is above 0
+            else if (newOrigin > 0) {
+                var bottom = -180 + newOrigin; // the value below newOrigin at which yaw_angle is considered 180
+                
+                // tPos needs to be negative
+                if (currPos > bottom && currPos < newOrigin) {
+                    // currPos > bottom ( so a modulo op is NOT needed )
+                    // and currPos < newOrigin ( so tPos needs to be negative )
+
+                    // currPos 
+                    if (currPos < 0) {
+                        var tPos = Math.abs(currPos - newOrigin) * -1;
+                    }
+                    else {
+                        var tPos = currPos - newOrigin
+                    }
+                }
+                // tPos needs to be positive
+                else if (currPos < bottom || currPos > newOrigin) {
+                    // currPos < 0 and newOrigin > 0 and currPos < bottom ( |currPos - newOrigin| >= 180 )
+                    if (currPos < bottom) {
+                        // ( bottom margin + top margin)
+                        var tPos = ((180 + currPos) + (180 - newOrigin));
+                    }
+                    // currPos > 0 and newOrigin > 0 and currPos > newOrigin and |currPos - newOrigin| < 180
+                    else {
+                        var tPos = currPos - newOrigin;
+                    }
+                }
+                // tPos needs to be 0
+                else {
+
+                }
+            }
+            // newOrigin is 0
+            else {
+
+            }
+            */
+
+            console.log("translated position: ", newPos);
         })
 
         //                                      //
@@ -368,7 +618,7 @@
         testButtonIsPressed.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON button.is_pressed() #######");
             console.log("Test: start the test pressing either the left button or the right button");
-            var hub = new mySPIKE.PrimeHub();
+            
             
             var left_button = hub.left_button;
             var right_button = hub.right_button;
@@ -388,7 +638,7 @@
         testButtonWasPressed.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON button.was_pressed() #######");
             console.log("Test: press either the left button or the right button. Then, after some time start the test.");
-            var hub = new mySPIKE.PrimeHub();
+            
             
             var left_button = hub.left_button;
             var right_button = hub.right_button;
@@ -408,7 +658,7 @@
         testButtonWaitPressed.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON button.wait_until_pressed() #######");
             console.log("Test: Start the test. Then, after some time press either left button or right button");
-            var hub = new mySPIKE.PrimeHub();
+            
 
             var left_button = hub.left_button;
             var right_button = hub.right_button;
@@ -433,7 +683,7 @@
         testButtonWaitRelease.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON button.wait_until_released() #######");
             console.log("Test: Start the test. Then, after some time press either left button or right button and release them");
-            var hub = new mySPIKE.PrimeHub();
+            
 
             var left_button = hub.left_button;
             var right_button = hub.right_button;
@@ -679,6 +929,14 @@
             testButtonWaitPressed.style.backgroundColor = "lightgreen";
             testButtonWaitRelease.style.backgroundColor = "lightgreen";
             testButtonWasPressed.style.backgroundColor = "lightgreen";
+            testResetYaw.style.backgroundColor = "red";
+            testMotorPairStop.style.backgroundColor = "lightgreen";
+            testMotorPairMove.style.backgroundColor = "red";
+            //testMotorPairStart
+            testMotorPairMoveLeft.style.backgroundColor = "red";
+            testMotorPairMoveRight.style.backgroundColor = "red";
+            testMotorPairMoveLeftSlightly.style.backgroundColor = "red";
+            testMotorPairMoveRightSlightly.style.backgroundColor = "red";
 
             getTagsInfo.style.backgroundColor = "lightgreen";
             createNewTag.style.backgroundColor = "lightgreen";
@@ -825,6 +1083,18 @@
                 }
 
                 var selectedCases = document.getElementsByClassName("force");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "motorPairOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("motorPair");
                 for (var index = 0; index < selectedCases.length; index++) {
                     var aCase = selectedCases[index];
                     aCase.style.display = "block";
