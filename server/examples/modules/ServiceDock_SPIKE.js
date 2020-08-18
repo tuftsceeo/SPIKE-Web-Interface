@@ -259,9 +259,8 @@ function Service_SPIKE() {
     var funcAfterForceSensorPress = undefined;
     var funcAfterForceSensorRelease = undefined;
 
-    /* flags to destruct callbacks from wait_until functions */
-    var destructFuncAfterForceSensorPress = true;
-    var destructFuncAfterForceSensorRelease = true;
+    /* array that holds the pointers to callback functions to be executed after a UJSONRPC response */
+    var responseCallbacks = [];
 
     //////////////////////////////////////////
     //                                      //
@@ -1010,7 +1009,7 @@ function Service_SPIKE() {
 
         // default settings
         var defaultSpeed = 100;
-        var stopMethod = "coast"; // stop method doesnt seem to work in this current ujsonrpc config
+        var stopMethod = false; // stop method doesnt seem to work in this current ujsonrpc config
         var stallSetting = true;
 
         // check if device is a motor
@@ -1095,13 +1094,14 @@ function Service_SPIKE() {
          * 
          * @param {integer} degrees [0 to 359]
          * @param {integer} speed [-100 to 100]
+         * @param {function} [callback==undefined] Parameters:"stalled" or "done"
          */
-        function run_to_position (degrees, speed) {
+        function run_to_position (degrees, speed, callback = undefined) {
             if ( speed !== undefined && typeof speed == "number" ) {
-                UJSONRPC.motorGoRelPos (port, degrees, speed, stallSetting, stopMethod);
+                UJSONRPC.motorGoRelPos (port, degrees, speed, stallSetting, stopMethod, callback);
             }
             else {
-                UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod);
+                UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
             }
         }
 
@@ -1133,13 +1133,14 @@ function Service_SPIKE() {
          * 
          * @param {integer} seconds 
          * @param {integer} speed [-100 to 100]
+         * @param {function} [callback==undefined] Parameters:"stalled" or "done"
          */
-        function run_for_seconds (seconds, speed) {
+        function run_for_seconds (seconds, speed, callback = undefined) {
             if (speed !== undefined && typeof speed == "number") {
-                UJSONRPC.motorRunTimed (port, seconds, speed, stallSetting)
+                UJSONRPC.motorRunTimed (port, seconds, speed, stallSetting, stopMethod, callback)
             }
             else {
-                UJSONRPC.motorRunTimed(port, seconds, defaultSpeed, stallSetting)
+                UJSONRPC.motorRunTimed(port, seconds, defaultSpeed, stallSetting, stopMethod, callback)
             }
         }
 
@@ -1147,13 +1148,14 @@ function Service_SPIKE() {
          * 
          * @param {integer} degrees 
          * @param {integer} speed [-100 to 100]
+         * @param {function} [callback==undefined] Parameters:"stalled" or "done"
          */
-        function run_for_degrees (degrees, speed) {
+        function run_for_degrees (degrees, speed, callback = undefined) {
             if (speed !== undefined && typeof speed == "number") {
-                UJSONRPC.motorRunDegrees (port, degrees, speed, stallSetting);
+                UJSONRPC.motorRunDegrees (port, degrees, speed, stallSetting, stopMethod, callback);
             }
             else {
-                UJSONRPC.motorRunDegrees(port, degrees, defaultSpeed, stallSetting);
+                UJSONRPC.motorRunDegrees(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
             }
         }
 
@@ -1663,9 +1665,10 @@ function Service_SPIKE() {
      * @param {integer} position 
      * @param {integer} speed 
      * @param {boolean} stall 
-     * @param {integer} stop 
+     * @param {boolean} stop 
+     * @param {function} callback
      */
-    UJSONRPC.motorGoRelPos = async function motorGoRelPos(port, position, speed, stall, stop) {
+    UJSONRPC.motorGoRelPos = async function motorGoRelPos(port, position, speed, stall, stop, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.motor_go_to_relative_position"' +
@@ -1674,8 +1677,9 @@ function Service_SPIKE() {
             ', "position":' + position +
             ', "speed":' + speed +
             ', "stall":' + stall +
-            ', "stop":' + 0 +
+            ', "stop":' + stop +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1686,8 +1690,10 @@ function Service_SPIKE() {
      * @param {integer} time 
      * @param {integer} speed 
      * @param {integer} stall 
+     * @param {boolean} stop
+     * @param {function} callback
      */
-    UJSONRPC.motorRunTimed = async function motorRunTimed(port, time, speed, stall) {
+    UJSONRPC.motorRunTimed = async function motorRunTimed(port, time, speed, stall, stop, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.motor_run_timed"' +
@@ -1696,8 +1702,9 @@ function Service_SPIKE() {
             ', "time":' + time +
             ', "speed":' + speed +
             ', "stall":' + stall +
-            ', "stop":' + 0 +
+            ', "stop":' + stop +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1708,8 +1715,10 @@ function Service_SPIKE() {
      * @param {integer} degrees 
      * @param {integer} speed 
      * @param {integer} stall 
+     * @param {boolean} stop
+     * @param {function} callback
      */
-    UJSONRPC.motorRunDegrees = async function motorRunDegrees(port, degrees, speed, stall) {
+    UJSONRPC.motorRunDegrees = async function motorRunDegrees(port, degrees, speed, stall, stop, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.motor_run_for_degrees"' +
@@ -1718,8 +1727,9 @@ function Service_SPIKE() {
             ', "degrees":' + degrees +
             ', "speed":' + speed +
             ', "stall":' + stall +
-            ', "stop":' + 0 +
+            ', "stop":' + stop +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1731,9 +1741,10 @@ function Service_SPIKE() {
      * @param {integer} rspeed 
      * @param {string} lmotor 
      * @param {string} rmotor 
-     * @param {integer} stop 
+     * @param {boolean} stop
+     * @param {function} callback
      */
-    UJSONRPC.moveTankTime = async function moveTankTime(time, lspeed, rspeed, lmotor, rmotor, stop) {
+    UJSONRPC.moveTankTime = async function moveTankTime(time, lspeed, rspeed, lmotor, rmotor, stop, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.move_tank_time"' +
@@ -1743,8 +1754,9 @@ function Service_SPIKE() {
             ', "rspeed":' + rspeed +
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
-            ', "stop":' + 0 +
+            ', "stop":' + stop +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1756,9 +1768,10 @@ function Service_SPIKE() {
      * @param {integer} rspeed 
      * @param {string} lmotor 
      * @param {string} rmotor 
-     * @param {integer} stop 
+     * @param {boolean} stop
+     * @param {function} callback
      */
-    UJSONRPC.moveTankDegrees = async function moveTankDegrees(degrees, lspeed, rspeed, lmotor, rmotor, stop) {
+    UJSONRPC.moveTankDegrees = async function moveTankDegrees(degrees, lspeed, rspeed, lmotor, rmotor, stop, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.move_tank_degrees"' +
@@ -1768,8 +1781,9 @@ function Service_SPIKE() {
             ', "rspeed":' + rspeed +
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
-            ', "stop":' + 0 +
+            ', "stop":' + stop +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1780,8 +1794,9 @@ function Service_SPIKE() {
      * @param {integer} rspeed 
      * @param {string} lmotor 
      * @param {string} rmotor 
+     * @param {function} callback
      */
-    UJSONRPC.moveTankSpeeds = async function moveTankSpeeds(lspeed, rspeed, lmotor, rmotor) {
+    UJSONRPC.moveTankSpeeds = async function moveTankSpeeds(lspeed, rspeed, lmotor, rmotor, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.move_start_speeds"' +
@@ -1791,6 +1806,7 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1801,8 +1817,9 @@ function Service_SPIKE() {
      * @param {integer} rpower 
      * @param {string} lmotor 
      * @param {string} rmotor 
+     * @param {function} callback
      */
-    UJSONRPC.moveTankPowers = async function moveTankPowers(lpower, rpower, lmotor, rmotor) {
+    UJSONRPC.moveTankPowers = async function moveTankPowers(lpower, rpower, lmotor, rmotor, callback) {
         var randomId = Math.floor((Math.random() * 10000));
         var command = '{"i":' + randomId +
             ', "m": "scratch.move_start_powers"' +
@@ -1812,6 +1829,7 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
+        typeof callback !== undefined && pushResponseCallback(randomId, callback);
         sendDATA(command);
     }
 
@@ -1874,6 +1892,43 @@ function Service_SPIKE() {
     //                                      //
     //////////////////////////////////////////
 
+    /** 
+     * 
+     * @private
+     * @param {any} id 
+     * @param {any} funcName 
+     */
+    function pushResponseCallback(id, funcName) {
+        
+        var toPush = []; // [ ujson string id, function pointer ]
+        
+        toPush.push(id);
+        toPush.push(funcName);
+        // responseCallbacks has elements in it
+        if ( responseCallbacks.length > 0 ) {
+
+            var emptyFound = false; // empty index was found flag
+
+            // insert the pointer to the function where index is empty
+            for ( var index in responseCallbacks ) {
+                if ( responseCallbacks[index] == undefined) {
+                    responseCallbacks[index] = toPush;
+                    emptyFound = true;
+                }
+            }
+
+            // if all indices were full, push to the back
+            if (!emptyFound) {
+                responseCallbacks.push(toPush);
+            }
+            
+        }
+        // responseCallbacks current has no elements in it
+        else {
+            responseCallbacks.push(toPush);
+        }
+
+    }
     /** <h4> Sleep function </h4>
      * @private
      * @param {number} ms Miliseconds to sleep
@@ -2325,6 +2380,31 @@ function Service_SPIKE() {
             console.log(lastUJSONRPC);
         }
         else {
+
+            // iterate over responseCallbacks global variable
+            for ( var index in responseCallbacks ) {
+                var currCallbackInfo = responseCallbacks[index];
+
+                // check if the message id of UJSONRPC corresponds to that of a response callback
+                if ( currCallbackInfo[0] == parsedUJSON["m"] ) {
+                    
+                    var response = "null";
+
+                    if ( parsedUJSON["r"] == 0 ) {
+                        response = "done";
+                    }
+                    else if ( parsedUJSON["r"] == 2 ) {
+                        response = "stalled";
+                    }
+
+                    // execute callback with the response
+                    currCallbackInfo[1](response);
+
+                    // empty the index of which callback that was just executed
+                    responseCallbacks[index] = undefined;
+                }
+            }
+
             console.log(lastUJSONRPC);
         }
     }
