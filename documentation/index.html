@@ -54,6 +54,69 @@
     
 
 
+    <section>
+        <article class="readme"><h1>ServiceDock for SPIKE Prime</h1>
+<blockquote>
+<p>A frontend Javascript framework for building web interfaces that combine SPIKE Prime with third party services</p>
+</blockquote>
+<p>Note: access to this GitHub repository requires signing a LEGO Education NDA. If you haven't signed a LEGO Education NDA, please do not proceed further and immediately contact Ethan Danahy (ethan.danahy@tufts.edu).</p>
+<h2>Installation</h2>
+<ul>
+<li>TBD</li>
+</ul>
+<h2>Documentation</h2>
+<blockquote>
+<p><a href="https://github.com/tuftsceeo/SPIKE-Web-Interface/tree/master/documentation">documentation files</a></p>
+</blockquote>
+<h2>Tutorial</h2>
+<ul>
+<li><a href="#ServiceDock">ServiceDock setup</a></li>
+<li><a href="#Usage">Usage</a></li>
+</ul>
+<h2>ServiceDock</h2>
+<p>Include the Services you want to use. In this example, the ServiceDock will only support SPIKE Prime and System Link cloud service</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;./modules/ServiceDock.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;!-- include the Services to use -->
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;!-- this style must be kept for normal rendering-->
+            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/body>
+</code></pre>
+<h2>Usage</h2>
+<h2>Service Objects</h2>
+<p>Every Service object can be retrieved from its corresponding ServiceDock HTML element with document.getElementById(&quot;service ID&quot;).getService().</p>
+<pre class="prettyprint source lang-html"><code>&lt;!-- Use the Services with Javascript -->
+&lt;script>
+
+    var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService(); // a SPIKE object
+    
+    var mySL = document.getElementById(&quot;service_systemlink&quot;).getService(); // SystemLink cloud object
+</code></pre>
+<p>These objects are initialized when their respective ServiceDock buttons are activated on the web page.</p>
+<p>You can use object.executeAfterInit() to set a function to run after a Service is activated, or use object.isActive() to check if the Service is already activated.</p>
+<pre class="prettyprint source lang-js"><code>    /* execute following function when SystemLink is initialized */
+    mySL.executeAfterInit( function () {
+
+        var messageToDisplay = await mySL.getTagValue(&quot;message&quot;); // retrieve &quot;message&quot; tag from cloud
+
+        // execute only when SPIKE object is initialized
+        if ( mySPIKE.isActive() ) {
+
+            var hub = new mySPIKE.PrimeHub(); // PrimeHub object
+
+            hub.light_matrix.write(messageToDisplay); // display message on Prime hub
+        }
+    })
+&lt;/script>
+</code></pre></article>
+    </section>
+
 
 
 
