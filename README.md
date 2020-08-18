@@ -4,7 +4,7 @@
 
 Note: access to this GitHub repository requires signing a LEGO Education NDA. If you haven't signed a LEGO Education NDA, please do not proceed further and immediately contact Ethan Danahy (ethan.danahy@tufts.edu).
 
-## Example Usage
+## Example
 ```html
 <html>
     <!-- ServiceDock -->
@@ -43,7 +43,7 @@ Note: access to this GitHub repository requires signing a LEGO Education NDA. If
 
                 var hub = new mySPIKE.PrimeHub(); // PrimeHub object
 
-                hub.light_matrix.write(messageToDisplay); // display message on screen
+                hub.light_matrix.write(messageToDisplay); // display message on Prime hub
             }
         })
 
@@ -51,30 +51,47 @@ Note: access to this GitHub repository requires signing a LEGO Education NDA. If
 </html>
 ```
 
-## Table of Contents
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [Tests](#tests)
-- [FAQ](#faq)
-- [Support](#support)
-- [Team](#team)
-- [License](#license)
-
 ## Installation
 - TBD
 
 ## Documentation
 > [documentation files](https://github.com/tuftsceeo/SPIKE-Web-Interface/tree/master/documentation)
 
-## Contributing
+## Tutorial
+- [ServiceDock setup](#ServiceDock)
+- [Usage](#Usage)
 
-## Tests
+## ServiceDock
+Include the Services you want to use. In this example, the ServiceDock will only support SPIKE Prime and System Link cloud service
+```html
+<html>
+    <head>
+        <script src="./modules/ServiceDock.js"></script>
+    </head>
+    <!-- include the Services to use -->
+    <body>
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal rendering-->
+            <service-systemlink id="service_systemlink"></service-systemlink>
+            <service-spike id="service_spike"></service-spike>
+        </div>
+    </body>
+```
 
-## FAQ
+## Usage
 
-## Support
+## Service Objects
+Every Service object can be retrieved from its corresponding ServiceDock HTML element with document.getElementById("service ID").getService().
 
-## Team
+```html
+<!-- Use the Services with Javascript -->
+<script>
 
-## License
+    var mySPIKE = document.getElementById("service_spike").getService(); // a SPIKE object
+    
+    var mySL = document.getElementById("service_systemlink").getService(); // SystemLink cloud object
+```
+
+
+These objects are initialized when their respective ServiceDock buttons are activated on the web page.
+[!image](https://i.imgur.com/HsYKQro.gifv)
