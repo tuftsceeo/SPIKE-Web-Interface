@@ -36,7 +36,7 @@ class servicespike extends HTMLElement {
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
 
-        var imageRelPath = "./modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var imageRelPath = "/examples/modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
         var length = 50; // for width and height of button
         var buttonBackgroundColor = "#A2E1EF" // background color of the button
         var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
@@ -233,6 +233,30 @@ function Service_SPIKE() {
     let hubGestures = []; // array of hubGestures run since program started or since was_gesture() ran
     let hubButtonPresses = [];
 
+    /* SPIKE Prime Projects */
+    
+    let hubProjects = { "0": "None", 
+                    "1": "None", 
+                    "2": "None",
+                    "3": "None",
+                    "4": "None",
+                    "5": "None",
+                    "6": "None",
+                    "7": "None",
+                    "8": "None",
+                    "9": "None",
+                    "10": "None",
+                    "11": "None",
+                    "12": "None",
+                    "13": "None",
+                    "14": "None",
+                    "15": "None",
+                    "16": "None",
+                    "17": "None",
+                    "18": "None",
+                    "19": "None"
+                };
+
     // true after Force Sensor is pressed, turned to false after reading it for the first time that it is released
     let ForceSensorWasPressed = false;
     
@@ -262,6 +286,11 @@ function Service_SPIKE() {
     /* array that holds the pointers to callback functions to be executed after a UJSONRPC response */
     var responseCallbacks = [];
 
+    // array of information needed for writing program
+    var startWriteProgramCallback = undefined; // [message_id, function to execute ]
+    var writePackageInformation = undefined; // [ message_id, remaining_data, transfer_id, blocksize]
+    var writeProgramCallback = undefined; // callback function to run after a program was successfully written
+
     //////////////////////////////////////////
     //                                      //
     //          Public Functions            //
@@ -283,7 +312,7 @@ function Service_SPIKE() {
             // start streaming UJSONRPC
             streamUJSONRPC();
             serviceActive = true;
-            
+
             await sleep(2000); // wait for service to init
             
             // call funcAtInit if defined
@@ -445,6 +474,21 @@ function Service_SPIKE() {
      */
     async function getHubInfo() {
         return hub;
+    }
+
+
+    /** <h4> get projects in all the slots of SPIKE Prime hub </h4>
+     * 
+     * @public
+     * @returns {object}
+     */
+    async function getProjects() {
+        
+        UJSONRPC.getStorageStatus();
+
+        await sleep(2000);
+
+        return hubProjects
     }
 
     /** <h4> Reach the micropython interpreter beneath UJSON RPC </h4>
@@ -666,6 +710,61 @@ function Service_SPIKE() {
 
         return forcePorts;
 
+    }
+
+    /** <h4> Terminate currently running micropy program</h4>
+     * @public
+     */
+    function stopCurrentProgram() {
+        UJSONRPC.programTerminate();
+    }
+
+    /** <h4> write a micropy program into a slot of the SPIKE Prime </h4>
+     * 
+     * @public
+     * @param {string} projectName name of the project to register
+     * @param {string} data the micropy code to send (expecting an <input type="text">.value)
+     * @param {integer} slotid slot number to assign the program in [0-9]
+     * @param {function} callback callback to run after program is written
+     */
+    async function writeProgram(projectName, data, slotid, callback) {
+
+        // template of python file that needs to be concatenated
+        var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
+        var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    print(\"hello\")\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+
+        // stringify data and strip trailing and leading quotation marks
+        var stringifiedData = JSON.stringify(data);
+        stringifiedData = stringifiedData.substring(1, stringifiedData.length - 1);
+
+        var result = ""; // string to which the final code will be appended
+
+        var splitData = stringifiedData.split(/\\n/); // split the code by every newline
+
+        // add a tab before every newline (this is syntactically needed for concatenating with the template)
+        for (var index in splitData) {
+
+            var addedTab = "    " + splitData[index] + "\n";
+
+            result = result + addedTab;
+        }
+
+        stringifiedData = firstPart + result + secondPart;
+
+        writeProgramCallback = callback;
+
+        // begin the write program process
+        UJSONRPC.startWriteProgram(projectName, "python", stringifiedData, slotid);
+
+    }
+
+    /** <h4> Execute a program in a slot </h4>
+     * 
+     * @public
+     * @param {integer} slotid slot of program to execute [0-9]
+     */
+    function executeProgram(slotid) {
+        UJSONRPC.programExecute(slotid)
     }
 
     //////////////////////////////////////////
@@ -1615,8 +1714,8 @@ function Service_SPIKE() {
      * @param {string} text 
      */
     UJSONRPC.displayText = async function displayText(text) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.display_text", "p": {"text":' + '"' + text + '"' + '} }'
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.display_text", "p": {"text":' + '"' + text + '"' + '} }'
         sendDATA(command);
     }
 
@@ -1627,8 +1726,8 @@ function Service_SPIKE() {
      * @param {integer} brightness [1 to 100]
      */
     UJSONRPC.displaySetPixel = async function displaySetPixel(x, y, brightness) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.display_set_pixel", "p": {"x":' + x +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.display_set_pixel", "p": {"x":' + x +
             ', "y":' + y + ', "brightness":' + brightness + '} }';
         sendDATA(command);
     }
@@ -1637,8 +1736,8 @@ function Service_SPIKE() {
      * @memberof! UJSONRPC
      */
     UJSONRPC.displayClear = async function displayClear() {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.display_clear" }';
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.display_clear" }';
         sendDATA(command);
     }
 
@@ -1649,8 +1748,8 @@ function Service_SPIKE() {
      * @param {integer} stall 
      */
     UJSONRPC.motorStart = async function motorStart(port, speed, stall) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.motor_start", "p": {"port":'
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.motor_start", "p": {"port":'
             + '"' + port + '"' +
             ', "speed":' + speed +
             ', "stall":' + stall +
@@ -1669,8 +1768,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.motorGoRelPos = async function motorGoRelPos(port, position, speed, stall, stop, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.motor_go_to_relative_position"' +
             ', "p": {' +
             '"port":' + '"' + port + '"' +
@@ -1694,8 +1793,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.motorRunTimed = async function motorRunTimed(port, time, speed, stall, stop, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.motor_run_timed"' +
             ', "p": {' +
             '"port":' + '"' + port + '"' +
@@ -1719,8 +1818,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.motorRunDegrees = async function motorRunDegrees(port, degrees, speed, stall, stop, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.motor_run_for_degrees"' +
             ', "p": {' +
             '"port":' + '"' + port + '"' +
@@ -1734,7 +1833,6 @@ function Service_SPIKE() {
     }
 
     /**
-     * 
      * @memberof! UJSONRPC
      * @param {integer} time 
      * @param {integer} lspeed 
@@ -1745,8 +1843,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.moveTankTime = async function moveTankTime(time, lspeed, rspeed, lmotor, rmotor, stop, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.move_tank_time"' +
             ', "p": {' +
             '"time":' + time +
@@ -1772,8 +1870,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.moveTankDegrees = async function moveTankDegrees(degrees, lspeed, rspeed, lmotor, rmotor, stop, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.move_tank_degrees"' +
             ', "p": {' +
             '"degrees":' + degrees +
@@ -1797,8 +1895,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.moveTankSpeeds = async function moveTankSpeeds(lspeed, rspeed, lmotor, rmotor, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.move_start_speeds"' +
             ', "p": {' +
             '"lspeed":' + lspeed +
@@ -1820,8 +1918,8 @@ function Service_SPIKE() {
      * @param {function} callback
      */
     UJSONRPC.moveTankPowers = async function moveTankPowers(lpower, rpower, lmotor, rmotor, callback) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.move_start_powers"' +
             ', "p": {' +
             '"lpower":' + lpower +
@@ -1840,8 +1938,8 @@ function Service_SPIKE() {
      * @param {integer} note 
      */
     UJSONRPC.soundBeep = async function soundBeep(volume, note) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.sound_beep"' +
             ', "p": {' +
             '"volume":' + volume +
@@ -1854,8 +1952,8 @@ function Service_SPIKE() {
      * @memberof! UJSONRPC
      */
     UJSONRPC.soundStop = async function soundStop() {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "scratch.sound_off"' +
             '}';
         sendDATA(command);
@@ -1869,22 +1967,206 @@ function Service_SPIKE() {
      * @param {integer} stall 
      */
     UJSONRPC.motorPwm = async function motorPwm(port, power, stall) {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "scratch.motor_pwm", "p": {"port":' + '"' + port + '"' +
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.motor_pwm", "p": {"port":' + '"' + port + '"' +
             ', "power":' + power + ', "stall":' + stall + '} }';
         sendDATA(command);
     }
-
 
     /**
      * 
      * @memberof! UJSONRPC
      */
     UJSONRPC.getFirmwareInfo = async function getFirmwareInfo() {
-        var randomId = Math.floor((Math.random() * 10000));
-        var command = '{"i":' + randomId + ', "m": "get_firmware_info" ' + '}';
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "get_firmware_info" ' + '}';
         sendDATA(command);
     }
+
+    /** 
+     * 
+     * 
+     * @param {integer} slotid 
+     */
+    UJSONRPC.programExecute= async function programExecute(slotid) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "program_execute", "p": {"slotid":' + slotid + '} }';
+        sendDATA(command);
+    }
+
+    /** 
+     * 
+     * 
+     */
+    UJSONRPC.programTerminate = function programTerminate() {
+
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "program_terminate"' +
+            '}';
+
+        sendDATA(command);
+    }
+
+    /**
+     * 
+     * @param {string} projectName name of the project
+     * @param {integer} type type of data (micropy or scratch)
+     * @param {string} data entire data to send in ASCII
+     * @param {integer} slotid slot to which to assign the program
+     */
+    UJSONRPC.startWriteProgram = async function startWriteProgram(projectName, type, data, slotid) {
+
+        console.log("in startWriteProgram...");
+        console.log("constructing start_write_program script...");
+
+        if (type == "python") {
+            var typeInt = 0;
+        }
+
+        // construct the UJSONRPC packet to start writing program
+
+        var dataSize = (new TextEncoder().encode(data)).length;
+        
+        var randomId = generateId();
+
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "start_write_program", "p": {' +
+            '"meta": {' +
+            '"created": ' + parseInt(Date.now() * 1000) +
+            ', "modified": ' + parseInt(Date.now() * 1000) +
+            ', "name": ' + '"' + projectName + '"' +
+            ', "type": ' + typeInt +
+            ', "project_id":' + Math.floor(Math.random() * 1000) +
+            '}' +
+            ', "fname": ' + '"' + projectName + '"' +
+            ', "size": ' + dataSize +
+            ', "slotid": ' + slotid +
+            '} }';
+
+        console.log("constructed start_write_program script...");
+        
+        // assign function to start sending packets after confirming blocksize and transferid
+        startWriteProgramCallback = [randomId, writePackageFunc];
+
+        console.log("sending start_write_program script");
+
+        sendDATA(command);
+
+        // function to write the first packet of data
+        function writePackageFunc(blocksize, transferid) {
+
+            console.log("in writePackageFunc...");
+            
+            console.log("stringified the entire data to send: ", data);
+            
+            // when data's length is less than the blocksize limit of sending data
+            if ( data.length <= blocksize ) {
+                console.log("data's length is less than the blocksize of ", blocksize);
+
+                // if the data's length is not zero (not empty)
+                if ( data.length != 0 ) {
+
+                    var dataToSend = data.substring(0, data.length); // get the entirety of data
+
+                    console.log("data's length is not zero, sending the entire data: ", dataToSend);
+
+                    var base64data = btoa(dataToSend); // encode the packet to base64
+                    
+                    UJSONRPC.writePackage(base64data, transferid); // send the packet
+                }
+                // the package to send is empty, so throw error
+                else {
+                    throw new Error("package to send is initially empty");
+                }
+
+            }
+            // if the length of data to send is larger than the blocksize, send only a blocksize amount
+            // and save the remaining data to send packet by packet
+            else if ( data.length > blocksize ) {
+
+                console.log("data's length is more than the blocksize of ", blocksize);
+
+                var dataToSend = data.substring(0, blocksize); // get the first block of packet
+
+                console.log("sending the blocksize amount of data: ", dataToSend);
+
+                var base64data = btoa(dataToSend); // encode the packet to base64
+
+                var msgID = UJSONRPC.writePackage(base64data, transferid); // send the packet
+
+                var remainingData = data.substring(blocksize, data.length); // remove the portion just sent from data
+
+                console.log("reassigning writePackageInformation with message ID: ", msgID);
+                console.log("reassigning writePackageInformation with remainingData: ", remainingData);
+
+                // update package information to be used for sending remaining packets
+                writePackageInformation = [msgID, remainingData, transferid, blocksize];
+
+            }
+
+        }        
+
+    }
+
+
+
+    /**
+     * 
+     * @param {string} base64data base64 encoded data to send
+     * @param {string} transferid transferid of this program write process
+     * @returns {string} the randomly generated message id used to send this UJSONRPC script
+     */
+    UJSONRPC.writePackage = function writePackage(base64data, transferid) {
+
+        var randomId = generateId();
+        var writePackageCommand = '{"i":' + '"' + randomId + '"' +
+            ', "m": "write_package", "p": {' +
+            '"data": ' + '"' + base64data + '"' +
+            ', "transferid": ' + '"' + transferid + '"' +
+            '} }';
+
+        sendDATA(writePackageCommand);
+    
+        return randomId;
+
+    }
+
+    UJSONRPC.getStorageStatus = function getStorageStatus() {
+        
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "get_storage_status"' +
+            '}';
+        
+        sendDATA(command);
+
+    }
+
+    UJSONRPC.removeProject = function removeProject(slotid) {
+
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "remove_project", "p": {' +
+            '"slotid": ' + slotid + 
+            '} }';
+        
+        sendDATA(command);
+    }
+
+    UJSONRPC.moveProject = function moveProject(oldslotid, newslotid) {
+
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "move_project", "p": {' +
+            '"old_slotid": ' + oldslotid +
+            ', "new_slotid: ' + newslotid +
+            '} }';
+
+        sendDATA(command);
+
+    }
+
 
     //////////////////////////////////////////
     //                                      //
@@ -1904,6 +2186,7 @@ function Service_SPIKE() {
         
         toPush.push(id);
         toPush.push(funcName);
+
         // responseCallbacks has elements in it
         if ( responseCallbacks.length > 0 ) {
 
@@ -1938,6 +2221,22 @@ function Service_SPIKE() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    /** <h4> generate random id for UJSONRPC messages </h4>
+     * 
+     * @returns {string}
+     */
+    function generateId() {
+        var generatedID = ""
+        var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        
+        for ( var i = 0; i < 4; i++ ) {
+            var randomIndex = Math.floor(Math.random() * characters.length);
+            generatedID = generatedID + characters[randomIndex];
+        }
+
+        return generatedID;
+    }
+
     /** <h4> Prompt user to select web serial port and make connection to SPIKE Prime </h4>
      * <p> Effect Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
      * <p> Note: </p>
@@ -1947,24 +2246,33 @@ function Service_SPIKE() {
      * @returns {boolean} True if web serial initialization is successful, false otherwise
      */
     async function initWebSerial() {
-        var success = false;
-
-        port = await navigator.serial.getPorts();
-        console.log("ports:", port);
         try {
+            var success = false;
+
+            port = await navigator.serial.getPorts();
+            console.log("ports:", port);
             // select device
             port = await navigator.serial.requestPort({
                 //filters: [filter]
             });
             // wait for the port to open.
             await port.open({ baudrate: 115200 });
-            success = true;
+
+            if (port.readable) {
+                success = true;
+            }
+            else {
+                success = false;
+            }
+
+            
+            return success;
+
 
         } catch (e) {
             console.log("Cannot read port:", e);
+            return false;
         }
-
-        return success
     }
 
     /** <h4> Initialize writer object before sending commands </h4>
@@ -1999,50 +2307,74 @@ function Service_SPIKE() {
                     try {
                         // read UJSON RPC stream ( actual data in {value} )
                         ({ value, done } = await reader.read());
-
+                        
                         // log value
                         if (micropython_interpreter) {
-                            console.log(value)
+                            console.log(value);
                         }
 
-                        //concatenating incomplete json objects from the hub
+                        //concatenate UJSONRPC packets into complete JSON objects
                         if (value) {
-                            /* stringify input value and concatenate to jsonline */
-                            var json_string = JSON.stringify(value)
-                            jsonline = jsonline + value
 
-                            /* parse jsonline where the JSON object starts and ends */
-                            var rcb_index = json_string.indexOf('}', readFrom)
-                            var lcb_index = json_string.indexOf('{')
+                            // stringify the packet to look for carriage return
+                            var json_string = await JSON.stringify(value);
 
-                            // if the right curly brace exists (end of json)
-                            if (rcb_index > -1) {
-                                if (json_string.substring(rcb_index - 1, rcb_index) != '{') {
-                                    // if the first index is a left curly brace (start of json)
-                                    if (jsonline[0] === "{") {
+                            let findEscapedQuotes = /\\"/g;
 
-                                        /* get substring until instance of }\r */
+                            var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
+                            var cleanedJsonString = cleanedJsonString.substring(1,cleanedJsonString.length - 1);
 
-                                        // when REPL is declared with vanilla js (ex) document.getElementById
-                                        lastUJSONRPC = jsonline.substring(0, jsonline.indexOf('}') + 2)
+                            jsonline = jsonline + cleanedJsonString; // concatenate packet to data
 
-                                        // when REPL is decalred with jquery (ex) $("#REPL")
-                                        //lastUJSONRPC = jsonline.substring(0,jsonline.indexOf('}')+4)
+                            // regex search for carriage return
+                            let pattern = /\\r/g;
+                            var carriageReIndex = jsonline.search(pattern);
+                            
+                            // there is at least one carriage return in this packet
+                            if ( carriageReIndex > -1 ) {
+                                
+                                // the concatenated packets start with a left curly brace (start of JSON)
+                                if ( jsonline[0] == "{" ) {
 
-                                        updateHubPortsInfo();
-                                        PrimeHubEventHandler();
+                                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                                    // look for conjoined JSON packets: there's at least two carriage returns in jsonline
+                                    if ( jsonline.match(/\\r/g).length > 1 ) {
+                                        
+                                        var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
+
+                                        // last index only contains "" as it would be after \r
+                                        for ( var i = 0; i < conjoinedPacketsArray.length - 1; i++ ) {
+                                            
+                                            // for every JSON object in array, perform data handling
+
+                                            lastUJSONRPC = conjoinedPacketsArray[i];
+
+                                            // update hub information using lastUJSONRPC
+                                            await updateHubPortsInfo();
+                                            await PrimeHubEventHandler();
+
+                                            jsonline = "";
+
+                                        }
+                                    }
+                                    else {
+                                        lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                                        // update hub information using lastUJSONRPC
+                                        await updateHubPortsInfo();
+                                        await PrimeHubEventHandler();
+
+                                        jsonline = "";
                                     }
 
-                                    // reset jsonline to concatenate next stream
-                                    jsonline = ""
-                                    readFrom = 0;
                                 }
                                 else {
-                                    readFrom = jsonline.length - json_string.length + rcb_index + 1;
-                                    console.log("jsonline", jsonline);
-                                    console.log("reading from", JSON.stringify(jsonline).substring(readFrom, jsonline.length));
+                                    // reset jsonline for next concatenation
+                                    jsonline = "";
                                 }
                             }
+
                         }
                         if (done) {
                             serviceActive = false;
@@ -2093,7 +2425,9 @@ function Service_SPIKE() {
                 data_stream = data_stream.p;
             }
             catch (e) {
-                console.log("error parsing one_Line at updatePortsInfo", lastUJSONRPC);
+                console.log("error parsing lastUJSONRPC at updateHubPortsInfo", lastUJSONRPC);
+                console.log(typeof lastUJSONRPC);
+                console.log(lastUJSONRPC.p);
             }
 
             var index_to_port = ["A", "B", "C", "D", "E", "F"]
@@ -2180,8 +2514,6 @@ function Service_SPIKE() {
                             }
                         }
                         
-
-
                         // populate value object
                         device_value.device = "force";
                         device_value.data = { "force": Famount, "pressed": Fboolean, "forceSensitive": Fbigamount }
@@ -2254,16 +2586,29 @@ function Service_SPIKE() {
 
         var parsedUJSON = await JSON.parse(lastUJSONRPC);
         
+        var messageType = parsedUJSON["m"];
+
         //catch runtime_error made at ujsonrpc level
-        if (parsedUJSON["m"] == "runtime_error") {
-            console.log(lastUJSONRPC);
+        if (messageType == "runtime_error") {
+            var decodedResponse = atob(parsedUJSON["p"][3]);
+            console.log(decodedResponse);
+        }
+        // storage information
+        else if ( messageType == 1 ) {
+            
+            var storageInfo = parsedUJSON["p"]["slots"]; // get info of all the slots
+            
+            for ( var slotid in storageInfo ) {
+                hubProjects[slotid] = storageInfo[slotid]; // reassign hubProjects global variable
+            }
+
         }
         //catch this mysterious thing
-        else if (parsedUJSON["m"] == 2) {
+        else if (messageType == 2) {
             //console.log(lastUJSONRPC);
         }
         // give center button click, left, right (?)
-        else if (parsedUJSON["m"] == 3) {
+        else if (messageType == 3) {
             console.log(lastUJSONRPC);
             if (parsedUJSON.p[0] == "center") {
                 hubMainButton.pressed = true;
@@ -2317,7 +2662,7 @@ function Service_SPIKE() {
 
         }
         // gives orientation of the hub (leftside, up,..), tapping of hub, 
-        else if (parsedUJSON["m"] == 4) {
+        else if (messageType == 4) {
             var isOrientationData = parsedUJSON.p == "up" || parsedUJSON.p == "down" || parsedUJSON.p == "back" || parsedUJSON.p == "front" || parsedUJSON.p == "leftSide" || parsedUJSON.p == "rightSide";
             var isGestureData = parsedUJSON.p == "freefall" || parsedUJSON.p == "shake" || parsedUJSON.p == "tapped" || parsedUJSON.p == "doubletapped"
             /* this data stream is about hub orientation */
@@ -2373,20 +2718,43 @@ function Service_SPIKE() {
             }
             console.log(lastUJSONRPC);
         }
-        else if (parsedUJSON["m"] == 0) {
+        else if (messageType == 0) {
 
         }
-        else if (parsedUJSON["m"] == 11) {
+        else if (messageType == 11) {
             console.log(lastUJSONRPC);
+        }
+        else if (messageType == "userProgram.print") {
+            var printedMessage = parsedUJSON["p"]["value"];
+            var NLindex = printedMessage.search(/\\n/);
+            printedMessage = printedMessage.substring(0, NLindex);
+            
+            console.log(atob(printedMessage));
         }
         else {
 
+            // general parameters check
+            if (parsedUJSON["r"]) {
+                if (parsedUJSON["r"]["slots"]) {
+                    
+                    var storageInfo = parsedUJSON["r"]["slots"]; // get info of all the slots
+
+                    for (var slotid in storageInfo) {
+                        hubProjects[slotid] = storageInfo[slotid]; // reassign hubProjects global variable
+                    }
+
+                }
+            }
+
+            console.log("received response: ", lastUJSONRPC);
+
             // iterate over responseCallbacks global variable
             for ( var index in responseCallbacks ) {
+
                 var currCallbackInfo = responseCallbacks[index];
 
                 // check if the message id of UJSONRPC corresponds to that of a response callback
-                if ( currCallbackInfo[0] == parsedUJSON["m"] ) {
+                if ( currCallbackInfo[0] == parsedUJSON["i"] ) {
                     
                     var response = "null";
 
@@ -2404,8 +2772,100 @@ function Service_SPIKE() {
                     responseCallbacks[index] = undefined;
                 }
             }
+            
+            // execute the callback function after sending start_write_program UJSONRPC
+            if ( startWriteProgramCallback != undefined ) {
 
-            console.log(lastUJSONRPC);
+                console.log("startWriteProgramCallback is defined. Looking for matching mesasage id...")
+
+                // check if the message id of UJSONRPC corresponds to that of a response callback
+                if (startWriteProgramCallback[0] == parsedUJSON["i"]) {
+
+                    console.log("matching message id detected with startWriteProgramCallback[0]: ", startWriteProgramCallback[0])
+                    
+                    // get the information for the packet sending
+                    var blocksize = parsedUJSON["r"]["blocksize"]; // maximum size of each packet to be sent in bytes
+                    var transferid = parsedUJSON["r"]["transferid"]; // id to use for transferring this program
+
+                    console.log("executing writePackageFunc expecting transferID of ", transferid);
+
+                    // execute callback
+                    await startWriteProgramCallback[1](blocksize, transferid);
+
+                    console.log("deallocating startWriteProgramCallback");
+
+                    // deallocate callback
+                    startWriteProgramCallback = undefined;
+                }
+                
+            }
+
+            // check if the program should write packages for a program
+            if ( writePackageInformation != undefined ) {
+
+                console.log("writePackageInformation is defined. Looking for matching mesasage id...")
+
+                // check if the message id of UJSONRPC corresponds to that of the first write_package script that was sent
+                if (writePackageInformation[0] == parsedUJSON["i"]) {
+
+                    console.log("matching message id detected with writePackageInformation[0]: ", writePackageInformation[0]);
+
+                    // get the information for the package sending process
+                    var remainingData = writePackageInformation[1];
+                    var transferID = writePackageInformation[2];
+                    var blocksize = writePackageInformation[3];
+
+                    // the size of the remaining data to send is less than or equal to blocksize
+                    if ( remainingData.length <= blocksize ) {
+                        console.log("remaining data's length is less than or equal to blocksize");
+
+                        // the size of remaining data is not zero
+                        if ( remainingData.length != 0 ) {
+
+                            var dataToSend = remainingData.substring(0, remainingData.length);
+
+                            console.log("reminaing data's length is not zero, sending entire remaining data: ", dataToSend);
+                            
+                            var base64data = btoa(dataToSend);
+
+                            UJSONRPC.writePackage(base64data, transferID);
+
+                            console.log("deallocating writePackageInforamtion")
+
+                            if (writeProgramCallback != undefined) {
+                                
+                                writeProgramCallback();
+
+                                writeProgramCallback = undefined;
+                            }
+
+
+                            writePackageInformation = undefined;
+                        }
+                    }
+                    // the size of remaining data is more than the blocksize
+                    else if ( remainingData.length > blocksize ) {
+
+                        console.log("remaining data's length is more than blocksize");
+
+                        var dataToSend = remainingData.substsring(0, blocksize);
+                        
+                        console.log("sending blocksize amount of data: ", dataToSend)
+                        
+                        var base64data = btoa(dataToSend);
+
+                        var messageid = UJSONRPC.writePackage(blocksize, remainingData.length);
+
+                        console.log("expected response with message id of ", messageid);
+
+                        var remainingData = dataToSend(blocksize, remainingData.length);
+
+                        writePackageInformation = [messageid, remainingData, transferID, blocksize];   
+                    }
+                }
+
+            }
+
         }
     }
 
@@ -2452,6 +2912,7 @@ function Service_SPIKE() {
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
         getHubInfo: getHubInfo,
+        getProjects: getProjects,
         isActive: isActive,
         getBigMotorPorts: getBigMotorPorts,
         getSmallMotorPorts: getSmallMotorPorts,
@@ -2473,7 +2934,10 @@ function Service_SPIKE() {
         ForceSensor: ForceSensor,
         DistanceSensor: DistanceSensor,
         ColorSensor: ColorSensor,
-        MotorPair: MotorPair
+        MotorPair: MotorPair,
+        writeProgram: writeProgram,
+        stopCurrentProgram: stopCurrentProgram,
+        executeProgram: executeProgram
     };
 }
 
