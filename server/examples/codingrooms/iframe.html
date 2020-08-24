@@ -1,0 +1,166 @@
+<html>
+
+    <head>
+        <script type="text/javascript" src="../modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
+            integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg=="
+            crossorigin="anonymous"></script>
+        <script language="javascript">
+            // SPIKE Prime Code
+            var mySPIKE;
+            window.onload = function () {
+                console.log("here!");
+                mySPIKE = document.getElementById("Service_SPIKE").getService();
+                
+                mySPIKE.executeAfterInit(async function () {
+                    
+                    var hubProjects = await mySPIKE.getProjects();
+                    
+                    for ( var slot in hubProjects ) {
+                        var slotOption = document.getElementById("slot" + slot);
+
+                        if (hubProjects[slot] != "None") {
+                            slotOption.innerHTML = "(" + slot + ") " + hubProjects[slot]["name"];
+                        }
+                        else {
+                            slotOption.innerHTML = "(" + slot + ") " + "None";
+                        }
+                    }
+
+                    var runButton = document.getElementById("runProgram");
+                    runButton.addEventListener("click", function () {
+
+                        var slotidSelect = document.getElementById("slotidSelect");
+                        var slotidOption = slotidSelect.options[slotidSelect.selectedIndex];
+                        var slotid = slotidOption.id;
+                        slotid = slotid.substring(4, slotid.length);
+
+                        var slotidInteger = parseInt(slotid);
+
+                        console.log(slotidInteger);
+
+                        mySPIKE.executeProgram(slotidInteger);
+                    })
+
+                    var rebootButton = document.getElementById("rebootHub");
+                    rebootButton.addEventListener("click", function () {
+                        mySPIKE.rebootHub();
+                    })
+
+                    var stopButton = document.getElementById("stopProgram");
+                    stopButton.addEventListener("click", function () {
+                        mySPIKE.stopCurrentProgram();
+                    })
+                    
+                })
+                console.log("mySPIKE = " + mySPIKE);
+            };
+
+            requirejs.config({
+                paths: {
+                    'cc-web-exec-client': 'https://unpkg.com/@exlinc/cc-web-exec-sdk@1.0.6/dist/cc-web-exec-sdk'
+                },
+            });
+
+            requirejs(['cc-web-exec-client'],
+                function (webExecSDK) {
+                    window.webExecClient = new webExecSDK.CCWebExecClient();
+                    initApp();
+                }
+            );
+
+            function initApp() {
+                // NOTE: the subscribe call returns a string id for this subscriber that can be passed to the
+                //       unsubscribe function to drop this particular subscriber. This is not necessary if you call
+                //       the `.dispose()` function or you plan to have your app 'disposed' automatically when the iframe
+                //       is removed by the parent.
+                window.webExecClient.subscribe('execute_code', function (event, payload) {
+                    console.log(event, payload);
+                    writeCodeExecRequestPayloadToDOM(payload);
+                });
+            }
+
+            async function writeCodeExecRequestPayloadToDOM(payload) {
+                // var files = payload.files;
+                // for (var key in files) {
+                //     if (files.hasOwnProperty(key)) {
+                //         document.getElementById("mycontent").innerHTML += "<b>File:</b> " + key + "<br />\n";
+                //         document.getElementById("mycontent").innerHTML += "<b>Code:</b><br />\n";
+                //         document.getElementById("mycontent").innerHTML += "<blockquote style=\"font-family:'Courier New', Courier\">" + files[key] + "</blockquote>\n";
+                //         mySPIKE.sendDATA(files[key]);
+                //     }
+                // }
+                var fileName = payload.defaultFileName;
+                var slotid = payload.slotid;
+                var fileContent = payload.fileContent;
+
+                mySPIKE.writeProgram(fileName, fileContent, slotid, async function () {
+                    var hubProjects = await mySPIKE.getProjects();
+
+                    for (var slot in hubProjects) {
+                        var slotOption = document.getElementById("slot" + slot);
+
+                        if (hubProjects[slot] != "None") {
+                            slotOption.innerHTML = "(" + slot + ") " + hubProjects[slot]["name"];
+                        }
+                        else {
+                            slotOption.innerHTML = "(" + slot + ") " + "None";
+                        }
+                    }
+                });
+
+                return true;
+            }
+        </script>
+    </head>
+
+    <body>
+        <div id="servicedock" style="position: absolute; top:10px; right:10px;">
+            <service-spike id="Service_SPIKE"></service-spike>
+        </div>
+        <h1 align=center>SPIKE Prime Web UI</h1>
+        <div id = "topbar">
+            <div style = "float:left">
+                Project name:
+                <div id="projectName"></div>
+            </div>
+            <br/>
+            <div style="float:left">
+                Slot:
+            </div>
+            <select id="slotidSelect" style="float:left">
+                <option id="slot0">0</option>
+                <option id="slot1">1</option>
+                <option id="slot2">2</option>
+                <option id="slot3">3</option>
+                <option id="slot4">4</option>
+                <option id="slot5">5</option>
+                <option id="slot6">6</option>
+                <option id="slot7">7</option>
+                <option id="slot8">8</option>
+                <option id="slot9">9</option>
+                <option id="slot10">10</option>
+                <option id="slot11">11</option>
+                <option id="slot12">12</option>
+                <option id="slot13">13</option>
+                <option id="slot14">14</option>
+                <option id="slot15">15</option>
+                <option id="slot16">16</option>
+                <option id="slot17">17</option>
+                <option id="slot18">18</option>
+                <option id="slot19">19</option>
+            </select>
+            <input type = "submit" id = "runProgram" value = "Run">
+            <input type="submit" id="rebootHub" value="Reboot">
+            <input type="submit" id = "stopProgram" value="Stop">
+        </div>
+        <br />
+        <div id = "telemetry">
+            <div>
+                Console
+            </div>
+            <input type = "text" readonly style = "width: 500px; height: 200px;">
+        </div>
+    </body>
+
+</html>

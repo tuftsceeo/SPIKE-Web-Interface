@@ -1,0 +1,114 @@
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
+            integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg=="
+            crossorigin="anonymous"></script>
+    <script language="javascript">
+      requirejs.config({
+        paths: {
+          'cc-web-exec-manager': 'https://unpkg.com/@exlinc/cc-web-exec-sdk@1.0.6/dist/cc-web-exec-sdk'
+        },
+      });
+
+      requirejs(['cc-web-exec-manager'],
+        function (webExecSDK) {
+          window.webExecManager = new webExecSDK.CCWebExecManager('myFrameIdSetMe');
+        }
+      );
+
+      function submitForm() {
+        if (!window.webExecManager) {
+          alert('Web Exec Manager is missing/not yet loaded');
+          return;
+        }
+
+        // set up JSON data object
+        var fileName = document.getElementById("filename2").value;
+        var fileContent = document.getElementById("filecontent").value
+
+        var slotidSelect = document.getElementById("slotidSelect");
+        var slotid = slotidSelect.options[slotidSelect.selectedIndex].id;
+
+        var files = {}; // Files object
+        files[fileName] = fileContent; // add { filename: filecontent } to object
+        var payload = {
+          language: 'demo-lang',
+          defaultFileName: fileName,
+          slotid: slotid,
+          files: files,
+          fileContent: fileContent,
+          stdin: ''
+        };
+        
+        console.log("about to send: " + payload);
+
+        try {
+          window.webExecManager.sendMessage('execute_code', payload);
+        } catch (err) {
+          console.log("error sending execute code message: ", err);
+        }
+      }
+    </script>
+</head>
+<body>
+<h1>iframe test</h1>
+<form onsubmit="submitForm(); return false;">
+  <div style = "float:left;">
+    <div style = "float:left">
+      Project name:
+    </div>
+    <input type="text" id="filename2" value="Some Project" style = "float: left;"/>
+    <div style = "float:left">
+      Slots:
+    </div>
+    <select id = "slotidSelect" style = "float:left">
+      <option id = "0">0</option>
+      <option id = "1">1</option>
+      <option id = "2">2</option>
+      <option id = "3">3</option>
+      <option id = "4">4</option>
+      <option id = "5">5</option>
+      <option id = "6">6</option>
+      <option id = "7">7</option>
+      <option id = "8">8</option>
+      <option id = "9">9</option>
+      <option id = "10">10</option>
+      <option id = "11">11</option>
+      <option id = "12">12</option>
+      <option id = "13">13</option>
+      <option id = "14">14</option>
+      <option id = "15">15</option>
+      <option id = "16">16</option>
+      <option id = "17">17</option>
+      <option id = "18">18</option>
+      <option id = "19">19</option>
+    </select>
+  </div>
+  <br/>
+  <div style = "float:left;" >
+    <textarea style="width:600px; font-family:'Courier New', Courier" rows=5 id="filecontent">
+from spike import PrimeHub, LightMatrix, Motor, MotorPair
+from spike.control import wait_for_seconds, wait_until, Timer
+
+hub = PrimeHub()
+
+hub.light_matrix.show_image('HAPPY')
+      </textarea>
+  </div>
+    <input type=submit value = "Save">
+</form>
+
+<br/><br/>
+
+<!-- Note the id if the iframe element must be in the form of "cc-embed-frameId" where
+     there "frameId" is equal to the value of the "?frameId=" query param and the value set in
+     the CCWebExecManager constructor call, UNLESS you use the extended form of the CCWebExecManager
+     constructor where you specify the id of the iframe element, e.g.,
+     `new CCWebExecManager('myFrameIdSetMe', 'nonStandardIdOfMyIFrameElement')`
+ -->
+<iframe id="cc-embed-myFrameIdSetMe" src="iframe.html?frameId=myFrameIdSetMe"
+        style="height:400px;width:600px;border-width: 2px"
+        title="Run Code"></iframe>
+
+</body>
+</html>
