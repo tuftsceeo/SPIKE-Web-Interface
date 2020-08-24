@@ -1,8 +1,8 @@
 <html>
 
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="./modules/ServiceDock_SystemLink.js"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
     </head>
@@ -12,7 +12,11 @@
             <service-spike id="service_spike"></service-spike>
             <service-systemlink id="service_systemlink" ></service-systemlink>
         </div>
-        <div id = "output"></div>
+        <div id = "onlyForWriteProgram" >
+            <textarea id="writeProgramData" name="data" value=""
+                style="font-family: Courier; position: relative; left: 20px; z-index: 5;" /></textarea>
+            <input style = "position: relative; left: 20px;" type="button" id = "writeTheProgram" value="write program">
+        </div>
         <div id = "SPIKEbox">
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
@@ -21,6 +25,8 @@
                 <option id="forceOPTION"> force sensor functions </option>
                 <option id="speakerOPTION"> Primehub.speaker functions </option>
                 <option id="buttonOPTION"> Primehub.button functions </option>
+                <option id="colorOPTION"> Color sensor functions </option>
+                <option id="programOPTION"> write program functions </option>
                 <option id="miscOPTION"> miscellaneous functions </option>
             </select>
             <input type="button" id="SPIKE_test_select" value="display test cases for this function">
@@ -71,13 +77,48 @@
                 <input type="button" id="buttonWasPress" class="SPIKEtestCase button" value="left and right button.was_pressed()">
                 <input type="button" id="buttonIsPress" class="SPIKEtestCase button" value="left and right button.is_pressed()">
                 
+                <!-- color sensor functions -->
+                <input type="button" id="waitUntilColor" class="SPIKEtestCase color" value="wait until color test">
+                
+                <!-- write Program functions -->
+                <input type="button" id="writeProgram" class="SPIKEtestCase program" value="test write program">
+                <input type="button" id="concatenateProgram" class="SPIKEtestCase program" value="test source code for concatenating micropy program">
+                <input type="button" id="getProjects" class="SPIKEtestCase program" value="test getProjects()">
+
                 <!-- SPIKE Library functions-->
                 <input type="button" id="setHubOri" class="SPIKEtestCase misc" value="setHubOrientation()">
                 <input type="button" id="testUJSONRPC" class="SPIKEtestCase misc" value="test UJSONRPC.displayText()">
                 <input type="button" id="testNewKeyword" class="SPIKEtestCase misc" value="new Motor() vs Motor()">
                 <input type="button" id="testNewKeyword1" class="SPIKEtestCase misc" value="Motor() vs Motor() declared without 'new' keyword">
                 <input type="button" id="getMotorPorts" class="SPIKEtestCase misc" value="get motorports">
-            
+
+                <input type="button" id="displayClear" class="SPIKEtestCase misc" value="UJSON displayClear()">
+                <input type="button" id="displaySetPixel" class="SPIKEtestCase misc" value="UJSON displaySetPixel(0,0, 100)">
+                <input type="button" id="displayText" class="SPIKEtestCase misc" value="displayText('hello')">
+                <input type="button" id="motorGoRelPos" class="SPIKEtestCase misc" value="motorGoRelPos('A',180,100,true,true)">
+                <input type="button" id="motorGoRelPos1" class="SPIKEtestCase misc" value="motorGoRelPos('A',180,100,false,true)">
+                <input type="button" id="motorGoRelPos2" class="SPIKEtestCase misc" value="motorGoRelPos('A',180,100,true,false)">
+                <input type="button" id="motorGoRelPos3" class="SPIKEtestCase misc" value="motorGoRelPos('A',180,100,false,false)">
+                <input type="button" id="motorPwm" class="SPIKEtestCase misc" value="motorPwm('A',100,true)">
+                <input type="button" id="motorPwm1" class="SPIKEtestCase misc" value="motorPwm('A',100,false)">
+                <input type="button" id="motorRunDegrees" class="SPIKEtestCase misc" value="motorRunDegrees('A',400, 100, true, true)">
+                <input type="button" id="motorRunDegrees1" class="SPIKEtestCase misc" value="motorRunDegrees('A',400, 100, false, true)">
+                <input type="button" id="motorRunDegrees2" class="SPIKEtestCase misc" value="motorRunDegrees('A',400, 100, true, false)">
+                <input type="button" id="motorRunDegrees3" class="SPIKEtestCase misc" value="motorRunDegrees('A',400, 100, false, false)">
+                <input type="button" id="motorRunTimed" class="SPIKEtestCase misc" value="motorRunTimed('A',3000,100,true,true)">
+                <input type="button" id="motorRunTimed1" class="SPIKEtestCase misc" value="motorRunTimed('A',3000,100,false,true)">
+                <input type="button" id="motorRunTimed2" class="SPIKEtestCase misc" value="motorRunTimed('A',3000,100,true,false)">
+                <input type="button" id="motorRunTimed3" class="SPIKEtestCase misc" value="motorRunTimed('A',3000,100,false,false)">
+                <input type="button" id="motorStart" class="SPIKEtestCase misc" value="motorStart('A',100,true)">
+                <input type="button" id="motorStart1" class="SPIKEtestCase misc" value="motorStart('A',100,false)">
+                <input type="button" id="moveTankDegrees" class="SPIKEtestCase misc" value="moveTankDegrees(300, 100, 100, 'A', 'B',true)">
+                <input type="button" id="moveTankDegrees1" class="SPIKEtestCase misc" value="moveTankDegrees(300, 100, 100, 'A', 'B',false)">
+                <input type="button" id="moveTankPowers" class="SPIKEtestCase misc" value="moveTankPowers(100, 100, 'A', 'B')">
+                <input type="button" id="moveTankSpeeds" class="SPIKEtestCase misc" value="moveTankSpeeds(100, 100, 'A', 'B')">
+                <input type="button" id="moveTankTime" class="SPIKEtestCase misc" value="moveTankTime(3000, 100, 100, 'A', 'B',true)">
+                <input type="button" id="moveTankTime1" class="SPIKEtestCase misc" value="moveTankTime(3000, 100, 100, 'A', 'B',false)">
+                <input type="button" id="soundBeep" class="SPIKEtestCase misc" value="soundBeep(100, 300)">
+                <input type="button" id="soundStop" class="SPIKEtestCase misc" value="soundStop()">
                 <div id="chart"></div>
             </div>
         </div>
@@ -427,88 +468,6 @@
                 var newPos = difference % 360;
             }
 
-            /*
-            var tPos = (currPos - newOrigin) % 180;
-            // newOrigin is higher than currPos
-            if ((newOrigin - currPos) == 180) {
-                var tPos = -180;
-            }
-
-            // newOrigin is lower than currPos
-            else if ((newOrigin - currPos) == -180) {
-                var tPos = 180;
-            }
-
-            // the new origin is below 0 
-            if (newOrigin < 0) {
-                var top = 180 + newOrigin; // the value above newOrigin at which yaw_angle is considered -180
-                // tPos needs to be negative
-                if (currPos > top || currPos < newOrigin) {
-                    if (currPos > top) {
-                        // (top margin + bottom margin) * -1
-                        var tPos = ((180 - currPos) + (180 - newOrigin)) * -1;
-                    }
-                    // newOrigin < 0
-                    // currPos < newOrigin
-                    // Thus, currPos < 0
-                    else {
-                        var tPos = currPos - newOrigin;
-                    }
-                }
-                // tPos needs to be positive
-                else if (currPos < top && currPos > newOrigin) {
-                    if (currPos < 0) {
-                        var tPos = currPos - newOrigin;
-                    }
-                    else {
-                        var tPos = currPos - newOrigin;
-                    }
-                }
-                // tPos needs to be 0
-                else {
-
-                }
-            }
-            // the new origin is above 0
-            else if (newOrigin > 0) {
-                var bottom = -180 + newOrigin; // the value below newOrigin at which yaw_angle is considered 180
-                
-                // tPos needs to be negative
-                if (currPos > bottom && currPos < newOrigin) {
-                    // currPos > bottom ( so a modulo op is NOT needed )
-                    // and currPos < newOrigin ( so tPos needs to be negative )
-
-                    // currPos 
-                    if (currPos < 0) {
-                        var tPos = Math.abs(currPos - newOrigin) * -1;
-                    }
-                    else {
-                        var tPos = currPos - newOrigin
-                    }
-                }
-                // tPos needs to be positive
-                else if (currPos < bottom || currPos > newOrigin) {
-                    // currPos < 0 and newOrigin > 0 and currPos < bottom ( |currPos - newOrigin| >= 180 )
-                    if (currPos < bottom) {
-                        // ( bottom margin + top margin)
-                        var tPos = ((180 + currPos) + (180 - newOrigin));
-                    }
-                    // currPos > 0 and newOrigin > 0 and currPos > newOrigin and |currPos - newOrigin| < 180
-                    else {
-                        var tPos = currPos - newOrigin;
-                    }
-                }
-                // tPos needs to be 0
-                else {
-
-                }
-            }
-            // newOrigin is 0
-            else {
-
-            }
-            */
-
             console.log("translated position: ", newPos);
         })
 
@@ -702,6 +661,81 @@
 
             console.log("Expected result: console identifies button releases")
         })
+        //                                      //
+        //            program Tests             //
+        //                                      //
+
+        var testWriteProgram = document.getElementById("writeProgram");
+        testWriteProgram.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON writeProgram() #######");
+            console.log("Test: write hello world progam on slot 1 in python");
+            console.log("write your python command for SPIKE on textbox and press write program");
+            
+            var writeProgramButton = document.getElementById("writeTheProgram");
+            
+            writeProgramButton.addEventListener("click", function () {
+                var dataTextBox = document.getElementById("writeProgramData");
+                
+                var dataToWrite = dataTextBox.value;
+
+                console.log(dataToWrite);
+
+                mySPIKE.writeProgram("some project", dataToWrite, 1);
+
+            })
+            console.log("###### ENDING UNIT TEST ON writeProgram() #######");
+        })
+
+        var testConcatProgram = document.getElementById("concatenateProgram");
+        testConcatProgram.addEventListener("click", function () {
+            console.log("###### BEGINNING UNIT TEST ON source code for concatenating micropy with template.py #######");
+            console.log("Test: write micropy program in the textbox");
+
+            var writeProgramButton = document.getElementById("writeTheProgram");
+
+            writeProgramButton.addEventListener("click", function () {
+                var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
+                var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    print(\"hello\")\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+
+                var dataTextBox = document.getElementById("writeProgramData");
+
+                var dataToWrite = dataTextBox.value;
+
+                var stringifiedData = JSON.stringify(dataToWrite);
+                stringifiedData = stringifiedData.substring(1, stringifiedData.length-1);
+                var result = "";
+
+                var splitData = stringifiedData.split(/\\n/);
+                console.log(splitData);
+                for (var index in splitData) {
+
+                    var addedTab = "    " + splitData[index] + "\n"; 
+                    console.log(addedTab);
+                    result = result + addedTab;
+                }
+
+                console.log("result before parsed: ")
+                console.log("\n" + result);
+
+                console.log("converted data without parse");
+                result = firstPart + result + secondPart;
+                console.log("converted data: ");
+                console.log("\n" + result);
+
+
+            })
+            console.log("###### ENDING UNIT TEST ON source code for concatenating micropy with template.py #######");
+        })
+
+        var testGetProjects = document.getElementById("getProjects");
+        testGetProjects.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON mySPIKE.getProjects() #######");
+            var hubProjects = await mySPIKE.getProjects();
+            console.log(hubProjects);
+            console.log("Expected result: console log of an object listing all slots in the SPIKE Prime");
+            console.log("###### ENDING UNIT TEST ON mySPIKE.getProjects()#######");
+        })
+
 
         //                                      //
         //               Misc Tests             //
@@ -766,6 +800,138 @@
         test_getMotorPorts.addEventListener("click", async function () {
             var motorPorts = await mySPIKE.getMotorPorts();
             console.log(motorPorts);
+        })
+
+        var testUJSONRPCdisplayClear = document.getElementById("displayClear")
+        testUJSONRPCdisplayClear.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.displayClear();
+            
+        })
+        var testUJSONRPCdisplaySetPixel = document.getElementById("displaySetPixel")
+        testUJSONRPCdisplaySetPixel.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.displaySetPixel(0, 0, 100);
+            
+        })
+        var testUJSONRPCdisplayText = document.getElementById("displayText")
+        testUJSONRPCdisplayText.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.displayText('hello');
+            
+        })
+        var testUJSONRPCmotorGoRelPos = document.getElementById("motorGoRelPos")
+        testUJSONRPCmotorGoRelPos.addEventListener("click", function () {
+                mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, true, true)
+            
+        })
+        var testUJSONRPCmotorGoRelPos1 = document.getElementById("motorGoRelPos1")
+        testUJSONRPCmotorGoRelPos1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, false, true)
+            
+        })
+        var testUJSONRPCmotorGoRelPos2 = document.getElementById("motorGoRelPos2")
+        testUJSONRPCmotorGoRelPos2.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, true, false)
+            
+        })
+        var testUJSONRPCmotorGoRelPos3 = document.getElementById("motorGoRelPos3")
+        testUJSONRPCmotorGoRelPos3.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, false, false)
+            
+        })
+        var testUJSONRPCmotorPwm = document.getElementById("motorPwm")
+        testUJSONRPCmotorPwm.addEventListener("click", function () {
+ 
+                mySPIKE.UJSONRPC.motorPwm('A', 100, true)
+        })
+        var testUJSONRPCmotorPwm1 = document.getElementById("motorPwm1")
+        testUJSONRPCmotorPwm1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorPwm('A', 100, false)
+            
+        })
+        var testUJSONRPCmotorRunDegrees = document.getElementById("motorRunDegrees")
+        testUJSONRPCmotorRunDegrees.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, true, true)
+        })
+        var testUJSONRPCmotorRunDegrees1 = document.getElementById("motorRunDegrees1")
+        testUJSONRPCmotorRunDegrees1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, false, true)
+            
+        })
+        var testUJSONRPCmotorRunDegrees2 = document.getElementById("motorRunDegrees2")
+        testUJSONRPCmotorRunDegrees2.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, true, false)
+        })
+        var testUJSONRPCmotorRunDegrees3 = document.getElementById("motorRunDegrees3")
+        testUJSONRPCmotorRunDegrees3.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, false, false)
+
+        })
+        var testUJSONRPCmotorRunTimed = document.getElementById("motorRunTimed")
+        testUJSONRPCmotorRunTimed.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, true, true)
+
+        })
+        var testUJSONRPCmotorRunTimed1 = document.getElementById("motorRunTimed1")
+        testUJSONRPCmotorRunTimed1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, false, true)
+
+        })
+        var testUJSONRPCmotorRunTimed2 = document.getElementById("motorRunTimed2")
+        testUJSONRPCmotorRunTimed2.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, true, false)
+
+        })
+        var testUJSONRPCmotorRunTimed3 = document.getElementById("motorRunTimed3")
+        testUJSONRPCmotorRunTimed3.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, false, false)
+
+        })
+        var testUJSONRPCmotorStart = document.getElementById("motorStart")
+        testUJSONRPCmotorStart.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorStart('A', 100, true)
+
+        })
+        var testUJSONRPCmotorStart1 = document.getElementById("motorStart1")
+        testUJSONRPCmotorStart1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.motorStart('A', 100, false)
+
+        })
+        var testUJSONRPCmoveTankDegrees = document.getElementById("moveTankDegrees")
+        testUJSONRPCmoveTankDegrees.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankDegrees(300, 100, 100, 'A', 'B', true)
+
+        })
+        var testUJSONRPCmoveTankDegrees1 = document.getElementById("moveTankDegrees1")
+        testUJSONRPCmoveTankDegrees1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankDegrees(300, 100, 100, 'A', 'B', false)
+
+        })
+        var testUJSONRPCmoveTankPowers = document.getElementById("moveTankPowers")
+        testUJSONRPCmoveTankPowers.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankPowers(100, 100, 'A', 'B')
+
+        })
+        var testUJSONRPCmoveTankSpeeds = document.getElementById("moveTankSpeeds")
+        testUJSONRPCmoveTankSpeeds.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankSpeeds(100, 100, 'A', 'B')
+
+        })
+        var testUJSONRPCmoveTankTime = document.getElementById("moveTankTime")
+        testUJSONRPCmoveTankTime.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankTime(3000, 100, 100, 'A', 'B', true)
+
+        })
+        var testUJSONRPCmoveTankTime1 = document.getElementById("moveTankTime1")
+        testUJSONRPCmoveTankTime1.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.moveTankTime(3000, 100, 100, 'A', 'B', false)
+        })
+        var testUJSONRPCsoundBeep = document.getElementById("soundBeep")
+        testUJSONRPCsoundBeep.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.soundBeep(100, 300)
+
+        })
+        var testUJSONRPCsoundStop = document.getElementById("soundStop")
+        testUJSONRPCsoundStop.addEventListener("click", function () {
+            mySPIKE.UJSONRPC.soundStop()
         })
 
         //////////////////////////////////////////
@@ -930,6 +1096,7 @@
             testButtonWaitRelease.style.backgroundColor = "lightgreen";
             testButtonWasPressed.style.backgroundColor = "lightgreen";
             testResetYaw.style.backgroundColor = "red";
+            testResetYawSource.style.backgroundColor = "red";
             testMotorPairStop.style.backgroundColor = "lightgreen";
             testMotorPairMove.style.backgroundColor = "red";
             //testMotorPairStart
@@ -937,6 +1104,35 @@
             testMotorPairMoveRight.style.backgroundColor = "red";
             testMotorPairMoveLeftSlightly.style.backgroundColor = "red";
             testMotorPairMoveRightSlightly.style.backgroundColor = "red";
+
+            // ujsonrpc functions
+            testUJSONRPCdisplayClear.style.backgroundColor = "lightgreen";
+            testUJSONRPCdisplaySetPixel.style.backgroundColor = "lightgreen";
+            testUJSONRPCdisplayText.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorGoRelPos.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorGoRelPos1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorGoRelPos2.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorGoRelPos3.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorPwm.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorPwm1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunDegrees.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunDegrees1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunDegrees2.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunDegrees3.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunTimed.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunTimed1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunTimed2.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorRunTimed3.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorStart.style.backgroundColor = "lightgreen";
+            testUJSONRPCmotorStart1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankDegrees.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankDegrees1.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankPowers.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankSpeeds.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankTime.style.backgroundColor = "lightgreen";
+            testUJSONRPCmoveTankTime1.style.backgroundColor = "lightgreen";
+            testUJSONRPCsoundBeep.style.backgroundColor = "lightgreen";
+            testUJSONRPCsoundStop.style.backgroundColor = "lightgreen";
 
             getTagsInfo.style.backgroundColor = "lightgreen";
             createNewTag.style.backgroundColor = "lightgreen";
@@ -1095,6 +1291,30 @@
                 }
 
                 var selectedCases = document.getElementsByClassName("motorPair");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "colorOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("color");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "programOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("program");
                 for (var index = 0; index < selectedCases.length; index++) {
                     var aCase = selectedCases[index];
                     aCase.style.display = "block";
