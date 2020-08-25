@@ -18,8 +18,13 @@ class servicespike extends HTMLElement {
     constructor () {
         super();
 
-        this.active = false; // whether the service was activated
+        var active = false; // whether the service was activated
         this.service = new Service_SPIKE(); // instantiate a service object ( one object per button )
+
+        this.service.executeAfterDisconnect(function () {
+            active = false;
+            status.style.backgroundColor = "red";
+        })
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -66,15 +71,15 @@ class servicespike extends HTMLElement {
             button.style.backgroundColor = "#FFFFFF";
             button.style.color = "#000000";
         })
-    
+
         // when ServiceDock button is double clicked
         this.addEventListener("click", async function () {
             // check active flag so once activated, the service doesnt reinit
-            if (!this.active) {
+            if (!active) {
                 console.log("activating service");
                 var initSuccessful = await this.service.init();
                 if (initSuccessful) {
-                    this.active = true;
+                    active = true;
                     status.style.backgroundColor = "green";
                 }
             } 
@@ -273,6 +278,8 @@ function Service_SPIKE() {
 
     var funcAfterPrint = undefined; // function to call for micropy program print statements or errors
 
+    var funcAfterDisconnect = undefined; // function to call after SPIKE Prime is disconnected
+
     var funcAfterNewGesture = undefined;
     var funcAfterNewOrientation = undefined;
 
@@ -309,6 +316,9 @@ function Service_SPIKE() {
      * @returns {boolean} True if service was successsfully initialized, false otherwise
      */
     async function init() {
+
+        console.log("navigator.product is ", navigator.product);
+        console.log("navigator.appName is ", navigator.appName);
         // initialize web serial connection
         var webSerialConnected = await initWebSerial();
 
@@ -350,6 +360,15 @@ function Service_SPIKE() {
      */
     function executeAfterPrint(callback) {
         funcAfterPrint = callback;
+    }
+
+    /** <h4> Get the callback function to execute after service is disconnected </h4>
+     * 
+     * @public
+     * @param {any} callback 
+     */
+    function executeAfterDisconnect(callback) {
+        funcAfterDisconnect = callback;
     }
 
     /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
@@ -2405,6 +2424,11 @@ function Service_SPIKE() {
                     // error handler
                     catch (error) {
                         serviceActive = false;
+                        
+                        if ( funcAfterDisconnect != undefined ) {
+                            funcAfterDisconnect();
+                        }
+
                         console.log('[readLoop] ERROR', error);
                         // error detected: release
                         reader.releaseLock();
@@ -2941,6 +2965,7 @@ function Service_SPIKE() {
         reachMicroPy: reachMicroPy,
         executeAfterInit: executeAfterInit,
         executeAfterPrint: executeAfterPrint,
+        executeAfterDisconnect: executeAfterDisconnect,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
         getBatteryStatus: getBatteryStatus,
