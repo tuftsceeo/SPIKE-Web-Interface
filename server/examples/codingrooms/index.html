@@ -52,41 +52,41 @@
 </head>
 <body>
 <h1>iframe test</h1>
-<form onsubmit="submitForm(); return false;">
-  <div style = "float:left;">
-    <div style = "float:left">
-      Project name:
-    </div>
-    <input type="text" id="filename2" value="Some Project" style = "float: left;"/>
-    <div style = "float:left">
-      Slots:
-    </div>
-    <select id = "slotidSelect" style = "float:left">
-      <option id = "0">0</option>
-      <option id = "1">1</option>
-      <option id = "2">2</option>
-      <option id = "3">3</option>
-      <option id = "4">4</option>
-      <option id = "5">5</option>
-      <option id = "6">6</option>
-      <option id = "7">7</option>
-      <option id = "8">8</option>
-      <option id = "9">9</option>
-      <option id = "10">10</option>
-      <option id = "11">11</option>
-      <option id = "12">12</option>
-      <option id = "13">13</option>
-      <option id = "14">14</option>
-      <option id = "15">15</option>
-      <option id = "16">16</option>
-      <option id = "17">17</option>
-      <option id = "18">18</option>
-      <option id = "19">19</option>
-    </select>
+<div>
+  <div style="float:left">
+    Project name:
   </div>
-  <br/>
-  <div style = "float:left;" >
-    <textarea style="width:600px; font-family:'Courier New', Courier" rows=5 id="filecontent">
+  <input type="text" id="filename2" value="Some Project" style="float: left;" />
+  <div style="float:left">
+    Slots:
+  </div>
+  <select id="slotidSelect" style="float:left">
+    <option id="0">0</option>
+    <option id="1">1</option>
+    <option id="2">2</option>
+    <option id="3">3</option>
+    <option id="4">4</option>
+    <option id="5">5</option>
+    <option id="6">6</option>
+    <option id="7">7</option>
+    <option id="8">8</option>
+    <option id="9">9</option>
+    <option id="10">10</option>
+    <option id="11">11</option>
+    <option id="12">12</option>
+    <option id="13">13</option>
+    <option id="14">14</option>
+    <option id="15">15</option>
+    <option id="16">16</option>
+    <option id="17">17</option>
+    <option id="18">18</option>
+    <option id="19">19</option>
+  </select> 
+</div>
+<br/><br />
+<div>
+<form style="position:relative;" onsubmit="submitForm(); return false;">
+  <textarea style="width:600px; font-family:'Courier New', Courier" rows=5 id="filecontent">
 from spike import PrimeHub, LightMatrix, Motor, MotorPair
 from spike.control import wait_for_seconds, wait_until, Timer
 
@@ -94,9 +94,9 @@ hub = PrimeHub()
 
 hub.light_matrix.show_image('HAPPY')
       </textarea>
-  </div>
-    <input type=submit value = "Save">
+  <input type=submit value="Save">
 </form>
+</div>
 
 <br/><br/>
 
