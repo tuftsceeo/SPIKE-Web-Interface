@@ -161,7 +161,6 @@ function Service_SPIKE() {
 
     // contains latest full json object from SPIKE readings
     let lastUJSONRPC;
-    let readFrom = 0;
 
     // object containing real-time info on devices connected to each port of SPIKE Prime 
     let ports =
@@ -200,6 +199,8 @@ function Service_SPIKE() {
         "accel": [0,0,0],
         "pos": [0,0,0]
     }
+
+    let batteryAmount = 0; // battery [0-100]
 
     // string containing real-time info on hub events
     let hubFrontEvent;
@@ -267,7 +268,10 @@ function Service_SPIKE() {
     var waitForNewOriFirst = true; //whether the wait_for_new_orientation method would be the first time called
 
     /* stored callback functions from wait_until functions and etc. */
+
     var funcAtInit = undefined; // function to call after init of SPIKE Service
+
+    var funcAfterPrint = undefined; // function to call for micropy program print statements or errors
 
     var funcAfterNewGesture = undefined;
     var funcAfterNewOrientation = undefined;
@@ -338,6 +342,14 @@ function Service_SPIKE() {
     function executeAfterInit(callback) {
         // Assigns global variable funcAtInit a pointer to callback function
         funcAtInit = callback;
+    }
+
+    /** <h4> Get the callback function to execute after service is initialized </h4>
+     * @public
+     * @param {function} callback 
+     */
+    function executeAfterPrint(callback) {
+        funcAfterPrint = callback;
     }
 
     /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
@@ -450,6 +462,15 @@ function Service_SPIKE() {
      */
     async function getPortInfo(letter) {
         return ports[letter];
+    }
+
+    /** <h4> Get battery status </h4>
+     * 
+     * @public
+     * @returns {integer} battery percentage
+     */
+    async function getBatteryStatus() {
+        return batteryAmount;
     }
 
     /** <h4> Get info of the hub </h4>
@@ -2265,7 +2286,6 @@ function Service_SPIKE() {
                 success = false;
             }
 
-            
             return success;
 
 
@@ -2591,7 +2611,13 @@ function Service_SPIKE() {
         //catch runtime_error made at ujsonrpc level
         if (messageType == "runtime_error") {
             var decodedResponse = atob(parsedUJSON["p"][3]);
+
             console.log(decodedResponse);
+
+            // execute function after print if defined
+            if (funcAfterPrint != undefined) {
+                funcAfterPrint(decodedResponse);
+            }
         }
         // storage information
         else if ( messageType == 1 ) {
@@ -2603,9 +2629,9 @@ function Service_SPIKE() {
             }
 
         }
-        //catch this mysterious thing
+        // battery status
         else if (messageType == 2) {
-            //console.log(lastUJSONRPC);
+            batteryAmount = parsedUJSON["p"][1];
         }
         // give center button click, left, right (?)
         else if (messageType == 3) {
@@ -2727,9 +2753,14 @@ function Service_SPIKE() {
         else if (messageType == "userProgram.print") {
             var printedMessage = parsedUJSON["p"]["value"];
             var NLindex = printedMessage.search(/\\n/);
-            printedMessage = printedMessage.substring(0, NLindex);
+            printedMessage = await printedMessage.substring(0, NLindex);
             
             console.log(atob(printedMessage));
+
+            // execute function after print if defined
+            if (funcAfterPrint != undefined) {
+                funcAfterPrint(atob(printedMessage));
+            }
         }
         else {
 
@@ -2909,8 +2940,10 @@ function Service_SPIKE() {
         rebootHub: rebootHub,
         reachMicroPy: reachMicroPy,
         executeAfterInit: executeAfterInit,
+        executeAfterPrint: executeAfterPrint,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
+        getBatteryStatus: getBatteryStatus,
         getHubInfo: getHubInfo,
         getProjects: getProjects,
         isActive: isActive,
