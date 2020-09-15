@@ -158,6 +158,7 @@ function Service_SPIKE() {
     let port;
     let reader;
     let writer;
+    let writableStreamClosed;
     let value;
     let done;
 
@@ -302,6 +303,10 @@ function Service_SPIKE() {
     var writePackageInformation = undefined; // [ message_id, remaining_data, transfer_id, blocksize]
     var writeProgramCallback = undefined; // callback function to run after a program was successfully written
 
+
+    /* for debugging purposes */
+    var arrayOfPackets = [];
+
     //////////////////////////////////////////
     //                                      //
     //          Public Functions            //
@@ -319,6 +324,11 @@ function Service_SPIKE() {
 
         console.log("navigator.product is ", navigator.product);
         console.log("navigator.appName is ", navigator.appName);
+
+        // reinit variables in the case of hardware disconnection and Service reactivation
+        reader = undefined;
+        writer = undefined;
+
         // initialize web serial connection
         var webSerialConnected = await initWebSerial();
 
@@ -771,7 +781,7 @@ function Service_SPIKE() {
 
         // template of python file that needs to be concatenated
         var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
-        var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    print(\"hello\")\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+        var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
 
         // stringify data and strip trailing and leading quotation marks
         var stringifiedData = JSON.stringify(data);
@@ -805,6 +815,11 @@ function Service_SPIKE() {
      */
     function executeProgram(slotid) {
         UJSONRPC.programExecute(slotid)
+    }
+
+
+    function getUJSONRPCpackets() {
+        return arrayOfPackets;
     }
 
     //////////////////////////////////////////
@@ -1818,7 +1833,9 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -1843,7 +1860,11 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
+
         sendDATA(command);
     }
 
@@ -1868,7 +1889,11 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        
+            if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
+
         sendDATA(command);
     }
 
@@ -1894,7 +1919,11 @@ function Service_SPIKE() {
             ', "rmotor":' + '"' + rmotor + '"' +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+
+        if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
+
         sendDATA(command);
     }
 
@@ -1921,7 +1950,11 @@ function Service_SPIKE() {
             ', "rmotor":' + '"' + rmotor + '"' +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+
+        if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
+
         sendDATA(command);
     }
 
@@ -1944,7 +1977,11 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+
+        if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
+
         sendDATA(command);
     }
 
@@ -1967,7 +2004,10 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        
+        if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2019,7 +2059,7 @@ function Service_SPIKE() {
      */
     UJSONRPC.getFirmwareInfo = async function getFirmwareInfo() {
         var randomId = generateId();
-        var command = '{"i":' + '"' + randomId + '"' + ', "m": "get_firmware_info" ' + '}';
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "get_hub_info" ' + '}';
         sendDATA(command);
     }
 
@@ -2073,8 +2113,8 @@ function Service_SPIKE() {
         var command = '{"i":' + '"' + randomId + '"' +
             ', "m": "start_write_program", "p": {' +
             '"meta": {' +
-            '"created": ' + parseInt(Date.now() * 1000) +
-            ', "modified": ' + parseInt(Date.now() * 1000) +
+            '"created": ' + parseInt(Date.now()) +
+            ', "modified": ' + parseInt(Date.now()) +
             ', "name": ' + '"' + projectName + '"' +
             ', "type": ' + typeInt +
             ', "project_id":' + Math.floor(Math.random() * 1000) +
@@ -2296,7 +2336,21 @@ function Service_SPIKE() {
                 //filters: [filter]
             });
             // wait for the port to open.
-            await port.open({ baudrate: 115200 });
+            try {
+                await port.open({ baudrate: 115200 });
+                console.log(port);
+            }
+            catch (er) {
+                try {
+                    console.log(er)
+                    await port.close();
+                }
+                catch (err) {
+                    console.log(err)
+                    success = false;
+                    return success;
+                }
+            }
 
             if (port.readable) {
                 success = true;
@@ -2323,7 +2377,7 @@ function Service_SPIKE() {
         if (typeof writer === 'undefined') {
             // set up writer for the first time
             const encoder = new TextEncoderStream();
-            const writableStreamClosed = encoder.readable.pipeTo(port.writable);
+            writableStreamClosed = encoder.readable.pipeTo(port.writable);
             writer = encoder.writable.getWriter();
         }
     }
@@ -2389,10 +2443,22 @@ function Service_SPIKE() {
 
                                             lastUJSONRPC = conjoinedPacketsArray[i];
 
-                                            // update hub information using lastUJSONRPC
-                                            await updateHubPortsInfo();
-                                            await PrimeHubEventHandler();
+                                            try {
+                                                var parseTest = await JSON.parse(lastUJSONRPC)
 
+                                                // update hub information using lastUJSONRPC
+                                                await updateHubPortsInfo();
+                                                await PrimeHubEventHandler();
+                                            }
+                                            catch (e) {
+                                                console.log(e);
+                                                console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
+                                                console.log("current jsonline: ", jsonline);
+                                                console.log("current cleaned json_string: ", cleanedJsonString)
+                                                console.log("current json_string: ", json_string);
+                                                console.log("current value: ", value);
+                                            }
+                                            
                                             jsonline = "";
 
                                         }
@@ -2400,15 +2466,31 @@ function Service_SPIKE() {
                                     else {
                                         lastUJSONRPC = jsonline.substring(0, carriageReIndex);
 
-                                        // update hub information using lastUJSONRPC
-                                        await updateHubPortsInfo();
-                                        await PrimeHubEventHandler();
+                                        // parsing test
+                                        try {
+                                            var parseTest = await JSON.parse(lastUJSONRPC)
 
-                                        jsonline = "";
+                                            // update hub information using lastUJSONRPC
+                                            await updateHubPortsInfo();
+                                            await PrimeHubEventHandler();
+
+                                        }
+                                        catch (e) {
+                                            console.log(e);
+                                            console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
+                                            console.log("current jsonline: ", jsonline);
+                                            console.log("current cleaned json_string: ", cleanedJsonString)
+                                            console.log("current json_string: ", json_string);
+                                            console.log("current value: ", value);
+
+                                        }
+
+                                        jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
                                     }
 
                                 }
                                 else {
+                                    console.log("jsonline was reset: ", jsonline);
                                     // reset jsonline for next concatenation
                                     jsonline = "";
                                 }
@@ -2423,17 +2505,31 @@ function Service_SPIKE() {
                     }
                     // error handler
                     catch (error) {
+                        console.log('[readLoop] ERROR', error);
+
                         serviceActive = false;
-                        
-                        if ( funcAfterDisconnect != undefined ) {
+
+                        if (funcAfterDisconnect != undefined) {
                             funcAfterDisconnect();
                         }
+                        writer.close();
+                        //await writer.releaseLock();
+                        await writableStreamClosed;
 
-                        console.log('[readLoop] ERROR', error);
-                        // error detected: release
-                        reader.releaseLock();
+                        reader.cancel();
+                        //await reader.releaseLock();
                         await readableStreamClosed.catch(reason => { });
+
                         await port.close();
+
+                        writer = undefined;
+                        reader = undefined;
+                        jsonline = "";
+                        lastUJSONRPC = undefined;
+                        json_string = undefined;
+                        cleanedJsonString = undefined;
+
+
                         break; // stop trying to read
                     }
                 } // end of: while (true) [reader loop]
@@ -2788,6 +2884,8 @@ function Service_SPIKE() {
         }
         else {
 
+            console.log("received response: ", lastUJSONRPC);
+
             // general parameters check
             if (parsedUJSON["r"]) {
                 if (parsedUJSON["r"]["slots"]) {
@@ -2800,8 +2898,13 @@ function Service_SPIKE() {
 
                 }
             }
-
-            console.log("received response: ", lastUJSONRPC);
+            
+            // check error message
+            if (parsedUJSON["e"]) {
+                console.log("responsed to message " + parsedUJSON["i"] + "with an error: ")
+                var decodedError = atob(parsedUJSON["e"]);
+                console.log(decodedError);
+            }
 
             // iterate over responseCallbacks global variable
             for ( var index in responseCallbacks ) {
