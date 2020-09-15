@@ -49,6 +49,7 @@
                 <input type="button" id="motorPairStartLeft" class="SPIKEtestCase motorPair" value="motorPair start left">
                 <input type="button" id="motorPairStartRight" class="SPIKEtestCase motorPair" value="motorPair start right">
                 <input type="button" id="motorPairStop" class="SPIKEtestCase motorPair" value="motorPair stop()">
+                
                 <!-- motion sensor functions-->
                 <input type="button" id="waitForNewGesture" class="SPIKEtestCase motion" value="wait_for_new_gesture test">
                 <input type="button" id="wasGesture" class="SPIKEtestCase motion" value="was_gesture test">
@@ -84,6 +85,7 @@
                 <input type="button" id="writeProgram" class="SPIKEtestCase program" value="test write program">
                 <input type="button" id="concatenateProgram" class="SPIKEtestCase program" value="test source code for concatenating micropy program">
                 <input type="button" id="getProjects" class="SPIKEtestCase program" value="test getProjects()">
+                <input type="button" id="parseUJSON" class="SPIKEtestCase program" value="test parseUJSONRPC source code">
 
                 <!-- SPIKE Library functions-->
                 <input type="button" id="setHubOri" class="SPIKEtestCase misc" value="setHubOrientation()">
@@ -119,6 +121,7 @@
                 <input type="button" id="moveTankTime1" class="SPIKEtestCase misc" value="moveTankTime(3000, 100, 100, 'A', 'B',false)">
                 <input type="button" id="soundBeep" class="SPIKEtestCase misc" value="soundBeep(100, 300)">
                 <input type="button" id="soundStop" class="SPIKEtestCase misc" value="soundStop()">
+                <input type="button" id="random" class="SPIKEtestCase misc" value="random">
                 <div id="chart"></div>
             </div>
         </div>
@@ -680,7 +683,9 @@
 
                 console.log(dataToWrite);
 
-                mySPIKE.writeProgram("some project", dataToWrite, 1);
+                var programname = "test program"
+
+                mySPIKE.writeProgram(btoa(programname), dataToWrite, 1);
 
             })
             console.log("###### ENDING UNIT TEST ON writeProgram() #######");
@@ -695,7 +700,7 @@
 
             writeProgramButton.addEventListener("click", function () {
                 var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
-                var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    print(\"hello\")\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+                var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
 
                 var dataTextBox = document.getElementById("writeProgramData");
 
@@ -730,10 +735,151 @@
         var testGetProjects = document.getElementById("getProjects");
         testGetProjects.addEventListener("click", async function () {
             console.log("###### BEGINNING UNIT TEST ON mySPIKE.getProjects() #######");
+            
             var hubProjects = await mySPIKE.getProjects();
             console.log(hubProjects);
             console.log("Expected result: console log of an object listing all slots in the SPIKE Prime");
             console.log("###### ENDING UNIT TEST ON mySPIKE.getProjects()#######");
+        })
+
+        var testParseUJSON = document.getElementById("parseUJSON");
+        testParseUJSON.addEventListener("click", async function () {
+
+            var array = ['{ "m": 2, "p": ','[8.326, 100] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -8, 989], [0, 0, 0], [-4, ','0, 0], "", 0] }\r{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49',', [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -8, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, ','null, 7, 7, 7]], [62, [','10]]',', [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]','], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109',', 0]], [48, ','[0, 0, -177, 0]], ','[49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61',', [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48',', [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -','6, 992], [0, 0, 0], [-4, 0, 0], ""',', 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [','62, [10]], [4, -5, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, ','[0, 0, -176, 0]], [49, [0, 0, ','166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [5, -8',', 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0]], [','48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [3, -10, 991], [','0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, n','ull, 7, 9, 7]], [62, [10]], [4, -5, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48',', [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], ','[62, [10]], ','[5, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ ','"m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [2, -8, ','989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0',']], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0',']], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -8, 991], ','[0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, ','0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0','], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, ','7, 7]], [62, [10]], [6, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r{ "m": 2, "p": [8.323, 100] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 991], [0, 0, 0], [-4, ','0, 0], "", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -5, 991], [0, 0, 0], [-4, 0, ','0], "", 0] }\r','{ "m": 0, "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -177, 0]], [','49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [5, -7, 991], [0, 0, 0], [-4, ','0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, ','0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1',', null, 7, 9, 7]], [62, [10',']], [4, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0',']], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]','], [4, -5, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 1','09, 0]], [48, [','0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [','61, [1, null, 7, 7, 7]], [62, [10]], [5, -7, 991], [0, 0, 0], [-4',', 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [6, -5, 989], [0, 0, 0], [-4, 0, 0], ','"", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [','1, null, 7, 7, 7]]',', [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, ','0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], ','[3, -6, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109',', 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]','], [4, ',' - 8, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [','61, [1, null, 7, 7, 7]], [62, [10]], [5, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], ','[48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, ','null, 7, 7, 7]], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [','0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [5, -6, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[','48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -7, 990], [0, 0, 0]',', [-4, 0, 0], "", 0]','}\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, ','0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [3, -7, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, ','[0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]]',', [62, [10]], [5, -6, 990]',', [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -6, ','992], [0, 0, 0], [-4, 0, 0], "", 0]','}\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0',', 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -8, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 2, "p": [8.323, 100] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, ','[0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, ','384]], [61, [1, null, 7, 7, 7]], [62, [10]], [5, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62',', [10]], [3, -6, 990], [0, 0, 0], [-4',', 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [','10]], [4, -6, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [','48, [0, 0, -177, 0]], ','[49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -8, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]','], [62, [1','0]], [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 992], [','0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [','3,- 7, 989], [0, 0, 0], [-4, 0, 0], "", 0]}\r', '{ "m": 0, "p": [[', '48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], ', '[61, [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r ', '{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10', ']], [4, -7, 990], [0, 0, 0], [-4, 0, 0], ', '"", 0] }\r {"i": "ECSn", "r": ', '{ "blocksize": 512', ', "transferid": "53766" }', '}\r' ]
+            
+            parseUJSON(array);
+
+            async function parseUJSON(streamArray) {
+
+                console.log("here");
+
+                //define for json concatenation
+                let jsonline = "";
+
+                // contains latest full json object from SPIKE readings
+                let lastUJSONRPC;
+
+                for ( var index in streamArray ) {
+                    var value = streamArray[index];
+                    //concatenate UJSONRPC packets into complete JSON objects
+                    if (value) {
+                        // stringify the packet to look for carriage return
+                        var json_string = await JSON.stringify(value);
+
+                        let findEscapedQuotes = /\\"/g;
+                        let findNewLines = /\\n/g;
+
+                        var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
+                        cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
+                        // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
+
+                        jsonline = jsonline + cleanedJsonString; // concatenate packet to data
+
+                        // regex search for carriage return
+                        let pattern = /\\r/g;
+                        var carriageReIndex = jsonline.search(pattern);
+
+                        // there is at least one carriage return in this packet
+                        if (carriageReIndex > -1) {
+
+                            // the concatenated packets start with a left curly brace (start of JSON)
+                            if (jsonline[0] == "{" || jsonline.substring(0, 2) == " {") {
+
+                                lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                                // look for conjoined JSON packets: there's at least two carriage returns in jsonline
+                                if (jsonline.match(/\\r/g).length > 1) {
+
+                                    var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
+
+                                    // last index only contains "" as it would be after \r
+                                    for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
+
+                                        // for every JSON object in array, perform data handling
+
+                                        lastUJSONRPC = conjoinedPacketsArray[i];
+
+                                        try {
+                                            var parseTest = await JSON.parse(lastUJSONRPC)
+
+                                            // // update hub information using lastUJSONRPC
+                                            // await updateHubPortsInfo();
+                                            // await PrimeHubEventHandler();
+
+                                            // if (funcWithStream) {
+                                            //     await funcWithStream();
+                                            // }
+                                            console.log("lastUJSONRPC: ", lastUJSONRPC);
+
+                                        }
+                                        catch (e) {
+                                            console.log(e);
+                                            console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
+                                            console.log("current jsonline: ", jsonline);
+                                            console.log("current cleaned json_string: ", cleanedJsonString)
+                                            console.log("current json_string: ", json_string);
+                                            console.log("current value: ", value);
+
+                                            // if (funcAfterError != undefined) {
+                                            //     funcAfterError("Fatal Error: Please refresh this environment");
+                                            // }
+
+                                        }
+
+                                        jsonline = "";
+
+                                    }
+                                }
+                                else {
+                                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                                    // // parsing test
+                                    try {
+                                        var parseTest = await JSON.parse(lastUJSONRPC)
+
+                                        // // update hub information using lastUJSONRPC
+                                        // await updateHubPortsInfo();
+                                        // await PrimeHubEventHandler();
+
+                                        // if (funcWithStream) {
+                                        //     await funcWithStream();
+                                        // }
+                                        console.log("lastUJSONRPC: ", lastUJSONRPC);
+                                    }
+                                    catch (e) {
+                                        console.log(e);
+                                        console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
+                                        console.log("current jsonline: ", jsonline);
+                                        console.log("current cleaned json_string: ", cleanedJsonString)
+                                        console.log("current json_string: ", json_string);
+                                        console.log("current value: ", value);
+                                        console.log("from a jsonline that has only one carriage return")
+
+                                        // if (funcAfterError != undefined) {
+                                        //     funcAfterError("Fatal Error: Please refresh this environment");
+                                        // }
+
+                                    }
+
+                                    jsonline = jsonline.substring(carriageReIndex+1, jsonline.length);
+                                }
+
+                            }
+                            // there was a carriage return in jsonline but a full JSON object wasnt formed
+                            // usually when it's the first packet
+                            else {
+
+                                console.log("RESETTING JSONLINE WOOOOOOOOOO")
+                                console.log("jsonline: ", jsonline);
+                                // reset jsonline for next concatenation
+                                jsonline = "";
+                            }
+                        }
+
+                    }
+                }
+            }
+        
         })
 
 
@@ -932,6 +1078,20 @@
         var testUJSONRPCsoundStop = document.getElementById("soundStop")
         testUJSONRPCsoundStop.addEventListener("click", function () {
             mySPIKE.UJSONRPC.soundStop()
+        })
+
+        var testRandom = document.getElementById("random");
+        testRandom.addEventListener("click", function () {
+            var json_string = '"{\"m\":\"userProgram.print\",\"p\":{\"value\": \"ZmluaXNoZWQK\\n\"},\"i\":4261}\r"'
+            
+            let findEscapedQuotes = /\\"/g;
+            let findNewLines = /\\n/g;
+
+            var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
+            cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
+            cleanedJsonString = cleanedJsonString.replace(findNewLines, '');
+
+            console.log(cleanedJsonString);
         })
 
         //////////////////////////////////////////
