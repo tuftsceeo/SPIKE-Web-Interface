@@ -4,10 +4,10 @@
 
 Note: access to this GitHub repository requires signing a LEGO Education NDA. If you haven't signed a LEGO Education NDA, please do not proceed further and immediately contact Ethan Danahy (ethan.danahy@tufts.edu).
 
-
-
-## Installation
-- TBD
+## Development
+- Install this repository in a directory
+- Get [MAMP](https://www.mamp.info)
+- Set root directory to ./server, in which index.html will be the main portal page
 
 ## Documentation
 > [documentation files](https://github.com/tuftsceeo/SPIKE-Web-Interface/tree/master/documentation)
