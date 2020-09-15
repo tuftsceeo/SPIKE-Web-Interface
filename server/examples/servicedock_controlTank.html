@@ -134,10 +134,9 @@ Note:
             })
 
             $("#startControl").on("click", function() {
-                ultrasonicSensor = new mySPIKE.DistanceSensor(ultrasonicPort);
-                
                 // optional color sensor
                 try {
+                    ultrasonicSensor = new mySPIKE.DistanceSensor(ultrasonicPort);
                     colorSensor = new mySPIKE.ColorSensor(colorPort);
                 }
                 catch(e) {}
@@ -153,6 +152,7 @@ Note:
         function defineListeners() {
             // listen to keyboard events to move the tank
             document.addEventListener('keydown', function (e) {
+                console.log("here you go")
                 if (!keyPressed) {
                     // up arrow key
                     if (e.which === 38) {
@@ -170,13 +170,23 @@ Note:
                     else if (e.which === 39) {
                         motorPair.start_tank(speed, -speed);
                     }
+                    // d key
+                    else if (e.which === 68) {
+                        console.log("d")
+                        motorPair.start_tank(speed, speed/2);
+                    }
+                    // a key
+                    else if (e.which === 65) {
+                        console.log("a")
+                        motorPair.start_tank(speed/2, speed);
+                    }
                     keyPressed = true;
                 }
-        });
+            });
 
             // listen to keyboard events to stop the tank if key is released
             document.addEventListener('keyup', function (e) {
-                if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39) {
+                if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39 || e.which === 68 || e.which === 65) {
                     motorPair.start_tank(0, 0);
                     keyPressed = false;
                 }
