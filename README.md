@@ -5,12 +5,10 @@
 Note: access to this GitHub repository requires signing a LEGO Education NDA. If you haven't signed a LEGO Education NDA, please do not proceed further and immediately contact Ethan Danahy (ethan.danahy@tufts.edu).
 
 ## Development
-- Install this repository in a directory
-- Get [MAMP](https://www.mamp.info)
-- Set root directory to ./server, in which index.html will be the main portal page
-
-## Documentation
-> [documentation files](https://github.com/tuftsceeo/SPIKE-Web-Interface/tree/master/documentation)
+1)  Install this repository in a directory
+2) Get [MAMP](https://www.mamp.info)
+3)  Set root directory to server folder, in which index.html will be the main portal page
+- Use "API Documentation" for documented ServiceDock API
 
 ## Tutorial
 - [ServiceDock setup](#ServiceDock)
