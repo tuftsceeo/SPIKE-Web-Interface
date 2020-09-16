@@ -18,12 +18,14 @@ Note:
         <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
-        
-        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
-        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <!--
+            <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+            <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        -->
     </head>
 
-    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_displayPixels</h1>
         <div id="servicedock" style="float:left;">
             <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
@@ -103,9 +105,9 @@ Note:
             }
         })
 
-        window.addEventListener("load", function () {
-            dragElement("demobox");
-        })
+        // window.addEventListener("load", function () {
+        //     dragElement("demobox");
+        // })
 
     </script>
     <style>

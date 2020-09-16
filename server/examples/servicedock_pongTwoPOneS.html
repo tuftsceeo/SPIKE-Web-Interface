@@ -31,7 +31,7 @@ NOTE: the main() function is where service dock's already declared variables
   justify-content: center;
 }
 body {
-  background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');
+  background-image: url('./modules/views/CEEOInnovationsbackground.png');
 }
 </style>
 <style>
@@ -52,6 +52,7 @@ body {
   }
   </style>
 <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+<h1 style="left: 500px; position: absolute; color: white;">servicedock_pongTwoPOneS</h1>
 <div id="servicedock" style="float:left;">
   <service-spike id = "Service_SPIKE"></service-spike>
 </div>
@@ -283,11 +284,12 @@ async function assignMotor () {
   rightMotor = new my_SPIKE.Motor(rightPlayerport);
 
 }
+
 // sync motor speed with respective Pong paddles
 async function main() {
 
-  leftPaddle.dy = leftMotor.get_speed();
-  rightPaddle.dy = rightMotor.get_speed();
+  leftPaddle.dy = await leftMotor.get_speed();
+  rightPaddle.dy = await rightMotor.get_speed();
 
 }
 // start the game

@@ -31,7 +31,7 @@ NOTE: the main() function is where service dock's already declared variables
   justify-content: center;
 }
 body {
-  background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');
+  background-image: url('./modules/views/CEEOInnovationsbackground.png');
 }
 </style>
 <style>
@@ -52,6 +52,7 @@ body {
   }
   </style>
 <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+  <h1 style="left: 500px; position: absolute; color: white;">servicedock_pongOnePHub</h1>
 <div id="servicedock" style="float:left;">
   <service-spike id = "Service_SPIKE"></service-spike>
 </div>
@@ -227,7 +228,7 @@ document.addEventListener('keyup', function(e) {
     var gyroPitch = hub.motion_sensor.get_pitch_angle();
     
     // convert data to speed
-    var gyroToPaddleSpeed = gyroPitch/100 * -1;
+    var gyroToPaddleSpeed = gyroPitch * -1;
 
     // assign converted speed to paddle speed
     rightPaddle.dy = gyroToPaddleSpeed;
@@ -278,7 +279,7 @@ requestAnimationFrame(loop);
           stage++;
           break;
         case 1:
-          explanation2.innerHTML = "Move the hub and play Pong!"
+          explanation2.innerHTML = "Tilt the hub and play Pong!"
           explanation.innerHTML = ""
           var triangleBefore = document.getElementById("SPIKE_triangle");
           triangleBefore.style.display = "none";

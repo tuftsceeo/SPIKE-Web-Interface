@@ -20,11 +20,11 @@ Note:
         <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
 
-
         <script src="https://unpkg.com/konva@7.0.4/konva.min.js"></script>
     </head>
 
-    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_painting</h1>
         <div id="servicedock" style="float:left;">
             <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
@@ -35,6 +35,7 @@ Note:
                 <option value="brush">Brush</option>
                 <option value="eraser">Eraser</option>
             </select>
+            Connect force sensor to your SPIKE, refresh page, reactivate ServiceDOck and begin drawing.
             <div id="container"></div>
         </div> 
     </body>

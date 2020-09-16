@@ -16,6 +16,7 @@ LICENSE: MIT
 class servicesystemlink extends HTMLElement {   
 
     constructor () {
+
         super();
 
         this.active = false; // whether the service was activated
@@ -46,8 +47,8 @@ class servicesystemlink extends HTMLElement {
 
         /* status circle definition and CSS */
 
-        var status = document.createElement("div");
-        status.setAttribute("class", "status");
+        this.status = document.createElement("div");
+        this.status.setAttribute("class", "status");
         
         /* CSS */
         var length = 20; // for width and height of circle
@@ -56,7 +57,7 @@ class servicesystemlink extends HTMLElement {
         var posTop = 20;
         var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
          "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
-        status.setAttribute("style", statusStyle);
+        this.status.setAttribute("style", statusStyle);
 
         /* event listeners */
 
@@ -85,7 +86,7 @@ class servicesystemlink extends HTMLElement {
                 
                 if (initSuccessful) {
                     this.active = true;
-                    status.style.backgroundColor = "green";
+                    this.status.style.backgroundColor = "green";
                 }
 
             }
@@ -93,7 +94,7 @@ class servicesystemlink extends HTMLElement {
         });
 
         shadow.appendChild(wrapper);
-        button.appendChild(status);
+        button.appendChild(this.status);
         wrapper.appendChild(button);
     }
 
@@ -151,6 +152,19 @@ class servicesystemlink extends HTMLElement {
         return this.active;
     }
 
+    // initialize the service (is not used in this class but available for use publicly)
+    async init() {
+        var initSuccess = await this.service.init(this.APIKey);
+        if (initSuccess) {
+            this.status.style.backgroundColor = "green";
+            this.active = true;
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
 
 // when defining custom element, the name must have at least one - dash 
@@ -171,6 +185,7 @@ LICENSE: MIT
 /**
  * 
  * @class Service_SystemLink
+ * @example
  * // if you're using ServiceDock
  * var mySL = document.getElemenyById("service_systemlink").getService();
  * // if you're not using ServiceDock

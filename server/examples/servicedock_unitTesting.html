@@ -3,6 +3,7 @@
     <head>
         <script src="./modules/ServiceDock_SPIKE.js"></script>
         <script src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="./modules/ServiceDock_Template.js"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
     </head>
@@ -10,7 +11,8 @@
     <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
-            <service-systemlink id="service_systemlink" ></service-systemlink>
+            <service-systemlink id="service_systemlink" apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
+            <service-template id = "service_template"></service-template>
         </div>
         <div id = "onlyForWriteProgram" >
             <textarea id="writeProgramData" name="data" value=""
@@ -168,7 +170,12 @@
     <script>
         var mySPIKE = document.getElementById("service_spike").getService();
         var hub = new mySPIKE.PrimeHub();
-        var mySL = document.getElementById("service_systemlink").getService();
+
+        var mySLElement = document.getElementById("service_systemlink");
+        // mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
+        mySLElement.init();
+        var mySL = mySLElement.getService();
+        //var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
 
         //////////////////////////////////////////
