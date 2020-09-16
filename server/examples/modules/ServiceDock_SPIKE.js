@@ -41,7 +41,7 @@ class servicespike extends HTMLElement {
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
 
-        var imageRelPath = "/examples/modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var imageRelPath = "./modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
         var length = 50; // for width and height of button
         var buttonBackgroundColor = "#A2E1EF" // background color of the button
         var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
