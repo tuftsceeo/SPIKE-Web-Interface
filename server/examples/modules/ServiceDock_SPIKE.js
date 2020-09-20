@@ -2457,6 +2457,147 @@ function Service_SPIKE() {
         }
     }
 
+
+    /** <h4> Process a packet in UJSONRPC </h4>
+    * @private
+    *
+    */
+    async function parsePacket(value, testing = false, callback) {
+
+        // console.log(value);
+
+        // stringify the packet to look for carriage return
+        var json_string = await JSON.stringify(value);
+        json_string = json_string.trim();
+
+        let findEscapedQuotes = /\\"/g;
+
+        var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
+        cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
+        // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
+
+        jsonline = jsonline + cleanedJsonString; // concatenate packet to data
+        jsonline = jsonline.trim();
+
+        // regex search for carriage return
+        let pattern = /\\r/g;
+        var carriageReIndex = jsonline.search(pattern);
+
+        // there is at least one carriage return in this packet
+        if (carriageReIndex > -1) {
+
+            // the concatenated packets start with a left curly brace (start of JSON)
+            if (jsonline[0] == "{") {
+
+                lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                // look for conjoined JSON packets: there's at least two carriage returns in jsonline
+                if (jsonline.match(/\\r/g).length > 1) {
+
+                    var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
+
+                    // last index only contains "" as it would be after \r
+                    for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
+
+                        // for every JSON object in array, perform data handling
+
+                        lastUJSONRPC = conjoinedPacketsArray[i];
+
+                        try {
+                            var parseTest = await JSON.parse(lastUJSONRPC)
+
+                            if (testing) {
+                                console.log("%cTuftsCEEO ", "color: #3ba336;", "UJSONRPC line: ", lastUJSONRPC);
+                            }
+
+                            // update hub information using lastUJSONRPC
+                            await updateHubPortsInfo();
+                            await PrimeHubEventHandler();
+
+                            if (funcWithStream) {
+                                await funcWithStream();
+                            }
+
+                        }
+                        catch (e) {
+                            console.log(e);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC: ", lastUJSONRPC);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current jsonline: ", jsonline);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current cleaned json_string: ", cleanedJsonString)
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current json_string: ", json_string);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current value: ", value);
+
+                            if (funcAfterError != undefined) {
+                                funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
+                            }
+
+                            if (callback != undefined) {
+                                callback();
+                            }
+
+                        }
+
+                        jsonline = "";
+
+                    }
+                }
+                // there are no conjoined packets in this jsonline
+                else {
+                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                    // parsing test
+                    try {
+                        var parseTest = await JSON.parse(lastUJSONRPC);
+
+                        if (testing) {
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "UJSONRPC line: ", lastUJSONRPC);
+                        }
+
+                        // update hub information using lastUJSONRPC
+                        await updateHubPortsInfo();
+                        await PrimeHubEventHandler();
+
+                        if (funcWithStream) {
+                            await funcWithStream();
+                        }
+                    }
+                    catch (e) {
+                        console.log(e);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC: ", lastUJSONRPC);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current jsonline: ", jsonline);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current cleaned json_string: ", cleanedJsonString)
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current json_string: ", json_string);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current value: ", value);
+
+                        if (funcAfterError != undefined) {
+                            funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
+                        }
+
+                        if (callback != undefined) {
+                            callback();
+                        }
+
+                    }
+
+                    jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+                }
+
+            }
+            else {
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+
+                jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+
+                // reset jsonline for next concatenation
+                // jsonline = "";
+            }
+        }
+
+    }
+
+
     /** <h4> Continuously take UJSON RPC input from SPIKE Prime </h4>
      * @private
      */
@@ -2493,114 +2634,7 @@ function Service_SPIKE() {
 
                         //concatenate UJSONRPC packets into complete JSON objects
                         if (value) {
-
-                            // stringify the packet to look for carriage return
-                            var json_string = await JSON.stringify(value);
-                            let findEscapedQuotes = /\\"/g;
-                            let findNewLines = /\\n/g;
-
-                            var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
-                            cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
-                            // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
-
-                            jsonline = jsonline + cleanedJsonString; // concatenate packet to data
-
-                            // regex search for carriage return
-                            let pattern = /\\r/g;
-                            var carriageReIndex = jsonline.search(pattern);
-
-                            // there is at least one carriage return in this packet
-                            if (carriageReIndex > -1) {
-
-                                // the concatenated packets start with a left curly brace (start of JSON)
-                                if (jsonline[0] == "{") {
-
-                                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                    // look for conjoined JSON packets: there's at least two carriage returns in jsonline
-                                    if (jsonline.match(/\\r/g).length > 1) {
-
-                                        var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
-
-                                        // last index only contains "" as it would be after \r
-                                        for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
-
-                                            // for every JSON object in array, perform data handling
-
-                                            lastUJSONRPC = conjoinedPacketsArray[i];
-
-                                            try {
-                                                var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                                // update hub information using lastUJSONRPC
-                                                await updateHubPortsInfo();
-                                                await PrimeHubEventHandler();
-
-                                                if (funcWithStream) {
-                                                    await funcWithStream();
-                                                }
-
-                                            }
-                                            catch (e) {
-                                                console.log(e);
-                                                console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                                console.log("current jsonline: ", jsonline);
-                                                console.log("current cleaned json_string: ", cleanedJsonString)
-                                                console.log("current json_string: ", json_string);
-                                                console.log("current value: ", value);
-
-                                                if (funcAfterError != undefined) {
-                                                    funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
-                                                }
-
-                                            }
-
-                                            jsonline = "";
-
-                                        }
-                                    }
-                                    // there are no conjoined packets in this jsonline
-                                    else {
-                                        lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                        // parsing test
-                                        try {
-                                            var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                            // update hub information using lastUJSONRPC
-                                            await updateHubPortsInfo();
-                                            await PrimeHubEventHandler();
-
-                                            if (funcWithStream) {
-                                                await funcWithStream();
-                                            }
-                                        }
-                                        catch (e) {
-                                            console.log(e);
-                                            console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                            console.log("current jsonline: ", jsonline);
-                                            console.log("current cleaned json_string: ", cleanedJsonString)
-                                            console.log("current json_string: ", json_string);
-                                            console.log("current value: ", value);
-
-                                            if (funcAfterError != undefined) {
-                                                funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
-                                            }
-
-                                        }
-
-                                        jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
-                                    }
-
-                                }
-                                else {
-                                    console.log("jsonline was reset: ", jsonline);
-
-                                    // reset jsonline for next concatenation
-                                    jsonline = "";
-                                }
-                            }
-
+                            parsePacket(value);
                         }
                         if (done) {
                             serviceActive = false;
@@ -2951,59 +2985,28 @@ function Service_SPIKE() {
         }
         // gives orientation of the hub (leftside, up,..), tapping of hub, 
         else if (messageType == 4) {
-            var isOrientationData = parsedUJSON.p == "up" || parsedUJSON.p == "down" || parsedUJSON.p == "back" || parsedUJSON.p == "front" || parsedUJSON.p == "leftSide" || parsedUJSON.p == "rightSide";
-            var isGestureData = parsedUJSON.p == "freefall" || parsedUJSON.p == "shake" || parsedUJSON.p == "tapped" || parsedUJSON.p == "doubletapped"
             /* this data stream is about hub orientation */
-            if (isOrientationData) {
 
-                var newOrientation = parsedUJSON.p;
-
-                if (newOrientation == "up") {
-                    lastHubOrientation = "up";
-                }
-                else if (newOrientation == "down") {
-                    lastHubOrientation = "down";
-                }
-                else if (newOrientation == "front") {
-                    lastHubOrientation = "front";
-                }
-                else if (newOrientation == "back") {
-                    lastHubOrientation = "back";
-                }
-                else if (newOrientation == "leftSide") {
-                    lastHubOrientation = "leftSide";
-                }
-                else if (newOrientation == "rightSide") {
-                    lastHubOrientation = "rightSide";
-                }
+            var newOrientation = parsedUJSON.p;
+            if (newOrientation == "1") {
+                lastHubOrientation = "up";
             }
-            /* this data stream is about hub gesture */
-            else if (isGestureData) {
-
-                var newGesture = parsedUJSON.p;
-
-                if (newGesture == "freefall") {
-                    hubGesture = "freefall";
-                    hubGestures.push(newGesture);
-                }
-                else if (newGesture == "shake") {
-                    hubGesture = "shake";
-                    hubGestures.push("shaken"); // the string is different at higher level
-                }
-                else if (newGesture == "tapped") {
-                    hubFrontEvent = "tapped";
-                    hubGestures.push(newGesture);
-                }
-                else if (newGesture == "doubletapped") {
-                    hubFrontEvent = "doubletapped";
-                    hubGestures.push(newGesture);
-                }
-
-                // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
-                typeof funcAfterNewGesture === "function" && funcAfterNewGesture(newGesture);
-                funcAfterNewGesture = undefined;
-
+            else if (newOrientation == "4") {
+                lastHubOrientation = "down";
             }
+            else if (newOrientation == "0") {
+                lastHubOrientation = "front";
+            }
+            else if (newOrientation == "3") {
+                lastHubOrientation = "back";
+            }
+            else if (newOrientation == "2") {
+                lastHubOrientation = "leftSide";
+            }
+            else if (newOrientation == "5") {
+                lastHubOrientation = "rightSide";
+            }
+
             console.log(lastUJSONRPC);
         }
         else if (messageType == 7) {
@@ -3027,6 +3030,35 @@ function Service_SPIKE() {
         }
         else if (messageType == 11) {
             console.log(lastUJSONRPC);
+        }
+        else if (messageType == 14) {
+            var newGesture = parsedUJSON.p;
+
+            if (newGesture == "3") {
+                hubGesture = "freefall";
+                hubGestures.push(newGesture);
+            }
+            else if (newGesture == "2") {
+                hubGesture = "shake";
+                hubGestures.push("shaken"); // the string is different at higher level
+            }
+            else if (newGesture == "1") {
+                hubFrontEvent = "tapped";
+                hubGestures.push(newGesture);
+            }
+            else if (newGesture == "0") {
+                hubFrontEvent = "doubletapped";
+                hubGestures.push(newGesture);
+            }
+
+            // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
+            if (typeof funcAfterNewGesture === "function") {
+                funcAfterNewGesture(newGesture);
+                funcAfterNewGesture = undefined;
+            }
+
+            console.log(lastUJSONRPC);
+
         }
         else if (messageType == "userProgram.print") {
             var printedMessage = parsedUJSON["p"]["value"];
@@ -3212,16 +3244,16 @@ function Service_SPIKE() {
                 }
             }
             else if (gyro[1] > 500) {
-                newOrientation = "leftside";
+                newOrientation = "up";
             }
             else if (gyro[1] < -500) {
-                newOrientation = "rightside";
+                newOrientation = "down";
             }
         } else if (gyro[0] > 500) {
-            newOrientation = "down";
+            newOrientation = "leftSide";
         }
         else if (gyro[0] < -500) {
-            newOrientation = "up";
+            newOrientation = "rightSide";
         }
 
         return newOrientation;
