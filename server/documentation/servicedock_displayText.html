@@ -1,0 +1,74 @@
+<html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_displayText.html
+Author: Jeremy Jung
+Last update: 8/11/20
+Description: display custom text on the SPIKE Prime
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+            <h1 style="left: 500px; position: absolute">servicedock_displayText</h1>
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <!-- from w3schools -->
+        <div id="demobox" class="slidecontainer">
+            <p>Show text on the SPIKE Prime display</p>
+            <textarea id="text">Hello World!</textarea>
+            <div>
+                <input type="button" id="display" value="display">
+            </div>
+        </div>
+    </body>
+    <script>
+        /* SPIKE service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var hub = new mySPIKE.PrimeHub();
+
+        var displayButton = document.getElementById("display");
+        var textArea = document.getElementById("text");
+
+        mySPIKE.executeAfterInit(function() {
+            displayButton.addEventListener("click", function () {
+                var messageToDisplay = textArea.value;
+                hub.light_matrix.write(messageToDisplay);
+            })
+        })
+        
+        window.addEventListener("load", function () {
+                dragElement("demobox");
+        })
+
+    </script>
+    <style>
+        #demobox {
+            position: absolute;
+            background-color: #4CE0D2;
+            color: black;
+            height: 300px;
+            width: 500px;
+            top: 200px;
+            left: 400px;
+            border: solid;
+        }
+
+        #text {
+            height: 80px;
+            width: 400px;
+        }
+    </style>
+</html>

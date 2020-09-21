@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_hub.html
+Author: Jeremy Jung
+Last update: 8/4/20
+Description: see a visual of the hub's orientation
+Credits/inspirations:
+    Onshape Team's dice demonstration
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_hub</h1>
+        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id ="hub">
+            <div id = "front" style = "display: block;">
+                <div id="mainButton">
+                </div>
+            </div>
+            <div id = "back" style = "display: none">
+
+            </div>
+            <div id="leftside" style="display: none">
+            
+            </div>
+            <div id = "rightside" style="display: none">
+            
+            </div>
+            <div id = "bottom" style="display: none">
+            
+            </div>
+            <div id="top" style="display: none">
+            
+            </div>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        mySPIKE.executeAfterInit(setInt)
+        
+        function setInt() {
+            setInterval(getData, 1);
+        }
+        async function getData() {
+
+            var hubInfo = await mySPIKE.getHubInfo();
+            
+            var hubDeg = hubInfo.pos[0];
+
+            var hubOrientation = await mySPIKE.getHubOrientation();
+            var HTMLElement;
+            
+            if( hubOrientation == "back" ) {
+                HTMLElement = $("#back");
+                HTMLElement.css("display", "block");
+                $("#front").css("display", "none");
+                
+            } else if ( hubOrientation == "front" ) {
+                HTMLElement = $("#front");
+                HTMLElement.css("display", "block");
+                $("#back").css("display", "none");
+            }
+            
+            if (HTMLElement !== undefined) {
+                HTMLElement.css("transform", "rotate(" + hubDeg + "deg)");
+            } else {
+                $("#front").css("transform", "rotate(" + hubDeg + "deg)");
+            }
+            // var hubYaccel = hubInfo.accel[2];
+
+        }
+
+        var degrees;
+        var posLeft;
+        var posTop;
+
+        // 0 degrees is when button is lower
+        async function showFront() {
+            $("#front").css("display", "block");
+            $("#front").css("transform", "rotate(" + degrees + "deg)");
+        }
+    </script>
+    <style>
+        #front {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(231,233,232);
+            height: 250px;
+            width: 150px;
+            transform: rotate(0deg);
+        }
+
+        #mainButton {
+            position:relative; 
+            height:37px; 
+            width: 37px;
+            left: 51px;
+            top: 200px;
+            background-color:whitesmoke; 
+            border: solid; 
+            border-radius:50%;
+        }
+        
+        #back {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(252,208,0);
+            height: 250px;
+            width: 150px;
+        }
+    </style>
+</html>

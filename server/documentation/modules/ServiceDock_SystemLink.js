@@ -1,57 +1,9 @@
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Source: ServiceDock_SystemLink.js | Source: ServiceDock_SystemLink.js</title>
-
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
-
-    
-</head>
-<body>
-<nav class="lnb" id="lnb">
-    <div class="logo" style="width: 100px; height: 30px">
-        
-            <img src="./img/CEEO_Innovations_Logo_White.png" width="100%" height="100%">
-        
-    </div>
-    <div class="title">
-        <h1><a href="index.html" class="link">Source: ServiceDock_SystemLink.js</a></h1>
-        
-    </div>
-    <div class="search-container" id="search-container">
-        <input type="text" placeholder="Search">
-        <ul></ul>
-    </div>
-    
-    <div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Service_SPIKE.html">Service_SPIKE</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.html#~executeAfterDisconnect">executeAfterDisconnect</a></li><li><a href="Service_SPIKE.html#~executeAfterError">executeAfterError</a></li><li><a href="Service_SPIKE.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SPIKE.html#~executeAfterPrint">executeAfterPrint</a></li><li><a href="Service_SPIKE.html#~executeProgram">executeProgram</a></li><li><a href="Service_SPIKE.html#~executeWithStream">executeWithStream</a></li><li><a href="Service_SPIKE.html#~getBatteryStatus">getBatteryStatus</a></li><li><a href="Service_SPIKE.html#~getBigMotorPorts">getBigMotorPorts</a></li><li><a href="Service_SPIKE.html#~getBluetoothButton">getBluetoothButton</a></li><li><a href="Service_SPIKE.html#~getColorPorts">getColorPorts</a></li><li><a href="Service_SPIKE.html#~getFirmwareInfo">getFirmwareInfo</a></li><li><a href="Service_SPIKE.html#~getForcePorts">getForcePorts</a></li><li><a href="Service_SPIKE.html#~getHubFrontEvent">getHubFrontEvent</a></li><li><a href="Service_SPIKE.html#~getHubGesture">getHubGesture</a></li><li><a href="Service_SPIKE.html#~getHubInfo">getHubInfo</a></li><li><a href="Service_SPIKE.html#~getHubName">getHubName</a></li><li><a href="Service_SPIKE.html#~getHubOrientation">getHubOrientation</a></li><li><a href="Service_SPIKE.html#~getLatestUJSON">getLatestUJSON</a></li><li><a href="Service_SPIKE.html#~getLeftButton">getLeftButton</a></li><li><a href="Service_SPIKE.html#~getMainButton">getMainButton</a></li><li><a href="Service_SPIKE.html#~getMotorPorts">getMotorPorts</a></li><li><a href="Service_SPIKE.html#~getPortInfo">getPortInfo</a></li><li><a href="Service_SPIKE.html#~getPortsInfo">getPortsInfo</a></li><li><a href="Service_SPIKE.html#~getProjects">getProjects</a></li><li><a href="Service_SPIKE.html#~getRightButton">getRightButton</a></li><li><a href="Service_SPIKE.html#~getSmallMotorPorts">getSmallMotorPorts</a></li><li><a href="Service_SPIKE.html#~getUltrasonicPorts">getUltrasonicPorts</a></li><li><a href="Service_SPIKE.html#~init">init</a></li><li><a href="Service_SPIKE.html#~isActive">isActive</a></li><li><a href="Service_SPIKE.html#~reachMicroPy">reachMicroPy</a></li><li><a href="Service_SPIKE.html#~rebootHub">rebootHub</a></li><li><a href="Service_SPIKE.html#~sendDATA">sendDATA</a></li><li><a href="Service_SPIKE.html#~stopCurrentProgram">stopCurrentProgram</a></li><li><a href="Service_SPIKE.html#~writeProgram">writeProgram</a></li></ul></div></li><li><a href="Service_SPIKE.ColorSensor.html">ColorSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ColorSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ColorSensor.html#~get_ambient_light">get_ambient_light</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_blue">get_blue</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_color">get_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_green">get_green</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_red">get_red</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_reflected_light">get_reflected_light</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_rgb_intensity">get_rgb_intensity</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_for_new_color">wait_for_new_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_until_color">wait_until_color</a></li></ul></div></li><li><a href="Service_SPIKE.DistanceSensor.html">DistanceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.DistanceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_cm">get_distance_cm</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_inches">get_distance_inches</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_percentage">get_distance_percentage</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_closer_than">wait_for_distance_closer_than</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_farther_than">wait_for_distance_farther_than</a></li></ul></div></li><li><a href="Service_SPIKE.ForceSensor.html">ForceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ForceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ForceSensor.html#~get_force_newton">get_force_newton</a></li><li><a href="Service_SPIKE.ForceSensor.html#~get_force_percentage">get_force_percentage</a></li><li><a href="Service_SPIKE.ForceSensor.html#~is_pressed">is_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_pressed">wait_until_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_released">wait_until_released</a></li></ul></div></li><li><a href="Service_SPIKE.Motor.html">Motor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.Motor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.Motor.html#~get_default_speed">get_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~get_degrees_counted">get_degrees_counted</a></li><li><a href="Service_SPIKE.Motor.html#~get_position">get_position</a></li><li><a href="Service_SPIKE.Motor.html#~get_power">get_power</a></li><li><a href="Service_SPIKE.Motor.html#~get_speed">get_speed</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_degrees">run_for_degrees</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_seconds">run_for_seconds</a></li><li><a href="Service_SPIKE.Motor.html#~run_to_position">run_to_position</a></li><li><a href="Service_SPIKE.Motor.html#~set_default_speed">set_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~set_stall_detection">set_stall_detection</a></li><li><a href="Service_SPIKE.Motor.html#~start">start</a></li><li><a href="Service_SPIKE.Motor.html#~start_at_power">start_at_power</a></li><li><a href="Service_SPIKE.Motor.html#~stop">stop</a></li></ul></div></li><li><a href="Service_SPIKE.MotorPair.html">MotorPair</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.MotorPair_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.MotorPair.html#~set_motor_rotation">set_motor_rotation</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank">start_tank</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank_at_power">start_tank_at_power</a></li><li><a href="Service_SPIKE.MotorPair.html#~stop">stop</a></li></ul></div></li><li><a href="Service_SPIKE.PrimeHub.html">PrimeHub</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub_sub"></div></li><li><a href="Service_SPIKE.PrimeHub-left_button.html">left_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub~left_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.PrimeHub-left_button.html#.is_pressed">is_pressed</a></li><li><a href="Service_SPIKE.PrimeHub-left_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="Service_SPIKE.PrimeHub-left_button.html#.wait_until_released">wait_until_released</a></li><li><a href="Service_SPIKE.PrimeHub-left_button.html#.was_pressed">was_pressed</a></li></ul></div></li><li><a href="Service_SPIKE.PrimeHub-light_matrix.html">light_matrix</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub~light_matrix_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.PrimeHub-light_matrix.html#.off">off</a></li><li><a href="Service_SPIKE.PrimeHub-light_matrix.html#.set_pixel">set_pixel</a></li><li><a href="Service_SPIKE.PrimeHub-light_matrix.html#.show_image">show_image</a></li><li><a href="Service_SPIKE.PrimeHub-light_matrix.html#.write">write</a></li></ul></div></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html">motion_sensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub~motion_sensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.get_gesture">get_gesture</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.get_orientation">get_orientation</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.get_pitch_angle">get_pitch_angle</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.get_roll_angle">get_roll_angle</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.get_yaw_angle">get_yaw_angle</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.wait_for_new_gesture">wait_for_new_gesture</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.wait_for_new_orientation">wait_for_new_orientation</a></li><li><a href="Service_SPIKE.PrimeHub-motion_sensor.html#.was_gesture">was_gesture</a></li></ul></div></li><li><a href="Service_SPIKE.PrimeHub-right_button.html">right_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub~right_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.PrimeHub-right_button.html#.is_pressed">is_pressed</a></li><li><a href="Service_SPIKE.PrimeHub-right_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="Service_SPIKE.PrimeHub-right_button.html#.wait_until_released">wait_until_released</a></li><li><a href="Service_SPIKE.PrimeHub-right_button.html#.was_pressed">was_pressed</a></li></ul></div></li><li><a href="Service_SPIKE.PrimeHub-speaker.html">speaker</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub~speaker_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.PrimeHub-speaker.html#.beep">beep</a></li><li><a href="Service_SPIKE.PrimeHub-speaker.html#.get_volume">get_volume</a></li><li><a href="Service_SPIKE.PrimeHub-speaker.html#.set_volume">set_volume</a></li><li><a href="Service_SPIKE.PrimeHub-speaker.html#.start_beep">start_beep</a></li><li><a href="Service_SPIKE.PrimeHub-speaker.html#.stop">stop</a></li></ul></div></li><li><a href="Service_SystemLink.html">Service_SystemLink</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SystemLink_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SystemLink.html#~createTag">createTag</a></li><li><a href="Service_SystemLink.html#~deleteTag">deleteTag</a></li><li><a href="Service_SystemLink.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SystemLink.html#~getTagsInfo">getTagsInfo</a></li><li><a href="Service_SystemLink.html#~getTagValue">getTagValue</a></li><li><a href="Service_SystemLink.html#~init">init</a></li><li><a href="Service_SystemLink.html#~isActive">isActive</a></li><li><a href="Service_SystemLink.html#~setAPIKey">setAPIKey</a></li><li><a href="Service_SystemLink.html#~setTagValue">setTagValue</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="UJSONRPC.html">UJSONRPC</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="UJSONRPC_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="UJSONRPC.html#.displayClear">.displayClear</a></li><li><a href="UJSONRPC.html#.displaySetPixel">.displaySetPixel</a></li><li><a href="UJSONRPC.html#.displayText">.displayText</a></li><li><a href="UJSONRPC.html#.getFirmwareInfo">.getFirmwareInfo</a></li><li><a href="UJSONRPC.html#.getStorageStatus">.getStorageStatus</a></li><li><a href="UJSONRPC.html#.motorGoRelPos">.motorGoRelPos</a></li><li><a href="UJSONRPC.html#.motorPwm">.motorPwm</a></li><li><a href="UJSONRPC.html#.motorRunDegrees">.motorRunDegrees</a></li><li><a href="UJSONRPC.html#.motorRunTimed">.motorRunTimed</a></li><li><a href="UJSONRPC.html#.motorStart">.motorStart</a></li><li><a href="UJSONRPC.html#.moveProject">.moveProject</a></li><li><a href="UJSONRPC.html#.moveTankDegrees">.moveTankDegrees</a></li><li><a href="UJSONRPC.html#.moveTankPowers">.moveTankPowers</a></li><li><a href="UJSONRPC.html#.moveTankSpeeds">.moveTankSpeeds</a></li><li><a href="UJSONRPC.html#.moveTankTime">.moveTankTime</a></li><li><a href="UJSONRPC.html#.programExecute">.programExecute</a></li><li><a href="UJSONRPC.html#.programTerminate">.programTerminate</a></li><li><a href="UJSONRPC.html#.removeProject">.removeProject</a></li><li><a href="UJSONRPC.html#.soundBeep">.soundBeep</a></li><li><a href="UJSONRPC.html#.soundStop">.soundStop</a></li><li><a href="UJSONRPC.html#.startWriteProgram">.startWriteProgram</a></li><li><a href="UJSONRPC.html#.triggerCurrentState">.triggerCurrentState</a></li><li><a href="UJSONRPC.html#.writePackage">.writePackage</a></li></ul></div></li></ul></div>
-</nav>
-<div id="resizer"></div>
-
-<div class="main" id="main">
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/*
+/*
 Project Name: SPIKE Prime Web Interface
 File name: ServiceDock_SystemLink.js
 Author: Jeremy Jung
 Last update: 7/19/20
-Description: HTML Element definition for &lt;service-systemlink> to be used in ServiceDocks
+Description: HTML Element definition for <service-systemlink> to be used in ServiceDocks
 Credits/inspirations:
 History:
     Created by Jeremy on 7/16/20
@@ -126,7 +78,7 @@ class servicesystemlink extends HTMLElement {
             }
 
             // check active flag so once activated, the service doesnt reinit
-            if ( !this.active &amp;&amp; this.proceed) {
+            if ( !this.active && this.proceed) {
                 
                 console.log("activating service");
                 
@@ -267,9 +219,9 @@ function Service_SystemLink() {
     //                                      //
     //////////////////////////////////////////
 
-    /** &lt;h4> initialize SystemLink_Service &lt;/h4>
-     * &lt;p> Starts polling the System Link cloud &lt;/p>
-     * &lt;p> &lt;em> this function needs to be executed after executeAfterInit but before all other public functions &lt;/em> &lt;/p>
+    /** <h4> initialize SystemLink_Service </h4>
+     * <p> Starts polling the System Link cloud </p>
+     * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
      * 
      * @public
      * @param {string} APIKeyInput SYstemlink APIkey
@@ -312,8 +264,8 @@ function Service_SystemLink() {
         }
     }
 
-    /** &lt;h4> Get the callback function to execute after service is initialized &lt;/h4>
-     * &lt;p> &lt;em> This function needs to be executed before calling init() &lt;/em> &lt;/p>
+    /** <h4> Get the callback function to execute after service is initialized </h4>
+     * <p> <em> This function needs to be executed before calling init() </em> </p>
      * 
      * @public
      * @param {function} callback function to execute after initialization
@@ -327,7 +279,7 @@ function Service_SystemLink() {
         funcAtInit = callback;
     }
 
-    /** &lt;h4> Return the tagsInfo global variable &lt;/h4>
+    /** <h4> Return the tagsInfo global variable </h4>
      * 
      * @public
      * @returns basic information about currently existing tags in the cloud
@@ -340,7 +292,7 @@ function Service_SystemLink() {
         return tagsInfo;
     }
 
-    /** &lt;h4> Change the current value of a tag on SystemLink cloud &lt;/h4>
+    /** <h4> Change the current value of a tag on SystemLink cloud </h4>
      * 
      * @public
      * @param {string} tagName 
@@ -351,12 +303,12 @@ function Service_SystemLink() {
         // changes the value of a tag on the cloud
         changeValue(tagName, newValue, function(valueChanged) {
             if (valueChanged) {
-                typeof callback === 'function' &amp;&amp; callback();
+                typeof callback === 'function' && callback();
             }
         });
     }
 
-    /** &lt;h4> Get the current value of a tag on SystemLink cloud &lt;/h4>
+    /** <h4> Get the current value of a tag on SystemLink cloud </h4>
      * 
      * @public
      * @param {string} tagName 
@@ -369,7 +321,7 @@ function Service_SystemLink() {
         return currentValue;
     }
 
-    /** &lt;h4> Get whether the Service was initialized or not &lt;/h4>
+    /** <h4> Get whether the Service was initialized or not </h4>
      * 
      * @public
      * @returns {boolean} whether Service was initialized or not
@@ -378,7 +330,7 @@ function Service_SystemLink() {
         return serviceActive;
     }
 
-    /** &lt;h4> Change the APIKey &lt;/h4>
+    /** <h4> Change the APIKey </h4>
      * 
      * @param {string} APIKeyInput 
      */
@@ -387,7 +339,7 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** &lt;h4> Create a new tag &lt;/h4>
+    /** <h4> Create a new tag </h4>
      * 
      * @public
      * @param {string} tagName name of tag to create
@@ -408,14 +360,14 @@ function Service_SystemLink() {
                 // execute callback if successful
                 if (newTagCreated) {
                     if (newTagValueAssigned) {
-                        typeof callback === 'function' &amp;&amp; callback();
+                        typeof callback === 'function' && callback();
                     }
                 }
             })
         })
     }
 
-    /** &lt;h4> Delete tag &lt;/h4>
+    /** <h4> Delete tag </h4>
      * 
      * @public
      * @param {string} tagName name of tag to delete
@@ -425,7 +377,7 @@ function Service_SystemLink() {
         // delete the tag on System Link cloud
         deleteTagHelper(tagName, function (tagDeleted) {
             if ( tagDeleted ) {
-                typeof callback === 'function' &amp;&amp; callback();
+                typeof callback === 'function' && callback();
             }
         });
     }
@@ -447,7 +399,7 @@ function Service_SystemLink() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /** &lt;h4> Check if Systemlink API key is valid for use &lt;/h4>
+    /** <h4> Check if Systemlink API key is valid for use </h4>
      * 
      * @private
      * @param {string} APIKeyInput 
@@ -481,7 +433,7 @@ function Service_SystemLink() {
         })
     }
 
-    /** &lt;h4> Assign list of tags existing in the cloud to {tagPaths} global variable &lt;/h4>
+    /** <h4> Assign list of tags existing in the cloud to {tagPaths} global variable </h4>
      * 
      * @private
      * @param {function} callback 
@@ -516,7 +468,7 @@ function Service_SystemLink() {
 
     }
 
-    /** &lt;h4> Get the info of a tag in the cloud &lt;/h4>
+    /** <h4> Get the info of a tag in the cloud </h4>
      * 
      * @private
      * @param {function} callback 
@@ -544,7 +496,7 @@ function Service_SystemLink() {
                 // get total number of tags
                 var tagsAmount = responseJSON.totalCount;
 
-                for (var i = 0; i &lt; tagsAmount; i++) {
+                for (var i = 0; i < tagsAmount; i++) {
 
                     // parse information of the tags
 
@@ -604,7 +556,7 @@ function Service_SystemLink() {
         )
     }
 
-    /** &lt;h4> Send PUT request to SL cloud API and change the value of a tag &lt;/h4>
+    /** <h4> Send PUT request to SL cloud API and change the value of a tag </h4>
      * 
      * @private
      * @param {string} tagPath string of the name of the tag
@@ -646,7 +598,7 @@ function Service_SystemLink() {
 
             // catch error
             request.onreadystatechange = function () {
-                if (this.readyState === XMLHttpRequest.DONE &amp;&amp; (this.status != 200) ) {
+                if (this.readyState === XMLHttpRequest.DONE && (this.status != 200) ) {
                     console.log(this.status + " Error at changeValue: ", this.response)
                 }
             }
@@ -692,7 +644,7 @@ function Service_SystemLink() {
 
             // catch error
             request.onreadystatechange = function () {
-                if (this.readyState === XMLHttpRequest.DONE &amp;&amp; (this.status != 200 &amp;&amp; this.status != 201)) {
+                if (this.readyState === XMLHttpRequest.DONE && (this.status != 200 && this.status != 201)) {
                     console.log(this.status + " Error at createNewTagHelper: ", this.response)
                 }
             }
@@ -709,7 +661,7 @@ function Service_SystemLink() {
         )
     }
 
-    /** &lt;h4> Delete the tag on the System Link cloud &lt;/h4>
+    /** <h4> Delete the tag on the System Link cloud </h4>
      * 
      * @private
      * @param {string} tagName 
@@ -733,7 +685,7 @@ function Service_SystemLink() {
 
             // catch error
             request.onreadystatechange = function () {
-                if (this.readyState === XMLHttpRequest.DONE &amp;&amp; this.status != 200) {
+                if (this.readyState === XMLHttpRequest.DONE && this.status != 200) {
                     console.log(this.status + " Error at deleteTagHelper: ", this.response)
                 }
             }
@@ -784,7 +736,7 @@ function Service_SystemLink() {
         return request;
     }
 
-    /** &lt;h4> Helper function for getting data types in systemlink format &lt;/h4>
+    /** <h4> Helper function for getting data types in systemlink format </h4>
      * 
      * @private
      * @param {any} new_value the variable containing the new value of a tag
@@ -813,7 +765,7 @@ function Service_SystemLink() {
         }
     }
 
-    /** &lt;h4> Helper function for converting values to correct type based on data type &lt;/h4>
+    /** <h4> Helper function for converting values to correct type based on data type </h4>
      * 
      * @private
      * @param {string} valueType data type of value in systemlink format
@@ -850,33 +802,4 @@ function Service_SystemLink() {
         createTag: createTag,
         deleteTag: deleteTag
     }
-}</code></pre>
-        </article>
-    </section>
-
-
-
-
-</div>
-
-<footer>
-    <img class="logo" src="./img/CEEO_Innovations_Logo_White.png" style="width: 100px; height: 30px">
-    <div class="footer-text">SPIKE Web Interface Documentation (2020 September 21)</div>
-</footer>
-<script>prettyPrint();</script>
-<script src="scripts/jquery.min.js"></script>
-<script src="scripts/tui-doc.js"></script>
-<script src="scripts/linenumber.js"></script>
-
-    <script>
-        var id = '_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
-    </script>
-
-</body>
-</html>
+}

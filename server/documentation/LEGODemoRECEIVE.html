@@ -1,0 +1,218 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+            <service-systemlink id="service_systemlink"></service-systemlink>
+        </div>
+        <div>
+            <input type="button" value="END DEMO" id="reboot">
+        </div>
+        <div id="chooseRoleDiv">
+            Who are you?
+            <div>
+                <select id="selectRole" class="select_components target_ignore">
+                    <option id="ETHAN"> Ethan (Motor) </option>
+                    <option id="JEREMY"> Jeremy (Hub) </option>
+                </select>
+                <input id="roleChoose" type="button" value="select">
+            </div>
+        </div>
+        <div id="ETHANportsInterface">
+            <div id="motor">
+                <p>Select motor to have moved</p>
+                <select id="motorPort" class="select_components target_ignore">
+                </select>
+                <input id="motorPortChoose" type="button" value="select">
+            </div>
+            <div>
+                Start Demo
+                <input id="startControl" type="button" value="start">
+                <div id="demoStarted"></div>
+            </div>
+        </div>
+        <div id="JEREMYportsInterface">
+            <div>
+                Start Demo
+                <input id="startControl" type="button" value="start">
+                <div id = "demoStarted"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var mySL = document.getElementById("service_systemlink").getService();
+
+        var message;
+        
+        var motorPort;
+
+        var EthanInterval;
+        var JeremyInterval;
+
+        
+        var ethan = false;
+
+        /* when roles are chosen, display relevant divs and populate port selects */
+        $("#roleChoose").on("click", async function () {
+            var role = await $("#selectRole option:selected").attr('id');
+            if (role == "ETHAN") {
+                ethan = true;
+                $("#ETHANportsInterface").css("display", "block");
+            }
+            else {
+                ethan = false;
+                $("#JEREMYportsInterface").css("display", "block");
+            }
+            $("#chooseRoleDiv").css("display", "none");
+            readyDemo();
+        })
+
+        /* append the ports to select HTML element when receiving values*/
+        async function initPortSelects(motorPorts) {
+            for (var port in motorPorts) {
+                $("#motorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+            }
+        }
+
+        async function readyDemo() {
+            /* if user is Ethan */
+            if (ethan) {
+
+                var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+
+                initPortSelects(motorPorts); // append ports to <select>
+
+                $("#motorPortChoose").on("click", async function () {
+                    // get the selected port
+                    motorPort = await $("#motorPort option:selected").val();
+                })
+
+                /* when control button is clicked, start receiving speed value and run motor */
+                $("#ETHANportsInterface").find("#startControl").on("click", function () {
+
+                    $("#ETHANportsInterface").find("#demoStarted").html("Demo has been started!")
+                    
+                    EthanInterval = setInterval(async function () {
+
+                        /* receive LEGOSpeed tag value from cloud */
+                        var steerSpeed = await mySL.getTagValue("LEGODEMOSpeed");
+
+                        mySPIKE.motorStart(motorPort, steerSpeed, 0);
+
+                    }, 100)
+                })
+            }
+            else {
+
+                $("#JEREMYportsInterface").find("#startControl").on("click", async function () {
+                    
+                    $("#JEREMYportsInterface").find("#demoStarted").html("Demo has been started!");
+                    
+                    // get default message tag value
+                    message = await mySL.getTagValue("message");
+                    
+                    // display default value
+                    mySPIKE.displayText(message);
+
+                    JeremyInterval = setInterval(async function () {
+                        /* get message tag and display on hub when different */
+
+                        var newMessage = await mySL.getTagValue("message");
+
+                        // message value on cloud is different from previous value
+                        if (newMessage != message) {
+                            
+                            // reassign message
+                            message = newMessage;
+
+                            // display new message
+                            mySPIKE.displayText(message);
+                        }
+
+                    }, 100)
+                })
+
+            }
+        }
+        var rebootButton = document.getElementById("reboot");
+        window.addEventListener("load", function () {
+            dragElement("demobox");
+            rebootButton.addEventListener("click", function() {
+                
+                if (ethan) {
+                    clearInterval(EthanInterval);
+                    $("#ETHANportsInterface").find("#demoStarted").html("Demo has ended");
+                    console.log($("#ETHANportsInterface").find("#demoStarted"));
+                } else {
+                    clearInterval(JeremyInterval);
+                    $("#JEREMYportsInterface").find("#demoStarted").html("Demo has ended");
+                }
+
+                mySPIKE.rebootHub();
+            })
+        })
+
+    </script>
+    <style>
+        #demobox {
+            position: absolute;
+            background-color: #4CE0D2;
+            color: black;
+            height: 300px;
+            width: 500px;
+            top: 200px;
+            left: 400px;
+            border: solid;
+        }
+
+        #text {
+            height: 80px;
+            width: 400px;
+        }
+
+        #chooseRoleDiv {
+            position: absolute;
+            left: 300px;
+            border: solid;
+            background-color: #4CE0D2;
+            height: 100px;
+            width: 200px;
+        }
+
+
+        #ETHANportsInterface {
+            position: absolute;
+            top: 50px;
+            left: 200px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+            display: none;
+        }
+
+        #JEREMYportsInterface {
+            position: absolute;
+            top: 50px;
+            left: 200px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+            display: none;
+        }
+    </style>
+
+</html>
