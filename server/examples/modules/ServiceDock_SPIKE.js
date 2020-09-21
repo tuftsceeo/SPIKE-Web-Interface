@@ -41,10 +41,10 @@ class servicespike extends HTMLElement {
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
 
-        var imageRelPath = "./modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var imageRelPath = "./modules/views/SPIKE_button.png" // relative to the document in which a servicespike is created ( NOT this file )
         var length = 50; // for width and height of button
         var buttonBackgroundColor = "#A2E1EF" // background color of the button
-        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 50px 50px; background-color:" + buttonBackgroundColor
             + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
         button.setAttribute("style", buttonStyle);
 
@@ -124,13 +124,20 @@ LICENSE: MIT
 
 /**
  * @class Service_SPIKE 
+ * @classdesc
+ * ServiceDock library for interfacing with LEGO® SPIKE™ Prime
  * @example
- * // if you're using ServiceDock
+ * // if you're using ServiceDock 
  * var mySPIKE = document.getElemenyById("service_spike").getService();
+ * mySPIKE.executeAfterInit(async function() {
+ *     // write code here
+ * })
+ * 
  * // if you're not using ServiceDock
  * var mySPIKE = new Service_SPIKE();
- * 
  * mySPIKE.init();
+ * 
+ * 
  */
 function Service_SPIKE() {
 
@@ -380,6 +387,7 @@ function Service_SPIKE() {
     /** <h4> Get the callback function to execute after a print or error from SPIKE python program </h4>
      * @public
      * @param {function} callback 
+     * 
      */
     function executeAfterPrint(callback) {
         funcAfterPrint = callback;
@@ -395,10 +403,15 @@ function Service_SPIKE() {
     }
 
 
-    /**
+    /** <h4> Execute a stack of functions with the SPIKE data stream </h4>
      * 
      * @public
      * @param {any} callback 
+     * @example
+     * mySPIKE.executeWithStream( async function() {
+     *      var portsInfo = await mySPIKE.getPortsInfo();
+     *      var motor = portsInfo["A"];  
+     * })
      */
     function executeWithStream(callback) {
         funcWithStream = callback;
@@ -406,7 +419,6 @@ function Service_SPIKE() {
 
     /** <h4> Get the callback function to execute after service is disconnected </h4>
      * 
-     * @public
      * @param {any} callback 
      */
     function executeAfterDisconnect(callback) {
@@ -415,7 +427,6 @@ function Service_SPIKE() {
 
     /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
      * <p> May make the SPIKE Prime do something </p>
-     * @public 
      * @param {string} command Command to send (or sequence of commands, separated by new lines)
      */
     async function sendDATA(command) {
@@ -558,17 +569,16 @@ function Service_SPIKE() {
         return hub;
     }
 
-    /**
+    /** <h4> Get the name of the hub </h4>
      * 
-     * 
+     * @public
      * @returns name of hub
      */
-    async function getHubName(callback) {
+    async function getHubName() {
         return hubName;
     }
 
     /**
-     * 
      * 
      * @param {any} callback 
      */
@@ -576,16 +586,6 @@ function Service_SPIKE() {
 
         UJSONRPC.getFirmwareInfo(callback);
 
-    }
-
-    /**
-     * 
-     * 
-     * @param {any} callback 
-     */
-    async function triggerCurrentState(callback) {
-
-        UJSONRPC.triggerCurrentState(callback);
     }
 
 
@@ -644,14 +644,6 @@ function Service_SPIKE() {
         return serviceActive;
     }
 
-    /** <h4> Get the most recently detected orientation of the hub </h4>
-     * @public
-     * @returns {string} ['up','down','front','back','leftside','rightside']
-     */
-    async function getHubOrientation() {
-        return lastHubOrientation;
-    }
-
     /** <h4> Get the most recently detected event on the display of the hub </h4>
      * @public
      * @returns {string} ['tapped','doubletapped']
@@ -667,6 +659,15 @@ function Service_SPIKE() {
     async function getHubGesture() {
         return hubGesture;
     }
+
+    /** <h4> Get the most recently detected orientation of the hub </h4>
+     * @public
+     * @returns {string} ['up','down','front','back','leftside','rightside']
+     */
+    async function getHubOrientation() {
+        return lastHubOrientation;
+    }
+
 
     /** <h4> Get the latest press event information on the "connect" button </h4>
      * @public
@@ -2097,6 +2098,7 @@ function Service_SPIKE() {
     /**
      * 
      * @memberof! UJSONRPC
+     * @param {function} callback
      */
     UJSONRPC.getFirmwareInfo = async function getFirmwareInfo(callback) {
         var randomId = generateId();
@@ -2108,6 +2110,10 @@ function Service_SPIKE() {
         }
     }
 
+    /**
+     * @memberof! UJSONRPC
+     * @param {function} callback 
+     */
     UJSONRPC.triggerCurrentState = async function triggerCurrentState(callback) {
         var randomId = generateId();
 
@@ -2120,7 +2126,7 @@ function Service_SPIKE() {
 
     /** 
      * 
-     * 
+     * @memberof! UJSONRPC
      * @param {integer} slotid 
      */
     UJSONRPC.programExecute = async function programExecute(slotid) {
@@ -2129,9 +2135,8 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    /** 
-     * 
-     * 
+    /**
+     * @memberof! UJSONRPC
      */
     UJSONRPC.programTerminate = function programTerminate() {
 
@@ -2144,7 +2149,7 @@ function Service_SPIKE() {
     }
 
     /**
-     * 
+     * @memberof! UJSONRPC
      * @param {string} projectName name of the project
      * @param {integer} type type of data (micropy or scratch)
      * @param {string} data entire data to send in ASCII
@@ -2263,6 +2268,7 @@ function Service_SPIKE() {
 
     /**
      * 
+     * @memberof! UJSONRPC
      * @param {string} base64data base64 encoded data to send
      * @param {string} transferid transferid of this program write process
      * @returns {string} the randomly generated message id used to send this UJSONRPC script
@@ -2282,6 +2288,9 @@ function Service_SPIKE() {
 
     }
 
+    /**
+     * @memberof! UJSONRPC
+     */
     UJSONRPC.getStorageStatus = function getStorageStatus() {
 
         var randomId = generateId();
@@ -2293,6 +2302,10 @@ function Service_SPIKE() {
 
     }
 
+    /**
+     * @memberof! UJSONRPC
+     * @param {string} slotid 
+     */
     UJSONRPC.removeProject = function removeProject(slotid) {
 
         var randomId = generateId();
@@ -2304,6 +2317,12 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
+    /**
+     * 
+     * @memberof! UJSONRPC
+     * @param {string} oldslotid 
+     * @param {string} newslotid 
+     */
     UJSONRPC.moveProject = function moveProject(oldslotid, newslotid) {
 
         var randomId = generateId();
@@ -2323,12 +2342,21 @@ function Service_SPIKE() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
+    
+    /**
+    * @private
+    * @param {function} callback 
+    */
+    async function triggerCurrentState(callback) {
+
+        UJSONRPC.triggerCurrentState(callback);
+    }
 
     /** 
      * 
      * @private
-     * @param {any} id 
-     * @param {any} funcName 
+     * @param {string} id 
+     * @param {string} funcName 
      */
     function pushResponseCallback(id, funcName) {
 
@@ -2362,6 +2390,7 @@ function Service_SPIKE() {
         }
 
     }
+
     /** <h4> Sleep function </h4>
      * @private
      * @param {number} ms Miliseconds to sleep
@@ -2372,7 +2401,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> generate random id for UJSONRPC messages </h4>
-     * 
+     * @private
      * @returns {string}
      */
     function generateId() {
@@ -2459,9 +2488,9 @@ function Service_SPIKE() {
 
 
     /** <h4> Process a packet in UJSONRPC </h4>
-    * @private
-    *
-    */
+        * @private
+        *
+        */
     async function parsePacket(value, testing = false, callback) {
 
         // console.log(value);
@@ -3274,7 +3303,6 @@ function Service_SPIKE() {
         getPortInfo: getPortInfo,
         getBatteryStatus: getBatteryStatus,
         getFirmwareInfo: getFirmwareInfo,
-        triggerCurrentState: triggerCurrentState,
         getHubInfo: getHubInfo,
         getHubName: getHubName,
         getProjects: getProjects,
@@ -3295,7 +3323,6 @@ function Service_SPIKE() {
         getHubOrientation: getHubOrientation,
         Motor: Motor,
         PrimeHub: PrimeHub,
-        UJSONRPC: UJSONRPC,
         ForceSensor: ForceSensor,
         DistanceSensor: DistanceSensor,
         ColorSensor: ColorSensor,
