@@ -16,12 +16,10 @@ Note:
 <html>
     <head>
         <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
-        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
-        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
     </head>
     <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
         <h1 style="left: 500px; position: absolute">servicedock_hub</h1>
-        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
         </div>
@@ -33,64 +31,50 @@ Note:
             <div id = "back" style = "display: none">
 
             </div>
-            <div id="leftside" style="display: none">
-            
-            </div>
-            <div id = "rightside" style="display: none">
-            
-            </div>
-            <div id = "bottom" style="display: none">
-            
-            </div>
-            <div id="top" style="display: none">
-            
-            </div>
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService();
-        mySPIKE.executeAfterInit(setInt)
-        
-        function setInt() {
-            setInterval(getData, 1);
-        }
-        async function getData() {
-
-            var hubInfo = await mySPIKE.getHubInfo();
+        window.onload = function (){
+            var mySPIKE = document.getElementById("service_spike").getService();
             
-            var hubDeg = hubInfo.pos[0];
-
-            var hubOrientation = await mySPIKE.getHubOrientation();
+            /* declare HTML elements */
+            var spriteFront = document.getElementById("front");
+            var spriteBack = document.getElementById("back");
             var HTMLElement;
-            
-            if( hubOrientation == "back" ) {
-                HTMLElement = $("#back");
-                HTMLElement.css("display", "block");
-                $("#front").css("display", "none");
-                
-            } else if ( hubOrientation == "front" ) {
-                HTMLElement = $("#front");
-                HTMLElement.css("display", "block");
-                $("#back").css("display", "none");
+
+            /* declare motion_sensor */
+
+            var hub = mySPIKE.PrimeHub();
+
+            mySPIKE.executeAfterInit(function () {
+                mySPIKE.executeWithStream(getData);
+            })
+
+            async function getData() {
+
+                var hubDeg = await hub.motion_sensor.get_yaw_angle();
+
+                var hubOrientation = await mySPIKE.getHubOrientation();
+
+                if (hubOrientation == "back") {
+                    HTMLElement = document.getElementById("back");
+                    HTMLElement.style.display = "block";
+
+                    spriteFront.style.display = "none";
+                } else if (hubOrientation == "front") {
+                    HTMLElement = document.getElementById("front");
+                    HTMLElement.style.display = "block";
+
+                    spriteBack.style.display = "none";
+                }
+
+                if (HTMLElement !== undefined) {
+                    HTMLElement.style.transform = "rotate(" + hubDeg + "deg)";
+                } else {
+                    spriteFront.style.transform = "rotate(" + hubDeg + "deg)";
+                }
+
             }
-            
-            if (HTMLElement !== undefined) {
-                HTMLElement.css("transform", "rotate(" + hubDeg + "deg)");
-            } else {
-                $("#front").css("transform", "rotate(" + hubDeg + "deg)");
-            }
-            // var hubYaccel = hubInfo.accel[2];
-
-        }
-
-        var degrees;
-        var posLeft;
-        var posTop;
-
-        // 0 degrees is when button is lower
-        async function showFront() {
-            $("#front").css("display", "block");
-            $("#front").css("transform", "rotate(" + degrees + "deg)");
         }
     </script>
     <style>

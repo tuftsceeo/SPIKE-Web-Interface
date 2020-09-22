@@ -28,7 +28,8 @@
         "default": {
             "staticFiles": {
                 "include": [
-                    "./server/examples"
+                    "./server/examples",
+                    "./jsdocTemplate/images"
                 ]
             },
             "layoutFile": ""

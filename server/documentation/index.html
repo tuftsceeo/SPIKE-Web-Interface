@@ -59,55 +59,215 @@
 <blockquote>
 <p>A frontend Javascript framework for building web interfaces that combine SPIKE Prime with third party services</p>
 </blockquote>
-<h2>Tutorial</h2>
-<ul>
-<li><a href="#ServiceDock">ServiceDock setup</a></li>
-<li><a href="#Usage">Usage</a></li>
-</ul>
+<h2>Overview</h2>
+<p>ServiceDock allows you to easily integrate your LEGO SPIKE Prime into interactive web pages.</p>
+<p><img src="servicedockrealdemo.gif" alt="Demonstration"></p>
 <h2>ServiceDock</h2>
-<p>Include the Services you want to use. In this example, the ServiceDock will only support SPIKE Prime and System Link cloud service</p>
+<p>The following code creates the ServiceDock interface you see on the top left corner of the example above. This is all you need to use ServiceDock!</p>
 <pre class="prettyprint source lang-html"><code>&lt;html>
     &lt;head>
-        &lt;script src=&quot;./modules/ServiceDock.js&quot;>&lt;/script>
+        &lt;script src = &quot;./modules/ServiceDock.js&quot;>&lt;/script>
     &lt;/head>
-    &lt;!-- include the Services to use -->
     &lt;body>
-        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;!-- this style must be kept for normal rendering-->
-            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
-            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;!-- this style must be kept for normal rendering-->
+        &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
+            &lt;!-- include the Services to use -->
+            &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
+            &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
     &lt;/body>
 </code></pre>
-<h2>Usage</h2>
-<h2>Service Objects</h2>
-<p>Every Service object can be retrieved from its corresponding ServiceDock HTML element with document.getElementById(&quot;service ID&quot;).getService().</p>
-<pre class="prettyprint source lang-html"><code>&lt;!-- Use the Services with Javascript -->
-&lt;script>
-
-    var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService(); // a SPIKE object
-    
-    var mySL = document.getElementById(&quot;service_systemlink&quot;).getService(); // SystemLink cloud object
+<h2>Services</h2>
+<p>However, to be able to connect your Services (e.g. the SPIKE Prime Service), you will need to get its object from its corresponding ServiceDock HTML element. For example, <code> &lt;service-spike id = &quot;service_spike&quot;&gt;&lt;/service-spike&gt;</code> is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, mySPIKE, you will need to do:</p>
+<pre class="prettyprint source lang-javascript"><code>var mySPIKE = document.getElementbyId(&quot;service_spike&quot;).getService();
 </code></pre>
-<p>These objects are initialized when their respective ServiceDock buttons are activated on the web page.</p>
-<p>You can use object.executeAfterInit() to set a function to run after a Service is activated, or use object.isActive() to check if the Service is already activated.</p>
-<pre class="prettyprint source lang-js"><code>    /* execute following function when SystemLink is initialized */
-    mySL.executeAfterInit( function () {
-
-        var messageToDisplay = await mySL.getTagValue(&quot;message&quot;); // retrieve &quot;message&quot; tag from cloud
-
-        // execute only when SPIKE object is initialized
-        if ( mySPIKE.isActive() ) {
-
-            var hub = new mySPIKE.PrimeHub(); // PrimeHub object
-
-            hub.light_matrix.write(messageToDisplay); // display message on Prime hub
-        }
+<p>If you wanted to get the System Link cloud Service object, the process is exactly the same:</p>
+<pre class="prettyprint source lang-javascript"><code>var mySL = document.getElementbyId(&quot;service_systemlink&quot;).getService();
+</code></pre>
+<h2>SPIKE Prime Service</h2>
+<p>Let's just focus on SPIKE Prime for now. <code>mySPIKE</code> is your SPIKE Prime Service, which will get initialized when the user of your webpage clicks on the ServiceDock SPIKE button and connects their SPIKE Prime. To mess with their SPIKE Prime after they connect it to the browser, you will need to use <code> executeAfterInit(callback)</code>. The argument is a callback function, a fundamental way in Javascript for ensuring flow of execution. A callback function means that it will not execute until its parent function, <code>executeAfterInit</code>, has finished.</p>
+<pre class="prettyprint source lang-javascript"><code>    mySPIKE.executeAfterInit(function () {
+        mySPIKE.executeWithStream(getData);
     })
-&lt;/script>
 </code></pre>
-<h1>Example</h1>
-<p><a href="servicedock_displayText.html">Go here</a></p></article>
+<p>This tells the ServiceDock to execute <code>executeWithStream()</code> after the SPIKE Service was initialized. But what is <code>executeWithStream</code>?</p>
+<p><code>executeWithStream</code> takes its own callback function and executes it forever...until the user disconnects their SPIKE Prime. This means that whatever code is inside the callback function, which in this case is <code>getData</code>, will be getting a live feed of sensor readings from the SPIKE Prime. This is how the image of the SPIKE Prime above was able to rotate only when the physical SPIKE Prime did.</p>
+<p>Let's take a look at <code>getData</code></p>
+<pre class="prettyprint source lang-javascript"><code>    async function getData() {
+        // get the yaw degrees of rotation of the SPIKE Prime.
+        var hubDeg = await hub.motion_sensor.get_yaw_angle();
+
+        // get the orientation of the hub ( e.g. &quot;front&quot; or &quot;back&quot; )
+        var hubOrientation = await mySPIKE.getHubOrientation();
+
+        // when the SPIKE is facing down, show the sprite of its &quot;back&quot;, and hide the &quot;back&quot; sprite
+        // else, when the SPIKE is facing up, show the sprite of its &quot;front&quot;, and hide the &quot;back&quot; sprite
+        if (hubOrientation == &quot;back&quot;) {
+            HTMLElement = document.getElementById(&quot;back&quot;);
+            HTMLElement.style.display = &quot;block&quot;;
+
+            spriteFront.style.display = &quot;none&quot;;
+        } else if (hubOrientation == &quot;front&quot;) {
+            HTMLElement = document.getElementById(&quot;front&quot;);
+            HTMLElement.style.display = &quot;block&quot;;
+
+            spriteBack.style.display = &quot;none&quot;;
+        }
+
+        // rotate the sprites the same number of degrees that the SPIKE rotates
+        if (HTMLElement !== undefined) {
+            HTMLElement.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+        } else {
+            spriteFront.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+        }
+
+    }
+</code></pre>
+<p><code>getData</code> function does two things.</p>
+<ol>
+<li>It displays on the web page whether the SPIKE is facing up or down</li>
+<li>It rotates the displayed image of the SPIKE according to the SPIKE's yaw angle.</li>
+</ol>
+<p>You will see that there is a keyword called <code>async</code> before the definition of getData and <code>await</code> before the Service's getter functions. These two keywords are necessary in Javascript if you want to ensure that you get what you want, and not a &quot;promise&quot; that you will get it. A good rule of thumb is: whenever you need to use <code>await</code>, it needs to be enclosed inside an <code>async</code> function. You will always want to use <code>await</code> when you are using a getter function.</p>
+<p>Oops. Some variables in getData weren't declared yet, such as hub, HTMLElement, spriteBack, and spriteFront. Don't worry. Here is the full javascript code.</p>
+<pre class="prettyprint source lang-javascript"><code>window.onload = function () {
+    var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+    
+    /* declare HTML elements */
+    var spriteFront = document.getElementById(&quot;front&quot;);
+    var spriteBack = document.getElementById(&quot;back&quot;);
+    var HTMLElement;
+
+    /* declare PrimeHub */
+    var hub = mySPIKE.PrimeHub();
+
+    mySPIKE.executeAfterInit(function () {
+        mySPIKE.executeWithStream(getData);
+    })
+
+    async function getData() {
+
+        var hubDeg = await hub.motion_sensor.get_yaw_angle();
+
+        var hubOrientation = await mySPIKE.getHubOrientation();
+
+        if (hubOrientation == &quot;back&quot;) {
+            HTMLElement = document.getElementById(&quot;back&quot;);
+            HTMLElement.style.display = &quot;block&quot;;
+
+            spriteFront.style.display = &quot;none&quot;;
+        } else if (hubOrientation == &quot;front&quot;) {
+            HTMLElement = document.getElementById(&quot;front&quot;);
+            HTMLElement.style.display = &quot;block&quot;;
+
+            spriteBack.style.display = &quot;none&quot;;
+        }
+
+        if (HTMLElement !== undefined) {
+            HTMLElement.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+        } else {
+            spriteFront.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+        }
+
+    }
+}
+</code></pre>
+<p>That's it for the Javascript code! There's much more functions you can play around with, all of which you can check out in the API documentation to the left. But the webpage wouldn't be complete with more HTML and CSS!</p>
+<p>If you would like to try out the example if your SPIKE Prime, click <a href="servicedock_hub.html">here!</a></p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src = &quot;./modules/ServiceDock.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;!--ServiceDock-->
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;!--the SPIKE image container-->
+        &lt;div id =&quot;hub&quot;>
+            &lt;!-- sprite of the SPIKE facing up-->
+            &lt;div id = &quot;front&quot; style = &quot;display: block;&quot;>
+                &lt;div id=&quot;mainButton&quot;>&lt;/div> &lt;!--the main button icon-->
+            &lt;/div>
+            &lt;!-- sprite of the SPIKE facing down-->
+            &lt;div id = &quot;back&quot; style = &quot;display: none&quot;>&lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        window.onload = function (){
+            var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+            
+            var spriteFront = document.getElementById(&quot;front&quot;);
+            var spriteBack = document.getElementById(&quot;back&quot;);
+            var HTMLElement;
+
+            var hub = mySPIKE.PrimeHub();
+
+            mySPIKE.executeAfterInit(function () {
+                mySPIKE.executeWithStream(getData);
+            })
+
+            async function getData() {
+
+                var hubDeg = await hub.motion_sensor.get_yaw_angle();
+
+                var hubOrientation = await mySPIKE.getHubOrientation();
+
+                if (hubOrientation == &quot;back&quot;) {
+                    HTMLElement = document.getElementById(&quot;back&quot;);
+                    HTMLElement.style.display = &quot;block&quot;;
+
+                    spriteFront.style.display = &quot;none&quot;;
+                } else if (hubOrientation == &quot;front&quot;) {
+                    HTMLElement = document.getElementById(&quot;front&quot;);
+                    HTMLElement.style.display = &quot;block&quot;;
+
+                    spriteBack.style.display = &quot;none&quot;;
+                }
+
+                if (HTMLElement !== undefined) {
+                    HTMLElement.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+                } else {
+                    spriteFront.style.transform = &quot;rotate(&quot; + hubDeg + &quot;deg)&quot;;
+                }
+
+            }
+        }
+    &lt;/script>
+    &lt;style>
+        #front {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(231,233,232);
+            height: 250px;
+            width: 150px;
+            transform: rotate(0deg);
+        }
+
+        #mainButton {
+            position:relative; 
+            height:37px; 
+            width: 37px;
+            left: 51px;
+            top: 200px;
+            background-color:whitesmoke; 
+            border: solid; 
+            border-radius:50%;
+        }
+        
+        #back {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(252,208,0);
+            height: 250px;
+            width: 150px;
+        }
+    &lt;/style>
+&lt;/html>
+
+</code></pre></article>
     </section>
 
 
