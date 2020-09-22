@@ -1,0 +1,29 @@
+{
+  "name": "spike_web",
+  "version": "1.0.0",
+  "description": "Code for SPIKE Prime web interface (2020 July 20)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
+    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tuftsceeo/SPIKE-Web-Interface.git"
+  },
+  "author": "Jeremy Jung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tuftsceeo/SPIKE-Web-Interface/issues"
+  },
+  "homepage": "https://github.com/tuftsceeo/SPIKE-Web-Interface#readme",
+  "dependencies": {
+    "@exlinc/cc-web-exec-sdk": "^1.0.6",
+    "jsdoc": "^3.6.5"
+  },
+  "devDependencies": {
+    "better-docs": "^2.3.0",
+    "tui-jsdoc-template": "^1.2.2"
+  }
+}

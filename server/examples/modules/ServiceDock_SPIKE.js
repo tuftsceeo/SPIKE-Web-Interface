@@ -2,13 +2,17 @@
 Project Name: SPIKE Prime Web Interface
 File name: ServiceDock_SPIKE.js
 Author: Jeremy Jung
-Last update: 7/19/20
+Last update: 9/22/20
 Description: HTML Element definition for <service-spike> to be used in ServiceDocks
 Credits/inspirations:
 History:
     Created by Jeremy on 7/16/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+TODO:
+include bluetooth_button and main_button in PrimeHub() SPIKE APP functions
+Remove all instances of getPortsInfo in example codes
+implement get_color
 */
 
 // import { Service_SPIKE } from "./Service_SPIKE.js";
@@ -41,10 +45,10 @@ class servicespike extends HTMLElement {
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
 
-        var imageRelPath = "./modules/views/four.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var imageRelPath = "./modules/views/SPIKE_button.png" // relative to the document in which a servicespike is created ( NOT this file )
         var length = 50; // for width and height of button
         var buttonBackgroundColor = "#A2E1EF" // background color of the button
-        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 50px 50px; background-color:" + buttonBackgroundColor
             + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
         button.setAttribute("style", buttonStyle);
 
@@ -76,7 +80,7 @@ class servicespike extends HTMLElement {
         this.addEventListener("click", async function () {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
-                console.log("activating service");
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
                 var initSuccessful = await this.service.init();
                 if (initSuccessful) {
                     active = true;
@@ -124,13 +128,20 @@ LICENSE: MIT
 
 /**
  * @class Service_SPIKE 
+ * @classdesc
+ * ServiceDock library for interfacing with LEGO® SPIKE™ Prime
  * @example
- * // if you're using ServiceDock
+ * // if you're using ServiceDock 
  * var mySPIKE = document.getElemenyById("service_spike").getService();
+ * mySPIKE.executeAfterInit(async function() {
+ *     // write code here
+ * })
+ * 
  * // if you're not using ServiceDock
  * var mySPIKE = new Service_SPIKE();
- * 
  * mySPIKE.init();
+ * 
+ * 
  */
 function Service_SPIKE() {
 
@@ -322,7 +333,7 @@ function Service_SPIKE() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> initialize SPIKE_service </h4>
+    /**  initialize SPIKE_service
      * <p> Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
      * <p> Starts streaming UJSONRPC </p>
      * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
@@ -331,8 +342,8 @@ function Service_SPIKE() {
      */
     async function init() {
 
-        console.log("navigator.product is ", navigator.product);
-        console.log("navigator.appName is ", navigator.appName);
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.product is ", navigator.product);
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.appName is ", navigator.appName);
         // reinit variables in the case of hardware disconnection and Service reactivation
         reader = undefined;
         writer = undefined;
@@ -363,13 +374,15 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Get the callback function to execute after service is initialized. </h4>
+    /**  Get the callback function to execute after service is initialized.
      * <p> <em> This function needs to be executed before calling init() </em> </p>
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
      * @example
-     * mySPIKE.executeAfterInit( function () {
-     *     var portsInfo = await mySPIKE.getPortsInfo();
+     * var motor = mySPIKE.Motor("A");
+     * mySPIKE.executeAfterInit( async function () {
+     *     var speed = await motor.get_speed();
+     *     // do something with speed
      * })
      */
     function executeAfterInit(callback) {
@@ -377,17 +390,16 @@ function Service_SPIKE() {
         funcAtInit = callback;
     }
 
-    /** <h4> Get the callback function to execute after a print or error from SPIKE python program </h4>
-     * @public
+    /**  Get the callback function to execute after a print or error from SPIKE python program
+     * @ignore
      * @param {function} callback 
      */
     function executeAfterPrint(callback) {
         funcAfterPrint = callback;
     }
 
-    /** <h4> Get the callback function to execute after Service Dock encounters an error </h4>
-     * 
-     * @public 
+    /**  Get the callback function to execute after Service Dock encounters an error
+     * @ignore
      * @param {any} callback 
      */
     function executeAfterError(callback) {
@@ -395,34 +407,39 @@ function Service_SPIKE() {
     }
 
 
-    /**
+    /**  Execute a stack of functions continuously with SPIKE sensor feed
      * 
      * @public
      * @param {any} callback 
+     * @example
+     * var motor = new mySPIKE.Motor('A')
+     * mySPIKE.executeWithStream( async function() {
+     *      var speed = await motor.get_speed();
+     *      // do something with motor speed
+     * })
      */
     function executeWithStream(callback) {
         funcWithStream = callback;
     }
 
-    /** <h4> Get the callback function to execute after service is disconnected </h4>
-     * 
-     * @public
+    /**  Get the callback function to execute after service is disconnected
+     * @ignore
      * @param {any} callback 
      */
     function executeAfterDisconnect(callback) {
         funcAfterDisconnect = callback;
     }
 
-    /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
+    /**  Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter)
      * <p> May make the SPIKE Prime do something </p>
-     * @public 
+     * @ignore
      * @param {string} command Command to send (or sequence of commands, separated by new lines)
      */
     async function sendDATA(command) {
         // look up the command to send
         commands = command.split("\n"); // split on new line
         //commands = command
-        console.log("sendDATA: " + commands);
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
@@ -431,7 +448,7 @@ function Service_SPIKE() {
         if (micropython_interpreter) {
 
             for (var i = 0; i < commands.length; i++) {
-                // console.log("commands.length", commands.length)
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "commands.length", commands.length)
 
                 // trim trailing, leading whitespaces
                 var current = commands[i].trim();
@@ -446,10 +463,10 @@ function Service_SPIKE() {
             // trim it, send it, and send a return...
             for (var i = 0; i < commands.length; i++) {
 
-                //console.log("commands.length", commands.length)
+                //console.log("%cTuftsCEEO ", "color: #3ba336;", "commands.length", commands.length)
 
                 current = commands[i].trim();
-                //console.log("current", current);
+                //console.log("%cTuftsCEEO ", "color: #3ba336;", "current", current);
                 // turn string into JSON
 
                 //string_current = (JSON.stringify(current));
@@ -464,14 +481,14 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Send character sequences to reboot SPIKE Prime </h4>
+    /**  Send character sequences to reboot SPIKE Prime
      * <p> <em> Run this function to exit micropython interpreter </em> </p>
      * @public
      * @example
      * mySPIKE.rebootHub();
      */
-    async function rebootHub() {
-        console.log("rebooting")
+    function rebootHub() {
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "rebooting")
         // make sure ready to write to device
         setupWriter();
         writer.write(CONTROL_C);
@@ -483,8 +500,8 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Get the information of all the ports and devices connected to them </h4>
-     * @public
+    /**  Get the information of all the ports and devices connected to them
+     * @ignore
      * @returns {object} <p> An object with keys as port letters and values as objects of device type and info </p>
      * @example
      * // USAGE 
@@ -516,8 +533,8 @@ function Service_SPIKE() {
         return ports;
     }
 
-    /** <h4> get the info of a single port </h4>
-     * @public
+    /**  get the info of a single port
+     * @ignore
      * @param {string} letter Port on the SPIKE hub
      * @returns {object} Keys as device and info as value
      */
@@ -525,17 +542,16 @@ function Service_SPIKE() {
         return ports[letter];
     }
 
-    /** <h4> Get battery status </h4>
-     * 
-     * @public
+    /**  Get battery status
+     * @ignore
      * @returns {integer} battery percentage
      */
     async function getBatteryStatus() {
         return batteryAmount;
     }
 
-    /** <h4> Get info of the hub </h4>
-     * @public
+    /**  Get info of the hub
+     * @ignore
      * @returns {object} Info of the hub
      * @example
      * var hubInfo = await mySPIKE.getHubInfo();
@@ -558,18 +574,17 @@ function Service_SPIKE() {
         return hub;
     }
 
-    /**
+    /**  Get the name of the hub
      * 
-     * 
+     * @public
      * @returns name of hub
      */
-    async function getHubName(callback) {
+    async function getHubName() {
         return hubName;
     }
 
     /**
-     * 
-     * 
+     * @ignore
      * @param {any} callback 
      */
     async function getFirmwareInfo(callback) {
@@ -578,20 +593,10 @@ function Service_SPIKE() {
 
     }
 
-    /**
-     * 
-     * 
-     * @param {any} callback 
-     */
-    async function triggerCurrentState(callback) {
 
-        UJSONRPC.triggerCurrentState(callback);
-    }
-
-
-    /** <h4> get projects in all the slots of SPIKE Prime hub </h4>
+    /**  get projects in all the slots of SPIKE Prime hub
      * 
-     * @public
+     * @ignore
      * @returns {object}
      */
     async function getProjects() {
@@ -603,25 +608,25 @@ function Service_SPIKE() {
         return hubProjects
     }
 
-    /** <h4> Reach the micropython interpreter beneath UJSON RPC </h4>
+    /**  Reach the micropython interpreter beneath UJSON RPC
      * <p> Note: Stops UJSON RPC stream </p>
      * <p> hub needs to be rebooted to return to UJSONRPC stream</p>
-     * @public
+     * @ignore
      * @example
      * mySPIKE.reachMicroPy();
      * mySPIKE.sendDATA("from spike import PrimeHub");
      * mySPIKE.sendDATA("hub = PrimeHub()");
      * mySPIKE.sendDATA("hub.light_matrix.show_image('HAPPY')");
      */
-    async function reachMicroPy() {
-        console.log("starting micropy interpreter");
+    function reachMicroPy() {
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "starting micropy interpreter");
         setupWriter();
         writer.write(CONTROL_C);
         micropython_interpreter = true;
     }
 
-    /** <h4> Get the latest complete line of UJSON RPC from stream </h4>
-     * @public
+    /**  Get the latest complete line of UJSON RPC from stream
+     * @ignore
      * @returns {string} Represents a JSON object from UJSON RPC
      */
     async function getLatestUJSON() {
@@ -630,7 +635,7 @@ function Service_SPIKE() {
             var parsedUJSON = await JSON.parse(lastUJSONRPC)
         }
         catch (error) {
-            //console.log('[retrieveData] ERROR', error);
+            //console.log("%cTuftsCEEO ", "color: #3ba336;", '[retrieveData] ERROR', error);
         }
 
         return lastUJSONRPC
@@ -639,37 +644,56 @@ function Service_SPIKE() {
     /** Get whether the Service was initialized or not
      * @public
      * @returns {boolean} True if service initialized, false otherwise
+     * @example
+     * if (mySPIKE.isActive()) {
+     *      // do something
+     * }
      */
     function isActive() {
         return serviceActive;
     }
 
-    /** <h4> Get the most recently detected orientation of the hub </h4>
-     * @public
-     * @returns {string} ['up','down','front','back','leftside','rightside']
-     */
-    async function getHubOrientation() {
-        return lastHubOrientation;
-    }
-
-    /** <h4> Get the most recently detected event on the display of the hub </h4>
+    /**  Get the most recently detected event on the display of the hub
      * @public
      * @returns {string} ['tapped','doubletapped']
+     * var event = await mySPIKE.getHubEvent();
+     * if (event == "tapped" ) {
+     *      console.log("SPIKE is tapped");
+     * }
      */
-    async function getHubFrontEvent() {
+    async function getHubEvent() {
         return hubFrontEvent;
     }
 
-    /** <h4> Get the most recently detected gesture of the hub </h4>
+    /**  Get the most recently detected gesture of the hub
      * @public
      * @returns {string} ['shake', 'freefall']
+     * @example
+     * var gesture = await mySPIKE.getHubGesture();
+     * if (gesture == "shake") {
+     *      console.log("SPIKE is being shaked");
+     * }
      */
     async function getHubGesture() {
         return hubGesture;
     }
 
-    /** <h4> Get the latest press event information on the "connect" button </h4>
+    /**  Get the most recently detected orientation of the hub
      * @public
+     * @returns {string} ['up','down','front','back','leftside','rightside']
+     * @example
+     * var orientation = await mySPIKE.getHubOrientation();
+     * if (orientation == "front") {
+     *      console.log("SPIKE is facing up");
+     * }
+     */
+    async function getHubOrientation() {
+        return lastHubOrientation;
+    }
+
+
+    /**  Get the latest press event information on the "connect" button
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var bluetoothButtonInfo = await mySPIKE.getBluetoothButton();
@@ -680,8 +704,8 @@ function Service_SPIKE() {
         return hubBluetoothButton;
     }
 
-    /** <h4> Get the latest press event information on the "center" button </h4>
-     * @public
+    /**  Get the latest press event information on the "center" button
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER }
      * @example
      * var mainButtonInfo = await mySPIKE.getMainButton();
@@ -693,8 +717,8 @@ function Service_SPIKE() {
         return hubMainButton;
     }
 
-    /** <h4> Get the latest press event information on the "left" button </h4>
-     * @public
+    /**  Get the latest press event information on the "left" button
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var leftButtonInfo = await mySPIKE.getLeftButton();
@@ -706,8 +730,8 @@ function Service_SPIKE() {
         return hubLeftButton;
     }
 
-    /** <h4> Get the latest press event information on the "right" button </h4>
-     * @public
+    /**  Get the latest press event information on the "right" button
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var rightButtonInfo = await mySPIKE.getRightButton();
@@ -718,7 +742,7 @@ function Service_SPIKE() {
         return hubRightButton;
     }
 
-    /** <h4> Get the ports connected to any kind of Motors </h4>
+    /**  Get the letters of ports connected to any kind of Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
      */
@@ -735,7 +759,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the ports connected to Small Motors </h4>
+    /**  Get the letters of ports connected to Small Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
      */
@@ -752,7 +776,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the ports connected to Big Motors </h4>
+    /**  Get the letters of ports connected to Big Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
      */
@@ -767,7 +791,7 @@ function Service_SPIKE() {
         return motorPorts;
     }
 
-    /** <h4> Get the ports connected to Distance Sensors </h4>
+    /**  Get the letters of ports connected to Distance Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
      */
@@ -786,7 +810,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the ports connected to Color Sensors </h4>
+    /**  Get the letters of ports connected to Color Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Color Sensors
      */
@@ -805,7 +829,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the ports connected to Force Sensors </h4>
+    /**  Get the letters of ports connected to Force Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Force Sensors
      */
@@ -824,16 +848,93 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Terminate currently running micropy program</h4>
+    /**  Get all motor objects currently connected to SPIKE
+     * 
      * @public
+     * @returns {object} All connected Motor objects
+     * @example
+     * var motors = await mySPIKE.getMotors();
+     * var myMotor = motors["A"]  
+     */
+    async function getMotors() {
+        var portsInfo = ports;
+        var motors = {};
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
+                motors[key] = new Motor(key);
+            }
+        }
+        return motors;
+    }
+
+    /**  Get all distance sensor objects currently connected to SPIKE
+     * 
+     * @public
+     * @returns {object} All connected DistanceSensor objects
+     * @example
+     * var distanceSensors = await mySPIKE.getDistanceSensors();
+     * var mySensor = distanceSensors["A"];
+     */
+    async function getDistanceSensors() {
+        var portsInfo = ports;
+        var distanceSensors = {};
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "ultrasonic") {
+                distanceSensors[key] = new DistanceSensor(key);
+            }
+        }
+        return distanceSensors;
+    }
+
+    /**  Get all color sensor objects currently connected to SPIKE
+     * 
+     * @public
+     * @returns {object} All connected ColorSensor objects
+     * @example
+     * var colorSensors = await mySPIKE.getColorSensors();
+     * var mySensor = colorSensors["A"];
+     */
+    async function getColorSensors() {
+        var portsInfo = ports;
+        var colorSensors = {};
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "color") {
+                colorSensors[key] = new ColorSensor(key);
+            }
+        }
+        return colorSensors;
+    }
+
+    /**  Get all force sensor objects currently connected to SPIKE
+     * 
+     * @public
+     * @returns {object} All connected ForceSensor objects
+     * @example
+     * var forceSensors = await mySPIKE.getForceSensors();
+     * var mySensor = forceSensors["A"];
+     */
+    async function getForceSensors() {
+        var portsInfo = ports;
+        var forceSensors = {};
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "force") {
+                forceSensors[key] = new ForceSensor(key);
+            }
+        }
+        return forceSensors;
+    }
+
+
+    /**  Terminate currently running micropy progra
+     * @ignore
      */
     function stopCurrentProgram() {
         UJSONRPC.programTerminate();
     }
 
-    /** <h4> write a micropy program into a slot of the SPIKE Prime </h4>
+    /**  write a micropy program into a slot of the SPIKE Prime
      * 
-     * @public
+     * @ignore
      * @param {string} projectName name of the project to register
      * @param {string} data the micropy code to send (expecting an <input type="text">.value)
      * @param {integer} slotid slot number to assign the program in [0-9]
@@ -879,9 +980,9 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Execute a program in a slot </h4>
+    /**  Execute a program in a slot
      * 
-     * @public
+     * @ignore
      * @param {integer} slotid slot of program to execute [0-9]
      */
     function executeProgram(slotid) {
@@ -895,7 +996,7 @@ function Service_SPIKE() {
     //////////////////////////////////////////
 
     /** PrimeHub object
-    * @class
+    * @ignore
     * @memberof Service_SPIKE
     * @returns {classes} 
     * <p> left_button </p>
@@ -906,9 +1007,13 @@ function Service_SPIKE() {
     PrimeHub = function () {
         var newOrigin = 0;
 
-        /** PrimeHub.left_button
+        /** The left button on the hub
         * @class
         * @returns {functions} - functions from PrimeHub.left_button
+        * @example
+        * var hub = mySPIKE.PrimeHub();
+        * var left_button = hub.left_button();
+        * // do something with left_button
         */
         var left_button = {};
 
@@ -951,9 +1056,13 @@ function Service_SPIKE() {
             }
         }
 
-        /** PrimeHub.right_button
+        /** The right button on the hub
          * @class
          * @returns {functions} functions from PrimeHub.right_button
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var right_button = hub.right_button();
+         * // do something with right_button
          */
         var right_button = {};
 
@@ -1018,9 +1127,13 @@ function Service_SPIKE() {
             }
         }
 
-        /** PrimeHub.Light Matrix
+        /** Hub's light matrix
          * @class
          * @returns {functions} - functions from PrimeHub.light_matrix
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var light_matrix = hub.light_matrix();
+         * // do something with light_matrix
          */
         var light_matrix = {};
 
@@ -1055,9 +1168,13 @@ function Service_SPIKE() {
             UJSONRPC.displayClear();
         }
 
-        /** speaker
+        /** Hub's speaker
          * @class
          * @returns {functions} functions from Primehub.speaker
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var speaker = hub.speaker();
+         * // do something with speaker
          */
         var speaker = {};
 
@@ -1103,9 +1220,13 @@ function Service_SPIKE() {
             speaker.volume = newVolume
         }
 
-        /** Motion Sensor
+        /** Hub's motion sensor
          * @class
          * @returns {functions} functions from PrimeHub.motion_sensor
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var motion_sensor = hub.motion_sensor();
+         * // do something with motion_sensor
          */
         var motion_sensor = {};
 
@@ -1189,6 +1310,30 @@ function Service_SPIKE() {
          */
         motion_sensor.get_roll_angle = function get_roll_angle() {
             return hub.pos[2];
+        }
+
+        /** Gets the acceleration of the SPIKE's yaw axis
+         * 
+         * @returns {integer} acceleration
+         */
+        motion_sensor.get_yaw_acceleration = function get_yaw_acceleration() {
+            return hub.pos[2];
+        }
+
+        /**  Gets the acceleration of the SPIKE's pitch axis
+         * 
+         * @returns {integer} acceleration
+         */
+        motion_sensor.get_pitch_acceleration = function get_pitch_acceleration() {
+            return hub.pos[1];
+        }
+
+        /** Gets the acceleration of the SPIKE's roll axis
+         * 
+         * @returns {integer} acceleration
+         */
+        motion_sensor.get_roll_acceleration = function get_roll_acceleration() {
+            return hub.pos[0];
         }
 
         /** Retrieves the most recently detected gesture.
@@ -1421,19 +1566,21 @@ function Service_SPIKE() {
         }
 
         /** Get the name of the detected color
-         * 
+         * @ignore
          * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
+         * @todo Implement this function
          */
         function get_color() {
             var colorsensor = ports[port]; // get the color sensor info by port
             var colorsensorData = colorsensor.data;
 
-            var r = colorsensorData.Cr;
-            var g = colorsensorData.Cg;
-            var b = colorsensorData.Cb;
+            var r = colorsensorData.RGB[0];
+            var g = colorsensorData.RGB[1];
+            var b = colorsensorData.RGB[2];
 
             var hex = rgbToHex(r, g, b);
-            var match = ntc(hex);
+            console.log(hex);
+            var match = ntc.name(hex);
             // name of the color 
             return match[1]
         }
@@ -1510,11 +1657,12 @@ function Service_SPIKE() {
 
 
         /** Waits until the Color Sensor detects the specified color.
+         * @ignore
          * @todo Implement this function
          */
         function wait_until_color(color) {
             var color = get_color();
-
+            console.log(color);
         }
 
 
@@ -1522,6 +1670,7 @@ function Service_SPIKE() {
          * The first time this method is called, it returns immediately the detected color. 
          * After that, it waits until the Color Sensor detects a color that is different from the color that
          * was detected the last time this method was used.
+         * @ignore
          * @todo Implement this function
          * @param {function(string)} callback  
          */
@@ -1825,6 +1974,7 @@ function Service_SPIKE() {
     //////////////////////////////////////////
 
     /** Low Level UJSONRPC Commands
+     * @ignore
      * @namespace UJSONRPC
      */
     var UJSONRPC = {};
@@ -2097,6 +2247,7 @@ function Service_SPIKE() {
     /**
      * 
      * @memberof! UJSONRPC
+     * @param {function} callback
      */
     UJSONRPC.getFirmwareInfo = async function getFirmwareInfo(callback) {
         var randomId = generateId();
@@ -2108,6 +2259,10 @@ function Service_SPIKE() {
         }
     }
 
+    /**
+     * @memberof! UJSONRPC
+     * @param {function} callback 
+     */
     UJSONRPC.triggerCurrentState = async function triggerCurrentState(callback) {
         var randomId = generateId();
 
@@ -2120,7 +2275,7 @@ function Service_SPIKE() {
 
     /** 
      * 
-     * 
+     * @memberof! UJSONRPC
      * @param {integer} slotid 
      */
     UJSONRPC.programExecute = async function programExecute(slotid) {
@@ -2129,9 +2284,8 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
-    /** 
-     * 
-     * 
+    /**
+     * @memberof! UJSONRPC
      */
     UJSONRPC.programTerminate = function programTerminate() {
 
@@ -2144,7 +2298,7 @@ function Service_SPIKE() {
     }
 
     /**
-     * 
+     * @memberof! UJSONRPC
      * @param {string} projectName name of the project
      * @param {integer} type type of data (micropy or scratch)
      * @param {string} data entire data to send in ASCII
@@ -2152,8 +2306,8 @@ function Service_SPIKE() {
      */
     UJSONRPC.startWriteProgram = async function startWriteProgram(projectName, type, data, slotid) {
 
-        console.log("in startWriteProgram...");
-        console.log("constructing start_write_program script...");
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "in startWriteProgram...");
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "constructing start_write_program script...");
 
         if (type == "python") {
             var typeInt = 0;
@@ -2179,12 +2333,12 @@ function Service_SPIKE() {
             ', "slotid": ' + slotid +
             '} }';
 
-        console.log("constructed start_write_program script...");
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "constructed start_write_program script...");
 
         // assign function to start sending packets after confirming blocksize and transferid
         startWriteProgramCallback = [randomId, writePackageFunc];
 
-        console.log("sending start_write_program script");
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "sending start_write_program script");
 
         sendDATA(command);
 
@@ -2200,20 +2354,20 @@ function Service_SPIKE() {
         // function to write the first packet of data
         function writePackageFunc(blocksize, transferid) {
 
-            console.log("in writePackageFunc...");
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "in writePackageFunc...");
 
-            console.log("stringified the entire data to send: ", data);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "stringified the entire data to send: ", data);
 
             // when data's length is less than the blocksize limit of sending data
             if (data.length <= blocksize) {
-                console.log("data's length is less than the blocksize of ", blocksize);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "data's length is less than the blocksize of ", blocksize);
 
                 // if the data's length is not zero (not empty)
                 if (data.length != 0) {
 
                     var dataToSend = data.substring(0, data.length); // get the entirety of data
 
-                    console.log("data's length is not zero, sending the entire data: ", dataToSend);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "data's length is not zero, sending the entire data: ", dataToSend);
 
                     var base64data = btoa(dataToSend); // encode the packet to base64
 
@@ -2235,11 +2389,11 @@ function Service_SPIKE() {
             // and save the remaining data to send packet by packet
             else if (data.length > blocksize) {
 
-                console.log("data's length is more than the blocksize of ", blocksize);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "data's length is more than the blocksize of ", blocksize);
 
                 var dataToSend = data.substring(0, blocksize); // get the first block of packet
 
-                console.log("sending the blocksize amount of data: ", dataToSend);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "sending the blocksize amount of data: ", dataToSend);
 
                 var base64data = btoa(dataToSend); // encode the packet to base64
 
@@ -2247,8 +2401,8 @@ function Service_SPIKE() {
 
                 var remainingData = data.substring(blocksize, data.length); // remove the portion just sent from data
 
-                console.log("reassigning writePackageInformation with message ID: ", msgID);
-                console.log("reassigning writePackageInformation with remainingData: ", remainingData);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "reassigning writePackageInformation with message ID: ", msgID);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "reassigning writePackageInformation with remainingData: ", remainingData);
 
                 // update package information to be used for sending remaining packets
                 writePackageInformation = [msgID, remainingData, transferid, blocksize];
@@ -2263,6 +2417,7 @@ function Service_SPIKE() {
 
     /**
      * 
+     * @memberof! UJSONRPC
      * @param {string} base64data base64 encoded data to send
      * @param {string} transferid transferid of this program write process
      * @returns {string} the randomly generated message id used to send this UJSONRPC script
@@ -2282,6 +2437,9 @@ function Service_SPIKE() {
 
     }
 
+    /**
+     * @memberof! UJSONRPC
+     */
     UJSONRPC.getStorageStatus = function getStorageStatus() {
 
         var randomId = generateId();
@@ -2293,6 +2451,10 @@ function Service_SPIKE() {
 
     }
 
+    /**
+     * @memberof! UJSONRPC
+     * @param {string} slotid 
+     */
     UJSONRPC.removeProject = function removeProject(slotid) {
 
         var randomId = generateId();
@@ -2304,6 +2466,12 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
+    /**
+     * 
+     * @memberof! UJSONRPC
+     * @param {string} oldslotid 
+     * @param {string} newslotid 
+     */
     UJSONRPC.moveProject = function moveProject(oldslotid, newslotid) {
 
         var randomId = generateId();
@@ -2323,12 +2491,21 @@ function Service_SPIKE() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
+    
+    /**
+    * @private
+    * @param {function} callback 
+    */
+    async function triggerCurrentState(callback) {
+
+        UJSONRPC.triggerCurrentState(callback);
+    }
 
     /** 
      * 
      * @private
-     * @param {any} id 
-     * @param {any} funcName 
+     * @param {string} id 
+     * @param {string} funcName 
      */
     function pushResponseCallback(id, funcName) {
 
@@ -2362,7 +2539,8 @@ function Service_SPIKE() {
         }
 
     }
-    /** <h4> Sleep function </h4>
+
+    /**  Sleep function
      * @private
      * @param {number} ms Miliseconds to sleep
      * @returns {Promise} 
@@ -2371,8 +2549,8 @@ function Service_SPIKE() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /** <h4> generate random id for UJSONRPC messages </h4>
-     * 
+    /**  generate random id for UJSONRPC messages
+     * @private
      * @returns {string}
      */
     function generateId() {
@@ -2387,7 +2565,7 @@ function Service_SPIKE() {
         return generatedID;
     }
 
-    /** <h4> Prompt user to select web serial port and make connection to SPIKE Prime </h4>
+    /**  Prompt user to select web serial port and make connection to SPIKE Prime
      * <p> Effect Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
      * <p> Note: </p>
      * <p> This function is to be executed before reading in JSON RPC streams from the hub </p>
@@ -2400,7 +2578,7 @@ function Service_SPIKE() {
             var success = false;
 
             port = await navigator.serial.getPorts();
-            console.log("ports:", port);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "ports:", port);
             // select device
             port = await navigator.serial.requestPort({
                 // filters:[filter]
@@ -2409,15 +2587,9 @@ function Service_SPIKE() {
             // wait for the port to open.
             try {
                 await port.open({ baudrate: 115200 });
-                // console.log("Connected web serial port");
-                // console.log(navigator.serial.getInfo());
-                // console.log(typeof port);
-
-                // console.log(port.getInfo());
-
             }
             catch (er) {
-                console.log(er)
+                console.log("%cTuftsCEEO ", "color: #3ba336;", er)
                 if (funcAfterError != undefined) {
                     funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                 }
@@ -2435,7 +2607,7 @@ function Service_SPIKE() {
 
 
         } catch (e) {
-            console.log("Cannot read port:", e);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "Cannot read port:", e);
             if (funcAfterError != undefined) {
                 funcAfterError(e);
             }
@@ -2443,7 +2615,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Initialize writer object before sending commands </h4>
+    /**  Initialize writer object before sending commands
      * @private
      * 
      */
@@ -2457,7 +2629,148 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Continuously take UJSON RPC input from SPIKE Prime </h4>
+
+    /**  Process a packet in UJSONRPC
+        * @private
+        *
+        */
+    async function parsePacket(value, testing = false, callback) {
+
+        // console.log("%cTuftsCEEO ", "color: #3ba336;", value);
+
+        // stringify the packet to look for carriage return
+        var json_string = await JSON.stringify(value);
+        json_string = json_string.trim();
+
+        let findEscapedQuotes = /\\"/g;
+
+        var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
+        cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
+        // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
+
+        jsonline = jsonline + cleanedJsonString; // concatenate packet to data
+        jsonline = jsonline.trim();
+
+        // regex search for carriage return
+        let pattern = /\\r/g;
+        var carriageReIndex = jsonline.search(pattern);
+
+        // there is at least one carriage return in this packet
+        if (carriageReIndex > -1) {
+
+            // the concatenated packets start with a left curly brace (start of JSON)
+            if (jsonline[0] == "{") {
+
+                lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                // look for conjoined JSON packets: there's at least two carriage returns in jsonline
+                if (jsonline.match(/\\r/g).length > 1) {
+
+                    var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
+
+                    // last index only contains "" as it would be after \r
+                    for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
+
+                        // for every JSON object in array, perform data handling
+
+                        lastUJSONRPC = conjoinedPacketsArray[i];
+
+                        try {
+                            var parseTest = await JSON.parse(lastUJSONRPC)
+
+                            if (testing) {
+                                console.log("%cTuftsCEEO ", "color: #3ba336;", "UJSONRPC line: ", lastUJSONRPC);
+                            }
+
+                            // update hub information using lastUJSONRPC
+                            await updateHubPortsInfo();
+                            await PrimeHubEventHandler();
+
+                            if (funcWithStream) {
+                                await funcWithStream();
+                            }
+
+                        }
+                        catch (e) {
+                            console.log(e);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC: ", lastUJSONRPC);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current jsonline: ", jsonline);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current cleaned json_string: ", cleanedJsonString)
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current json_string: ", json_string);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "current value: ", value);
+
+                            if (funcAfterError != undefined) {
+                                funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
+                            }
+
+                            if (callback != undefined) {
+                                callback();
+                            }
+
+                        }
+
+                        jsonline = "";
+
+                    }
+                }
+                // there are no conjoined packets in this jsonline
+                else {
+                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+
+                    // parsing test
+                    try {
+                        var parseTest = await JSON.parse(lastUJSONRPC);
+
+                        if (testing) {
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "UJSONRPC line: ", lastUJSONRPC);
+                        }
+
+                        // update hub information using lastUJSONRPC
+                        await updateHubPortsInfo();
+                        await PrimeHubEventHandler();
+
+                        if (funcWithStream) {
+                            await funcWithStream();
+                        }
+                    }
+                    catch (e) {
+                        console.log(e);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC: ", lastUJSONRPC);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current jsonline: ", jsonline);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current cleaned json_string: ", cleanedJsonString)
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current json_string: ", json_string);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "current value: ", value);
+
+                        if (funcAfterError != undefined) {
+                            funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
+                        }
+
+                        if (callback != undefined) {
+                            callback();
+                        }
+
+                    }
+
+                    jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+                }
+
+            }
+            else {
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+
+                jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+
+                // reset jsonline for next concatenation
+                // jsonline = "";
+            }
+        }
+
+    }
+
+
+    /**  Continuously take UJSON RPC input from SPIKE Prime
      * @private
      */
     async function streamUJSONRPC() {
@@ -2476,9 +2789,9 @@ function Service_SPIKE() {
                     try {
 
                         if (firstReading) {
-                            console.log("##### READING FIRST UJSONRPC LINE ##### CHECKING VARIABLES");
-                            console.log("jsonline: ", jsonline);
-                            console.log("lastUJSONRPC: ", lastUJSONRPC);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "##### READING FIRST UJSONRPC LINE ##### CHECKING VARIABLES");
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline: ", jsonline);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "lastUJSONRPC: ", lastUJSONRPC);
                             firstReading = false;
                         }
                         // read UJSON RPC stream ( actual data in {value} )
@@ -2486,131 +2799,24 @@ function Service_SPIKE() {
 
                         // log value
                         if (micropython_interpreter) {
-                            console.log(value);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", value);
                         }
 
-                        // console.log(value);
+                        // console.log("%cTuftsCEEO ", "color: #3ba336;", value);
 
                         //concatenate UJSONRPC packets into complete JSON objects
                         if (value) {
-
-                            // stringify the packet to look for carriage return
-                            var json_string = await JSON.stringify(value);
-                            let findEscapedQuotes = /\\"/g;
-                            let findNewLines = /\\n/g;
-
-                            var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
-                            cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
-                            // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
-
-                            jsonline = jsonline + cleanedJsonString; // concatenate packet to data
-
-                            // regex search for carriage return
-                            let pattern = /\\r/g;
-                            var carriageReIndex = jsonline.search(pattern);
-
-                            // there is at least one carriage return in this packet
-                            if (carriageReIndex > -1) {
-
-                                // the concatenated packets start with a left curly brace (start of JSON)
-                                if (jsonline[0] == "{") {
-
-                                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                    // look for conjoined JSON packets: there's at least two carriage returns in jsonline
-                                    if (jsonline.match(/\\r/g).length > 1) {
-
-                                        var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
-
-                                        // last index only contains "" as it would be after \r
-                                        for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
-
-                                            // for every JSON object in array, perform data handling
-
-                                            lastUJSONRPC = conjoinedPacketsArray[i];
-
-                                            try {
-                                                var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                                // update hub information using lastUJSONRPC
-                                                await updateHubPortsInfo();
-                                                await PrimeHubEventHandler();
-
-                                                if (funcWithStream) {
-                                                    await funcWithStream();
-                                                }
-
-                                            }
-                                            catch (e) {
-                                                console.log(e);
-                                                console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                                console.log("current jsonline: ", jsonline);
-                                                console.log("current cleaned json_string: ", cleanedJsonString)
-                                                console.log("current json_string: ", json_string);
-                                                console.log("current value: ", value);
-
-                                                if (funcAfterError != undefined) {
-                                                    funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
-                                                }
-
-                                            }
-
-                                            jsonline = "";
-
-                                        }
-                                    }
-                                    // there are no conjoined packets in this jsonline
-                                    else {
-                                        lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                        // parsing test
-                                        try {
-                                            var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                            // update hub information using lastUJSONRPC
-                                            await updateHubPortsInfo();
-                                            await PrimeHubEventHandler();
-
-                                            if (funcWithStream) {
-                                                await funcWithStream();
-                                            }
-                                        }
-                                        catch (e) {
-                                            console.log(e);
-                                            console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                            console.log("current jsonline: ", jsonline);
-                                            console.log("current cleaned json_string: ", cleanedJsonString)
-                                            console.log("current json_string: ", json_string);
-                                            console.log("current value: ", value);
-
-                                            if (funcAfterError != undefined) {
-                                                funcAfterError("Fatal Error: Please close any other window or program that is connected to your SPIKE Prime");
-                                            }
-
-                                        }
-
-                                        jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
-                                    }
-
-                                }
-                                else {
-                                    console.log("jsonline was reset: ", jsonline);
-
-                                    // reset jsonline for next concatenation
-                                    jsonline = "";
-                                }
-                            }
-
+                            parsePacket(value);
                         }
                         if (done) {
                             serviceActive = false;
                             // reader has been canceled.
-                            console.log("[readLoop] DONE", done);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "[readLoop] DONE", done);
                         }
                     }
                     // error handler
                     catch (error) {
-                        console.log('[readLoop] ERROR', error);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", '[readLoop] ERROR', error);
 
                         serviceActive = false;
 
@@ -2647,12 +2853,12 @@ function Service_SPIKE() {
                 reader.releaseLock();
 
             } // end of: while (port.readable) [checking if readable loop]
-            console.log("- port.readable is FALSE")
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "- port.readable is FALSE")
         } // end of: trying to open port
         catch (e) {
             serviceActive = false;
             // Permission to access a device was denied implicitly or explicitly by the user.
-            console.log('ERROR trying to open:', e);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", 'ERROR trying to open:', e);
         }
     }
 
@@ -2674,9 +2880,9 @@ function Service_SPIKE() {
                 data_stream = data_stream.p;
             }
             catch (e) {
-                console.log("error parsing lastUJSONRPC at updateHubPortsInfo", lastUJSONRPC);
-                console.log(typeof lastUJSONRPC);
-                console.log(lastUJSONRPC.p);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC at updateHubPortsInfo", lastUJSONRPC);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", typeof lastUJSONRPC);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC.p);
 
                 if (funcAfterError != undefined) {
                     funcAfterError("Fatal Error: Please reboot the Hub and refresh this environment");
@@ -2830,7 +3036,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Catch hub events in UJSONRPC </h4>
+    /**  Catch hub events in UJSONRPC
      * <p> Effect: </p>
      * <p> Logs in the console when some particular messages are caught </p>
      * <p> Assigns the hub events global variables </p>
@@ -2848,7 +3054,7 @@ function Service_SPIKE() {
 
             decodedResponse = JSON.stringify(decodedResponse);
 
-            console.log(decodedResponse);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", decodedResponse);
 
             var splitData = decodedResponse.split(/\\n/); // split the code by every newline
 
@@ -2860,16 +3066,16 @@ function Service_SPIKE() {
                 if (errorType.indexOf("SyntaxError") > -1) {
                     /* get the error line number*/
                     var lineNumberLine = splitData[splitData.length - 3];
-                    console.log("lineNumberLine: ", lineNumberLine);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "lineNumberLine: ", lineNumberLine);
                     var indexLine = lineNumberLine.indexOf("line");
                     var lineNumberSubstring = lineNumberLine.substring(indexLine, lineNumberLine.length);
                     var numberPattern = /\d+/g;
                     var lineNumber = lineNumberSubstring.match(numberPattern)[0];
-                    console.log(lineNumberSubstring.match(numberPattern));
-                    console.log("lineNumber:", lineNumber);
-                    console.log("typeof lineNumber:", typeof lineNumber);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", lineNumberSubstring.match(numberPattern));
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "lineNumber:", lineNumber);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "typeof lineNumber:", typeof lineNumber);
                     var lineNumberInNumber = parseInt(lineNumber) - 5;
-                    console.log("typeof lineNumberInNumber:", typeof lineNumberInNumber);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "typeof lineNumberInNumber:", typeof lineNumberInNumber);
 
                     funcAfterError("line " + lineNumberInNumber + ": " + errorType);
                 }
@@ -2897,7 +3103,7 @@ function Service_SPIKE() {
         }
         // give center button click, left, right (?)
         else if (messageType == 3) {
-            console.log(lastUJSONRPC);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
             if (parsedUJSON.p[0] == "center") {
                 hubMainButton.pressed = true;
 
@@ -2951,60 +3157,29 @@ function Service_SPIKE() {
         }
         // gives orientation of the hub (leftside, up,..), tapping of hub, 
         else if (messageType == 4) {
-            var isOrientationData = parsedUJSON.p == "up" || parsedUJSON.p == "down" || parsedUJSON.p == "back" || parsedUJSON.p == "front" || parsedUJSON.p == "leftSide" || parsedUJSON.p == "rightSide";
-            var isGestureData = parsedUJSON.p == "freefall" || parsedUJSON.p == "shake" || parsedUJSON.p == "tapped" || parsedUJSON.p == "doubletapped"
             /* this data stream is about hub orientation */
-            if (isOrientationData) {
 
-                var newOrientation = parsedUJSON.p;
-
-                if (newOrientation == "up") {
-                    lastHubOrientation = "up";
-                }
-                else if (newOrientation == "down") {
-                    lastHubOrientation = "down";
-                }
-                else if (newOrientation == "front") {
-                    lastHubOrientation = "front";
-                }
-                else if (newOrientation == "back") {
-                    lastHubOrientation = "back";
-                }
-                else if (newOrientation == "leftSide") {
-                    lastHubOrientation = "leftSide";
-                }
-                else if (newOrientation == "rightSide") {
-                    lastHubOrientation = "rightSide";
-                }
+            var newOrientation = parsedUJSON.p;
+            if (newOrientation == "1") {
+                lastHubOrientation = "up";
             }
-            /* this data stream is about hub gesture */
-            else if (isGestureData) {
-
-                var newGesture = parsedUJSON.p;
-
-                if (newGesture == "freefall") {
-                    hubGesture = "freefall";
-                    hubGestures.push(newGesture);
-                }
-                else if (newGesture == "shake") {
-                    hubGesture = "shake";
-                    hubGestures.push("shaken"); // the string is different at higher level
-                }
-                else if (newGesture == "tapped") {
-                    hubFrontEvent = "tapped";
-                    hubGestures.push(newGesture);
-                }
-                else if (newGesture == "doubletapped") {
-                    hubFrontEvent = "doubletapped";
-                    hubGestures.push(newGesture);
-                }
-
-                // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
-                typeof funcAfterNewGesture === "function" && funcAfterNewGesture(newGesture);
-                funcAfterNewGesture = undefined;
-
+            else if (newOrientation == "4") {
+                lastHubOrientation = "down";
             }
-            console.log(lastUJSONRPC);
+            else if (newOrientation == "0") {
+                lastHubOrientation = "front";
+            }
+            else if (newOrientation == "3") {
+                lastHubOrientation = "back";
+            }
+            else if (newOrientation == "2") {
+                lastHubOrientation = "leftSide";
+            }
+            else if (newOrientation == "5") {
+                lastHubOrientation = "rightSide";
+            }
+
+            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
         else if (messageType == 7) {
             if (funcAfterPrint != undefined) {
@@ -3026,14 +3201,43 @@ function Service_SPIKE() {
             }
         }
         else if (messageType == 11) {
-            console.log(lastUJSONRPC);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
+        }
+        else if (messageType == 14) {
+            var newGesture = parsedUJSON.p;
+
+            if (newGesture == "3") {
+                hubGesture = "freefall";
+                hubGestures.push(newGesture);
+            }
+            else if (newGesture == "2") {
+                hubGesture = "shake";
+                hubGestures.push("shaken"); // the string is different at higher level
+            }
+            else if (newGesture == "1") {
+                hubFrontEvent = "tapped";
+                hubGestures.push(newGesture);
+            }
+            else if (newGesture == "0") {
+                hubFrontEvent = "doubletapped";
+                hubGestures.push(newGesture);
+            }
+
+            // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
+            if (typeof funcAfterNewGesture === "function") {
+                funcAfterNewGesture(newGesture);
+                funcAfterNewGesture = undefined;
+            }
+
+            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
+
         }
         else if (messageType == "userProgram.print") {
             var printedMessage = parsedUJSON["p"]["value"];
             var NLindex = printedMessage.search(/\\n/);
             printedMessage = await printedMessage.substring(0, NLindex);
 
-            console.log(atob(printedMessage));
+            console.log("%cTuftsCEEO ", "color: #3ba336;", atob(printedMessage));
 
             // execute function after print if defined
             if (funcAfterPrint != undefined) {
@@ -3068,12 +3272,12 @@ function Service_SPIKE() {
                             stringVersion = stringVersion + version[index];
                         }
                     }
-                    console.log("firmware version: ", stringVersion);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "firmware version: ", stringVersion);
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
 
-            console.log("received response: ", lastUJSONRPC);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
 
             // iterate over responseCallbacks global variable
             for (var index in responseCallbacks) {
@@ -3103,23 +3307,23 @@ function Service_SPIKE() {
             // execute the callback function after sending start_write_program UJSONRPC
             if (startWriteProgramCallback != undefined) {
 
-                console.log("startWriteProgramCallback is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id...")
 
                 // check if the message id of UJSONRPC corresponds to that of a response callback
                 if (startWriteProgramCallback[0] == parsedUJSON["i"]) {
 
-                    console.log("matching message id detected with startWriteProgramCallback[0]: ", startWriteProgramCallback[0])
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "matching message id detected with startWriteProgramCallback[0]: ", startWriteProgramCallback[0])
 
                     // get the information for the packet sending
                     var blocksize = parsedUJSON["r"]["blocksize"]; // maximum size of each packet to be sent in bytes
                     var transferid = parsedUJSON["r"]["transferid"]; // id to use for transferring this program
 
-                    console.log("executing writePackageFunc expecting transferID of ", transferid);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "executing writePackageFunc expecting transferID of ", transferid);
 
                     // execute callback
                     await startWriteProgramCallback[1](blocksize, transferid);
 
-                    console.log("deallocating startWriteProgramCallback");
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "deallocating startWriteProgramCallback");
 
                     // deallocate callback
                     startWriteProgramCallback = undefined;
@@ -3130,12 +3334,12 @@ function Service_SPIKE() {
             // check if the program should write packages for a program
             if (writePackageInformation != undefined) {
 
-                console.log("writePackageInformation is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "writePackageInformation is defined. Looking for matching mesasage id...")
 
                 // check if the message id of UJSONRPC corresponds to that of the first write_package script that was sent
                 if (writePackageInformation[0] == parsedUJSON["i"]) {
 
-                    console.log("matching message id detected with writePackageInformation[0]: ", writePackageInformation[0]);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "matching message id detected with writePackageInformation[0]: ", writePackageInformation[0]);
 
                     // get the information for the package sending process
                     var remainingData = writePackageInformation[1];
@@ -3144,20 +3348,20 @@ function Service_SPIKE() {
 
                     // the size of the remaining data to send is less than or equal to blocksize
                     if (remainingData.length <= blocksize) {
-                        console.log("remaining data's length is less than or equal to blocksize");
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "remaining data's length is less than or equal to blocksize");
 
                         // the size of remaining data is not zero
                         if (remainingData.length != 0) {
 
                             var dataToSend = remainingData.substring(0, remainingData.length);
 
-                            console.log("reminaing data's length is not zero, sending entire remaining data: ", dataToSend);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "reminaing data's length is not zero, sending entire remaining data: ", dataToSend);
 
                             var base64data = btoa(dataToSend);
 
                             UJSONRPC.writePackage(base64data, transferID);
 
-                            console.log("deallocating writePackageInforamtion")
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "deallocating writePackageInforamtion")
 
                             if (writeProgramCallback != undefined) {
 
@@ -3171,17 +3375,17 @@ function Service_SPIKE() {
                     // the size of remaining data is more than the blocksize
                     else if (remainingData.length > blocksize) {
 
-                        console.log("remaining data's length is more than blocksize");
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "remaining data's length is more than blocksize");
 
                         var dataToSend = remainingData.substring(0, blocksize);
 
-                        console.log("sending blocksize amount of data: ", dataToSend)
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "sending blocksize amount of data: ", dataToSend)
 
                         var base64data = btoa(dataToSend);
 
                         var messageid = UJSONRPC.writePackage(base64data, transferID);
 
-                        console.log("expected response with message id of ", messageid);
+                        console.log("%cTuftsCEEO ", "color: #3ba336;", "expected response with message id of ", messageid);
 
                         var remainingData = remainingData.substring(blocksize, remainingData.length);
 
@@ -3212,16 +3416,16 @@ function Service_SPIKE() {
                 }
             }
             else if (gyro[1] > 500) {
-                newOrientation = "leftside";
+                newOrientation = "up";
             }
             else if (gyro[1] < -500) {
-                newOrientation = "rightside";
+                newOrientation = "down";
             }
         } else if (gyro[0] > 500) {
-            newOrientation = "down";
+            newOrientation = "leftSide";
         }
         else if (gyro[0] < -500) {
-            newOrientation = "up";
+            newOrientation = "rightSide";
         }
 
         return newOrientation;
@@ -3242,7 +3446,6 @@ function Service_SPIKE() {
         getPortInfo: getPortInfo,
         getBatteryStatus: getBatteryStatus,
         getFirmwareInfo: getFirmwareInfo,
-        triggerCurrentState: triggerCurrentState,
         getHubInfo: getHubInfo,
         getHubName: getHubName,
         getProjects: getProjects,
@@ -3253,17 +3456,20 @@ function Service_SPIKE() {
         getColorPorts: getColorPorts,
         getForcePorts: getForcePorts,
         getMotorPorts: getMotorPorts,
+        getMotors: getMotors,
+        getDistanceSensors: getDistanceSensors,
+        getColorSensors: getColorSensors,
+        getForceSensors: getForceSensors,
         getLatestUJSON: getLatestUJSON,
         getBluetoothButton: getBluetoothButton,
         getMainButton: getMainButton,
         getLeftButton: getLeftButton,
         getRightButton: getRightButton,
         getHubGesture: getHubGesture,
-        getHubFrontEvent: getHubFrontEvent,
+        getHubEvent: getHubEvent,
         getHubOrientation: getHubOrientation,
         Motor: Motor,
         PrimeHub: PrimeHub,
-        UJSONRPC: UJSONRPC,
         ForceSensor: ForceSensor,
         DistanceSensor: DistanceSensor,
         ColorSensor: ColorSensor,

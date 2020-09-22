@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_controlMotorButtonRemote.html
+Author: Jeremy Jung
+Last update: 8/4/20
+Description: control the speed of a motor with a force sensor through SystemLink cloud
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+Tags in use:
+motorSpeed
+motorPower
+motorAngle
+motorUAngle
+buttonForce
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.js" charset="utf-8"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 600px; position: absolute">servicedock_controlMotorButtonRemote</h1>
+        <h1 style="left: 600px; top: 50px; position: absolute">written with jquery</h1>
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+            <service-systemlink id = "service_systemlink"></service-systemlink>
+        </div>
+        <div id = "chooseRoleDiv">
+            <select id="selectRole" class="select_components target_ignore">
+                <option id = "RECV">Receive Control</option>
+                <option id="SEND"> Send Control</option>
+            </select>
+            <input id="roleChoose" type="button" value="select">
+        </div>
+        <div id ="RECVportsInterface">
+            <div id="motor" class = "target_ignore">
+                <p class = "target_ignore"> Select motor</p>
+                <select id="motorPort" class="select_components target_ignore">
+                </select>
+                <input id="motorPortChoose" type="button" value="select">
+            </div>
+            <div class = "target_ignore">
+                Start Controlling
+                <input id = "startControl" type="button" value="start">
+            </div>
+        </div>
+        <div id="controlInterface">
+            Motor data
+            <div id="selectbox" class="target_ignore">
+                <select id="dataSelect" class="select_components target_ignore">
+                    <option id = "motorSpeed">Motor Speed</option>
+                    <option id="motorPower">Motor Power</option>
+                    <option id="motorAngle">Motor Displacement</option>
+                    <option id="motorUAngle">Motor Position</option>
+                </select>
+            </div>
+            <div id="chart"></div>
+        </div>
+        <div id = "SENDportsInterface">
+            <div id="forceSensor" class = "target_ignore">
+                <p class = "target_ignore" >Choose force Sensor to move motor</p>
+                <select id="forceSensorPort" class="select_components target_ignore">
+                </select>
+                <input id="forceSensorPortChoose" type="button" value="select">
+            </div>
+            <div class = "target_ignore">
+                Start Controlling
+                <input id="startControl" type="button" value="start">
+            </div>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var mySL = document.getElementById("service_systemlink").getService();
+        var motor
+        var forceSensor;
+
+        var receiving = false;
+
+        /* for graphing*/
+        var motorSpeed;
+        var motorAngle;
+        var motorUAngle;
+        var motorPower;
+
+        /* when roles are chosen, display relevant divs and populate port selects */
+        $("#roleChoose").on("click", async function () {
+
+            var role = await $("#selectRole option:selected").attr('id');
+
+            if ( role == "RECV") {
+                receiving = true;
+                $("#RECVportsInterface").css("display","block");
+            }
+            else {
+                receiving = false;
+                $("#controlInterface").css("display", "block");
+                $("#SENDportsInterface").css("display", "block");
+                graphValue();
+            }
+
+            $("#chooseRoleDiv").css("display", "none");
+            initPortsByRole();
+        })
+
+        /* append the ports to select HTML element when receiving values*/
+        async function initRECVPortSelects(motorPorts) {
+
+            for (var port in motorPorts) {
+                $("#motorPort").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+            }
+            
+        }
+
+        /* append the motor ports to select HTML element sending values */
+        async function initSENDPortSelects(forcePorts) {
+
+            for (var port in forcePorts) {
+                $("#forceSensorPort").append("<option id = " + forcePorts[port] + ">" + forcePorts[port] + "</option>");
+            }            
+        }
+
+        async function initPortsByRole() {
+            if (receiving) {
+                var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+
+                initRECVPortSelects(motorPorts); // append ports to <select>
+
+                $("#motorPortChoose").on("click", async function () {
+                    // get the selected port
+                    console.log($("#motorPort option:selected"))
+                    var motorPort = await $("#motorPort option:selected").val();
+
+                    // instantiate motor object
+                    motor = new mySPIKE.Motor(motorPort);
+                })
+
+                /* when control button is clicked, start receiving steer and force values and send distance to cloud*/
+                $("#RECVportsInterface").find("#startControl").on("click", function () {
+
+                    var sendInterval = setInterval(async function () {
+
+                        /* send motor sensor value to cloud */
+                        var speed = motor.get_speed();
+                        var power = motor.get_power();
+                        var angle = motor.get_degrees_counted();
+                        var uangle = motor.get_position();
+
+                        mySL.setTagValue("motorSpeed", speed);
+                        mySL.setTagValue("motorPower", power);
+                        mySL.setTagValue("motorAngle", angle);
+                        mySL.setTagValue("motorUAngle", uangle);
+
+                        /* receive force sensor values from cloud */
+                        var steerSpeed = await mySL.getTagValue("buttonForce");
+                        steerSpeed = steerSpeed * 10;
+                        
+                        /* move motor */ 
+                        motor.start(steerSpeed);
+
+                    }, 100)
+                })
+            }
+            else {
+                var forceSensorPorts = await mySPIKE.getForcePorts(); // get ports connected to motors
+                
+                initSENDPortSelects(forceSensorPorts); // append ports to <select>
+                
+
+                $("#forceSensorPortChoose").on("click", async function () {
+                    // get the selected port
+                    forceSensorPort = await $("#forceSensorPort option:selected").val();
+
+                    forceSensor = new mySPIKE.ForceSensor(forceSensorPort);
+                })
+
+                $("#SENDportsInterface").find("#startControl").on("click", function () {
+                    var sendInterval = setInterval(async function () {
+                        
+                        /* send buttonForce valeus to cloud */
+                        var buttonForce = forceSensor.get_force_percentage();
+
+                        mySL.setTagValue("buttonForce", buttonForce);
+
+                        /* receive motor values from cloud */
+                        motorSpeed = await mySL.getTagValue("motorSpeed");
+                        motorAngle = await mySL.getTagValue("motorAngle");
+                        motorUAngle = await mySL.getTagValue("motorUAngle");
+                        motorPower = await mySL.getTagValue("motorPower");
+
+                    }, 100)
+                })
+
+            }
+        }
+        // gets selected data to display from html element and returns its value
+        async function graph_it() {
+            //get ids of selected port and data to display
+            var selectedDataHTML = $("#dataSelect option:selected")
+
+            var selected_data = selectedDataHTML.attr('id');
+
+            if ( selected_data == "motorSpeed" ) {
+                return motorSpeed;
+            }
+            else if (selected_data == "motorPower") {
+                return motorPower;
+            }
+            else if (selected_data == "motorAngle") {
+                return motorAngle;
+            }
+            else if (selected_data == "motorUAngle") {
+                return motorUAngle;
+            }
+        }
+
+        async function graphValue() {
+            /* graph ultrasonic sensor value */
+            $(function () {
+                Plotly.plot('chart', [{
+                    y: [graph_it()],
+                    type: 'line'
+                }]);
+
+                var cnt = 0;
+                setInterval(async function () {
+                    var datapoint;
+                    try {
+                        datapoint = await graph_it();
+                    }
+                    catch (error) {
+
+                    }
+                    Plotly.extendTraces('chart', { y: [[datapoint]] }, [0]);
+                    cnt++;
+                    if (cnt > 500) {
+                        Plotly.relayout('chart', {
+                            xaxis: {
+                                range: [cnt - 500, cnt]
+                            }
+                        });
+                    }
+                }, 15);
+            })
+        }
+
+        window.addEventListener("load", async function() {
+            dragElement("RECVportsInterface");
+            dragElement("SENDportsInterface");
+            dragElement("controlInterface");
+            dragElement("chooseRoleDiv");
+        })
+    </script>
+
+
+
+    <style>
+
+        #RECVportsInterface {
+            position: absolute;
+            top: 50px;
+            left: 200px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+            display: none;
+        }
+
+        #SENDportsInterface {
+            position: absolute;
+            top: 50px;
+            left: 200px;
+            height: 400px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+            display: none;
+        }
+
+        #controlInterface {
+            position: absolute;
+            top: 50px;
+            left: 500px;
+            height: 550px;
+            width: 550px;
+            background-color: #4CE0D2;
+            border: solid;
+            display: none;
+        }
+
+        #objectBox {
+            position: absolute;
+            height: 100px;
+            width: 100px;
+            left: 35;
+            top: 20;
+            border: solid;
+        }
+
+        #chooseRoleDiv {
+            position: absolute;
+            left: 300px;
+            border: solid;
+            background-color: #4CE0D2;
+            height: 100px;
+            width: 200px;
+        }
+
+        #visionSpace {
+            position: absolute;
+            height: 500px;
+            width: 500px;
+            left: 35;
+            top: 20;
+            border: solid;
+            text-align: center;
+        }
+
+    </style>
+</html>
