@@ -9,6 +9,10 @@ History:
     Created by Jeremy on 7/16/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+TODO:
+include all motor information in SPIKE APP functions
+include all hub information in SPIKE APP functions or another function
+include bluetooth_button and main_button in PrimeHub() SPIKE APP functions
 */
 
 // import { Service_SPIKE } from "./Service_SPIKE.js";
@@ -385,17 +389,15 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the callback function to execute after a print or error from SPIKE python program </h4>
-     * @public
+     * @ignore
      * @param {function} callback 
-     * 
      */
     function executeAfterPrint(callback) {
         funcAfterPrint = callback;
     }
 
     /** <h4> Get the callback function to execute after Service Dock encounters an error </h4>
-     * 
-     * @public 
+     * @ignore
      * @param {any} callback 
      */
     function executeAfterError(callback) {
@@ -408,9 +410,10 @@ function Service_SPIKE() {
      * @public
      * @param {any} callback 
      * @example
+     * var motor = new mySPIKE.Motor('A')
      * mySPIKE.executeWithStream( async function() {
-     *      var portsInfo = await mySPIKE.getPortsInfo();
-     *      var motor = portsInfo["A"];  
+     *      var speed = await motor.get_speed();
+     *      // do something with motor speed
      * })
      */
     function executeWithStream(callback) {
@@ -418,7 +421,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the callback function to execute after service is disconnected </h4>
-     * 
+     * @ignore
      * @param {any} callback 
      */
     function executeAfterDisconnect(callback) {
@@ -427,6 +430,7 @@ function Service_SPIKE() {
 
     /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
      * <p> May make the SPIKE Prime do something </p>
+     * @ignore
      * @param {string} command Command to send (or sequence of commands, separated by new lines)
      */
     async function sendDATA(command) {
@@ -495,7 +499,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the information of all the ports and devices connected to them </h4>
-     * @public
+     * @ignore
      * @returns {object} <p> An object with keys as port letters and values as objects of device type and info </p>
      * @example
      * // USAGE 
@@ -528,7 +532,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> get the info of a single port </h4>
-     * @public
+     * @ignore
      * @param {string} letter Port on the SPIKE hub
      * @returns {object} Keys as device and info as value
      */
@@ -537,8 +541,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get battery status </h4>
-     * 
-     * @public
+     * @ignore
      * @returns {integer} battery percentage
      */
     async function getBatteryStatus() {
@@ -546,7 +549,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get info of the hub </h4>
-     * @public
+     * @ignore
      * @returns {object} Info of the hub
      * @example
      * var hubInfo = await mySPIKE.getHubInfo();
@@ -579,7 +582,7 @@ function Service_SPIKE() {
     }
 
     /**
-     * 
+     * @ignore
      * @param {any} callback 
      */
     async function getFirmwareInfo(callback) {
@@ -591,7 +594,7 @@ function Service_SPIKE() {
 
     /** <h4> get projects in all the slots of SPIKE Prime hub </h4>
      * 
-     * @public
+     * @ignore
      * @returns {object}
      */
     async function getProjects() {
@@ -606,7 +609,7 @@ function Service_SPIKE() {
     /** <h4> Reach the micropython interpreter beneath UJSON RPC </h4>
      * <p> Note: Stops UJSON RPC stream </p>
      * <p> hub needs to be rebooted to return to UJSONRPC stream</p>
-     * @public
+     * @ignore
      * @example
      * mySPIKE.reachMicroPy();
      * mySPIKE.sendDATA("from spike import PrimeHub");
@@ -621,7 +624,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the latest complete line of UJSON RPC from stream </h4>
-     * @public
+     * @ignore
      * @returns {string} Represents a JSON object from UJSON RPC
      */
     async function getLatestUJSON() {
@@ -648,7 +651,7 @@ function Service_SPIKE() {
      * @public
      * @returns {string} ['tapped','doubletapped']
      */
-    async function getHubFrontEvent() {
+    async function getHubEvent() {
         return hubFrontEvent;
     }
 
@@ -670,7 +673,7 @@ function Service_SPIKE() {
 
 
     /** <h4> Get the latest press event information on the "connect" button </h4>
-     * @public
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var bluetoothButtonInfo = await mySPIKE.getBluetoothButton();
@@ -682,7 +685,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the latest press event information on the "center" button </h4>
-     * @public
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER }
      * @example
      * var mainButtonInfo = await mySPIKE.getMainButton();
@@ -695,7 +698,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the latest press event information on the "left" button </h4>
-     * @public
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var leftButtonInfo = await mySPIKE.getLeftButton();
@@ -708,7 +711,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Get the latest press event information on the "right" button </h4>
-     * @public
+     * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
      * var rightButtonInfo = await mySPIKE.getRightButton();
@@ -734,6 +737,17 @@ function Service_SPIKE() {
         }
         return motorPorts;
 
+    }
+
+    async function getMotors() {
+        var portsInfo = ports;
+        var motors = {};
+        for (var key in portsInfo) {
+            if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
+                motors[key] = new Motor(key);
+            }
+        }
+        return motorPorts;
     }
 
     /** <h4> Get the ports connected to Small Motors </h4>
@@ -826,7 +840,7 @@ function Service_SPIKE() {
     }
 
     /** <h4> Terminate currently running micropy program</h4>
-     * @public
+     * @ignore
      */
     function stopCurrentProgram() {
         UJSONRPC.programTerminate();
@@ -834,7 +848,7 @@ function Service_SPIKE() {
 
     /** <h4> write a micropy program into a slot of the SPIKE Prime </h4>
      * 
-     * @public
+     * @ignore
      * @param {string} projectName name of the project to register
      * @param {string} data the micropy code to send (expecting an <input type="text">.value)
      * @param {integer} slotid slot number to assign the program in [0-9]
@@ -882,7 +896,7 @@ function Service_SPIKE() {
 
     /** <h4> Execute a program in a slot </h4>
      * 
-     * @public
+     * @ignore
      * @param {integer} slotid slot of program to execute [0-9]
      */
     function executeProgram(slotid) {
@@ -896,7 +910,7 @@ function Service_SPIKE() {
     //////////////////////////////////////////
 
     /** PrimeHub object
-    * @class
+    * @ignore
     * @memberof Service_SPIKE
     * @returns {classes} 
     * <p> left_button </p>
@@ -907,9 +921,13 @@ function Service_SPIKE() {
     PrimeHub = function () {
         var newOrigin = 0;
 
-        /** PrimeHub.left_button
+        /** The left button on the hub
         * @class
         * @returns {functions} - functions from PrimeHub.left_button
+        * @example
+        * var hub = mySPIKE.PrimeHub();
+        * var left_button = hub.left_button();
+        * // do something with left_button
         */
         var left_button = {};
 
@@ -952,9 +970,13 @@ function Service_SPIKE() {
             }
         }
 
-        /** PrimeHub.right_button
+        /** The right button on the hub
          * @class
          * @returns {functions} functions from PrimeHub.right_button
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var right_button = hub.right_button();
+         * // do something with right_button
          */
         var right_button = {};
 
@@ -1019,9 +1041,13 @@ function Service_SPIKE() {
             }
         }
 
-        /** PrimeHub.Light Matrix
+        /** Hub's light matrix
          * @class
          * @returns {functions} - functions from PrimeHub.light_matrix
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var light_matrix = hub.light_matrix();
+         * // do something with light_matrix
          */
         var light_matrix = {};
 
@@ -1056,9 +1082,13 @@ function Service_SPIKE() {
             UJSONRPC.displayClear();
         }
 
-        /** speaker
+        /** Hub's speaker
          * @class
          * @returns {functions} functions from Primehub.speaker
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var speaker = hub.speaker();
+         * // do something with speaker
          */
         var speaker = {};
 
@@ -1104,9 +1134,13 @@ function Service_SPIKE() {
             speaker.volume = newVolume
         }
 
-        /** Motion Sensor
+        /** Hub's motion sensor
          * @class
          * @returns {functions} functions from PrimeHub.motion_sensor
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var motion_sensor = hub.motion_sensor();
+         * // do something with motion_sensor
          */
         var motion_sensor = {};
 
@@ -1826,6 +1860,7 @@ function Service_SPIKE() {
     //////////////////////////////////////////
 
     /** Low Level UJSONRPC Commands
+     * @ignore
      * @namespace UJSONRPC
      */
     var UJSONRPC = {};
@@ -3319,7 +3354,7 @@ function Service_SPIKE() {
         getLeftButton: getLeftButton,
         getRightButton: getRightButton,
         getHubGesture: getHubGesture,
-        getHubFrontEvent: getHubFrontEvent,
+        getHubEvent: getHubEvent,
         getHubOrientation: getHubOrientation,
         Motor: Motor,
         PrimeHub: PrimeHub,
