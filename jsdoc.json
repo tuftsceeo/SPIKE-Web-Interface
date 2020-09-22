@@ -1,6 +1,6 @@
 {
     "opts": {
-        "template": "node_modules/tui-jsdoc-template",
+        "template": "jsdocTemplate/tui-jsdoc-template/",
         "encoding": "utf8",
         "destination": "./server/documentation/"
     },
@@ -30,14 +30,15 @@
                 "include": [
                     "./server/examples"
                 ]
-            }
+            },
+            "layoutFile": ""
         },
         "cleverLinks": false,
         "monospaceLinks": false,
         "logo": {
             "url": "./img/CEEO_Innovations_Logo_White.png",
-            "height": "30px",
-            "width": "100px"
+            "height": "60px",
+            "width": "200px"
         },
         "footerText": "SPIKE Web Interface Documentation (2020 September 21)"
     }
