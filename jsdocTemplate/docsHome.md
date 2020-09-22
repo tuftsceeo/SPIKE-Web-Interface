@@ -131,9 +131,9 @@ window.onload = function () {
 }
 ```
 
-That's it for the Javascript code! There's much more functions you can play around with, all of which you can check out in the API documentation to the left. But the webpage wouldn't be complete with more HTML and CSS! 
+There's much more functions you can play around with, all of which you can check out in the API documentation to the left. But the webpage wouldn't be complete with more HTML and CSS! 
 
-If you would like to try out the example if your SPIKE Prime, click [here!](servicedock_hub.html)
+If you would like to try out this example with your SPIKE Prime, click [here!](servicedock_hub.html)
 
 ```html
 <html>
