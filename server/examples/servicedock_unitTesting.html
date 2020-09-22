@@ -81,6 +81,7 @@
                 <input type="button" id="buttonIsPress" class="SPIKEtestCase button" value="left and right button.is_pressed()">
                 
                 <!-- color sensor functions -->
+                <input type="button" id="getColor" class="SPIKEtestCase color" value="get color test">
                 <input type="button" id="waitUntilColor" class="SPIKEtestCase color" value="wait until color test">
                 
                 <!-- write Program functions -->
@@ -94,6 +95,7 @@
                 <input type="button" id="testUJSONRPC" class="SPIKEtestCase misc" value="test UJSONRPC.displayText()">
                 <input type="button" id="testNewKeyword" class="SPIKEtestCase misc" value="new Motor() vs Motor()">
                 <input type="button" id="testNewKeyword1" class="SPIKEtestCase misc" value="Motor() vs Motor() declared without 'new' keyword">
+                <input type="button" id="testGetMotors" class="SPIKEtestCase misc" value="getMotors">
                 <input type="button" id="getMotorPorts" class="SPIKEtestCase misc" value="get motorports">
 
                 <input type="button" id="displayClear" class="SPIKEtestCase misc" value="UJSON displayClear()">
@@ -671,6 +673,22 @@
 
             console.log("Expected result: console identifies button releases")
         })
+
+        //                                      //
+        //         ColorSensor Tests            //
+        //                                      //
+
+        var testGetColor = document.getElementById("getColor");
+        testGetColor.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').get_color() #######");
+            console.log("Test: Connect color sensor to port A and start the test");
+            var color_sensor = mySPIKE.ColorSensor("A");
+            var color = await color_sensor.get_color();
+            console.log("Detected color: ", color);
+
+            console.log("###### ENDING UNIT TEST ON ColorSensor('A').get_color() #######");
+        })
+
         //                                      //
         //            program Tests             //
         //                                      //
@@ -947,6 +965,12 @@
             console.log("motor2's default_speed, ", motor2_defaultSpeed);
             console.log("###### ENDING UNIT TEST ON two Motor objects declared without 'new' keywords #######");
         });
+
+        var testGetMotors = document.getElementById("testGetMotors");
+        testGetMotors.addEventListener("click", async function () {
+            var motors = await mySPIKE.getMotors();
+            console.log(motors);
+        })
         
         /* test mySPIKE.getMotorPorts() */
         var test_getMotorPorts = document.getElementById("getMotorPorts");
