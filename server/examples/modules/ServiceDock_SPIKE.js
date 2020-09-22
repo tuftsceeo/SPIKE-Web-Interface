@@ -333,7 +333,7 @@ function Service_SPIKE() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> initialize SPIKE_service </h4>
+    /**  initialize SPIKE_service
      * <p> Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
      * <p> Starts streaming UJSONRPC </p>
      * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
@@ -374,7 +374,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Get the callback function to execute after service is initialized. </h4>
+    /**  Get the callback function to execute after service is initialized.
      * <p> <em> This function needs to be executed before calling init() </em> </p>
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
@@ -390,7 +390,7 @@ function Service_SPIKE() {
         funcAtInit = callback;
     }
 
-    /** <h4> Get the callback function to execute after a print or error from SPIKE python program </h4>
+    /**  Get the callback function to execute after a print or error from SPIKE python program
      * @ignore
      * @param {function} callback 
      */
@@ -398,7 +398,7 @@ function Service_SPIKE() {
         funcAfterPrint = callback;
     }
 
-    /** <h4> Get the callback function to execute after Service Dock encounters an error </h4>
+    /**  Get the callback function to execute after Service Dock encounters an error
      * @ignore
      * @param {any} callback 
      */
@@ -407,7 +407,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Execute a stack of functions continuously with SPIKE sensor feed </h4>
+    /**  Execute a stack of functions continuously with SPIKE sensor feed
      * 
      * @public
      * @param {any} callback 
@@ -422,7 +422,7 @@ function Service_SPIKE() {
         funcWithStream = callback;
     }
 
-    /** <h4> Get the callback function to execute after service is disconnected </h4>
+    /**  Get the callback function to execute after service is disconnected
      * @ignore
      * @param {any} callback 
      */
@@ -430,7 +430,7 @@ function Service_SPIKE() {
         funcAfterDisconnect = callback;
     }
 
-    /** <h4> Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter) </h4>
+    /**  Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter)
      * <p> May make the SPIKE Prime do something </p>
      * @ignore
      * @param {string} command Command to send (or sequence of commands, separated by new lines)
@@ -481,7 +481,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Send character sequences to reboot SPIKE Prime </h4>
+    /**  Send character sequences to reboot SPIKE Prime
      * <p> <em> Run this function to exit micropython interpreter </em> </p>
      * @public
      * @example
@@ -500,7 +500,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Get the information of all the ports and devices connected to them </h4>
+    /**  Get the information of all the ports and devices connected to them
      * @ignore
      * @returns {object} <p> An object with keys as port letters and values as objects of device type and info </p>
      * @example
@@ -533,7 +533,7 @@ function Service_SPIKE() {
         return ports;
     }
 
-    /** <h4> get the info of a single port </h4>
+    /**  get the info of a single port
      * @ignore
      * @param {string} letter Port on the SPIKE hub
      * @returns {object} Keys as device and info as value
@@ -542,7 +542,7 @@ function Service_SPIKE() {
         return ports[letter];
     }
 
-    /** <h4> Get battery status </h4>
+    /**  Get battery status
      * @ignore
      * @returns {integer} battery percentage
      */
@@ -550,7 +550,7 @@ function Service_SPIKE() {
         return batteryAmount;
     }
 
-    /** <h4> Get info of the hub </h4>
+    /**  Get info of the hub
      * @ignore
      * @returns {object} Info of the hub
      * @example
@@ -574,7 +574,7 @@ function Service_SPIKE() {
         return hub;
     }
 
-    /** <h4> Get the name of the hub </h4>
+    /**  Get the name of the hub
      * 
      * @public
      * @returns name of hub
@@ -594,7 +594,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> get projects in all the slots of SPIKE Prime hub </h4>
+    /**  get projects in all the slots of SPIKE Prime hub
      * 
      * @ignore
      * @returns {object}
@@ -608,7 +608,7 @@ function Service_SPIKE() {
         return hubProjects
     }
 
-    /** <h4> Reach the micropython interpreter beneath UJSON RPC </h4>
+    /**  Reach the micropython interpreter beneath UJSON RPC
      * <p> Note: Stops UJSON RPC stream </p>
      * <p> hub needs to be rebooted to return to UJSONRPC stream</p>
      * @ignore
@@ -625,7 +625,7 @@ function Service_SPIKE() {
         micropython_interpreter = true;
     }
 
-    /** <h4> Get the latest complete line of UJSON RPC from stream </h4>
+    /**  Get the latest complete line of UJSON RPC from stream
      * @ignore
      * @returns {string} Represents a JSON object from UJSON RPC
      */
@@ -653,7 +653,7 @@ function Service_SPIKE() {
         return serviceActive;
     }
 
-    /** <h4> Get the most recently detected event on the display of the hub </h4>
+    /**  Get the most recently detected event on the display of the hub
      * @public
      * @returns {string} ['tapped','doubletapped']
      * var event = await mySPIKE.getHubEvent();
@@ -665,7 +665,7 @@ function Service_SPIKE() {
         return hubFrontEvent;
     }
 
-    /** <h4> Get the most recently detected gesture of the hub </h4>
+    /**  Get the most recently detected gesture of the hub
      * @public
      * @returns {string} ['shake', 'freefall']
      * @example
@@ -678,7 +678,7 @@ function Service_SPIKE() {
         return hubGesture;
     }
 
-    /** <h4> Get the most recently detected orientation of the hub </h4>
+    /**  Get the most recently detected orientation of the hub
      * @public
      * @returns {string} ['up','down','front','back','leftside','rightside']
      * @example
@@ -692,7 +692,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Get the latest press event information on the "connect" button </h4>
+    /**  Get the latest press event information on the "connect" button
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
@@ -704,7 +704,7 @@ function Service_SPIKE() {
         return hubBluetoothButton;
     }
 
-    /** <h4> Get the latest press event information on the "center" button </h4>
+    /**  Get the latest press event information on the "center" button
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER }
      * @example
@@ -717,7 +717,7 @@ function Service_SPIKE() {
         return hubMainButton;
     }
 
-    /** <h4> Get the latest press event information on the "left" button </h4>
+    /**  Get the latest press event information on the "left" button
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
@@ -730,7 +730,7 @@ function Service_SPIKE() {
         return hubLeftButton;
     }
 
-    /** <h4> Get the latest press event information on the "right" button </h4>
+    /**  Get the latest press event information on the "right" button
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
@@ -742,7 +742,7 @@ function Service_SPIKE() {
         return hubRightButton;
     }
 
-    /** <h4> Get the letters of ports connected to any kind of Motors </h4>
+    /**  Get the letters of ports connected to any kind of Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
      */
@@ -759,7 +759,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the letters of ports connected to Small Motors </h4>
+    /**  Get the letters of ports connected to Small Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
      */
@@ -776,7 +776,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the letters of ports connected to Big Motors </h4>
+    /**  Get the letters of ports connected to Big Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
      */
@@ -791,7 +791,7 @@ function Service_SPIKE() {
         return motorPorts;
     }
 
-    /** <h4> Get the letters of ports connected to Distance Sensors </h4>
+    /**  Get the letters of ports connected to Distance Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
      */
@@ -810,7 +810,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the letters of ports connected to Color Sensors </h4>
+    /**  Get the letters of ports connected to Color Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Color Sensors
      */
@@ -829,7 +829,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get the letters of ports connected to Force Sensors </h4>
+    /**  Get the letters of ports connected to Force Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Force Sensors
      */
@@ -848,10 +848,10 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Get all motor objects currently connected to SPIKE </h4>
+    /**  Get all motor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} all connected motor objects
+     * @returns {object} All connected Motor objects
      * @example
      * var motors = await mySPIKE.getMotors();
      * var myMotor = motors["A"]  
@@ -867,10 +867,13 @@ function Service_SPIKE() {
         return motors;
     }
 
-    /** <h4> Get all distance sensor objects currently connected to SPIKE </h4>
+    /**  Get all distance sensor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} all connected distance sensor objects
+     * @returns {object} All connected DistanceSensor objects
+     * @example
+     * var distanceSensors = await mySPIKE.getDistanceSensors();
+     * var mySensor = distanceSensors["A"];
      */
     async function getDistanceSensors() {
         var portsInfo = ports;
@@ -883,10 +886,13 @@ function Service_SPIKE() {
         return distanceSensors;
     }
 
-    /** <h4> Get all color sensor objects currently connected to SPIKE </h4>
+    /**  Get all color sensor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} all connected color sensor objects
+     * @returns {object} All connected ColorSensor objects
+     * @example
+     * var colorSensors = await mySPIKE.getColorSensors();
+     * var mySensor = colorSensors["A"];
      */
     async function getColorSensors() {
         var portsInfo = ports;
@@ -899,10 +905,13 @@ function Service_SPIKE() {
         return colorSensors;
     }
 
-    /** <h4> Get all force sensor objects currently connected to SPIKE </h4>
+    /**  Get all force sensor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} all connected force sensor objects
+     * @returns {object} All connected ForceSensor objects
+     * @example
+     * var forceSensors = await mySPIKE.getForceSensors();
+     * var mySensor = forceSensors["A"];
      */
     async function getForceSensors() {
         var portsInfo = ports;
@@ -916,14 +925,14 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Terminate currently running micropy program</h4>
+    /**  Terminate currently running micropy progra
      * @ignore
      */
     function stopCurrentProgram() {
         UJSONRPC.programTerminate();
     }
 
-    /** <h4> write a micropy program into a slot of the SPIKE Prime </h4>
+    /**  write a micropy program into a slot of the SPIKE Prime
      * 
      * @ignore
      * @param {string} projectName name of the project to register
@@ -971,7 +980,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Execute a program in a slot </h4>
+    /**  Execute a program in a slot
      * 
      * @ignore
      * @param {integer} slotid slot of program to execute [0-9]
@@ -1064,7 +1073,7 @@ function Service_SPIKE() {
         * var hub = new mySPIKE.PrimeHub();
         * var right_button = hub.right_button;
         * right_button.wait_until_pressed ( function () {
-        *     console.log("%cTuftsCEEO ", "color: #3ba336;", "right_button was pressed");
+        *     console.log("right_button was pressed");
         * })
         */
         right_button.wait_until_pressed = function wait_until_pressed(callback) {
@@ -1079,7 +1088,7 @@ function Service_SPIKE() {
          * var hub = new mySPIKE.PrimeHub();
          * var right_button = hub.right_button;
          * right_button.wait_until_released ( function () {
-         *     console.log("%cTuftsCEEO ", "color: #3ba336;", "right_button was released");
+         *     console.log("right_button was released");
          * })
          */
         right_button.wait_until_released = function wait_until_released(callback) {
@@ -1093,7 +1102,7 @@ function Service_SPIKE() {
          * @example
          * var hub = new mySPIKE.PrimeHub();
          * if ( hub.right_button.was_pressed() ) {
-         *     console.log("%cTuftsCEEO ", "color: #3ba336;", "right_button was pressed");
+         *     console.log("right_button was pressed");
          * }
          */
         right_button.was_pressed = function was_pressed() {
@@ -1557,8 +1566,9 @@ function Service_SPIKE() {
         }
 
         /** Get the name of the detected color
-         * 
+         * @ignore
          * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
+         * @todo Implement this function
          */
         function get_color() {
             var colorsensor = ports[port]; // get the color sensor info by port
@@ -1647,6 +1657,7 @@ function Service_SPIKE() {
 
 
         /** Waits until the Color Sensor detects the specified color.
+         * @ignore
          * @todo Implement this function
          */
         function wait_until_color(color) {
@@ -1659,6 +1670,7 @@ function Service_SPIKE() {
          * The first time this method is called, it returns immediately the detected color. 
          * After that, it waits until the Color Sensor detects a color that is different from the color that
          * was detected the last time this method was used.
+         * @ignore
          * @todo Implement this function
          * @param {function(string)} callback  
          */
@@ -2528,7 +2540,7 @@ function Service_SPIKE() {
 
     }
 
-    /** <h4> Sleep function </h4>
+    /**  Sleep function
      * @private
      * @param {number} ms Miliseconds to sleep
      * @returns {Promise} 
@@ -2537,7 +2549,7 @@ function Service_SPIKE() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /** <h4> generate random id for UJSONRPC messages </h4>
+    /**  generate random id for UJSONRPC messages
      * @private
      * @returns {string}
      */
@@ -2553,7 +2565,7 @@ function Service_SPIKE() {
         return generatedID;
     }
 
-    /** <h4> Prompt user to select web serial port and make connection to SPIKE Prime </h4>
+    /**  Prompt user to select web serial port and make connection to SPIKE Prime
      * <p> Effect Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
      * <p> Note: </p>
      * <p> This function is to be executed before reading in JSON RPC streams from the hub </p>
@@ -2603,7 +2615,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Initialize writer object before sending commands </h4>
+    /**  Initialize writer object before sending commands
      * @private
      * 
      */
@@ -2618,7 +2630,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Process a packet in UJSONRPC </h4>
+    /**  Process a packet in UJSONRPC
         * @private
         *
         */
@@ -2758,7 +2770,7 @@ function Service_SPIKE() {
     }
 
 
-    /** <h4> Continuously take UJSON RPC input from SPIKE Prime </h4>
+    /**  Continuously take UJSON RPC input from SPIKE Prime
      * @private
      */
     async function streamUJSONRPC() {
@@ -3024,7 +3036,7 @@ function Service_SPIKE() {
         }
     }
 
-    /** <h4> Catch hub events in UJSONRPC </h4>
+    /**  Catch hub events in UJSONRPC
      * <p> Effect: </p>
      * <p> Logs in the console when some particular messages are caught </p>
      * <p> Assigns the hub events global variables </p>

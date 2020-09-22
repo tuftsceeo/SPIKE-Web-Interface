@@ -115,16 +115,18 @@
                 })
             }
             else {
-
+                
                 $("#JEREMYportsInterface").find("#startControl").on("click", async function () {
                     
                     $("#JEREMYportsInterface").find("#demoStarted").html("Demo has been started!");
+                    var hub = new mySPIKE.PrimeHub();
+                    console.log(hub);
                     
                     // get default message tag value
                     message = await mySL.getTagValue("message");
                     
                     // display default value
-                    mySPIKE.displayText(message);
+                    hub.light_matrix.write(message);
 
                     JeremyInterval = setInterval(async function () {
                         /* get message tag and display on hub when different */
@@ -138,7 +140,7 @@
                             message = newMessage;
 
                             // display new message
-                            mySPIKE.displayText(message);
+                            hub.light_matrix.write(message);
                         }
 
                     }, 100)
