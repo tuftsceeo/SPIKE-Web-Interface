@@ -427,7 +427,7 @@ function Service_SPIKE() {
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
      * @example
-     * mySPIKE.executeAfterInit( function () {
+     * mySPIKE.executeAfterInit( async function () {
      *     var portsInfo = await mySPIKE.getPortsInfo();
      * })
      */
@@ -533,7 +533,7 @@ function Service_SPIKE() {
      * @example
      * mySPIKE.rebootHub();
      */
-    async function rebootHub() {
+    function rebootHub() {
         console.log("rebooting")
         // make sure ready to write to device
         setupWriter();
@@ -664,7 +664,7 @@ function Service_SPIKE() {
      * mySPIKE.sendDATA("hub = PrimeHub()");
      * mySPIKE.sendDATA("hub.light_matrix.show_image('HAPPY')");
      */
-    async function reachMicroPy() {
+    function reachMicroPy() {
         console.log("starting micropy interpreter");
         setupWriter();
         writer.write(CONTROL_C);

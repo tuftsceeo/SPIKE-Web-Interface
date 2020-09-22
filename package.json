@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
-    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.md -c jsdoc.json"
+    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json"
   },
   "repository": {
     "type": "git",

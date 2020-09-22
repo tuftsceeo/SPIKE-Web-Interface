@@ -226,14 +226,16 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     border: 0;
     padding: 1px 3px;
 }
+/* parameters sizing */
 .main section article table td.name,
 .main section article table td.type,
 .main section article table td.attributes,
 .main section article table td.default {
-    max-width: 100px;
+    max-width: 200px;
     min-width: 80px;
     word-break: break-all;
 }
+/* Parameter's type "string, integer"*/
 .main section article table td.type,
 .main section article table td.attributes {
     color: #aaa;
