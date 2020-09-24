@@ -16,3 +16,5 @@ ServiceDock allows you to easily integrate your LEGO SPIKE Prime into interactiv
 - Use "API Documentation" for documented ServiceDock API
 
 Regularly update "modules" inside "documentation/tutorials/modules" when updating ServiceDock, so that documentation example use up to date code.
+
+Web page examples should go in the "server/examples" folder.
