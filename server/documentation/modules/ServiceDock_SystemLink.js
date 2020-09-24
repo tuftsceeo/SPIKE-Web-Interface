@@ -38,10 +38,10 @@ class servicesystemlink extends HTMLElement {
         button.setAttribute("class", "SD_button");
         
         /* CSS */
-        var imageRelPath = "./modules/views/cloud.png" // relative to the document in which a servicesystemlink is created ( NOT this file )
+        var imageRelPath = "./modules/views/systemlinkIcon.png" // relative to the document in which a servicesystemlink is created ( NOT this file )
         var length = 50; // for width and height of button
         var backgroundColor = "#A2E1EF" // background color of the button
-        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + backgroundColor 
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 50px 50px; background-color:" + backgroundColor 
                 + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
         button.setAttribute("style", buttonStyle);
 
@@ -331,7 +331,7 @@ function Service_SystemLink() {
     }
 
     /** <h4> Change the APIKey </h4>
-     * 
+     * @ignore
      * @param {string} APIKeyInput 
      */
     function setAPIKey(APIKeyInput) {

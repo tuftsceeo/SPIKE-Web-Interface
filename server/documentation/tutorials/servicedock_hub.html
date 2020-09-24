@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_hub.html
+Author: Jeremy Jung
+Last update: 8/4/20
+Description: see a visual of the hub's orientation
+Credits/inspirations:
+    Onshape Team's dice demonstration
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="../modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="../modules/ServiceDock_SystemLink.js"></script>
+    </head>
+    <body style="background-image: url('../modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_hub</h1>
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id ="hub">
+            <div id = "front" style = "display: block;">
+                <div id="mainButton">
+                </div>
+            </div>
+            <div id = "back" style = "display: none">
+
+            </div>
+        </div>
+    </body>
+    <script>
+        window.onload = function (){
+            var mySPIKE = document.getElementById("service_spike").getService();
+            
+            /* declare HTML elements */
+            var spriteFront = document.getElementById("front");
+            var spriteBack = document.getElementById("back");
+            var HTMLElement;
+
+            /* declare motion_sensor */
+
+            var hub = mySPIKE.PrimeHub();
+
+            mySPIKE.executeAfterInit(function () {
+                mySPIKE.executeWithStream(getData);
+            })
+
+            async function getData() {
+
+                var hubDeg = await hub.motion_sensor.get_yaw_angle();
+
+                var hubOrientation = await mySPIKE.getHubOrientation();
+
+                if (hubOrientation == "back") {
+                    HTMLElement = document.getElementById("back");
+                    HTMLElement.style.display = "block";
+
+                    spriteFront.style.display = "none";
+                } else if (hubOrientation == "front") {
+                    HTMLElement = document.getElementById("front");
+                    HTMLElement.style.display = "block";
+
+                    spriteBack.style.display = "none";
+                }
+
+                if (HTMLElement !== undefined) {
+                    HTMLElement.style.transform = "rotate(" + hubDeg + "deg)";
+                } else {
+                    spriteFront.style.transform = "rotate(" + hubDeg + "deg)";
+                }
+
+            }
+        }
+    </script>
+    <style>
+        #front {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(231,233,232);
+            height: 250px;
+            width: 150px;
+            transform: rotate(0deg);
+        }
+
+        #mainButton {
+            position:relative; 
+            height:37px; 
+            width: 37px;
+            left: 51px;
+            top: 200px;
+            background-color:whitesmoke; 
+            border: solid; 
+            border-radius:50%;
+        }
+        
+        #back {
+            left: 400px;
+            top: 200px;
+            position: absolute;
+            background-color: rgb(252,208,0);
+            height: 250px;
+            width: 150px;
+        }
+    </style>
+</html>

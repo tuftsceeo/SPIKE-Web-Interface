@@ -28,6 +28,11 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     color: #fff;
     font-style: italic;
 }
+.lnb .title .currentPage{
+    font-size: 25px;
+    color: #fff;
+    font-style: italic;
+}
 .lnb h3 {
     font-size: 1.5em;
     color: #fa3282;
