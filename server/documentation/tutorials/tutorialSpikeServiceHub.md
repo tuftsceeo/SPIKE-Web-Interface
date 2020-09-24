@@ -223,4 +223,4 @@ If you would like to try out this example with your SPIKE Prime, click [here!](s
 
 ```
 
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="tutorials/servicedock_hub.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_hub.html"></iframe>
