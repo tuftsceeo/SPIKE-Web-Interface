@@ -224,11 +224,12 @@ function Service_Template() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> initialize Service_Template </h4>
-     * <p> Starts polling the external API </p>
-     * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
+    /** initialize Service_Template 
+     * Starts polling the external API
+     * <em> this function needs to be executed after executeAfterInit but before all other public functions </em> 
      * 
      * @public
+     * @ignore
      * @param {string} APIKeyInput API Key
      * @param {integer} pollIntervalInput interval at which to poll the cloud in MILISECONDS
      * @returns {boolean} True if service was successsfully initialized, false otherwise
@@ -271,8 +272,8 @@ function Service_Template() {
         }
     }
 
-    /** <h4> Get the callback function to execute after service is initialized </h4>
-     * <p> <em> This function needs to be executed before calling init() </em> </p>
+    /** Get the callback function to execute after service is initialized
+     *  <em> This function needs to be executed before calling init() </em>
      * 
      * @public
      * @param {function} callback function to execute after initialization
@@ -286,7 +287,7 @@ function Service_Template() {
         funcAtInit = callback;
     }
 
-    /** <h4> Get real time data from external API </h4>
+    /** Get real time data from external API
     *
     * @public
     * @returns {object} current data
@@ -299,7 +300,7 @@ function Service_Template() {
     }
 
 
-    /** <h4> Get whether the Service was initialized or not </h4>
+    /** Get whether the Service was initialized or not
     *
     * @public
     * @returns {boolean} whether Service was initialized or not
@@ -316,7 +317,7 @@ function Service_Template() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> Check if API credentials are valid for use </h4>
+    /** Check if API credentials are valid for use
     *
     * @private
     * @param {string} APIKeyInput
