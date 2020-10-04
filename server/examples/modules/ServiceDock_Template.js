@@ -351,13 +351,10 @@ function Service_Template() {
         })
     }
 
-    /* beginDataStream() - update the collectedData global variable
-    * 
-    * Effect:
-    * modifies global variable {collectedData}
-    * continuously send GET requests API (ASYNC INTERVAL)
-    * 
-    */
+    /** update the collectedData global variable
+     * @private
+     * 
+     */
     async function beginDataStream() {
         setInterval(async function () {
 
@@ -370,104 +367,6 @@ function Service_Template() {
             }
 
         }, pollInterval)
-    }
-
-    /* getInfoFromAPI() - get a piece of info from API
-    * 
-    * Return: 
-    * {Promise} - if success: collectedAPIInfo
-    *           - if fail: (error)
-    *
-    */
-    async function getInfoFromAPI() {
-        return new Promise(async function (resolve, reject) {
-
-            var getInfoURL = "example API URL";
-
-            // send request to API
-            var request = await sendXMLHTTPRequest("GET", getInfoURL, APIKey);
-
-            // when transaction is complete, parse response and update return value (collectedTagsInfo)
-            request.onload = function () {
-
-                // parse response (string) into JSON object
-                var responseJSON = JSON.parse(this.response);
-                var APIInfoArray = responseJSON.datalist;
-
-                resolve(APIInfoArray)
-
-            }
-            request.onerror = function () {
-                reject(new Error("Error at getInfoFromAPI"));
-            }
-        })
-    }
-
-
-    /* postNewDataToAPI() - send PUT request to SL cloud API and change the value of a tag
-    *
-    * Parameters:
-    * {infoPath} - name of some variable to change
-    * {newValue} - new value of the variable
-    * 
-    * Returns:
-    * {Promise} - if success: true
-    *           - if fail: error
-    */
-    async function postNewDataToAPI(infoPath, newValue) {
-
-        return new Promise(async function (resolve, reject) {
-
-            var postURL = "api.example.com/" + infoPath;
-            var data = { "value": newValue };
-            var requestBody = data;
-
-            var request = await sendXMLHTTPRequest("POST", postURL, APIKey, requestBody);
-
-            request.onload = function () {
-                resolve(true);
-            }
-
-            request.onerror = function () {
-                reject(new Error("Error at postNewDataToAPI"));
-            }
-        })
-
-    }
-
-
-    /** Helper function for sending XMLHTTPRequests
-     * 
-     * @private
-     * @param {string} method 
-     * @param {string} URL 
-     * @param {string} APIKeyInput 
-     * @param {object} body 
-     * @returns {object} XMLHttpRequest
-     */
-    async function sendXMLHTTPRequest(method, URL, APIKeyInput, body) {
-        var request = new XMLHttpRequest();
-        request.open(method, URL, true);
-
-        //Send the proper header information along with the request
-        request.setRequestHeader("x-ni-api-key", APIKeyInput);
-
-        if (body === undefined) {
-            request.setRequestHeader("Accept", "application/json");
-
-            request.send();
-        }
-        else {
-            request.setRequestHeader("Content-type", "application/json");
-            var requestBody = JSON.stringify(body);
-            try {
-                request.send(requestBody);
-            } catch (e) {
-                console.log("error sending request:", request.response);
-            }
-        }
-
-        return request;
     }
 
     /* public members */
