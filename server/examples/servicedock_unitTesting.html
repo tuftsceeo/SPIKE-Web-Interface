@@ -11,7 +11,10 @@
     <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
-            <service-systemlink id="service_systemlink" apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
+
+            <service-systemlink id="service_systemlink" 
+            apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
+
             <service-template id = "service_template"></service-template>
         </div>
         <div id = "onlyForWriteProgram" >
@@ -174,7 +177,8 @@
         var hub = new mySPIKE.PrimeHub();
 
         var mySLElement = document.getElementById("service_systemlink");
-        // mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
+        //mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
+        
         mySLElement.init();
         var mySL = mySLElement.getService();
         //var mySL = document.getElementById("service_systemlink").getService();

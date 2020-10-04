@@ -1,7 +1,7 @@
 # ServiceDock for SPIKE Prime
 
 ## Overview
-ServiceDock is a general purpose Javascript framework that simplifies usage of third party services for developers of interactive web pages and their visitors. Users can interact with your dynamic webpage by clicking on the buttons to activate the Services. 
+ServiceDock is a Javascript framework that allows incorporation of LEGO SPIKE Prime and third party services in interactive web pages. Users can interact with your dynamic webpage by clicking on the buttons to activate the Services. 
 
 ![Demonstration](servicedockDemo.gif)
 

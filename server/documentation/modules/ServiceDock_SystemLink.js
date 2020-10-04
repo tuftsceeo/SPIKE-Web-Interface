@@ -219,7 +219,7 @@ function Service_SystemLink() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> initialize SystemLink_Service </h4>
+    /** initialize SystemLink_Service
      * <p> Starts polling the System Link cloud </p>
      * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
      * 
@@ -264,7 +264,7 @@ function Service_SystemLink() {
         }
     }
 
-    /** <h4> Get the callback function to execute after service is initialized </h4>
+    /** Get the callback function to execute after service is initialized
      * <p> <em> This function needs to be executed before calling init() </em> </p>
      * 
      * @public
@@ -279,7 +279,7 @@ function Service_SystemLink() {
         funcAtInit = callback;
     }
 
-    /** <h4> Return the tagsInfo global variable </h4>
+    /** Return the tagsInfo global variable
      * 
      * @public
      * @returns basic information about currently existing tags in the cloud
@@ -292,7 +292,7 @@ function Service_SystemLink() {
         return tagsInfo;
     }
 
-    /** <h4> Change the current value of a tag on SystemLink cloud </h4>
+    /** Change the current value of a tag on SystemLink cloud
      * 
      * @public
      * @param {string} tagName 
@@ -308,7 +308,7 @@ function Service_SystemLink() {
         });
     }
 
-    /** <h4> Get the current value of a tag on SystemLink cloud </h4>
+    /** Get the current value of a tag on SystemLink cloud
      * 
      * @public
      * @param {string} tagName 
@@ -321,7 +321,7 @@ function Service_SystemLink() {
         return currentValue;
     }
 
-    /** <h4> Get whether the Service was initialized or not </h4>
+    /** Get whether the Service was initialized or not
      * 
      * @public
      * @returns {boolean} whether Service was initialized or not
@@ -330,7 +330,7 @@ function Service_SystemLink() {
         return serviceActive;
     }
 
-    /** <h4> Change the APIKey </h4>
+    /** Change the APIKey
      * @ignore
      * @param {string} APIKeyInput 
      */
@@ -339,12 +339,16 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** <h4> Create a new tag </h4>
+    /** Create a new tag
      * 
      * @public
      * @param {string} tagName name of tag to create
      * @param {any} tagValue value to assign the tag after creation
      * @param {function} callback optional callback
+     * @example
+     * mySL.createTag("message", "hi", function () {
+     *      mySL.setTagValue("message", "bye"); 
+     * })
      */
     async function createTag(tagName, tagValue, callback) {
         
@@ -367,7 +371,7 @@ function Service_SystemLink() {
         })
     }
 
-    /** <h4> Delete tag </h4>
+    /** Delete tag
      * 
      * @public
      * @param {string} tagName name of tag to delete
@@ -399,7 +403,7 @@ function Service_SystemLink() {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /** <h4> Check if Systemlink API key is valid for use </h4>
+    /** Check if Systemlink API key is valid for use
      * 
      * @private
      * @param {string} APIKeyInput 
@@ -433,7 +437,7 @@ function Service_SystemLink() {
         })
     }
 
-    /** <h4> Assign list of tags existing in the cloud to {tagPaths} global variable </h4>
+    /** Assign list of tags existing in the cloud to {tagPaths} global variable
      * 
      * @private
      * @param {function} callback 
@@ -468,7 +472,7 @@ function Service_SystemLink() {
 
     }
 
-    /** <h4> Get the info of a tag in the cloud </h4>
+    /** Get the info of a tag in the cloud
      * 
      * @private
      * @param {function} callback 
@@ -556,7 +560,7 @@ function Service_SystemLink() {
         )
     }
 
-    /** <h4> Send PUT request to SL cloud API and change the value of a tag </h4>
+    /** Send PUT request to SL cloud API and change the value of a tag
      * 
      * @private
      * @param {string} tagPath string of the name of the tag
@@ -661,7 +665,7 @@ function Service_SystemLink() {
         )
     }
 
-    /** <h4> Delete the tag on the System Link cloud </h4>
+    /** Delete the tag on the System Link cloud
      * 
      * @private
      * @param {string} tagName 
@@ -736,7 +740,7 @@ function Service_SystemLink() {
         return request;
     }
 
-    /** <h4> Helper function for getting data types in systemlink format </h4>
+    /** Helper function for getting data types in systemlink format
      * 
      * @private
      * @param {any} new_value the variable containing the new value of a tag
@@ -765,7 +769,7 @@ function Service_SystemLink() {
         }
     }
 
-    /** <h4> Helper function for converting values to correct type based on data type </h4>
+    /** Helper function for converting values to correct type based on data type
      * 
      * @private
      * @param {string} valueType data type of value in systemlink format

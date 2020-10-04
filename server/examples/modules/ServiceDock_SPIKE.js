@@ -2628,7 +2628,7 @@ function Service_SPIKE() {
      * @private
      * 
      * @param {any} json_string 
-     * @returns 
+     * @returns {string}
      */
     function cleanJsonString(json_string) {
         var cleanedJsonString = "";

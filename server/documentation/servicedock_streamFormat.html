@@ -77,7 +77,7 @@ Note:
             "<td id = \"Famount\"> 0</td>" + "</tr>" + "<tr>" + "<th>Binary</th>" + "<td id = \"Fbinary\"> 0</td>" + "</tr>" +
             "<tr>" + "<th>Force (Sensitive):</th>" + "<td id = \"Fbigamount\" > 0</td>" + "</tr>" + "</table>" + "</div>";
         var colorInfo = "<div id = \"colorInfo\">" + "<span>COLOR</span>" + "<table id = \"colorTable\">" + "<tr>" + "<th> Reflectivity:</th>" + "<td id = \"Cdist\"> 0</td>" +
-            "</tr>" + "<tr>" + "<th>Ambient Light:</th>" + "<td id = \"Cunknown\"> 0</td>" + "</tr>" + "<tr>" + "<th> Color (RGB):</th>" +
+            "</tr>" + "<tr>" + "<th>Color:</th>" + "<td id = \"Cunknown\"> 0</td>" + "</tr>" + "<tr>" + "<th> Color (RGB):</th>" +
             "<td id = \"Crgb\">" + "<div id = \"rgbbox\" data-r = \"0\", data-g = \"0\", data-b = \"0\" style = \"height:30px;width:30px;\"> </div> " + "</td>" +
             "</tr>" + "</table>" + "</div>";
         
@@ -140,7 +140,7 @@ Note:
                     portInfoHTML.innerHTML = colorInfo;
 
                     var Cdist = portsInfo[key].data.reflected;
-                    var Cunknown = portsInfo[key].data.ambient;
+                    var Cunknown = portsInfo[key].data.color;
                     var Cr = portsInfo[key].data.RGB[0];
                     var Cg = portsInfo[key].data.RGB[1];
                     var Cb = portsInfo[key].data.RGB[2];
