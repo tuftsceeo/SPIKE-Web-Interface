@@ -2624,6 +2624,12 @@ function Service_SPIKE() {
         }
     }
 
+    /** clean the json_string for concatenation into jsonline
+     * @private
+     * 
+     * @param {any} json_string 
+     * @returns 
+     */
     function cleanJsonString(json_string) {
         var cleanedJsonString = "";
         json_string = json_string.trim();
@@ -2637,6 +2643,14 @@ function Service_SPIKE() {
         return cleanedJsonString;
     }
 
+    /** Process the UJSON RPC script
+     * 
+     * @private
+     * @param {any} lastUJSONRPC 
+     * @param {string} [json_string="undefined"] 
+     * @param {boolean} [testing=false] 
+     * @param {any} callback 
+     */
     async function processFullUJSONRPC(lastUJSONRPC, json_string = "undefined", testing = false, callback) {
         try {
 
@@ -2645,8 +2659,6 @@ function Service_SPIKE() {
             if (testing) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "processing FullUJSONRPC line: ", lastUJSONRPC);
             }
-
-            countProcessedUJSONRPC = countProcessedUJSONRPC + 1;
 
             // update hub information using lastUJSONRPC
             if (parseTest["m"] == 0) {
@@ -2680,18 +2692,17 @@ function Service_SPIKE() {
         }
     }
 
-
     /**  Process a packet in UJSONRPC
-        * @private
-        *
-        */
+    * @private
+    *
+    */
     async function parsePacket(value, testing = false, callback) {
 
         // console.log("%cTuftsCEEO ", "color: #3ba336;", value);
 
         // stringify the packet to look for carriage return
         var json_string = await JSON.stringify(value);
-        
+
         cleanedJsonString = cleanJsonString(json_string);
         // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
 
