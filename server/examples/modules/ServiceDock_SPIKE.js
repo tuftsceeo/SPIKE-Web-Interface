@@ -1577,9 +1577,7 @@ function Service_SPIKE() {
         }
 
         /** Get the name of the detected color
-         * @ignore
          * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
-         * @todo Implement this function
          */
         function get_color() {
             var colorsensor = ports[port]; // get the color sensor info by port
