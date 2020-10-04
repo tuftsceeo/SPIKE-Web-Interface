@@ -2,7 +2,8 @@
     "opts": {
         "template": "jsdocTemplate/tui-jsdoc-template/",
         "encoding": "utf8",
-        "destination": "./server/documentation/"
+        "destination": "./server/documentation/",
+        "tutorials": "./server/documentation/tutorials"
     },
     "plugins": [
         "plugins/markdown"

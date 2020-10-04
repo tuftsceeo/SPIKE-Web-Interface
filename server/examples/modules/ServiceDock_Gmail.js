@@ -37,10 +37,10 @@ class servicegmail extends HTMLElement {
         button.setAttribute("id", "sl_button");
         button.setAttribute("class", "SD_button");
 
-        var imageRelPath = "./modules/views/mail.png" // relative to the document in which a servicespike is created ( NOT this file )
+        var imageRelPath = "./modules/views/gmailserviceIcon.png" // relative to the document in which a servicespike is created ( NOT this file )
         var length = 50; // for width and height of button
         var buttonBackgroundColor = "#A2E1EF" // background color of the button
-        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 40px 40px; background-color:" + buttonBackgroundColor
+        var buttonStyle = "width:" + length + "px; height:" + length + "px; background: url(" + imageRelPath + ") no-repeat; background-size: 50px 50px; background-color:" + buttonBackgroundColor
             + "; border: none; background-position: center; cursor: pointer; border-radius: 10px; position: relative; margin: 4px 0px; "
         button.setAttribute("style", buttonStyle);
 

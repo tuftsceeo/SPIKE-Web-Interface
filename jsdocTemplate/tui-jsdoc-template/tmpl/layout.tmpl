@@ -67,7 +67,10 @@ if (package) {
         <?js } ?>
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link"><?js= name ?></a></h1>
+        <h1><a href="index.html" class="link">Home</a></h1>
+        <?js if (name != "Home") { ?>
+            <a class = "currentPage"><?js= name ?></a>
+        <?js } ?>
         <?js if (version) { ?>
             <span class="version">v<?js= version ?></span>
         <?js } ?>

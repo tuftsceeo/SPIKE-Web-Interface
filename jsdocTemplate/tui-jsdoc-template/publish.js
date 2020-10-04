@@ -31,7 +31,7 @@ env.conf.templates = _.extend({
 
 env.conf.templates.tabNames = _.extend({
     api: 'API',
-    tutorials: 'Examples'
+    tutorials: 'Tutorials'
 }, env.conf.templates.tabNames);
 
 tutorialsName = env.conf.templates.tabNames.tutorials;

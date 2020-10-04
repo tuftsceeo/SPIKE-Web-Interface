@@ -224,11 +224,12 @@ function Service_Template() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> initialize Service_Template </h4>
-     * <p> Starts polling the external API </p>
-     * <p> <em> this function needs to be executed after executeAfterInit but before all other public functions </em> </p>
+    /** initialize Service_Template 
+     * Starts polling the external API
+     * <em> this function needs to be executed after executeAfterInit but before all other public functions </em> 
      * 
      * @public
+     * @ignore
      * @param {string} APIKeyInput API Key
      * @param {integer} pollIntervalInput interval at which to poll the cloud in MILISECONDS
      * @returns {boolean} True if service was successsfully initialized, false otherwise
@@ -271,8 +272,8 @@ function Service_Template() {
         }
     }
 
-    /** <h4> Get the callback function to execute after service is initialized </h4>
-     * <p> <em> This function needs to be executed before calling init() </em> </p>
+    /** Get the callback function to execute after service is initialized
+     *  <em> This function needs to be executed before calling init() </em>
      * 
      * @public
      * @param {function} callback function to execute after initialization
@@ -286,7 +287,7 @@ function Service_Template() {
         funcAtInit = callback;
     }
 
-    /** <h4> Get real time data from external API </h4>
+    /** Get real time data from external API
     *
     * @public
     * @returns {object} current data
@@ -299,7 +300,7 @@ function Service_Template() {
     }
 
 
-    /** <h4> Get whether the Service was initialized or not </h4>
+    /** Get whether the Service was initialized or not
     *
     * @public
     * @returns {boolean} whether Service was initialized or not
@@ -316,7 +317,7 @@ function Service_Template() {
     //                                      //
     //////////////////////////////////////////
 
-    /** <h4> Check if API credentials are valid for use </h4>
+    /** Check if API credentials are valid for use
     *
     * @private
     * @param {string} APIKeyInput
@@ -350,13 +351,10 @@ function Service_Template() {
         })
     }
 
-    /* beginDataStream() - update the collectedData global variable
-    * 
-    * Effect:
-    * modifies global variable {collectedData}
-    * continuously send GET requests API (ASYNC INTERVAL)
-    * 
-    */
+    /** update the collectedData global variable
+     * @private
+     * 
+     */
     async function beginDataStream() {
         setInterval(async function () {
 
@@ -369,104 +367,6 @@ function Service_Template() {
             }
 
         }, pollInterval)
-    }
-
-    /* getInfoFromAPI() - get a piece of info from API
-    * 
-    * Return: 
-    * {Promise} - if success: collectedAPIInfo
-    *           - if fail: (error)
-    *
-    */
-    async function getInfoFromAPI() {
-        return new Promise(async function (resolve, reject) {
-
-            var getInfoURL = "example API URL";
-
-            // send request to API
-            var request = await sendXMLHTTPRequest("GET", getInfoURL, APIKey);
-
-            // when transaction is complete, parse response and update return value (collectedTagsInfo)
-            request.onload = function () {
-
-                // parse response (string) into JSON object
-                var responseJSON = JSON.parse(this.response);
-                var APIInfoArray = responseJSON.datalist;
-
-                resolve(APIInfoArray)
-
-            }
-            request.onerror = function () {
-                reject(new Error("Error at getInfoFromAPI"));
-            }
-        })
-    }
-
-
-    /* postNewDataToAPI() - send PUT request to SL cloud API and change the value of a tag
-    *
-    * Parameters:
-    * {infoPath} - name of some variable to change
-    * {newValue} - new value of the variable
-    * 
-    * Returns:
-    * {Promise} - if success: true
-    *           - if fail: error
-    */
-    async function postNewDataToAPI(infoPath, newValue) {
-
-        return new Promise(async function (resolve, reject) {
-
-            var postURL = "api.example.com/" + infoPath;
-            var data = { "value": newValue };
-            var requestBody = data;
-
-            var request = await sendXMLHTTPRequest("POST", postURL, APIKey, requestBody);
-
-            request.onload = function () {
-                resolve(true);
-            }
-
-            request.onerror = function () {
-                reject(new Error("Error at postNewDataToAPI"));
-            }
-        })
-
-    }
-
-
-    /** Helper function for sending XMLHTTPRequests
-     * 
-     * @private
-     * @param {string} method 
-     * @param {string} URL 
-     * @param {string} APIKeyInput 
-     * @param {object} body 
-     * @returns {object} XMLHttpRequest
-     */
-    async function sendXMLHTTPRequest(method, URL, APIKeyInput, body) {
-        var request = new XMLHttpRequest();
-        request.open(method, URL, true);
-
-        //Send the proper header information along with the request
-        request.setRequestHeader("x-ni-api-key", APIKeyInput);
-
-        if (body === undefined) {
-            request.setRequestHeader("Accept", "application/json");
-
-            request.send();
-        }
-        else {
-            request.setRequestHeader("Content-type", "application/json");
-            var requestBody = JSON.stringify(body);
-            try {
-                request.send(requestBody);
-            } catch (e) {
-                console.log("error sending request:", request.response);
-            }
-        }
-
-        return request;
     }
 
     /* public members */
