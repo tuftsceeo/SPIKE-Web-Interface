@@ -2,11 +2,12 @@
 Project Name: SPIKE Prime Web Interface
 File name: ServiceDock_SPIKE.js
 Author: Jeremy Jung
-Last update: 9/22/20
+Last update: 10/11/2020
 Description: HTML Element definition for <service-spike> to be used in ServiceDocks
 Credits/inspirations:
 History:
     Created by Jeremy on 7/16/20
+    Fixed baudRate by Teddy on 10/11/20
 LICENSE: MIT
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
 TODO:
@@ -2576,10 +2577,9 @@ function Service_SPIKE() {
             port = await navigator.serial.requestPort({
                 // filters:[filter]
             });
-
             // wait for the port to open.
             try {
-                await port.open({ baudrate: 115200 });
+                await port.open({ baudRate: 115200 });
             }
             catch (er) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", er)
