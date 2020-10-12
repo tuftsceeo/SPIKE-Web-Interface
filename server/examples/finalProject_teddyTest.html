@@ -1,0 +1,267 @@
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: finalProject_teddyTest
+Author: Jeremy Jung 
+Edited by: Teddy Robbins
+Last update: 10/12/20
+Description: control a motor's angular position from a slider
+Credits/inspirations:
+History: 
+    Created as motor slider html by Jeremy on 8/4/20
+    Edited by Teddy Robbins in October 2020 for testing in preparation for final project
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_motorSlider</h1>
+        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "demobox" class="slidecontainer">
+            <p>Control a motor's angle with the slider</p>
+            <select id="portSelect" class="select_components target_ignore">
+            </select>
+            <input id="selectport" type="button" value="select port">
+            <input type="range" min="-180" max="180" value="0" class="slider" id="myRange">
+            <div id="directionBox" class="directioncontainer">
+                <select id='motorDirection'>
+                    <option id="clockwise">clockwise</option>
+                    <option id="counterclockwise">counterclockwise</option>
+                </select>
+                <input id="selectdirection" type="button" value="Go">
+            </div>
+            <div id = "angleBox" class="anglecontainer">
+                <p>Position is: </p>
+                <p id='motorPosition'></p> 
+                <p>Angle is: </p>
+                <p id='motorAngle'></p> 
+            </div>
+        </div>
+        <div id='motorbox' class='motorcontainer'>
+            <p>Motor Settings</p>
+            <p>Speed:</p>
+            <input type='number' min='1' max='100' value='15' id='speedEntry'>
+            <p>Steady State Error Allowable (Degrees):</p>
+            <input type='number' min='5' max='180' value='20' id='threshEntry'><br><br>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+
+        //general values
+        var motor; //motor that we are moving
+        var port; // port to which motor is connected
+        var angle_input; // angular input from the slider to run motor with
+        var motor_direction = 'clockwise'; // whether to run the motor clockwise or counterclockwise
+
+        //motor values
+        var motor_position; //absolute position of motor 
+        var motor_angle; // relative angle of motor
+        var motor_moving=false; //whether motor is currently spinning or not
+        var pos_error; //error in angle from desired to current
+        var thresh=20; // default allowable steady state error
+        var speed=15; //default motor speed
+    
+        mySPIKE.executeAfterInit(SPIKE_main);
+
+        /* append the motor ports to select HTML element */
+        async function initPortSelect(motorPorts) {
+            for (var port in motorPorts) {
+                $("#portSelect").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+            }
+        }
+
+        async function SPIKE_main() {
+            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+
+            initPortSelect(motorPorts); // append ports to <select>
+            
+            $("#selectport").on("click", async function (){
+                // get the selected port
+                port = await $("#portSelect option:selected").val();
+                motor = new mySPIKE.Motor(port);
+
+                var angleCheckInterval = setInterval(checkAngle, 100); //check angle
+
+                checkAngle();
+
+            })
+
+            $("#selectdirection").on("click", async function (){
+                motor_direction = await $("#motorDirection option:selected").val();
+                //console.log('Clicked select with direction: '+motor_direction);
+
+                speed = $("#speedEntry").val(); //update speed and thresh when a student clicks go
+                thresh = $("#threshEntry").val();
+                setMotorToAngle();
+            })
+
+        }
+
+        //function changeMotorPower() {
+        //    motor.start_at_power(power)
+        //}
+
+        function checkAngle(){
+            motor_position=motor.get_position(); //get motor absolute position
+
+            /////////////////////////////////
+            //
+            //    This conditional maps 
+            //    values from absolute to
+            //    relative position
+            //
+            /////////////////////////////////
+            if(motor_position>0){
+                if(motor_position%360>180){
+                    motor_angle=-(180-(motor_position%360-180));
+                }
+                else if(motor_position%360<180){
+                    motor_angle=motor_position%360;
+                }
+            }
+            else if(motor_position<0){
+                if(Math.abs(motor_position%360)>180){
+                    motor_angle=(180-(Math.abs(motor_position%360)-180));
+                }
+                else if(Math.abs(motor_position%360)<180){
+                    motor_angle=motor_position%360;
+                }
+            }
+            else{
+                motor_angle=0;
+            }
+
+            //this is our error from desired
+            pos_error = angle_input-motor_angle;
+
+            //check to see if we've made it to our goal (within thresh)
+            if(Math.abs(pos_error) < thresh){
+                motor.stop();
+                motor_moving=false;
+            }
+
+            //update absolute and relative positions
+            document.getElementById('motorPosition').innerHTML = motor_position;
+            document.getElementById('motorAngle').innerHTML = motor_angle;
+        }
+
+        function setMotorToAngle(){
+
+            //if we aren't already moving and we need to, start moving
+            // according to selected direction
+            if(Math.abs(pos_error) > thresh && !motor_moving){
+                motor_moving=true;
+
+                //this part could probably be improved to use
+                // proportional control
+                if(motor_direction=='clockwise'){
+                    motor.start_at_power(speed);
+                }
+                else if(motor_direction=='counterclockwise'){
+                    motor.start_at_power(-speed);
+                }
+            }
+        }
+
+
+        /* Slider Code*/
+
+        var slider = document.getElementById("myRange");
+        angle_input = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            //console.log('Dragged slider.');
+            angle_input = this.value;
+            //console.log('Angle is: '+angle_input);
+        }
+
+        /* */
+        window.addEventListener("load", function() {
+            
+            dragElement("demobox");
+            dragElement("motorbox");
+
+        })
+
+
+    </script>
+    <style>
+        .motorcontainer{
+            position: absolute;
+            top: 200px;
+            width: 200px; /* Width of the outside container */
+            background-color: #4CE0D2;
+            height: 200px;
+            border: solid;
+            left: 100px;
+        }
+
+        .slidecontainer {
+            position: absolute;
+            top: 200px;
+            width: 600px; /* Width of the outside container */
+            background-color: #4CE0D2;
+            height: 200px;
+            border: solid;
+            left: 400px;
+        }
+
+        .anglecontainer {
+            position: absolute;
+            left: 80%;
+            top: 10%;
+            width: 15%; 
+            height: 80%;
+            background-color: #53f030;
+            border: solid;
+        }
+
+        .directioncontainer {
+            position: relative;
+            top: 35%;
+            left: 16%;
+            width: 33%;
+            height: 25px;
+            background-color: #53f030;
+            border: solid;
+        }
+
+
+        /* The slider itself */
+        .slider {
+            position: absolute;
+            top: 100px;
+            left: 0%;
+            -webkit-appearance: none;  /* Override default CSS styles */
+            appearance: none;
+            width: 66%; /* Full-width */
+            height: 25px; /* Specified height */
+            background: #d3d3d3; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+            transition: opacity .2s;
+        }
+
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 5; /* Fully shown on mouse-over */
+        }
+    </style>
+</html>
