@@ -2043,7 +2043,9 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2068,7 +2070,9 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2093,7 +2097,9 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if ( callback != undefined ) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2119,7 +2125,9 @@ function Service_SPIKE() {
             ', "rmotor":' + '"' + rmotor + '"' +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2146,7 +2154,9 @@ function Service_SPIKE() {
             ', "rmotor":' + '"' + rmotor + '"' +
             ', "stop":' + stop +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2169,7 +2179,9 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
@@ -2192,7 +2204,9 @@ function Service_SPIKE() {
             ', "lmotor":' + '"' + lmotor + '"' +
             ', "rmotor":' + '"' + rmotor + '"' +
             '} }';
-        typeof callback !== undefined && pushResponseCallback(randomId, callback);
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
         sendDATA(command);
     }
 
