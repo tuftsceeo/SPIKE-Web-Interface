@@ -2582,9 +2582,22 @@ function Service_SPIKE() {
                 await port.open({ baudRate: 115200 });
             }
             catch (er) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", er)
-                if (funcAfterError != undefined) {
-                    funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
+                console.log("%cTuftsCEEO ", "color: #3ba336;", er);
+                // check if system requires baudRate syntax
+                if (er.message.indexOf("baudrate") > -1) {
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "baudRate needs to be baudrate");
+                    await port.open({ baudrate: 115200 });
+                }
+                // check if error is due to unsuccessful closing of previous port
+                else if (er.message.indexOf("close") > -1) {
+                    if (funcAfterError != undefined) {
+                        funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
+                    }
+                    await port.close();
+                } else {
+                    if (funcAfterError != undefined) {
+                        funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
+                    }
                 }
                 await port.close();
             }
