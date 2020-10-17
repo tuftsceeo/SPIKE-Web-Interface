@@ -1,6 +1,6 @@
 {
     "opts": {
-        "template": "jsdocTemplate/tui-jsdoc-template/",
+        "template": "./jsdocTemplate/tui-jsdoc-template/",
         "encoding": "utf8",
         "destination": "./server/documentation/",
         "tutorials": "./server/documentation/tutorials"
