@@ -7,7 +7,7 @@ Note: access to this GitHub repository requires signing a LEGO Education NDA. If
 ## Overview
 
 ServiceDock allows you to easily integrate your LEGO SPIKE Prime into interactive web pages. 
-![Demonstration](./jsdocTemplate/images/servicedockrealdemo.gif)
+![Demonstration](./jsdocTemplate/images/servicedockDemo.gif)
 
 ## Development
 1)  Install this repository in a directory
