@@ -3,7 +3,9 @@
     <head>
         <script src="./modules/ServiceDock_SPIKE.js"></script>
         <script src="./modules/ServiceDock_SystemLink.js"></script>
-        <script src="./modules/ServiceDock_Template.js"></script>
+        <script src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script src="./modules/ServiceDock_Airtable.js"></script>
+        <script src="./modules/ServiceDock_Gmail.js"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
     </head>
@@ -15,7 +17,14 @@
             <service-systemlink id="service_systemlink" 
             apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
 
-            <service-template id = "service_template"></service-template>
+            <!--<service-airtable id="service_airtable" apikey = "keyFiNlvyTdd2Vs1b" baseid = "appHoo8e4oPG9YJIH" tablename = "Artists"></service-airtable>-->
+            <service-airtable id="service_airtable">
+            </service-airtable>
+            <service-gmail ></service-gmail>
+            <service-geolocation></service-geolocation>
+       
+
+            
         </div>
         <div id = "onlyForWriteProgram" >
             <textarea id="writeProgramData" name="data" value=""
@@ -155,7 +164,7 @@
                 <input type="button" id="createNewTag" class = "SLtestCase createNewTag" value="create new tag ('newTag')">
                 
                 <!--deleteTag CASES -->
-                <!-- (when tag to delete exists -->
+                <!-- (when tag to delete exists) -->
                 <input type="button" id="deleteTag"    class = "SLtestCase deleteTag" value="delete tag ('newTag')">
                 
                 <!-- (when tag to delete doesn't exist)-->
@@ -171,14 +180,26 @@
             </div>
             
         </div>
+    
+
+        
     </body>
     <script>
         var mySPIKE = document.getElementById("service_spike").getService();
         var hub = new mySPIKE.PrimeHub();
 
         var mySLElement = document.getElementById("service_systemlink");
+        var AirtableElement = document.getElementById("service_airtable");
         //mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
         
+        /* Testing automatic initialization of SD Airtable JEREMY CODE */
+        AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
+        AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
+        AirtableElement.setAttribute("tablename", "Artists");
+        
+        AirtableElement.init();
+        /* Testing automatic initialization of SD Airtable */
+
         mySLElement.init();
         var mySL = mySLElement.getService();
         //var mySL = document.getElementById("service_systemlink").getService();
