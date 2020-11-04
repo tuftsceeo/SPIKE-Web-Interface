@@ -431,6 +431,14 @@ function Service_Airtable() {
       return names;
     }
 
+    /** Get the Value associated with a given Name
+     * @param {any} name 
+     * @returns {string}
+     */
+    async function getValue(name) {
+      return currentData[name];
+    }
+
     const minifyRecord = (record) => {
         return {
             id: record.id,
@@ -520,6 +528,7 @@ function Service_Airtable() {
         updateRecord: updateRecord,
         getRecords: getRecords,
         getNames: getNames,
+        getValue: getValue,
         deleteRecord: deleteRecord,
         getRecordById: getRecordById,
         minifyRecord: minifyRecord
