@@ -50,8 +50,8 @@ class serviceairtable extends HTMLElement {
 
         /* status circle definition and CSS */
 
-        var status = document.createElement("div");
-        status.setAttribute("class", "status");
+        this.status = document.createElement("div");
+        this.status.setAttribute("class", "status");
 
         /* CSS */
         var length = 20; // for width and height of circle
@@ -60,7 +60,7 @@ class serviceairtable extends HTMLElement {
         var posTop = 20;
         var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
             "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
-        status.setAttribute("style", statusStyle);
+        this.status.setAttribute("style", statusStyle);
 
         /* event listeners */
 
@@ -92,7 +92,7 @@ class serviceairtable extends HTMLElement {
 
                 if (initSuccessful && initSuccessful2 && initSuccessful3) {
                     this.active = true;
-                    status.style.backgroundColor = "green";
+                    this.status.style.backgroundColor = "green";
                 }
 
             }
@@ -101,7 +101,7 @@ class serviceairtable extends HTMLElement {
 
 
         shadow.appendChild(wrapper);
-        button.appendChild(status);
+        button.appendChild(this.status);
         wrapper.appendChild(button);
     }
 
@@ -248,7 +248,8 @@ class serviceairtable extends HTMLElement {
         console.log("tablename attribute value: ", this.TableName);
         var initSuccess = await this.service.init(this.APIKey, this.BaseID, this.TableName);
         if (initSuccess) {
-            return true;
+          this.status.style.backgroundColor = "green";
+          return true;
         }
         else {
             return false;
@@ -329,13 +330,13 @@ function Service_Airtable() {
             APIKey = APIKeyInput;
         }
         
-         // if an BaseIDKey was specified, use the specified key
+        // if an BaseIDKey was specified, use the specified key
         if (BaseIDInput !== undefined) {
             BaseID = BaseIDInput;
         }
 
-         // if an TableName was specified, use the specified key
-         if (TableNameInput !== undefined) {
+        // if an TableName was specified, use the specified key
+        if (TableNameInput !== undefined) {
             TableName = TableNameInput;
         }
 
@@ -353,7 +354,6 @@ function Service_Airtable() {
         // console.log(apiKey);
 
         table = base(TableName);
-
 
         // if the credentials are valid authorization
         if (credentialsValid) {
@@ -469,78 +469,6 @@ function Service_Airtable() {
     //                                      //
     //////////////////////////////////////////
 
-    /** Check if API credentials are valid for use
-    *
-    * @private
-    * @param {string} APIKeyInput
-    * @param {string} BaseIDInput
-    * @param {string} TableNameInput
-    * @returns {Promise} resolve(true) or reject(error)
-    */
-    async function checkAPICredentials(APIKeyInput, BaseIDInput, TableNameInput, ) {
-        return new Promise(async function (resolve, reject) {
-            //var apiKeyAuthURL = "api.example.com/authapikey";
-            
-            var URL = 'https://api.airtable.com/v0/'+ BaseIDInput +'/'+TableNameInput+"?api_key="+APIKeyInput;
-            console.log()
-            var request = await sendXMLHTTPRequest("GET", URL, APIKeyInput, BaseIDInput);
-
-            request.onload = function () {
-
-                var response = JSON.parse(request.responseText);
-
-                if (response.error) {
-                    reject(new Error("Error at apikey auth:", response));
-                }
-                else {
-                    console.log("APIkey is valid")
-                    resolve(true)
-                }
-            }
-
-            request.onerror = function () {
-                var response = JSON.parse(request.response);
-                // console.log("Error at apikey auth:", request.response);
-                reject(new Error("Error at apikey auth:", response));
-            }
-        })
-    }
-    
-    // /** Helper function for sending XMLHTTPRequests
-    //  * 
-    //  * @private
-    //  * @param {string} method 
-    //  * @param {string} URL 
-    //  * @param {string} APIKeyInput 
-    //  * @param {string} BaseIDInput
-    //  * @param {string} TableNameInput
-    //  * @param {object} body 
-    //  * @returns {object} XMLHttpRequest
-    //  */
-    // async function sendXMLHTTPRequest(method, URL, APIKeyInput, BaseIDInput, body) {
-    //     var request = new XMLHttpRequest();
-    //     request.open(method, URL, true);
-
-    //     //Send the proper header information along with the request
-    //     request.setRequestHeader("api_key", APIKeyInput, BaseIDInput);
-
-    //     if (body === undefined) {
-    //         request.setRequestHeader("Accept", "application/json");
-            
-    //         request.send();
-    //     }
-    //     else {
-    //         request.setRequestHeader("Content-type", "application/json");
-    //         var requestBody = JSON.stringify(body);
-    //         try {
-    //             request.send(requestBody);
-    //         } catch (e) {
-    //             console.log("error sending request:", request.response);
-    //         }
-    //     }
-
-    //     return request;
-    // }
 
     /** update the collectedData global variable
      * @private
