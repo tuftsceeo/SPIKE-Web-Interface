@@ -12,7 +12,6 @@ LICENSE: MIT
 */
 
 /* ServiceDock HTML Element Definition */
-document.writeln("<script type='text/javascript' src='./modules/libraries/airtable.browser.js'></script>");
 // document.writeln("<script type='text/javascript' src='ServiceDock_Airtable.js'></script>");
 
 class serviceairtable extends HTMLElement {
@@ -338,19 +337,22 @@ function Service_Airtable() {
         // if an TableName was specified, use the specified key
         if (TableNameInput !== undefined) {
             TableName = TableNameInput;
+
         }
 
+        console.log(BaseID);
+
         const Airtable = require('airtable');
+
         try {
-            base = new Airtable({ apiKey: APIKey }).base({appId: BaseID});
+            base = new Airtable({ apiKey: APIKey }).base(BaseID);
             credentialsValid = true;
         }
         catch (e) {
             return false;
         }
 
-        console.log(Airtable);
-        console.log(BaseID);
+        console.log(base);
         // console.log(apiKey);
 
         table = base(TableName);
@@ -358,29 +360,16 @@ function Service_Airtable() {
         // if the credentials are valid authorization
         if (credentialsValid) {
 
-            // // change the rate at which ServiceDock polls/requests the external API
-            // if (pollIntervalInput !== undefined) {
-            //     pollInterval = await pollIntervalInput;
-            // }
-
-            // // begin polling the external API to populate {currentData}
-            // beginDataStream(function () {
-
-            //     serviceActive = true; // flag that the service is active
-
-            //     // call funcAtInit if defined from executeAfterInit
-            //     if (funcAtInit !== undefined) {
-            //         funcAtInit();
-            //     }
-                
-            // });
-
+          beginDataStream(function () {
+            console.log(funcAtInit)
             // call funcAtInit if defined from executeAfterInit
             if (funcAtInit !== undefined) {
-                    funcAtInit();
+              console.log("hre")
+              funcAtInit();
             }
+          });
 
-            return true;
+          return true;
         }
         else {
             return false;
@@ -402,19 +391,6 @@ function Service_Airtable() {
         funcAtInit = callback;
     }
 
-    /** Get real time data from external API
-    *
-    * @public
-    * @returns {object} current data
-    * @example
-    * var info = await myTemplate.getCurrentData();
-    * 
-    */
-    function getCurrentData() {
-        return currentData;
-    }
-    
-
     /** Get whether the Service was initialized or not
     *
     * @public
@@ -426,16 +402,62 @@ function Service_Airtable() {
     }
 
     const getRecordById = async (id) => {
-        const record = await table.find(id);
-        console.log(record);
+      const record = await table.find(id);
+      console.log(record);
     };
-
+    
+    /** Get 50 pieces of "row" information
+     * @returns records
+     */
     const getRecords = async () => {
-        const records = await table
-            .select({ maxRecords: 3, view: 'All projects' })
-            .firstPage();
-        console.log(records);
-    };
+      const records = await table.select({ 
+        maxRecords: 50, view: 'Main View' 
+      }).firstPage();
+      
+      return records;
+    }
+
+    /** Get all the entries only in 'Name' column, which are keys
+     * @public
+     * @returns {array}
+     */
+    async function getNames() {
+      console.log("in getNames, currentData: ", currentData);
+      var names = [];
+
+      for (var key in currentData) {
+        names.push(currentData[key].fields.Name);
+      }
+
+      return names;
+    }
+
+    const getArtists = async () => {
+      base('Artists').select({
+        sort: [
+          { field: 'Name', direction: 'asc' }
+        ]
+      }).eachPage(function page(records, fetchNextPage) {
+        records.forEach(function (record) {
+          console.log('Retrieved ', record.get('Name'));
+
+          var $artistInfo = $('<div>');
+          $artistInfo.append($('<h3>').text(record.get('Name')));
+          $artistInfo.append($('<div>').text(record.get('Bio')));
+          var x = $('<button>').text('Delete').click(function () {
+            deleteArtist(record);
+          });
+          $artistInfo.append(x)
+          $artistInfo.attr('data-record-id', record.getId());
+
+          $('#artists').append($artistInfo);
+        });
+
+        fetchNextPage();
+      }, function done(error) {
+        console.log(error);
+      });
+    }
 
     const minifyRecord = (record) => {
         return {
@@ -470,34 +492,50 @@ function Service_Airtable() {
     //////////////////////////////////////////
 
 
-    /** update the collectedData global variable
+    /** get an initial reading of the table, and then initialize global variable currentData
      * @private
      * 
      */
-    async function beginDataStream() {
-        setInterval(async function () {
+    async function beginDataStream(callback) {
 
-            var response = await getInfoFromAPI();
+      var records = await base(TableName).select().firstPage(function(err, records) {
+        if (err) {
+          console.log(err);
+          return false;
+        }
+
+        currentData = records;
+        console.log("currentData: ", currentData);
+
+        setTimeout( function () {
+          setInterval(async function () {
+
+            var records = await base(TableName).select().firstPage();
 
             // if the object is defined and not boolean false
-            if (response ) {
-                // populate the collectedData global var
-                collectedData = response;
+            if (records) {
+              // populate the currentData global var
+              currentData = records;
             }
 
-        }, pollInterval)
+          }, 200)
+
+          callback();
+        }, 2000);
+
+      });
     }
 
     /* public members */
     return {
         init: init,
         executeAfterInit, executeAfterInit,
-        getCurrentData: getCurrentData,
         isActive: isActive,
-        createRecord: createRecord ,
-        updateRecord: updateRecord ,
-        getRecords: getRecords ,
-        deleteRecord: deleteRecord ,
+        createRecord: createRecord,
+        updateRecord: updateRecord,
+        getRecords: getRecords,
+        getNames: getNames,
+        deleteRecord: deleteRecord,
         getRecordById: getRecordById,
         minifyRecord: minifyRecord
 
