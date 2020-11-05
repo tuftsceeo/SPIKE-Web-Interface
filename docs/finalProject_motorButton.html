@@ -1,0 +1,137 @@
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_motorSlider.html
+Author: Jeremy Jung & Teddy Robbins
+Last update: 10/18/20
+Description: control a motor while a button is pressed
+Credits/inspirations:
+History: 
+    Created by Teddy on 10/18/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">finalProject_motorButton</h1>
+        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "selectbox" class="selectcontainer">
+            <p>Select your motor</p>
+            <select id="portSelect" class="select_components target_ignore">
+            </select>
+            <input id="selectport" type="button" value="select">
+        </div>
+        <div id = "motorbox" class="buttoncontainer">
+            <p>Move the motor while the button is pressed</p>
+            <input id='backwardButton' type='button' value='Move Backward'>
+            <input id='forwardButton' type='button' value='Move Forward'><br>
+            Speed:<input id='selectSpeed' type='number' value='15'>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var motor;
+        var port; // port to which motor is connected
+
+        var fwdButton = document.getElementById('forwardButton');
+        var bckButton = document.getElementById('backwardButton');
+        var speed = document.getElementById('selectSpeed');
+        var currentSpeed;
+
+        mySPIKE.executeAfterInit(SPIKE_main);
+
+        /* append the motor ports to select HTML element */
+        async function initPortSelect(motorPorts) {
+            for (var port in motorPorts) {
+                $("#portSelect").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+            }
+        }
+
+        async function SPIKE_main() {
+            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+
+            initPortSelect(motorPorts); // append ports to <select>
+            
+            $("#selectport").on("click", async function (){
+                // get the selected port
+                port = await $("#portSelect option:selected").val();
+                motor = new mySPIKE.Motor(port);
+                
+                defineListeners();
+            })
+        }
+
+        function defineListeners(){
+            console.log("Defining Listeners...")
+            fwdButton.addEventListener('mousedown',moveForward);
+            fwdButton.addEventListener('mouseup',stopMotor);
+
+            bckButton.addEventListener('mousedown',moveBackward);
+            bckButton.addEventListener('mouseup',stopMotor);
+        }
+
+        function moveForward(){
+            console.log("Moving Forward");
+            currentSpeed = speed.value;
+            motor.start(currentSpeed);
+        }
+
+        function moveBackward(){
+            console.log("Moving Backward");
+            currentSpeed = speed.value;
+            motor.start(-currentSpeed);
+        }
+
+        function stopMotor(){
+            console.log("Stopping Motor");
+            motor.stop();
+        }
+
+        /* */
+        window.addEventListener("load", function() {
+            
+            dragElement("selectbox");
+            dragElement("motorbox");
+
+        })
+
+
+    </script>
+    <style>
+        .selectcontainer {
+            position: absolute;
+            top: 200px;
+            width: 150px; /* Width of the outside container */
+            background-color: #4CE0D2;
+            height: 100px;
+            border: solid;
+            left: 400px;
+        }
+
+        .buttoncontainer {
+            position: absolute;
+            top: 400px;
+            width: 300px; /* Width of the outside container */
+            background-color: #4CE0D2;
+            height: 100px;
+            border: solid;
+            left: 400px;
+        }
+
+    </style>
+</html>
