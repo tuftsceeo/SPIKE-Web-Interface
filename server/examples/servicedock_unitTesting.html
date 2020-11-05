@@ -195,12 +195,41 @@
         /* Testing automatic initialization of SD Airtable JEREMY CODE */
         AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
         AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
-        AirtableElement.setAttribute("tablename", "Artists");
-        
+        // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
+        AirtableElement.setAttribute("tablename", "Example");
+
+        var Airtable = AirtableElement.getService();
+        /* End testing automatic init */
+
+        /* set function to execute after init*/
+        Airtable.executeAfterInit( async function() {
+
+            /* begin testing Airtable getter functions */
+
+            // get all the "Name" fields on the table
+            var names = Airtable.getNames();
+            console.log(names);
+
+            // get all the "Value" fields associated with a "Name"
+            for ( var index in names ) {
+                var value = Airtable.getValue(names[index]);
+                console.log("value of " + names[index] + " is: ", value);
+            }
+
+            /* end testing Airtable getter functions */
+
+            /* begin testing setter functions */
+
+            
+
+            /* end testing setter functions */
+        });
+
+        /* initialize Airtable */
         AirtableElement.init();
+        
         /* Testing automatic initialization of SD Airtable */
 
-        mySLElement.init();
         var mySL = mySLElement.getService();
         //var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
