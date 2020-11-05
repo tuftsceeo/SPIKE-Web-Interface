@@ -7,7 +7,7 @@ ServiceDock SystemLink allows you to utilize National Instrument's SystemLink Cl
 All you need is your SystemLink Cloud API Key.
 
 SystemLink Cloud account activation required:
-![SystemLink Website](https://www.systemlinkcloud.com/)
+[SystemLink Website](https://www.systemlinkcloud.com/).
 
 Or:
 
