@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_systemlink.html
+Author: Jeremy Jung
+Last update: 11/05/20
+Description: Example code for using SystemLink
+Credits/inspirations:
+History: 
+    Created by Jeremy on 11/05/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+    </head>
+
+    <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
+        <!-- this style must be kept for normal rendering-->
+        <div id="servicedock" style="float:left;">
+            <!-- include the Services to use -->
+            <service-systemlink id="service_systemlink"></service-systemlink>
+        </div>
+    </body>
+    <script>
+        //Use ServiceDock here!
+        var SystemLinkService = document.getElementbyId("service_systemlink");
+        var mySL = SystemLinkService.getService(); // your Service object
+
+        mySL.executeAfterInit( function() {
+            
+        })
+    </script>
+
+</html>
+<script>
+
+</script>
+
+<style>
+    /* The Modal (background) */
+    #servicedockexplain {
+        left: 100px;
+        top: 0;
+        width: 200px;
+        /* Full width */
+        height: 100px;
+        /* Full height */
+        /* background-color: rgb(0,0,0); */
+        /* Fallback color */
+        /* background-color: rgba(0,0,0,0.4); */
+        /* Black w/ opacity */
+    }
+
+    .modal {
+        display: block;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 1;
+        /* Sit on top */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>

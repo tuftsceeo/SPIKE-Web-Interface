@@ -19,7 +19,7 @@ LICENSE: MIT
         <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
     </head>
-    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+    <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
         <div id="servicedock" style="float:left;">
             <!-- this style must be kept for normal visualization-->
             <service-systemlink id="service_systemlink"></service-systemlink>
@@ -29,30 +29,27 @@ LICENSE: MIT
         </div>
     </body>
     <script>
-        // Get the modal
-        var modal = document.getElementById("servicedockexplain");
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("myBtn");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function () {
-            modal.style.display = "none";
+        /* testing micropyUtils */
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var userDefinedGlobalVariable = "okay";
+        var objectGlobalVariable = { "test": 0 };
+        mySPIKE.executeAfterInit(doSomething);
+        async function doSomething() {
+            var objectVariable = {"test": 0};
+            var integerVariable = 2;
+            var doubleVariable = 3.1;
+            var stringDoubleQuotesVariable = "heya"
+            var stringSingleQuotesVariable = 'heya'
+            mySPIKE.micropython(slotid = 10, `
+from spike import Motor
+# Initialize the motor
+motor = Motor('C')
+# Rotate clockwise for time defined in Airtable at 75% speed
+motor.run_for_seconds(integerVariable, 75)
+`);
         }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        console.log(document.cookie)
-    </script>
+        // micropyUtils.init(); // this needs to be run after global variable declarations but before hoisted functions
+        </script>
 </html>
 <script>
 
@@ -60,7 +57,7 @@ LICENSE: MIT
 
 <style>
     /* The Modal (background) */
-#servicedockexplain{
+#servicedockexplain {
     left: 100px;
     top: 0;
     width: 200px; /* Full width */

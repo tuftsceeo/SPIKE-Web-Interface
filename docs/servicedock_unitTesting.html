@@ -10,7 +10,7 @@
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
     </head>
 
-    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+    <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
 
@@ -52,6 +52,7 @@
                 <input type="button" id="motorPosition" class="SPIKEtestCase motor" value="motor get position">
                 <input type="button" id="getPower" class="SPIKEtestCase motor" value="motor get power">
                 <input type="button" id="getSpeed" class="SPIKEtestCase motor" value="motor get speed">
+                <input type="button" id="motorStartAtPower" class="SPIKEtestCase motor" value="motor startAtPower">
 
                 <!-- motor pair functions -->
                 <input type="button" id="motorPairMove" class="SPIKEtestCase motorPair" value="motorPair move(100, 'cm', 0, 100)">
@@ -101,6 +102,7 @@
                 <input type="button" id="concatenateProgram" class="SPIKEtestCase program" value="test source code for concatenating micropy program">
                 <input type="button" id="getProjects" class="SPIKEtestCase program" value="test getProjects()">
                 <input type="button" id="parseUJSON" class="SPIKEtestCase program" value="test parseUJSONRPC source code">
+                <input type="button" id="micropython" class="SPIKEtestCase program" value="test micropython tempalte literal">
 
                 <!-- SPIKE Library functions-->
                 <input type="button" id="setHubOri" class="SPIKEtestCase misc" value="setHubOrientation()">
@@ -195,12 +197,52 @@
         /* Testing automatic initialization of SD Airtable JEREMY CODE */
         AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
         AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
-        AirtableElement.setAttribute("tablename", "Artists");
-        
+        // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
+        AirtableElement.setAttribute("tablename", "Example");
+
+        var Airtable = AirtableElement.getService();
+        /* End testing automatic init */
+
+        /* set function to execute after init*/
+        Airtable.executeAfterInit( async function() {
+
+            /* begin testing Airtable getter functions */
+
+            // get all the "Name" fields on the table
+            var names = Airtable.getNames();
+            console.log(names);
+
+            // get all the "Value" fields associated with a "Name"
+            for ( var index in names ) {
+                var value = Airtable.getValue(names[index]);
+                console.log("value of " + names[index] + " is: ", value);
+            }
+
+            /* end testing Airtable getter functions */
+
+            /* begin testing setter functions */
+
+            // creates new data and pushes it to Airtable
+            Airtable.createNameValuePair("newTag", "testNewTag");
+            // var test1 = Airtable.createName({ Name: "Happy", Value: "2"});
+            // console.log(test1)
+
+            // updates existing info entry in Airtable
+            // var test2 = Airtable.updateName("recc3GIbPuDbIIk8T", {Name: "Mom", Value: "3"});
+            // console.log(test2)
+            Airtable.updateValue("Grace", "hi hi")
+            Airtable.updateValue("hee", true)
+            Airtable.updateValue("ho", false)
+            Airtable.updateValue("Baby", 1)
+
+            /* end testing setter functions */
+        });
+
+        /* initialize Airtable */
         AirtableElement.init();
+        
         /* Testing automatic initialization of SD Airtable */
 
-        mySLElement.init();
         var mySL = mySLElement.getService();
         //var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
@@ -247,6 +289,15 @@
             motor.run_to_position(180);
 
             console.log(motor.get_default_speed());
+
+        })
+
+        /* go to rel pos without stall detection */
+        var testMotorStartAtPower = document.getElementById("motorStartAtPower");
+        testMotorStartAtPower.addEventListener("click", async function () {
+
+            var motor = new mySPIKE.Motor("A");
+            motor.run_for_degrees(30,100);
 
         })
 
@@ -741,6 +792,69 @@
             console.log("###### ENDING UNIT TEST ON writeProgram() #######");
         })
 
+        var testMicropython = document.getElementById("micropython");
+        testMicropython.addEventListener("click", function () {
+//             mySPIKE.writeProgram("micropython test", 
+//                 `
+// from spike import PrimeHub, LightMatrix, Motor, MotorPair
+// from spike.control import wait_for_seconds, wait_until, Timer
+
+// hub = PrimeHub()
+
+// hub.light_matrix.show_image('HAPPY')
+//                 `, "10", function () {
+//                     mySPIKE.executeProgram("10");
+//                 }
+//             );
+
+        parseCommand(`
+from spike import PrimeHub, LightMatrix, Motor, MotorPair
+from spike.control import wait_for_seconds, wait_until, Timer
+
+hub = PrimeHub() 
+
+hub.light_matrix.write(run_for_seconds(2))
+
+run_for_seconds(3)
+        `)
+        })
+
+        //parse the cloudTagValue() command inserted at the textbox and execute it
+        async function parseCommand(rawContent) {
+
+            let index_runForSeconds = await rawContent.indexOf("run_for_seconds(");
+            if ( index_runForSeconds > -1 ) {
+                //find the index of rawContent at which the runForSeconds function ends
+                let index_lastparen = await rawContent.indexOf(")", index_runForSeconds);
+
+                //divide the rawContent into parts before the runForSeconds and after
+                let first_rawContent_part = await rawContent.substring(0, index_runForSeconds);
+                let second_rawContent_part = await rawContent.substring(index_lastparen + 1, rawContent.length);
+
+                //find the argument of the runForSeconds
+                let runForSeconds_string = await rawContent.substring(index_runForSeconds, index_lastparen + 1);
+                let index_first_paren = runForSeconds_string.indexOf("(");
+                let index_last_paren = runForSeconds_string.indexOf(")");
+                let tagName = runForSeconds_string.substring(index_first_paren + 1, index_last_paren);
+
+                // get the tag's value from the cloud
+                var yield = "yield(" + tagName + "000)";
+
+                //send the final UJSONRPC script to the hub.
+                let final_RPC_command;
+
+                console.log("typeof", typeof yield);
+
+                final_RPC_command = await first_rawContent_part + yield + second_rawContent_part;
+
+                return parseCommand(final_RPC_command);
+            }
+            else {
+                console.log(rawContent);
+                return rawContent;
+            }
+        }
+
         var testConcatProgram = document.getElementById("concatenateProgram");
         testConcatProgram.addEventListener("click", function () {
             console.log("###### BEGINNING UNIT TEST ON source code for concatenating micropy with template.py #######");
@@ -931,6 +1045,8 @@
             }
         
         })
+
+
 
 
         //                                      //
@@ -1138,16 +1254,7 @@
 
         var testRandom = document.getElementById("random");
         testRandom.addEventListener("click", function () {
-            var json_string = '"{\"m\":\"userProgram.print\",\"p\":{\"value\": \"ZmluaXNoZWQK\\n\"},\"i\":4261}\r"'
-            
-            let findEscapedQuotes = /\\"/g;
-            let findNewLines = /\\n/g;
-
-            var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
-            cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
-            cleanedJsonString = cleanedJsonString.replace(findNewLines, '');
-
-            console.log(cleanedJsonString);
+            mySPIKE.rebootHub();
         })
 
         //////////////////////////////////////////

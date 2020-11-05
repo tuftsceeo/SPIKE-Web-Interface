@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Class: speaker | Class: speaker</title>
+    <title>Class: Service_Airtable | Class: Service_Airtable</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Class: speaker</a>
+            <a class = "currentPage">Class: Service_Airtable</a>
         
         
     </div>
@@ -58,7 +58,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>speaker<span class="signature">()</span><span class="type-signature"> &rarr; {functions}</span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>Service_Airtable<span class="signature">()</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -71,14 +71,14 @@
 
 <dt>
     
-        <h4 class="name" id="speaker">
+        <h4 class="name" id="Service_Airtable">
             
-                new <span class="type-signature"></span>speaker<span class="signature">()</span><span class="type-signature"> &rarr; {functions}</span>
+                new <span class="type-signature"></span>Service_Airtable<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1277">line 1277</a></code>
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line279">line 279</a></code>
             </div>
             
         </h4>
@@ -90,7 +90,8 @@
 
     
     <div class="description">
-        <p>Hub's speaker</p>
+        <p>Assumes your workspace only consists of two columns of records
+that are &quot;Name&quot; and &quot;Value&quot;, each of a single line text type</p>
     </div>
     
 
@@ -112,27 +113,6 @@
 
     
 
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">functions</span>
-
-
-
-
-
-- <p>functions from Primehub.speaker</p>
-
-
-
-
-            
-    </div>
     
 
     
@@ -175,9 +155,12 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var hub = mySPIKE.PrimeHub();
-var speaker = hub.speaker();
-// do something with speaker</code></pre>
+    <pre class="prettyprint"><code>// if you're using ServiceDock
+var myAirtable = document.getElemenyById("service_airtable").getService();
+// if you're not using ServiceDock
+var myAirtable = new Service_Airtable();
+
+myAirtable.init(APIKEY, BASEID, TABLENAME);</code></pre>
 
     
 
@@ -209,14 +192,14 @@ var speaker = hub.speaker();
 
 <dt>
     
-        <h4 class="name" id=".beep">
+        <h4 class="name" id="~executeAfterInit">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>beep<span class="signature">(note, seconds)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">inner</span> </span>executeAfterInit<span class="signature">(callback)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1286">line 1286</a></code>
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line407">line 407</a></code>
             </div>
             
         </h4>
@@ -228,7 +211,8 @@ var speaker = hub.speaker();
 
     
     <div class="description">
-        <p>Plays a beep on the Hub.</p>
+        <p>Get the callback function to execute after service is initialized
+<em> This function needs to be executed before calling init() </em></p>
     </div>
     
 
@@ -264,13 +248,13 @@ var speaker = hub.speaker();
 
         <tr>
             
-                <td class="name"><code>note</code></td>
+                <td class="name"><code>callback</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">integer</span>
+<span class="param-type">function</span>
 
 
             
@@ -280,30 +264,7 @@ var speaker = hub.speaker();
 
             
 
-            <td class="description last"><p>The MIDI note number [44 to 123 (60 is middle C note)]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>seconds</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The duration of the beep in seconds</p></td>
+            <td class="description last"><p>function to execute after initialization</p></td>
         </tr>
 
     
@@ -363,6 +324,13 @@ var speaker = hub.speaker();
 
 
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>myAirtable.executeAfterInit( function () {
+    // your API code
+})</code></pre>
+
+    
 
 </dd>
 
@@ -371,14 +339,14 @@ var speaker = hub.speaker();
 
 <dt>
     
-        <h4 class="name" id=".start_beep">
+        <h4 class="name" id="~isActive">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>start_beep<span class="signature">(note)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">inner</span> </span>isActive<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span>
                 
             
             <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1295">line 1295</a></code>
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line417">line 417</a></code>
             </div>
             
         </h4>
@@ -390,235 +358,7 @@ var speaker = hub.speaker();
 
     
     <div class="description">
-        <p>Starts playing a beep.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>note</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The MIDI note number [44 to 123 (60 is middle C note)]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".stop">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>stop<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1302">line 1302</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Stops any sound that is playing.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".get_volume">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>get_volume<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1309">line 1309</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Retrieves the value of the speaker volume.</p>
+        <p>Get whether the Service was initialized or not</p>
     </div>
     
 
@@ -648,13 +388,13 @@ var speaker = hub.speaker();
 
 
 
-<span class="param-type">number</span>
+<span class="param-type">boolean</span>
 
 
 
 
 
-- <p>The current volume [0 to 100]</p>
+- <p>whether Service was initialized or not</p>
 
 
 
@@ -709,14 +449,14 @@ var speaker = hub.speaker();
 
 <dt>
     
-        <h4 class="name" id=".set_volume">
+        <h4 class="name" id="~getNames">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>set_volume<span class="signature">(newVolume)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">inner</span> </span>getNames<span class="signature">()</span><span class="type-signature"> &rarr; {array}</span>
                 
             
             <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1317">line 1317</a></code>
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line425">line 425</a></code>
             </div>
             
         </h4>
@@ -728,7 +468,115 @@ var speaker = hub.speaker();
 
     
     <div class="description">
-        <p>Sets the speaker volume.</p>
+        <p>Get all the entries only in 'Name' column, which are keys</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">array</span>
+
+
+
+
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="~createNameValuePair">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>createNameValuePair<span class="signature">(name, value, callback)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line441">line 441</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Create a Name &amp; Value pair if it doesn't exist</p>
     </div>
     
 
@@ -764,13 +612,13 @@ var speaker = hub.speaker();
 
         <tr>
             
-                <td class="name"><code>newVolume</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">integer</span>
+<span class="param-type">string</span>
 
 
             
@@ -781,6 +629,652 @@ var speaker = hub.speaker();
             
 
             <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="~getValue">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>getValue<span class="signature">(name)</span><span class="type-signature"> &rarr; {any}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line461">line 461</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Get the Value field associated with a Name</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>name of the Name entry</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">any</span>
+
+
+
+
+
+- <p>Value associated with the given Name</p>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="~updateValue">
+            
+                <span class="type-signature"><span class="icon green">inner</span> </span>updateValue<span class="signature">(name, newValue)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line470">line 470</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Update the Value field associated with a Name</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="~deleteRecord">
+            
+                <span class="type-signature"><span class="icon green">async</span>, <span class="icon green">inner</span> </span>deleteRecord<span class="signature">(id)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line481">line 481</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Delete a record given a record ID</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id="~createName">
+            
+                <span class="type-signature"><span class="icon green">async</span>, <span class="icon green">inner</span> </span>createName<span class="signature">(fields)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_Airtable.js.html">ServiceDock_Airtable.js</a></code>,
+                <code><a href="ServiceDock_Airtable.js.html#line559">line 559</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates a new entry of specified data fields that gets pushed to Airtable</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>passed in data fields</p></td>
         </tr>
 
     
@@ -867,7 +1361,7 @@ var speaker = hub.speaker();
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'Service_SPIKE.PrimeHub~speaker_sub'.replace(/"/g, '_');
+        var id = 'Service_Airtable_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
