@@ -9,5 +9,8 @@
                 "title": "Intro to SPIKE Service"
             }
         }
+    },
+    "tutorialSystemLinkService": {
+        "title": "SystemLink Cloud Service"
     }
 }
