@@ -456,8 +456,8 @@ function Service_Airtable() {
      */
     function updateValue(name, newValue) {
       var recordID = recordIDNameMap[name];
-
-      var requestBody = { Name: name, Value: newValue };
+      var convertedValue = convertToString(newValue);
+      var requestBody = { Name: name, Value: convertedValue };
       updateRecord(recordID, requestBody);
     }
 
@@ -614,6 +614,29 @@ function Service_Airtable() {
       return convertedInput
     }
 
+    /** Convert any variable to its string format for Airtable
+     * @private
+     * @param {any} input 
+     * @returns {string} input converted to string
+     */
+    function convertToString(input) {
+      var convertedInput = input;
+      // input is not a pure number
+      if (typeof input == "boolean") {
+        if (input) {
+          convertedInput = "true";
+        }
+        else {
+          convertedInput = "false";
+        }
+      }
+      else if (typeof input == "number") {
+        convertedInput = input.toString();
+      } 
+
+      return convertedInput
+    }
+
     /* public members */
     return {
         init: init,
@@ -624,6 +647,7 @@ function Service_Airtable() {
         getRecords: getRecords,
         getValue: getValue,
         getNames: getNames,
+        convertToString, convertToString,
         deleteRecord: deleteRecord,
         getRecordById: getRecordById,
         minifyRecord: minifyRecord
