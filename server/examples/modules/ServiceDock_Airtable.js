@@ -364,7 +364,6 @@ function Service_Airtable() {
             console.log(funcAtInit)
             // call funcAtInit if defined from executeAfterInit
             if (funcAtInit !== undefined) {
-              console.log("hre")
               funcAtInit();
             }
           });
@@ -401,9 +400,6 @@ function Service_Airtable() {
         return serviceActive;
     }
 
-
-
-
     const getRecordById = async (id) => {
       const record = await table.find(id);
       console.log(record);
@@ -426,12 +422,11 @@ function Service_Airtable() {
      * @public
      * @returns {array}
      */
-    async function getNames() {
-      console.log("in getNames, currentData: ", currentData);
+    function getNames() {
       var names = [];
 
       for (var key in currentData) {
-        names.push(currentData[key].fields.Name);
+        names.push(key);
       }
 
       return names;
@@ -443,12 +438,14 @@ function Service_Airtable() {
      * @param {string} fields passed in data fields
      * @returns nothing
      */
-
     const createName = async (fields) => {
       const createdName = await table.create(fields);
       console.log(minifyRecord(createdName));
     };
 
+    function getValue(name) {
+      return currentData[name];
+    }
 
     /** Updates an existing entry of data within Airtable
      * @public
@@ -456,38 +453,10 @@ function Service_Airtable() {
      * @param {string} fields passed in data fields
      * @returns nothing
      */
-
     const updateName = async (id, fields) => {
       const updatedName = await table.update(id, fields);
       console.log(minifyRecord(updatedName));
     };
-
-    const getArtists = async () => {
-      base('Artists').select({
-        sort: [
-          { field: 'Name', direction: 'asc' }
-        ]
-      }).eachPage(function page(records, fetchNextPage) {
-        records.forEach(function (record) {
-          console.log('Retrieved ', record.get('Name'));
-
-          var $artistInfo = $('<div>');
-          $artistInfo.append($('<h3>').text(record.get('Name')));
-          $artistInfo.append($('<div>').text(record.get('Bio')));
-          var x = $('<button>').text('Delete').click(function () {
-            deleteArtist(record);
-          });
-          $artistInfo.append(x)
-          $artistInfo.attr('data-record-id', record.getId());
-
-          $('#artists').append($artistInfo);
-        });
-
-        fetchNextPage();
-      }, function done(error) {
-        console.log(error);
-      });
-    }
 
     const minifyRecord = (record) => {
         return {
@@ -495,10 +464,6 @@ function Service_Airtable() {
             fields: record.fields,
         };
     };
-
-  
-
-    
 
     const deleteRecord = async (id) => {
         try {
@@ -528,7 +493,14 @@ function Service_Airtable() {
           return false;
         }
 
-        currentData = records;
+        // initialize currentData global variable
+        for (var key in records) {
+          var name = records[key].fields.Name;
+          var value = records[key].fields.Value;
+
+          currentData[name] = value;
+        }
+
         console.log("currentData: ", currentData);
 
         setTimeout( function () {
@@ -538,8 +510,13 @@ function Service_Airtable() {
 
             // if the object is defined and not boolean false
             if (records) {
-              // populate the currentData global var
-              currentData = records;
+              // initialize currentData global variable
+              for (var key in records) {
+                var name = records[key].fields.Name;
+                var value = records[key].fields.Value;
+
+                currentData[name] = value;
+              }
             }
 
           }, 200)
@@ -558,6 +535,7 @@ function Service_Airtable() {
         createName: createName,
         updateName: updateName,
         getRecords: getRecords,
+        getValue: getValue,
         getNames: getNames,
         deleteRecord: deleteRecord,
         getRecordById: getRecordById,
