@@ -284,7 +284,21 @@ function Service_Airtable() {
 
     /* private members */
 
+    /*
+    currentData = {
+      Name_field: Value_field
+    };
+    */
     let currentData= {}; // contains real-time information of the tags in the cloud
+
+    /* 
+    recordIDMap = {
+      rowNumber : recordID
+    }
+    */
+    let recordIDMap = {};
+
+    let recordIDNameMap = {}; // map Name fields to its record ID
 
     /* DEV: API credentials, add or remove as needed for your API */
     let APIKey = "API KEY"; // default APIKey in case no APIKey is given on init
@@ -399,24 +413,6 @@ function Service_Airtable() {
     function isActive() {
         return serviceActive;
     }
-
-    const getRecordById = async (id) => {
-      const record = await table.find(id);
-      console.log(record);
-    };
-    
-    
-    /** Get 50 pieces of "row" information
-     * @returns records
-     */
-    const getRecords = async () => {
-      const records = await table.select({ 
-        maxRecords: 50, view: 'Main View' 
-      }).firstPage();
-      
-      return records;
-    }
-
     
     /** Get all the entries only in 'Name' column, which are keys
      * @public
@@ -432,39 +428,43 @@ function Service_Airtable() {
       return names;
     }
 
-
-    /** Creates a new entry of specified data fields that gets pushed to Airtable
+    /** Create a Name & Value pair if it doesn't exist
      * @public
-     * @param {string} fields passed in data fields
-     * @returns nothing
+     * @param {string} name 
+     * @param {string} value 
      */
-    const createName = async (fields) => {
-      const createdName = await table.create(fields);
-      console.log(minifyRecord(createdName));
-    };
-
-    function getValue(name) {
-      return currentData[name];
+    function createNameValuePair(name, value) {
+      // only create new pair if name does not yet exist
+      if (currentData[name] == undefined) {
+        createName({Name: name, Value: value});
+      }
     }
 
-    /** Updates an existing entry of data within Airtable
+    /** Get the Value field associated with a Name
      * @public
-     * @param {string} id specific record id that will be updated 
-     * @param {string} fields passed in data fields
-     * @returns nothing
+     * @param {string} name name of the Name entry
+     * @returns {any} Value associated with the given Name
      */
-    const updateName = async (id, fields) => {
-      const updatedName = await table.update(id, fields);
-      console.log(minifyRecord(updatedName));
-    };
+    function getValue(name) {
+      return convertToDataType(currentData[name]);
+    }
 
-    const minifyRecord = (record) => {
-        return {
-            id: record.id,
-            fields: record.fields,
-        };
-    };
+    /** Update the Value field associated with a Name 
+     * @public
+     * @param {string} name 
+     * @param {string} newValue 
+     */
+    function updateValue(name, newValue) {
+      var recordID = recordIDNameMap[name];
 
+      var requestBody = { Name: name, Value: newValue };
+      updateRecord(recordID, requestBody);
+    }
+
+    /** Delete a record given a record ID
+     * @public
+     * @param {any} id 
+     */
     const deleteRecord = async (id) => {
         try {
             const deletedRecord = await table.destroy(id);
@@ -486,23 +486,25 @@ function Service_Airtable() {
      * 
      */
     async function beginDataStream(callback) {
-
       var records = await base(TableName).select().firstPage(function(err, records) {
         if (err) {
           console.log(err);
           return false;
         }
-
+        console.log(records);
         // initialize currentData global variable
         for (var key in records) {
           var name = records[key].fields.Name;
           var value = records[key].fields.Value;
+          var recordID = records[key].id;
 
           currentData[name] = value;
+          recordIDMap[key] = recordID;
+          recordIDNameMap[name] = recordID;
         }
 
         console.log("currentData: ", currentData);
-
+        console.log(recordIDMap);
         setTimeout( function () {
           setInterval(async function () {
 
@@ -514,8 +516,11 @@ function Service_Airtable() {
               for (var key in records) {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
+                var recordID = records[key].id;
 
                 currentData[name] = value;
+                recordIDMap[key] = recordID;
+                recordIDNameMap[name] = recordID;
               }
             }
 
@@ -527,13 +532,95 @@ function Service_Airtable() {
       });
     }
 
+    /** Update the record(row) with given fields
+     * @private
+     * @param {integer} rowNumber row number to update
+     * @param {object} fields an object with given fields to update row with
+     */
+    async function updateRecord(recordID, fields) {
+      const updatedRecord = await table.update(recordID, fields);
+      console.log(minifyRecord(updatedRecord));
+    }
+
+    /** Creates a new entry of specified data fields that gets pushed to Airtable
+    * @param {string} fields passed in data fields
+    */
+    const createName = async (fields) => {
+      const createdName = await table.create(fields);
+      console.log(minifyRecord(createdName));
+    };
+
+    /** Get the content of a record/row in minified format
+     * @private
+     * @param {any} record 
+     * @returns {object}
+     */
+    const minifyRecord = (record) => {
+      return {
+        id: record.id,
+        fields: record.fields,
+      };
+    };
+
+    /** Display a record by its recordID
+    * @private
+    * @param {any} id 
+    */
+    const getRecordById = async (id) => {
+      const record = await table.find(id);
+      console.log(record);
+    };
+
+
+    /** Get 50 pieces of "row" information
+     * @private
+     * @returns records
+     */
+    const getRecords = async () => {
+      const records = await table.select({
+        maxRecords: 50, view: 'Main View'
+      }).firstPage();
+
+      return records;
+    }
+
+
+    /** convert a string variable to a JS variable of its presumed data type
+     * @private
+     * @param {string} input 
+     * @returns {any} type converted variable
+     */
+    function convertToDataType(input) {
+      input = input.trim();
+      var convertedInput;
+      // string is not a pure number
+      if (isNaN(input)) {
+        // string is a boolean
+        if (input == "True" || input == "true") {
+          convertedInput = true;
+        }
+        else if (input == "False" || input == "false") {
+          convertedInput = false;
+        }
+        // string is just a string
+        else {
+          convertedInput = input;
+        }
+      }
+      // string is a pure number
+      else {
+        convertedInput = Number(input);
+      }
+      return convertedInput
+    }
+
     /* public members */
     return {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
-        createName: createName,
-        updateName: updateName,
+        updateValue: updateValue,
+        createNameValuePair: createNameValuePair,
         getRecords: getRecords,
         getValue: getValue,
         getNames: getNames,
