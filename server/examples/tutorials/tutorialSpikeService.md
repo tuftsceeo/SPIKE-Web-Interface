@@ -1,6 +1,6 @@
 ## SPIKE Service
 
-SPIKE Service allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection. 
+ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection. 
 
 ## Dependencies
 
