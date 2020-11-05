@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_motor.html
+Author: Jeremy Jung
+Last update: 7/20/20
+Description: example of using cloud to sync two remote motors with the aid of Service Dock
+Credits/inspirations:
+History: 
+    Created by Jeremy on 7/20/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+1. activate service systemlink
+2. activate EITHER a receiving SPIKE service or a sending SPIKE service
+3. wait for motor ports to append to drop down list
+4. if RECEIVING: choose motor to control the speed of ||| if SENDING: choose motor to get the speed of
+5. hit select
+6. rotate the "SENDING" motor and see the "RECEIVING" motor move
+-->
+
+<script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+<script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+<script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+<script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<html>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <h1 style="left: 500px; position: absolute">servicedock_motor</h1>
+        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
+        <div id="servicedock" style="float:left;">
+            <service-systemlink id="service_systemlink"></service-systemlink>
+            <div id = "systemlink_triangle" class="triangle-left triangle" style= "display: none; position: absolute; left: 70px; top: 20px;"></div>
+            <service-spike id="service_spike_receiving"></service-spike>
+            <span> receiving </span>
+            <div id="receiving_triangle" class="triangle-left triangle" style="display: none; position: absolute; left: 70px; top: 80px;"></div>
+            <service-spike id="service_spike_sending"></service-spike>
+            <div> sending </div>
+            <div id="sending_triangle" class="triangle-left triangle" style="display: none; position: absolute; left: 70px; top: 160px;"></div>
+        </div>
+        <!-- The Explanation Modal box -->
+        <div id="servicedockexplain" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p id="explanation"> You need: Two SPIKE Prime hubs, two motors, and two computer devices</p>
+                <p id="explanation2"> Connct a motor to every hub, and connect the hubs to different computers with this page</p>
+            </div>
+        </div>
+        <div id="receivingInterface_triangle" class="triangle-right triangle" style="display: none; position: absolute; left: 220px; top: 400px;">
+        </div>
+        <div id = "receiving" class = "demobox" style = "position: absolute; left: 300px; top: 300px;">
+            <center class="target_ignore">
+                <h1 class="target_ignore"> Getting motor value from cloud</h1>
+            </center>
+            <select id="portSelect" class="select_components target_ignore">
+            </select>
+            <input id = "selectport" type = "button" value = "select">
+        </div>
+        <div id="sendingInterface_triangle" class="triangle-right triangle" style="display: none; position: absolute; left: 840px; top: 400px;">
+        </div>
+        <div id = "sending" class = "demobox" style = "position: absolute; left: 900px; top: 300px;">
+            <center class = "target_ignore">
+                <h1 class = "target_ignore" >Sending motor value to cloud</h1>
+            </center>
+            <select id="portSelect" class="select_components target_ignore">
+            </select>
+            <input id="selectport" type="button" value="select">
+        </div>
+    </body>
+    <script>
+        var receiving; // flag for webpage ( true if page for receving, false if page for sending)
+
+        /* define objects for Service use and DOM manipulation*/
+        var RECVbutton = document.getElementById("service_spike_receiving");
+        var SENDbutton = document.getElementById("service_spike_sending");
+
+        var myRECVSPIKE = document.getElementById("service_spike_receiving").getService();
+        var mySENDSPIKE = document.getElementById("service_spike_sending").getService();
+        var mySL = document.getElementById("service_systemlink").getService();
+
+        var RECVMotor;
+        var SENDMotor;
+
+        mySL.executeAfterInit( function() {
+            if ( stage == 1 ) {
+                moveToNextExplain();
+            }
+        })
+        myRECVSPIKE.executeAfterInit(RecvMain); //execute argument after Service button pressed
+        mySENDSPIKE.executeAfterInit(SendMain); //execute argument after Service button pressed
+
+        window.addEventListener("click", function (){
+            if ( stage == 0 ) {
+                moveToNextExplain();
+            } else if (stage == 3) {
+                moveToNextExplain();
+            }
+        })
+
+        // main function to call for the sending SPIKE after its init
+        async function SendMain() {
+            receiving = false; //set the "receiving" flag
+
+            var motorPorts = await mySENDSPIKE.getMotorPorts(); // get ports connected to motors
+            initPortSelect(motorPorts); // append ports to <select>
+
+            // when the "select" button is clicked
+            $("#sending").find("#selectport").on("click", async () => {
+                // get the selected port
+                var port = await $("#sending").find("#portSelect option:selected").val();
+
+                SENDMotor = new mySENDSPIKE.Motor(port);
+
+                var sendToCloudInt = setInterval(async function () {
+
+                    // parse the motor's speed value 
+                    var toSend = SENDMotor.get_speed();
+
+                    // change the tag value in the cloud
+                    mySL.setTagValue("testInt", toSend);
+                }, 500)
+                if ( stage == 4 ) {
+                    moveToNextExplain();
+                }
+            })
+
+            if (stage == 2) {
+                moveToNextExplain();
+            }
+        }
+
+        // main function to call for the receiving SPIKE after its init
+        async function RecvMain() {
+            receiving = true; //set the "receiving" flag
+
+            var motorPorts = await myRECVSPIKE.getMotorPorts(); // get ports connected to motors
+            initPortSelect(motorPorts); // append ports to <select>
+
+            // when the "select" button is clicked
+            $("#receiving").find("#selectport").on("click", async () => {
+                // get the selected port
+                var port = await $("#receiving").find("#portSelect option:selected").val();
+
+                RECVMotor = new myRECVSPIKE.Motor(port);
+
+                var motorInt = setInterval(async function () {
+
+                    // parse "testInt" tag's value 
+                    var motorSpeed = await mySL.getTagValue("testInt");
+
+                    // change the motor's speed
+                    RECVMotor.start(motorSpeed);
+
+                }, 500);
+                
+                if (stage == 4) {
+                    moveToNextExplain();
+                }
+            })
+
+            if (stage == 2) {
+                moveToNextExplain();
+            }
+        }
+
+        /* append the motor ports to select HTML element */
+        async function initPortSelect(motorPorts) {
+            // if receiving motor values
+            if ( receiving ) {
+                console.log("receiving");
+                for ( var port in motorPorts ) {
+                    $("#receiving").find("#portSelect").append("<option id = "+ motorPorts[port] + ">" + motorPorts[port] +"</option>");
+                }
+            }
+            // if sending motor values
+            else {
+                for (var port in motorPorts) {
+                    $("#sending").find("#portSelect").append("<option id = " + motorPorts[port] + ">" + motorPorts[port] + "</option>");
+                }
+            }
+        }
+
+        //sleep function
+        function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+
+        // make divs draggable
+        dragElement("receiving")
+        dragElement("sending")
+
+    </script>
+    <!-- for modals -->
+    <script>
+        var stage = 0; // for explanation
+        var closeClicked = false; // for toggle explanation
+    
+        // Get the modal
+        var modal = document.getElementById("servicedockexplain");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+            closeClicked = true;
+            var triangles = document.getElementsByClassName("triangle");
+            for (var i = 0; i < triangles.length; i++) {
+                triangles[i].style.display = "none";
+            }
+        }
+
+        async function moveToNextExplain() {
+            var explanation = document.getElementById("explanation");
+            var explanation2 = document.getElementById("explanation2");
+            // only show explanation when close button hasnt been clicked
+            if (!closeClicked) {
+                switch (stage) {
+                    case 0:
+                        explanation.innerHTML = "Activate SystemLink Cloud service"
+                        explanation2.innerHTML = ""
+                        var triangle = document.getElementById("systemlink_triangle");
+                        triangle.style.display = "block";
+                        stage++;
+                        break;
+                    case 1:
+                        explanation2.innerHTML = "If you're SENDING motor values: click the 'sending' SPIKE button"
+                        explanation.innerHTML = "If you're RECEIVING motor values: click the 'receiving' SPIKE button"
+                        var triangleBefore = document.getElementById("systemlink_triangle");
+                        triangleBefore.style.display = "none";
+                        var triangleSending = document.getElementById("sending_triangle");
+                        var triangleGetting = document.getElementById("receiving_triangle");
+                        triangleSending.style.display = "block";
+                        triangleGetting.style.display = "block";
+                        stage++;
+                        break;
+                    case 2:
+                        if (receiving) {
+                            var triangleBefore = document.getElementById("sending_triangle");
+                            triangleBefore.style.display = "none";
+                            explanation.innerHTML = "You will be RECEIVING the other motor's SPEED value";
+                            explanation2.innerHTML = "";
+
+                        } else {
+                            var triangleBefore = document.getElementById("receiving_triangle");
+                            triangleBefore.style.display = "none";
+                            explanation.innerHTML = "You will be SENDING your motor's SPEED value to the other motor"
+                            explanation2.innerHTML = ""
+                        }
+                        stage++;
+                        break;
+                    case 3:
+                        if (receiving) {
+                            var triangleBefore = document.getElementById("receiving_triangle");
+                            triangleBefore.style.display = "none";
+                            var triangle = document.getElementById("receivingInterface_triangle");
+                            triangle.style.display = "block";
+                            explanation.innerHTML = "Choose the port of the motor you wish it be remotely controlled";
+                            explanation2.innerHTML = "And then press select";
+
+                        } else {
+                            var triangleBefore = document.getElementById("sending_triangle");
+                            triangleBefore.style.display = "none";
+                            var triangle = document.getElementById("sendingInterface_triangle");
+                            triangle.style.display = "block";
+                            explanation.innerHTML = "Choose the port of the motor you wish to use to control the other motor";
+                            explanation2.innerHTML = "And then press select";
+                        }
+                        stage++;
+                        break;
+                    case 4:
+                        if (receiving) {
+                            var triangleBefore = document.getElementById("receivingInterface_triangle");
+                            triangleBefore.style.display = "none";
+                            explanation.innerHTML = "Move the other 'sending' motor (not the 'receiving' motor) ";
+                            explanation2.innerHTML = "Observe the 'receiving' motor ";
+
+                        } else {
+                            var triangleBefore = document.getElementById("sendingInterface_triangle");
+                            triangleBefore.style.display = "none";
+                            explanation.innerHTML = "Move the connected motor";
+                            explanation2.innerHTML = "Observe the 'receiving' motor ";
+                        }
+                        stage++;
+                        break;
+                }
+            }
+        }
+    </script>
+</html>
+
+<style>
+    .demobox {
+        background-color: #4CE0D2;
+        color: black;
+        height: 300px;
+        width: 300px;
+        border: solid;
+    }
+
+    /* modal boxes CSS */
+    .triangle-left {
+	    width: 0;
+	    height: 0;
+	    border-top: 20px solid transparent;
+	    border-right: 30px solid #555;
+	    border-bottom: 20px solid transparent;
+    }
+
+    .triangle-right {
+	    width: 0;
+	    height: 0;
+	    border-top: 20px solid transparent;
+	    border-left: 30px solid #555;
+	    border-bottom: 20px solid transparent;
+    }
+
+
+     /* The Modal (background) */
+    #servicedockexplain{
+        left: 110px;
+        top: -10px;
+        width: 300px; /* Full width */
+        height: 300px;/* Full height */
+        /* background-color: rgb(0,0,0); */ /* Fallback color */
+        /* background-color: rgba(0,0,0,0.4); */ /* Black w/ opacity */
+    }
+
+    .modal {
+        display: block; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover, 
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>

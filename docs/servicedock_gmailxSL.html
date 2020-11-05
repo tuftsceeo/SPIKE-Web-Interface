@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_gmail.html
+Author: Jeremy Jung
+Last update: 6/26/20
+Description: Gmail Service example
+Credits/inspirations:
+    Based on ServiceDock by Ethan Danahy
+History: 
+    Created by Jeremy on 6/26/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+
+        <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+    </head>
+    <body style="background-image: url('/examples/modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+            <service-gmail id="service_gmail"></service-gmail>
+            <service-systemlink id= "service_SL"></service-systemlink>
+        </div>
+        <!-- The Explanation Modal box -->
+        <div id="servicedockexplain" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p id="explanation"> You need: 1 SPIKE Prime hub and a tuftsceeo email address. Make sure this webpage starts in localhost:8888</p>
+                <p id="explanation2"> Connect the hub to this computer</p>
+            </div>
+        </div>
+        <div id="SPIKE_triangle" class="triangle-left triangle"
+            style="display: none; position: absolute; left: 70px; top: 20px;"></div>
+        <div id="Gmail_triangle" class="triangle-left triangle"
+            style="display: none; position: absolute; left: 70px; top: 80px;"></div>
+        <div id="systemlink_triangle" class="triangle-left triangle"
+            style="display: none; position: absolute; left: 70px; top: 140px;"></div>
+
+        <div id="sender_triangle" class="triangle-down triangle"
+            style="display: none; position: absolute; left: 600px; top: 40px;"></div>
+        <div id="read_triangle" class="triangle-right triangle"
+            style="display: none; position: absolute; left: 450px; top: 110px;"></div>
+        <div id="execute_triangle" class="triangle-up triangle"
+            style="display: none; position: absolute; left: 750px; top: 610px;"></div>
+        
+        <div id="recipient_triangle" class="triangle-down triangle"
+            style="display: none; position: absolute; left: 1200px; top: 40px;"></div>
+        <div id="send_triangle" class="triangle-up triangle"
+            style="display: none; position: absolute; left: 1250px; top: 610px;"></div>
+        <div id="content_triangle" class="triangle-right triangle"
+            style="display: none; position: absolute; left: 950px; top: 200px;">
+        </div>
+
+
+
+
+        <div id="sendInterface" style = "position: absolute; left: 1000px; top: 100px;" >
+            <div class = "target_ignore">
+                Recipient's email
+                <input type = "text" id = "recipient">
+            </div>
+            <div class="target_ignore">
+                Message subject
+                <input type="text" id="subject">
+            </div>
+            <div style = "position: relative;" class = "target_ignore">
+                <textarea id="data" name="data" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+                <input type = "button" id="send" name="Send" value="Send" style="font-family: Courier; position: relative; left: 20px">
+            </div>
+        </div>
+        <div id = "receiveInterface" style = "position: absolute; left: 500px; top: 100px;">
+            <div style="position: relative;" class="target_ignore">
+                <div class="target_ignore">
+                    Sender's email
+                    <input type="text" id="sender">
+                </div>
+                <input type="button" id="readLatest" value="read from Inbox" style="font-family: Courier; position: relative; left: 20px">
+                <div>
+                    Received data
+                </div>
+                <textarea id="RECVdata" name="RECVdata" value="" style="font-family: Courier; position: relative; left: 20px" /></textarea>
+                <input type="button" id="execute" value="Execute" style="font-family: Courier; position: relative; left: 20px">
+            </div>
+        </div>
+    </body>
+    <script>
+        // instantiate service objects
+        var mySPIKE = document.getElementById("service_spike").getService();
+        var myGmail = document.getElementById("service_gmail").getService();
+        var mySL = document.getElementById("service_SL").getService();
+        // get HTML elements
+        var dataInput = document.getElementById("data");
+        var sendData = document.getElementById("send");
+        var recipient = document.getElementById("recipient");
+        var sender = document.getElementById("sender");
+        var subject = document.getElementById("subject");
+        var sendMicroPy = document.getElementById("execute");
+
+        var readMailButton = document.getElementById("readLatest");
+        var RECV = document.getElementById("RECVdata");
+
+        mySPIKE.executeAfterInit(SPIKEfunc);
+        
+        async function SPIKEfunc() {
+                mySPIKE.reachMicroPy(); // move from ujsonrpc to micropy
+                if (stage == 1) {
+                    moveToNextExplain();
+                }
+        }
+
+        //parse the cloudTagValue() command inserted at the textbox and execute it
+        async function parseCommand(rawContent) {
+
+            let index_cloudTagValue = await rawContent.indexOf("cloudTagValue(");
+            
+            //find the index of rawContent at which the cloudTagValue function ends
+            let index_lastparen = await rawContent.indexOf(")", index_cloudTagValue);
+            
+            //divide the rawContent into parts before the cloudTagValue and after
+            let first_rawContent_part = await rawContent.substring(0, index_cloudTagValue);
+            let second_rawContent_part = await rawContent.substring(index_lastparen + 1, rawContent.length);
+
+            //find the argument of the cloudTagValue
+            let cloudTagValue_string = await rawContent.substring(index_cloudTagValue, index_lastparen + 1);
+            let index_first_paren = cloudTagValue_string.indexOf("(");
+            let index_last_paren = cloudTagValue_string.indexOf(")");
+            let tagName = cloudTagValue_string.substring(index_first_paren + 1, index_last_paren);
+
+            // get the tag's value from the cloud
+            let tagsInfo = await mySL.getTagsInfo();
+            console.log("tagsInfo", tagsInfo);
+            console.log("tagName", tagName)
+            let selectedTag = await tagsInfo[tagName];
+            
+            if (selectedTag) {
+                var selectedTagValue = selectedTag.value;
+            }
+
+            //send the final UJSONRPC script to the hub.
+            let final_RPC_command;
+            
+            console.log("typeof", typeof selectedTagValue);
+
+            if (typeof selectedTagValue == "string") {
+                final_RPC_command = await first_rawContent_part + '"' + selectedTagValue + '"' + second_rawContent_part;
+            }
+            else if (selectedTagValue.type == "INT") {
+                final_RPC_command = await first_rawContent_part + selectedTagValue + second_rawContent_part;
+            }
+
+            return final_RPC_command;
+        }
+
+        window.addEventListener("load", function () {
+            
+            /* sending data button listener */
+            sendData.addEventListener("click", async function () {
+
+                // get the content of the textbox
+                var dataToSend = dataInput.value;
+                console.log("dataToSend", dataToSend);
+
+                // get recipient of mail
+                var recipientAddr = recipient.value;
+
+                // send the message
+                myGmail.sendMessage(dataToSend, recipientAddr, subject.value);
+                if (stage == 6) {
+                    moveToNextExplain();
+                }
+
+            })
+
+            /* reading mail button listener */
+            readMailButton.addEventListener("click", async function () {
+                if (stage == 8) {
+                    moveToNextExplain();
+                }
+                // get the email address of the sender
+                var senderAddr = sender.value;
+                // get and display read content
+                var content = await myGmail.readLatestUnreadFrom(senderAddr); // get the latest unread message sent by user
+                var parsedContent = await parseCommand(content);
+
+                RECV.value = parsedContent;
+            })
+
+            sendMicroPy.addEventListener("click", async function() {
+                var toSend = RECV.value;
+                mySPIKE.sendDATA(toSend);
+
+                if (stage == 9) {
+                    moveToNextExplain();
+                }
+            })
+            dragElement("sendInterface");
+            dragElement("receiveInterface");
+        })
+
+        mySL.executeAfterInit(function () {
+            if (stage == 3) {
+                moveToNextExplain();
+            }
+        });
+
+        myGmail.executeAfterInit(function () {
+            if (stage == 2) {
+                moveToNextExplain();
+            }
+        });
+
+        subject.addEventListener("input", function () {
+            if (stage == 4) {
+                moveToNextExplain();
+            }
+        })
+
+        dataInput.addEventListener("input", function () {
+            setTimeout(function() {
+                if (stage == 5) {
+                    moveToNextExplain();
+                }
+            }, 5000)
+        })
+
+        sender.addEventListener("input", function () {
+            if (stage == 7) {
+                moveToNextExplain();
+            }
+        })
+
+
+    </script>
+    <style>
+        #sendInterface, #receiveInterface {
+            height: 500px;
+            width: 400px;
+            background-color: #4CE0D2;
+            border: solid;
+        }
+
+        #data, #RECVdata{
+            height:400px;
+            width: 200px;
+        }
+    </style>
+</html> 
+
+<!--
+SAMPLE python code:
+
+from spike import PrimeHub, LightMatrix, Motor, MotorPair
+from spike.control import wait_for_seconds, wait_until, Timer
+
+hub = PrimeHub() 
+
+hub.light_matrix.write(cloudTagValue(message))
+
+-->
+
+<!-- EXPLANATION SCRIPT -->
+<script>
+    var stage = 0; // for explanation
+    var closeClicked = false; // for toggle explanation
+
+    // Get the modal
+    var modal = document.getElementById("servicedockexplain");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close all modals, and hide all triangles
+    span.onclick = function () {
+        modal.style.display = "none";
+        closeClicked = true;
+        var triangles = document.getElementsByClassName("triangle");
+        for (var i = 0; i < triangles.length; i++) {
+            triangles[i].style.display = "none";
+        }
+    }
+
+    window.addEventListener("click", function () {
+        if (stage == 0) {
+            moveToNextExplain();
+        } 
+    })
+
+    async function moveToNextExplain() {
+        var explanation = document.getElementById("explanation");
+        var explanation2 = document.getElementById("explanation2");
+        // only show explanation when close button hasnt been clicked
+        if (!closeClicked) {
+            switch (stage) {
+                case 0:
+                    explanation.innerHTML = "Activate SPIKE Service"
+                    explanation2.innerHTML = ""
+                    var triangle = document.getElementById("SPIKE_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 1:
+                    explanation2.innerHTML = "Activate Gmail Service"
+                    explanation.innerHTML = "!!! Log in to @tuftsceeo.org email !!! "
+                    var triangleBefore = document.getElementById("SPIKE_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("Gmail_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 2:
+                    explanation2.innerHTML = "Activate System Link Cloud Service"
+                    explanation.innerHTML = ""
+                    var triangleBefore = document.getElementById("Gmail_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("systemlink_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 3:
+                    explanation.innerHTML = "You will send Micropython instructions to an email address"
+                    explanation2.innerHTML = "Write the email address you logged in with and the subject of the email"
+                    var triangleBefore = document.getElementById("systemlink_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("recipient_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 4:
+                    explanation.innerHTML = "Write a micropython instruction. You can use cloudTagValue(tagName) to substitue for values from the cloud"
+                    explanation3.innerHTML = ""
+                    var triangleBefore = document.getElementById("recipient_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("content_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 5:
+                    explanation2.innerHTML = "Send the email"
+                    explanation.innerHTML = ""
+                    var triangleBefore = document.getElementById("content_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("send_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 6:
+                    explanation.innerHTML = "Now, you will receive the email and execute the instructions"
+                    explanation2.innerHTML = "Write the email of the sender ( the address of the Google user that's logged in )"
+                    var triangleBefore = document.getElementById("send_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("sender_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 7:
+                    explanation.innerHTML = "Read your inbox"
+                    explanation2.innerHTML = ""
+                    var triangleBefore = document.getElementById("sender_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("read_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 8:
+                    explanation.innerHTML = "The cloudTagValue() has been replaced with the value from the cloud"
+                    explanation2.innerHTML = "Execute the script"
+                    var triangleBefore = document.getElementById("read_triangle");
+                    triangleBefore.style.display = "none";
+                    var triangle = document.getElementById("execute_triangle");
+                    triangle.style.display = "block";
+                    stage++;
+                    break;
+                case 9:
+                    explanation2.innerHTML = "Observe the hub"
+                    explanation.innerHTML = ""
+                    var triangleBefore = document.getElementById("execute_triangle");
+                    triangleBefore.style.display = "none";
+                    stage++;
+                    break;
+            }
+        }
+    }
+</script>
+
+<!-- EXPLANATION CSS -->
+<style>
+    /* triangles CSS */
+
+    .triangle-left {
+        width: 0;
+        height: 0;
+        border-top: 20px solid transparent;
+        border-right: 30px solid #555;
+        border-bottom: 20px solid transparent;
+    }
+
+    .triangle-right {
+        width: 0;
+        height: 0;
+        border-top: 20px solid transparent;
+        border-left: 30px solid #555;
+        border-bottom: 20px solid transparent;
+    }
+
+    .triangle-down {
+        width: 0;
+        height: 0;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 30px solid #555;
+    }
+
+    .triangle-up {
+	    width: 0;
+	    height: 0;
+	    border-left: 20px solid transparent;
+	    border-right: 20px solid transparent;
+	    border-bottom: 30px solid #555;
+    }
+
+    /* modal boxes CSS */
+
+    /* The Modal (background) */
+    #servicedockexplain {
+        left: 110px;
+        top: -10px;
+        width: 300px;
+        /* Full width */
+        height: 300px;
+        /* Full height */
+        /* background-color: rgb(0,0,0); */
+        /* Fallback color */
+        /* background-color: rgba(0,0,0,0.4); */
+        /* Black w/ opacity */
+    }
+
+    .modal {
+        display: block;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 1;
+        /* Sit on top */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
