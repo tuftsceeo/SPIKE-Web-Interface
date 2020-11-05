@@ -411,7 +411,7 @@ function Service_Airtable() {
      */
     const getRecords = async () => {
       const records = await table.select({ 
-        maxRecords: 50, view: 'Main View' 
+        view: 'Grid view' 
       }).firstPage();
       
       return records;
@@ -420,8 +420,10 @@ function Service_Airtable() {
     /** Get all the entries only in 'Name' column, which are keys
      * @public
      * @returns {array}
+     * @example
+     * var allNames = my_Airtable.getNames();
      */
-    async function getNames() {
+    function getNames() {
       var names = [];
 
       for (var key in currentData) {
@@ -434,8 +436,10 @@ function Service_Airtable() {
     /** Get the Value associated with a given Name
      * @param {any} name 
      * @returns {string}
+     * @example
+     * var valueOfMessage = my_Airtable.getValue("message");
      */
-    async function getValue(name) {
+    function getValue(name) {
       return currentData[name];
     }
 
