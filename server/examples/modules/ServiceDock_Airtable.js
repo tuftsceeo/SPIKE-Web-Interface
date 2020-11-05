@@ -2,9 +2,10 @@
 Project Name: SPIKE Prime Web Interface
 File name: ServiceDock_Airtable.js
 Author: Grace Kayode
-Last update: 11/1/20
+Last update: 11/5/20
 Description: HTML Element definition for <service-airtable> to be used in ServiceDocks
 Credits/inspirations:
+    Airtable browser API (https://github.com/Airtable/airtable.js)
 History:
     Created by Jeremy on 7/20/20, Edited by Grace 11/1/20
 LICENSE: MIT
@@ -293,13 +294,6 @@ function Service_Airtable() {
     */
     let currentData= {}; // contains real-time information of the tags in the cloud
 
-    /* 
-    recordIDMap = {
-      rowNumber : recordID
-    }
-    */
-    let recordIDMap = {};
-
     let recordIDNameMap = {}; // map Name fields to its record ID
 
     /* DEV: API credentials, add or remove as needed for your API */
@@ -510,12 +504,10 @@ function Service_Airtable() {
           var recordID = records[key].id;
 
           currentData[name] = value;
-          recordIDMap[key] = recordID;
           recordIDNameMap[name] = recordID;
         }
 
         console.log("currentData: ", currentData);
-        console.log(recordIDMap);
         setTimeout( function () {
           setInterval(async function () {
 
@@ -531,7 +523,6 @@ function Service_Airtable() {
                 var recordID = records[key].id;
 
                 currentData[name] = value;
-                recordIDMap[key] = recordID;
                 recordIDNameMap[name] = recordID;
               }
             }
