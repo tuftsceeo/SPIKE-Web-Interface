@@ -401,10 +401,14 @@ function Service_Airtable() {
         return serviceActive;
     }
 
+
+
+
     const getRecordById = async (id) => {
       const record = await table.find(id);
       console.log(record);
     };
+    
     
     /** Get 50 pieces of "row" information
      * @returns records
@@ -417,6 +421,7 @@ function Service_Airtable() {
       return records;
     }
 
+    
     /** Get all the entries only in 'Name' column, which are keys
      * @public
      * @returns {array}
@@ -431,6 +436,31 @@ function Service_Airtable() {
 
       return names;
     }
+
+
+    /** Creates a new entry of specified data fields that gets pushed to Airtable
+     * @public
+     * @param {string} fields passed in data fields
+     * @returns nothing
+     */
+
+    const createName = async (fields) => {
+      const createdName = await table.create(fields);
+      console.log(minifyRecord(createdName));
+    };
+
+
+    /** Updates an existing entry of data within Airtable
+     * @public
+     * @param {string} id specific record id that will be updated 
+     * @param {string} fields passed in data fields
+     * @returns nothing
+     */
+
+    const updateName = async (id, fields) => {
+      const updatedName = await table.update(id, fields);
+      console.log(minifyRecord(updatedName));
+    };
 
     const getArtists = async () => {
       base('Artists').select({
@@ -466,15 +496,9 @@ function Service_Airtable() {
         };
     };
 
-    const createRecord = async (fields) => {
-        const createdRecord = await table.create(fields);
-        console.log(minifyRecord(createdRecord));
-    };
+  
 
-    const updateRecord = async (id, fields) => {
-        const updatedRecord = await table.update(id, fields);
-        console.log(minifyRecord(updatedRecord));
-    };
+    
 
     const deleteRecord = async (id) => {
         try {
@@ -531,8 +555,8 @@ function Service_Airtable() {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
-        createRecord: createRecord,
-        updateRecord: updateRecord,
+        createName: createName,
+        updateName: updateName,
         getRecords: getRecords,
         getNames: getNames,
         deleteRecord: deleteRecord,
