@@ -401,46 +401,92 @@ function Service_Airtable() {
         return serviceActive;
     }
 
+
+
+
     const getRecordById = async (id) => {
       const record = await table.find(id);
       console.log(record);
     };
+    
     
     /** Get 50 pieces of "row" information
      * @returns records
      */
     const getRecords = async () => {
       const records = await table.select({ 
-        view: 'Grid view' 
+        maxRecords: 50, view: 'Main View' 
       }).firstPage();
       
       return records;
     }
 
+    
     /** Get all the entries only in 'Name' column, which are keys
      * @public
      * @returns {array}
-     * @example
-     * var allNames = my_Airtable.getNames();
      */
-    function getNames() {
+    async function getNames() {
+      console.log("in getNames, currentData: ", currentData);
       var names = [];
 
       for (var key in currentData) {
-        names.push(key);
+        names.push(currentData[key].fields.Name);
       }
 
       return names;
     }
 
-    /** Get the Value associated with a given Name
-     * @param {any} name 
-     * @returns {string}
-     * @example
-     * var valueOfMessage = my_Airtable.getValue("message");
+
+    /** Creates a new entry of specified data fields that gets pushed to Airtable
+     * @public
+     * @param {string} fields passed in data fields
+     * @returns nothing
      */
-    function getValue(name) {
-      return currentData[name];
+
+    const createName = async (fields) => {
+      const createdName = await table.create(fields);
+      console.log(minifyRecord(createdName));
+    };
+
+
+    /** Updates an existing entry of data within Airtable
+     * @public
+     * @param {string} id specific record id that will be updated 
+     * @param {string} fields passed in data fields
+     * @returns nothing
+     */
+
+    const updateName = async (id, fields) => {
+      const updatedName = await table.update(id, fields);
+      console.log(minifyRecord(updatedName));
+    };
+
+    const getArtists = async () => {
+      base('Artists').select({
+        sort: [
+          { field: 'Name', direction: 'asc' }
+        ]
+      }).eachPage(function page(records, fetchNextPage) {
+        records.forEach(function (record) {
+          console.log('Retrieved ', record.get('Name'));
+
+          var $artistInfo = $('<div>');
+          $artistInfo.append($('<h3>').text(record.get('Name')));
+          $artistInfo.append($('<div>').text(record.get('Bio')));
+          var x = $('<button>').text('Delete').click(function () {
+            deleteArtist(record);
+          });
+          $artistInfo.append(x)
+          $artistInfo.attr('data-record-id', record.getId());
+
+          $('#artists').append($artistInfo);
+        });
+
+        fetchNextPage();
+      }, function done(error) {
+        console.log(error);
+      });
     }
 
     const minifyRecord = (record) => {
@@ -450,15 +496,9 @@ function Service_Airtable() {
         };
     };
 
-    const createRecord = async (fields) => {
-        const createdRecord = await table.create(fields);
-        console.log(minifyRecord(createdRecord));
-    };
+  
 
-    const updateRecord = async (id, fields) => {
-        const updatedRecord = await table.update(id, fields);
-        console.log(minifyRecord(updatedRecord));
-    };
+    
 
     const deleteRecord = async (id) => {
         try {
@@ -488,14 +528,7 @@ function Service_Airtable() {
           return false;
         }
 
-        // initialize currentData global variable
-        for ( var key in records ) {
-          var name = records[key].fields.Name;
-          var value = records[key].fields.Value;
-
-          currentData[name] = value;
-        }
-
+        currentData = records;
         console.log("currentData: ", currentData);
 
         setTimeout( function () {
@@ -505,14 +538,8 @@ function Service_Airtable() {
 
             // if the object is defined and not boolean false
             if (records) {
-
-              // update the currentData global var
-              for (var key in records) {
-                var name = records[key].fields.Name;
-                var value = records[key].fields.Value;
-
-                currentData[name] = value;
-              }
+              // populate the currentData global var
+              currentData = records;
             }
 
           }, 200)
@@ -528,11 +555,10 @@ function Service_Airtable() {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
-        createRecord: createRecord,
-        updateRecord: updateRecord,
+        createName: createName,
+        updateName: updateName,
         getRecords: getRecords,
         getNames: getNames,
-        getValue: getValue,
         deleteRecord: deleteRecord,
         getRecordById: getRecordById,
         minifyRecord: minifyRecord

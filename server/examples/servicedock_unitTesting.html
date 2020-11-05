@@ -218,9 +218,17 @@
 
             /* end testing Airtable getter functions */
 
+
             /* begin testing setter functions */
 
-            
+            // creates new data and pushes it to Airtable
+            var test1 = Airtable.createName({ Name: "Happy", Value: "2"});
+            console.log(test1)
+
+            // updates existing info entry in Airtable
+            var test2 = Airtable.updateName("recc3GIbPuDbIIk8T", {Name: "Mom", Value: "3"});
+            console.log(test2)
+
 
             /* end testing setter functions */
         });
