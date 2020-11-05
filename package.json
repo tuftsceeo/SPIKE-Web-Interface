@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
-    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json -u ./server/examples/tutorials"
+    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json -u ./server/examples/tutorials",
+    "combine": "./node_modules/.bin/concat -o ./server/examples/modules/ServiceDock.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   "homepage": "https://github.com/tuftsceeo/SPIKE-Web-Interface#readme",
   "dependencies": {
     "@exlinc/cc-web-exec-sdk": "^1.0.6",
+    "concat": "^1.0.3",
     "jsdoc": "^3.6.5"
   },
   "devDependencies": {
