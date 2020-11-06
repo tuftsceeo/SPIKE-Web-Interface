@@ -571,7 +571,8 @@ function Service_SystemLink() {
     }
 
     /** Send PUT request to SL cloud API and change the value of a tag
-     * 
+     * This function will receive a newValue of any kind of type. Before the POST request is sent,
+     * the SL data type of the tag to convert must be found, and newValue must be in string format
      * @private
      * @param {string} tagPath string of the name of the tag
      * @param {any} newValue value to assign tag
@@ -582,22 +583,24 @@ function Service_SystemLink() {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
 
-            var valueType = getValueType(newValue);
+            // assume newValue is already in correct datatype and just give the data type in SystemLink format
+            //var valueType = getValueType(newValue);
+            var valueType;
+            var newValueStringified;
 
-            // value is not a string
-            if (valueType != "STRING") {
-                // newValue will have no quotation marks before being stringified
-                var stringifiedValue = JSON.stringify(newValue);
-
-                var data = { "value": { "type": valueType, "value": stringifiedValue } };
-
+            // if Tag to change does not yet exist (possibly due to it being created very recently)
+            if (tagsInfo[tagPath] == undefined) {
+                // refer to newValue's JS type to deduce Tag's data type
+                valueType = getValueType(newValue);
             }
-            // value is a string
+            // Tag to change exists; find the SL data type of tag from locally stored tagsInfo
             else {
-                // newValue will already have quotation marks before being stringified, so don't stringify
-                var data = { "value": { "type": valueType, "value": newValue } };
+                valueType = tagsInfo[tagPath].type;
             }
+            
+            newValueStringified = changeToString(newValue);
 
+            var data = { "value": { "type": valueType, "value": newValueStringified } };
             var requestBody = data;
 
             var request = await sendXMLHTTPRequest("PUT", URL, APIKey, requestBody);
@@ -777,6 +780,26 @@ function Service_SystemLink() {
                 return "DOUBLE"
             }
         }
+    }
+
+    /** stringify newValue
+     * Note: for POST request
+     * @private
+     * @param {any} newValue 
+     * @returns {string} newValue stringified
+     */
+    function changeToString(newValue) {
+        var newValueConverted;
+
+        // already a string
+        if (typeof newValue == "string") {
+            newValueConverted = newValue;
+        }
+        else {
+            newValueConverted = JSON.stringify(newValue);
+        }
+
+        return newValueConverted;
     }
 
     /** Helper function for converting values to correct type based on data type
