@@ -1,13 +1,18 @@
 <html>
 
     <head>
-        <script src="./modules/ServiceDock_SPIKE.js"></script>
-        <script src="./modules/ServiceDock_SystemLink.js"></script>
-        <script src="./modules/ServiceDock_GeoLocation.js"></script>
-        <script src="./modules/ServiceDock_Airtable.js"></script>
-        <script src="./modules/ServiceDock_Gmail.js"></script>
+        <!--
+            <script src="./modules/ServiceDock_SPIKE.js"></script>
+            <script src="./modules/ServiceDock_SystemLink.js"></script>
+            <script src="./modules/ServiceDock_GeoLocation.js"></script>
+            <script src="./modules/ServiceDock_Gmail.js"></script>
+            <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
+            <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
+        -->
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/server/examples/modules/ServiceDock.js" 
+        type = "text/javascript"></script>
     </head>
 
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
@@ -187,20 +192,22 @@
         
     </body>
     <script>
+        var mySLElement = document.getElementById("service_systemlink");
+        var AirtableElement = document.getElementById("service_airtable");
+        
+        //mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
+        var mySL = mySLElement.getService();
+        var Airtable = AirtableElement.getService();
         var mySPIKE = document.getElementById("service_spike").getService();
         var hub = new mySPIKE.PrimeHub();
 
-        var mySLElement = document.getElementById("service_systemlink");
-        var AirtableElement = document.getElementById("service_airtable");
-        //mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
-        
+
         /* Testing automatic initialization of SD Airtable JEREMY CODE */
-        AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
+        AirtableElement.setAttribute("apikey", "kaaaaaaaa");
         AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
         // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
         AirtableElement.setAttribute("tablename", "Example");
 
-        var Airtable = AirtableElement.getService();
         /* End testing automatic init */
 
         /* set function to execute after init*/

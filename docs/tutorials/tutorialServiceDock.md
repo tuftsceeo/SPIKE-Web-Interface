@@ -6,7 +6,8 @@ The following code creates the ServiceDock interface you see on the top left cor
 ```html
 <html>
     <head>
-        <script src = "./modules/ServiceDock.js"></script>
+        <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/server/examples/modules/ServiceDock.min.js" 
+        type = "text/javascript"></script>
     </head>
     <body>
         <!-- this style must be kept for normal rendering-->
