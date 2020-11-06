@@ -354,8 +354,7 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** Create a new tag
-     * 
+    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue.
      * @public
      * @param {string} tagName name of tag to create
      * @param {any} tagValue value to assign the tag after creation
@@ -379,7 +378,12 @@ function Service_SystemLink() {
                 // execute callback if successful
                 if (newTagCreated) {
                     if (newTagValueAssigned) {
-                        typeof callback === 'function' && callback();
+                        // wait for changed value to be retrieved
+                        setTimeout( function() {
+                            if (typeof callback == 'function') {
+                                callback();
+                            }
+                        }, 1000)
                     }
                 }
             })
