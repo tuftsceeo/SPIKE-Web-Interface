@@ -291,7 +291,7 @@ function Service_SystemLink() {
      * var astringValue = tagsInfo["astring"]["value"];
      * var astringType = tagsInfo["astring"]["type"];
      */
-    async function getTagsInfo() {
+    function getTagsInfo() {
         return tagsInfo;
     }
 
@@ -302,7 +302,7 @@ function Service_SystemLink() {
      * @param {any} newValue 
      * @param {function} callback 
      */
-    async function setTagValue(tagName, newValue, callback) {
+    function setTagValue(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
         changeValue(tagName, newValue, function(valueChanged) {
             if (valueChanged) {
@@ -317,7 +317,7 @@ function Service_SystemLink() {
      * @param {string} tagName 
      * @returns {any} current value of tag
      */
-    async function getTagValue(tagName) {
+    function getTagValue(tagName) {
 
         var currentValue = tagsInfo[tagName].value;
 
@@ -353,7 +353,7 @@ function Service_SystemLink() {
      *      mySL.setTagValue("message", "bye"); 
      * })
      */
-    async function createTag(tagName, tagValue, callback) {
+    function createTag(tagName, tagValue, callback) {
         
         // get the SystemLink formatted data type of tag
         var valueType = getValueType(tagValue);
@@ -380,7 +380,7 @@ function Service_SystemLink() {
      * @param {string} tagName name of tag to delete
      * @param {function} callback optional callback
      */
-    async function deleteTag(tagName, callback) {
+    function deleteTag(tagName, callback) {
         // delete the tag on System Link cloud
         deleteTagHelper(tagName, function (tagDeleted) {
             if ( tagDeleted ) {
