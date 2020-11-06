@@ -14,22 +14,29 @@ LICENSE: MIT
 <html>
 
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
-    </head>
-
-    <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
+            type="text/javascript"></script>
         <!-- this style must be kept for normal rendering-->
         <div id="servicedock" style="float:left;">
             <!-- include the Services to use -->
             <service-systemlink id="service_systemlink"></service-systemlink>
         </div>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id = "interface">
+            <div id = "changeTag">
+                <input type = "text" placeholder = "message">
+                <input type = "submit" value = "change">
+            </div>
+            <div id = "createTag">
+                <input type="text" placeholder="message">
+                <input type="submit" value="Create">
+            </div>
+        </div>
     </body>
     <script>
         //Use ServiceDock here!
-        var SystemLinkService = document.getElementbyId("service_systemlink");
+        var SystemLinkService = document.getElementById("service_systemlink");
         var mySL = SystemLinkService.getService(); // your Service object
 
         mySL.executeAfterInit( function() {
@@ -38,57 +45,13 @@ LICENSE: MIT
     </script>
 
 </html>
-<script>
-
-</script>
-
 <style>
-    /* The Modal (background) */
-    #servicedockexplain {
-        left: 100px;
-        top: 0;
-        width: 200px;
-        /* Full width */
-        height: 100px;
-        /* Full height */
-        /* background-color: rgb(0,0,0); */
-        /* Fallback color */
-        /* background-color: rgba(0,0,0,0.4); */
-        /* Black w/ opacity */
-    }
-
-    .modal {
-        display: block;
-        /* Hidden by default */
-        position: fixed;
-        /* Stay in place */
-        z-index: 1;
-        /* Sit on top */
-    }
-
-    /* Modal Content/Box */
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        /* 15% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        /* Could be more or less, depending on screen size */
-    }
-
-    /* The Close Button */
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
+    #interface {
+        position: relative;
+        left: 400px;
+        top: 100px;
+        background-color: rgb(8, 141, 128);
+        height: 400px;
+        width: 500px;
     }
 </style>
