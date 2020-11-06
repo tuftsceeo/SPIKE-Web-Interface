@@ -307,13 +307,18 @@ function Service_SystemLink() {
      * @public
      * @param {string} tagName 
      * @param {any} newValue 
-     * @param {function} callback 
+     * @param {function} callback executes 1 second after this function is called
      */
     function setTagValue(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
         changeValue(tagName, newValue, function(valueChanged) {
             if (valueChanged) {
-                typeof callback === 'function' && callback();
+                // wait for changed value to be retrieved
+                setTimeout(function() {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }, 1000)
             }
         });
     }
