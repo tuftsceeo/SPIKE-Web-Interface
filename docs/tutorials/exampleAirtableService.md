@@ -96,7 +96,6 @@
             setup();
             // setup the ServiceDock
             airtableElement = document.getElementById("service_airtable");
-            airtableElement.init();
             my_airtable = airtableElement.getService();
         });
 
