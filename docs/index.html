@@ -67,9 +67,25 @@
     <section>
         <article class="readme"><h1>ServiceDock for SPIKE Prime</h1>
 <h2>Overview</h2>
-<p>ServiceDock is a Javascript framework that allows incorporation of LEGO SPIKE Prime and third party services in interactive web pages. Users can interact with your dynamic webpage by clicking on the buttons to activate the Services.</p>
+<p>ServiceDock is a Javascript framework that allows incorporation of LEGO SPIKE Prime and third party services in interactive web pages. Have various web services at the tip of your fingertips and speed up your prototyping process with ServiceDock's intuitive visual interface and API.</p>
+<p>Users can interact with your dynamic webpage by clicking on the ServiceDock icons to activate various Services.</p>
 <p><img src="servicedockDemo.gif" alt="Demonstration"></p>
-<p>Please refer to the documentation and the stutorials to get started!</p>
+<h2>Framework</h2>
+<p>To use ServiceDock, you will need to import the framework from a CDN as shown.</p>
+<pre class="prettyprint source lang-html"><code>&lt;head>
+    &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
+        type=&quot;text/javascript&quot;>&lt;/script>
+    &lt;!-- ServiceDock -->
+    &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
+        &lt;!-- SystemLink Cloud Service -->
+        &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
+        &lt;!-- SPIKE Service -->
+        &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
+        &lt;!-- Etc. -->
+    &lt;/div>
+&lt;/head>
+</code></pre>
+<p>Please refer to the documentation and the tutorials to get started with using ServiceDock!</p>
 <h2>Development</h2>
 <p>ServiceDock is still a work in progress. If you encounter any difficulties, bugs, or questions, please submit an issue at our <a href="https://github.com/tuftsceeo/SPIKE-Web-Interface">Github!</a></p></article>
     </section>
