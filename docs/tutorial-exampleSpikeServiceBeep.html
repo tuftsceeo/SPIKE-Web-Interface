@@ -65,13 +65,50 @@
         &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
             type=&quot;text/javascript&quot;>&lt;/script>
         &lt;script src=&quot;./modules/libraries/jquery_351.js&quot; type=&quot;text/javascript&quot;>&lt;/script>
+            &lt;style>
+            .slidecontainer {
+                position: absolute;
+                top: 200px;
+                width: 400px;
+                /* Width of the outside container */
+                background-color: #4CE0D2;
+                height: 200px;
+                border: solid;
+                left: 400px;
+            }
+
+            /* The slider itself */
+            .slider {
+                position: relative;
+                top: 50px;
+                -webkit-appearance: none;
+                /* Override default CSS styles */
+                appearance: none;
+                width: 100%;
+                /* Full-width */
+                height: 25px;
+                /* Specified height */
+                background: #d3d3d3;
+                /* Grey background */
+                outline: none;
+                /* Remove outline */
+                opacity: 0.7;
+                /* Set transparency (for mouse-over effects on hover) */
+                transition: opacity .2s;
+            }
+
+            /* Mouse-over effects */
+            .slider:hover {
+                opacity: 5;
+                /* Fully shown on mouse-over */
+            }
+        &lt;/style>
+    &lt;/head>
+    &lt;body>
         &lt;!-- ServiceDock -->
         &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
             &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
-    &lt;/head>
-
-    &lt;body>
         &lt;!-- from w3schools -->
         &lt;div id=&quot;demobox&quot; class=&quot;slidecontainer&quot;>
             &lt;p>Control beeping Pitch with the slider&lt;/p>
@@ -115,45 +152,6 @@
             pitch = this.value;
         }
     &lt;/script>
-    &lt;style>
-        .slidecontainer {
-            position: absolute;
-            top: 200px;
-            width: 400px;
-            /* Width of the outside container */
-            background-color: #4CE0D2;
-            height: 200px;
-            border: solid;
-            left: 400px;
-        }
-
-        /* The slider itself */
-        .slider {
-            position: relative;
-            top: 50px;
-            -webkit-appearance: none;
-            /* Override default CSS styles */
-            appearance: none;
-            width: 100%;
-            /* Full-width */
-            height: 25px;
-            /* Specified height */
-            background: #d3d3d3;
-            /* Grey background */
-            outline: none;
-            /* Remove outline */
-            opacity: 0.7;
-            /* Set transparency (for mouse-over effects on hover) */
-            transition: opacity .2s;
-        }
-
-        /* Mouse-over effects */
-        .slider:hover {
-            opacity: 5;
-            /* Fully shown on mouse-over */
-        }
-    &lt;/style>
-
 &lt;/html>
 </code></pre>
 <!-- Taken from documentation folder, which got the files from examples --->

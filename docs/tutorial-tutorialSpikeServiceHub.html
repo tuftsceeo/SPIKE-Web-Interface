@@ -65,8 +65,7 @@
 <h2>ServiceDock HTML</h2>
 <pre class="prettyprint source lang-html"><code>&lt;html>
     &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
-            type=&quot;text/javascript&quot;>&lt;/script>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;>&lt;/script>
     &lt;/head>
     &lt;body>
         &lt;!-- this style must be kept for normal rendering-->
@@ -178,7 +177,38 @@
 <p>If you would like to try out this example with your SPIKE Prime, click <a href="servicedock_hub.html">here!</a></p>
 <pre class="prettyprint source lang-html"><code>&lt;html>
     &lt;head>
-        &lt;script src = &quot;./modules/ServiceDock.js&quot;>&lt;/script>
+        &lt;script src = &quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;>&lt;/script>
+        &lt;style>
+            #front {
+                left: 400px;
+                top: 200px;
+                position: absolute;
+                background-color: rgb(231,233,232);
+                height: 250px;
+                width: 150px;
+                transform: rotate(0deg);
+            }
+
+            #mainButton {
+                position:relative; 
+                height:37px; 
+                width: 37px;
+                left: 51px;
+                top: 200px;
+                background-color:whitesmoke; 
+                border: solid; 
+                border-radius:50%;
+            }
+            
+            #back {
+                left: 400px;
+                top: 200px;
+                position: absolute;
+                background-color: rgb(252,208,0);
+                height: 250px;
+                width: 150px;
+            }
+        &lt;/style>
     &lt;/head>
     &lt;body>
         &lt;!--ServiceDock-->
@@ -236,37 +266,6 @@
             }
         }
     &lt;/script>
-    &lt;style>
-        #front {
-            left: 400px;
-            top: 200px;
-            position: absolute;
-            background-color: rgb(231,233,232);
-            height: 250px;
-            width: 150px;
-            transform: rotate(0deg);
-        }
-
-        #mainButton {
-            position:relative; 
-            height:37px; 
-            width: 37px;
-            left: 51px;
-            top: 200px;
-            background-color:whitesmoke; 
-            border: solid; 
-            border-radius:50%;
-        }
-        
-        #back {
-            left: 400px;
-            top: 200px;
-            position: absolute;
-            background-color: rgb(252,208,0);
-            height: 250px;
-            width: 150px;
-        }
-    &lt;/style>
 &lt;/html>
 
 </code></pre>
