@@ -281,7 +281,7 @@ function Service_SystemLink() {
      * @param {function} callback function to execute after initialization
      * @example
      * mySL.executeAfterInit( function () {
-     *     var tagsInfo = await getTagsInfo();
+     *     var tagsInfo = getTagsInfo();
      * })
      */
     function executeAfterInit(callback) {
