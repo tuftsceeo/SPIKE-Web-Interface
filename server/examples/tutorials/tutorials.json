@@ -7,6 +7,12 @@
         "children":{
             "tutorialSpikeServiceHub": {
                 "title": "Intro to SPIKE Service"
+            },
+            "exampleSpikeServiceBeep": {
+                "title": "Beeping pitch example"
+            },
+            "exampleSpikeServiceMotor": {
+                "title": "Motor example"
             }
         }
     },

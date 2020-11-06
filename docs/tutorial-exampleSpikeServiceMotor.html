@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: SPIKE Service | Tutorial: SPIKE Service</title>
+    <title>Tutorial: Motor example | Tutorial: Motor example</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: SPIKE Service</a>
+            <a class = "currentPage">Tutorial: Motor example</a>
         
         
     </div>
@@ -54,43 +54,114 @@
 <section>
     <header>
         
-        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Tutorials</span>
-        <ul>
-            <li style = "font-size: 20px;"><a href="tutorial-tutorialSpikeServiceHub.html">Intro to SPIKE Service</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBeep.html">Beeping pitch example</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceMotor.html">Motor example</a></li>
-        </ul>
-        
 
-        <h2>SPIKE Service</h2>
+        <h2>Motor example</h2>
     </header>
 
     
         <article class="readme">
-            <h2>SPIKE Service</h2>
-<p>ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection.</p>
-<h2>Dependencies</h2>
-<p>The webserial API is only supported on Google Chrome. <strong>Visitors that wish to connect their SPIKE Prime to your web page must ensure that the following requirements are fulfilled</strong>:</p>
-<p>To use the SPIKE™ Prime hardware, you must enable the <strong>WebSerial API</strong> in your browser. To do so, please make sure:</p>
-<ol>
-<li>You are using the <a href="https://www.google.com/chrome/">Google Chrome browser</a>.</li>
-<li>The following chrome flags are enabled on chrome://flags.
-Mac OSX user? #enable-experimental-web-platform-features</li>
-</ol>
-<p>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</p>
-<p>To enable these flags:</p>
-<ol>
-<li>In your Chrome Browser URL, visit chrome://flags</li>
-<li>Set the your required flags to &quot;Enabled&quot; via dropdown</li>
-<li>Relaunch the browser to have changes take effect</li>
-</ol>
-<p>When using SPIKE Service, make sure that your SPIKE Prime is connected (via USB or Bluetooth) to your computer and <em>you don't have any other applications or browser windows connected to your SPIKE Prime.</em></p>
-<p>#enable-experimental-web-platform-features</p>
-<p><img src="enableflag.png" alt="ExperimentalWebPlatformFeatures"></p>
-<p>#new-usb-backend</p>
-<p><img src="enableflagwindows.png" alt="NewUSBBackend"></p>
+            <pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
+            type=&quot;text/javascript&quot;>&lt;/script>
+        &lt;script src=&quot;./modules/libraries/jquery_351.js&quot; type=&quot;text/javascript&quot;>&lt;/script>
+        &lt;!--Service Dock-->
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/head>
+
+    &lt;body>
+        &lt;div id = &quot;demobox&quot; class=&quot;slidecontainer&quot;>
+            &lt;p>Control a motor with the slider&lt;/p>
+            &lt;select id=&quot;portSelect&quot; class=&quot;select_components target_ignore&quot;>
+            &lt;/select>
+            &lt;input id=&quot;selectport&quot; type=&quot;button&quot; value=&quot;select&quot;>
+            &lt;input type=&quot;range&quot; min=&quot;-100&quot; max=&quot;100&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;myRange&quot;>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+        var motor;
+        var port; // port to which motor is connected
+        var power; // power to run motor with
+        mySPIKE.executeAfterInit(SPIKE_main);
+
+        /* append the motor ports to select HTML element */
+        async function initPortSelect(motorPorts) {
+            for (var port in motorPorts) {
+                $(&quot;#portSelect&quot;).append(&quot;&lt;option id = &quot; + motorPorts[port] + &quot;>&quot; + motorPorts[port] + &quot;&lt;/option>&quot;);
+            }
+        }
+
+        async function SPIKE_main() {
+            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+
+            initPortSelect(motorPorts); // append ports to &lt;select>
+            
+            $(&quot;#selectport&quot;).on(&quot;click&quot;, async function (){
+                // get the selected port
+                port = await $(&quot;#portSelect option:selected&quot;).val();
+                motor = new mySPIKE.Motor(port);
+                
+                var motorPowerInterval = setInterval(changeMotorPower, 500);
+                // control motor's power
+                
+                motor.start_at_power(power)
+
+            })
+        }
+
+        function changeMotorPower() {
+            motor.start_at_power(power)
+        }
+
+
+        /* Slider Code*/
+        var slider = document.getElementById(&quot;myRange&quot;);
+        power = slider.value; // Display the default slider value
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function () {
+            power = this.value;
+
+        }
+    &lt;/script>
+    &lt;style>
+        .slidecontainer {
+            position: absolute;
+            top: 200px;
+            width: 400px; /* Width of the outside container */
+            background-color: #4CE0D2;
+            height: 200px;
+            border: solid;
+            left: 400px;
+        }
+
+        /* The slider itself */
+        .slider {
+            position: relative;
+            top: 50px;
+            -webkit-appearance: none;  /* Override default CSS styles */
+            appearance: none;
+            width: 100%; /* Full-width */
+            height: 25px; /* Specified height */
+            background: #d3d3d3; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+            transition: opacity .2s;
+        }
+
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 5; /* Fully shown on mouse-over */
+        }
+    &lt;/style>
+&lt;/html>
+</code></pre>
+<!-- Taken from documentation folder, which got the files from examples --->
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_motorSlider.html"></iframe>
         </article>
     
 </section>

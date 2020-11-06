@@ -1,28 +1,16 @@
-<!-- 
-Project Name: SPIKE Prime Web Interface
-File name: servicedock_motorSlider.html
-Author: Jeremy Jung
-Last update: 8/11/20
-Description: control a motor with a slider
-Credits/inspirations:
-History: 
-    Created by Jeremy on 8/4/20
-LICENSE: MIT
-(C) Tufts Center for Engineering Education and Outreach (CEEO)
-Note:
--->
+```html
 <html>
     <head>
         <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
             type="text/javascript"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <!--Service Dock-->
         <div id="servicedock" style="float:left;">
-            <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
         </div>
     </head>
 
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
         <div id = "demobox" class="slidecontainer">
             <p>Control a motor with the slider</p>
             <select id="portSelect" class="select_components target_ignore">
@@ -70,7 +58,6 @@ Note:
 
 
         /* Slider Code*/
-
         var slider = document.getElementById("myRange");
         power = slider.value; // Display the default slider value
 
@@ -79,15 +66,6 @@ Note:
             power = this.value;
 
         }
-
-        /* */
-        window.addEventListener("load", function() {
-            
-            dragElement("demobox");
-
-        })
-
-
     </script>
     <style>
         .slidecontainer {
@@ -120,3 +98,6 @@ Note:
         }
     </style>
 </html>
+```
+<!-- Taken from documentation folder, which got the files from examples --->
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_motorSlider.html"></iframe>

@@ -13,22 +13,16 @@ Note:
 -->
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
-
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
+            type="text/javascript"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
-        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
-    </head>
-
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
-        <h1 style="left: 500px; position: absolute">servicedock_motorSlider</h1>
-        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
         <div id="servicedock" style="float:left;">
             <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
         </div>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
         <div id = "demobox" class="slidecontainer">
             <p>Control a motor with the slider</p>
             <select id="portSelect" class="select_components target_ignore">

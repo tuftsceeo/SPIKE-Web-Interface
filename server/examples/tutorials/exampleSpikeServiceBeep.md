@@ -1,33 +1,16 @@
+```html
 <html>
-<!-- 
-Project Name: SPIKE Prime Web Interface
-File name: servicedock_beepSlider.html
-Author: Jeremy Jung
-Last update: 8/11/20
-Description: control the beeping frequency of SPIKE Prime with a slider
-Credits/inspirations:
-History: 
-    Created by Jeremy on 8/4/20
-LICENSE: MIT
-(C) Tufts Center for Engineering Education and Outreach (CEEO)
-Note:
--->
-
     <head>
         <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
             type="text/javascript"></script>
-
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
-        <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
-    </head>
-
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
-        <h1 style="left: 500px; position: absolute">servicedock_beepSlider</h1>
-        <h1 style="left: 500px; top: 50px; position: absolute">written with jquery</h1>
+        <!-- ServiceDock -->
         <div id="servicedock" style="float:left;">
-            <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
         </div>
+    </head>
+
+    <body>
         <!-- from w3schools -->
         <div id="demobox" class="slidecontainer">
             <p>Control beeping Pitch with the slider</p>
@@ -69,15 +52,7 @@ Note:
         // Update the current slider value (each time you drag the slider handle)
         slider.oninput = function () {
             pitch = this.value;
-
         }
-
-        /* */
-        window.addEventListener("load", function () {
-            dragElement("demobox")
-        })
-
-
     </script>
     <style>
         .slidecontainer {
@@ -119,3 +94,6 @@ Note:
     </style>
 
 </html>
+```
+<!-- Taken from documentation folder, which got the files from examples --->
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_beepSlider.html"></iframe>

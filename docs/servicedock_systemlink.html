@@ -24,12 +24,27 @@ LICENSE: MIT
     </head>
     <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
         <div id = "interface">
+            <center>
+            <div id = "apikey">
+                <input id = "apikeyInput" type = "text" placeholder="apikey">
+            </div>
+            </center>
+            <div>
+                Change existing tags
+            </div>
             <div id = "changeTag">
-                <input type = "text" placeholder = "message">
-                <input type = "submit" value = "change">
+                <select id = "existingTags">
+
+                </select>
+                <input id = "changeTagValue" type="text" placeholder="Value">
+                <input id = "changeTagSubmit" type = "submit" value = "change">
+            </div>
+            <div>
+                Create tags
             </div>
             <div id = "createTag">
-                <input type="text" placeholder="message">
+                <input id = "createTagName" type="text" placeholder="Tag Name">
+                <input id="createTagValue" type="text" placeholder="Value">
                 <input type="submit" value="Create">
             </div>
         </div>
@@ -37,10 +52,15 @@ LICENSE: MIT
     <script>
         //Use ServiceDock here!
         var SystemLinkService = document.getElementById("service_systemlink");
+        SystemLinkService.setAttribute("")
         var mySL = SystemLinkService.getService(); // your Service object
 
         mySL.executeAfterInit( function() {
             
+        })
+
+        setInterval( function () {
+            mySL
         })
     </script>
 
