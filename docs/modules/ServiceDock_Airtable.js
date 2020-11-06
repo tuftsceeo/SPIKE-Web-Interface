@@ -365,6 +365,7 @@ function Service_Airtable() {
 
         try {
             base = new Airtable({ apiKey: APIKey }).base(BaseID);
+            table = base(TableName);
             credentialsValid = true;
         }
         catch (e) {
@@ -374,7 +375,6 @@ function Service_Airtable() {
         console.log(base);
         // console.log(apiKey);
 
-        table = base(TableName);
 
         // if the credentials are valid authorization
         if (credentialsValid) {

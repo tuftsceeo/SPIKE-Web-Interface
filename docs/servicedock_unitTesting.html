@@ -2,17 +2,16 @@
 
     <head>
         <!--
-            <script src="./modules/ServiceDock_SPIKE.js"></script>
-            <script src="./modules/ServiceDock_SystemLink.js"></script>
             <script src="./modules/ServiceDock_GeoLocation.js"></script>
             <script src="./modules/ServiceDock_Gmail.js"></script>
             <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
-            <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
         -->
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
-        <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/server/examples/modules/ServiceDock.js" 
-        type = "text/javascript"></script>
+        <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"></script> -->
     </head>
 
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
@@ -21,7 +20,8 @@
 
             <service-systemlink id="service_systemlink" 
             apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
-
+            
+            <!--<service-systemlink id ="service_systemlink"></service-systemlink>-->
             <!--<service-airtable id="service_airtable" apikey = "keyFiNlvyTdd2Vs1b" baseid = "appHoo8e4oPG9YJIH" tablename = "Artists"></service-airtable>-->
             <service-airtable id="service_airtable">
             </service-airtable>
@@ -183,7 +183,16 @@
                 <!-- setTagValue CASES -->
                 <!-- setTagValue without callback-->
                 <input type="button" id="setTagValue" class="SLtestCase setTagValue" value="create 'newTag' with value 4 and change it to 5">
-
+                <input type="button" id="setINTtagwithString" class="SLtestCase setTagValue"
+                    value="set an INT tag's value with a string input">
+                <input type="button" id="setINTtagwithNumber" class="SLtestCase setTagValue"
+                    value="set an INT tag's value with a number input">
+                <input type="button" id="setSTRINGtagwithString" class="SLtestCase setTagValue"
+                    value="set a string tag's value with a string input">
+                <input type="button" id="setSTRINGtagwithNumber" class="SLtestCase setTagValue"
+                    value="set a string tag's value with a number input">
+                <input type="button" id="setBOOLEANtagwithString" class="SLtestCase setTagValue"
+                        value="set a BOOLEAN tag's value with a string input">
             </div>
             
         </div>
@@ -200,7 +209,6 @@
         var Airtable = AirtableElement.getService();
         var mySPIKE = document.getElementById("service_spike").getService();
         var hub = new mySPIKE.PrimeHub();
-
 
         /* Testing automatic initialization of SD Airtable JEREMY CODE */
         AirtableElement.setAttribute("apikey", "kaaaaaaaa");
@@ -1398,6 +1406,39 @@ run_for_seconds(3)
                 mySL.setTagValue("newTag", 5);
                 console.log("'newTag' value was changed to 5. run tagsinfo to check");
             });
+        })
+
+        var setINTtagwithString = document.getElementById("setINTtagwithString");
+        setINTtagwithString.addEventListener("click", function() {
+            console.log("changing an INT data type tag's value with string input");
+
+            mySL.setTagValue("integer1", "1");
+
+        })
+
+        var setINTtagwithNumber = document.getElementById("setINTtagwithNumber");
+        setINTtagwithNumber.addEventListener("click", function() {
+            console.log("changing an INT data type tag's value with number input");
+
+            mySL.setTagValue("integer1", 1);
+        })
+
+        var setSTRINGtagwithNumber = document.getElementById("setSTRINGtagwithNumber");
+        setSTRINGtagwithNumber.addEventListener("click", function() {
+            console.log("changing an STRING data type tag's value with number input");
+            mySL.setTagValue("message", 1);
+        })
+
+        var setSTRINGtagwithString = document.getElementById("setSTRINGtagwithString");
+        setSTRINGtagwithString.addEventListener("click", function() {
+            console.log("changing an STRING data type tag's value with string input");
+            mySL.setTagValue("message", "hi");
+        })
+
+        var setBOOLEANtagwithString = document.getElementById("setBOOLEANtagwithString");
+        setBOOLEANtagwithString.addEventListener("click", function() {
+            console.log("changing a BOOLEAN data type tag's value with string input");
+            mySL.setTagValue("abool", "true");
         })
 
         window.addEventListener("load", function () {

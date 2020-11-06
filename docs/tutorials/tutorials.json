@@ -9,14 +9,27 @@
                 "title": "Intro to SPIKE Service"
             },
             "exampleSpikeServiceBeep": {
-                "title": "Beeping pitch example"
+                "title": "Beeping Pitch Example"
             },
             "exampleSpikeServiceMotor": {
-                "title": "Motor example"
+                "title": "Motor Example"
             }
         }
     },
     "tutorialSystemLinkService": {
-        "title": "SystemLink Cloud Service"
+        "title": "SystemLink Cloud Service",
+        "children": {
+            "exampleSystemLinkServiceGeneral": {
+                "title": "General SystemLink Interface Example"
+            }
+        }
+    },
+    "tutorialAirtableService": {
+        "title": "Airtable Service",
+        "children": {
+            "exampleAirtableService": {
+                "title": "Tufts EN1-Simple Robotics Airtable Example"
+            }
+        }
     }
 }

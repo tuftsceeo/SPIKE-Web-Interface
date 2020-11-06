@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Motor Example | Tutorial: Motor Example</title>
+    <title>Tutorial: General SystemLink Interface Example | Tutorial: General SystemLink Interface Example</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Motor Example</a>
+            <a class = "currentPage">Tutorial: General SystemLink Interface Example</a>
         
         
     </div>
@@ -55,113 +55,214 @@
     <header>
         
 
-        <h2>Motor Example</h2>
+        <h2>General SystemLink Interface Example</h2>
     </header>
 
     
         <article class="readme">
             <pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;!-- Include ServiceDock -->
     &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js&quot;
             type=&quot;text/javascript&quot;>&lt;/script>
-        &lt;script src=&quot;./modules/libraries/jquery_351.js&quot; type=&quot;text/javascript&quot;>&lt;/script>
-        &lt;!--Service Dock-->
         &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+            &lt;!-- Include systemlink service-->
+            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
         &lt;/div>
     &lt;/head>
-
     &lt;body>
-        &lt;div id = &quot;demobox&quot; class=&quot;slidecontainer&quot;>
-            &lt;p>Control a motor with the slider&lt;/p>
-            &lt;select id=&quot;portSelect&quot; class=&quot;select_components target_ignore&quot;>
-            &lt;/select>
-            &lt;input id=&quot;selectport&quot; type=&quot;button&quot; value=&quot;select&quot;>
-            &lt;input type=&quot;range&quot; min=&quot;-100&quot; max=&quot;100&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;myRange&quot;>
+        &lt;div id = &quot;interface&quot;>
+            &lt;div class = &quot;action&quot;>
+                &lt;h3>
+                    Change existing tags
+                &lt;/h3>
+                &lt;div id=&quot;changeTag&quot;>
+                    &lt;select id=&quot;existingTags&quot;>
+                    
+                    &lt;/select>
+                    &lt;input id=&quot;changeTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
+                    &lt;input id=&quot;changeTagSubmit&quot; type=&quot;submit&quot; value=&quot;change&quot;>
+                &lt;/div>
+                &lt;div>
+                    Current value:
+                    &lt;span id=&quot;currentValue&quot;>
+                    
+                    &lt;/span>
+                &lt;/div>
+            &lt;/div>
+            &lt;div class = &quot;action&quot;>
+                &lt;h3>
+                    Create tags
+                &lt;/h3>
+                &lt;div id=&quot;createTag&quot;>
+                    &lt;input id=&quot;createTagName&quot; type=&quot;text&quot; placeholder=&quot;Tag Name&quot;>
+                    &lt;input id=&quot;createTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
+                    &lt;input id = &quot;createTagSubmit&quot; type=&quot;submit&quot; value=&quot;Create&quot;>
+                &lt;/div>
+                &lt;div>
+                    Status:
+                    &lt;span id=&quot;createTagStatus&quot;>
+                
+                    &lt;/span>
+                &lt;/div>
+            &lt;/div>
         &lt;/div>
     &lt;/body>
     &lt;script>
-        /* SPIKE Service code*/
-        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService();
-        var motor;
-        var port; // port to which motor is connected
-        var power; // power to run motor with
-        mySPIKE.executeAfterInit(SPIKE_main);
+        //Use ServiceDock here!
+        var SystemLinkService = document.getElementById(&quot;service_systemlink&quot;);
 
-        /* append the motor ports to select HTML element */
-        async function initPortSelect(motorPorts) {
-            for (var port in motorPorts) {
-                $(&quot;#portSelect&quot;).append(&quot;&lt;option id = &quot; + motorPorts[port] + &quot;>&quot; + motorPorts[port] + &quot;&lt;/option>&quot;);
+        var mySL = SystemLinkService.getService(); // your Service object
+
+        var realTimeTagsInfo = {}; // real time System Link Cloud tags
+
+        /* HTML Elements */
+        var existingTagsElement = document.getElementById(&quot;existingTags&quot;);
+        var currentValue = document.getElementById(&quot;currentValue&quot;);
+        var changeTagValue = document.getElementById(&quot;changeTagValue&quot;);
+        var createTagValue = document.getElementById(&quot;createTagValue&quot;);
+        var createTagName = document.getElementById(&quot;createTagName&quot;);
+        var createTagStatus = document.getElementById(&quot;createTagStatus&quot;);
+
+        // populate &lt;select> with all tags on the cloud and display the selected Tag's (first Tag) value
+        mySL.executeAfterInit( function() {
+            populateSelection();
+            displayCurrentValue();
+        });
+        
+        SystemLinkService.init(); 
+        
+        // append &lt;option> of Tags to &lt;select>
+        function populateSelection() {
+            existingTagsElement.innerHTML = &quot;&quot;; //reset &lt;select>
+            // get all tags information from Cloud
+            realTimeTagsInfo = mySL.getTagsInfo();
+
+            // append each to &lt;select>
+            for (var key in realTimeTagsInfo) {
+                var optionElement = document.createElement(&quot;option&quot;);
+                optionElement.innerHTML = key;
+                existingTagsElement.appendChild(optionElement);
             }
         }
 
-        async function SPIKE_main() {
-            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+        // when another &lt;option> is selected
+        existingTagsElement.addEventListener(&quot;change&quot;, function() {
+            displayCurrentValue();
+        })
 
-            initPortSelect(motorPorts); // append ports to &lt;select>
+        // display the value of the currently &quot;selected&quot; Tag option
+        function displayCurrentValue() {
+            // get the name of currently selected Tag
+            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
+
+            // get the value of the Tag
+            var value = mySL.getTagValue(key);
+
+            // update display
+            currentValue.innerHTML = value;
+        }
+
+        // button to change Tag's value was clicked
+        var changeTagButton = document.getElementById(&quot;changeTagSubmit&quot;);
+        changeTagButton.addEventListener(&quot;click&quot;, function () {
+            // get the name of Tag to change
+            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
+
+            // get the value to change Tag to
+            var newValue = changeTagValue.value;
             
-            $(&quot;#selectport&quot;).on(&quot;click&quot;, async function (){
-                // get the selected port
-                port = await $(&quot;#portSelect option:selected&quot;).val();
-                motor = new mySPIKE.Motor(port);
-                
-                var motorPowerInterval = setInterval(changeMotorPower, 500);
-                // control motor's power
-                
-                motor.start_at_power(power)
-
+            changeTagValue.value = &quot;&quot;; // reset input field
+            
+            // change Tag's value
+            mySL.setTagValue(key, newValue, function() {
+                displayCurrentValue();
             })
-        }
+        })
 
-        function changeMotorPower() {
-            motor.start_at_power(power)
-        }
+        var createTagButton = document.getElementById(&quot;createTagSubmit&quot;);
+        createTagButton.addEventListener(&quot;click&quot;, function() {
 
+            createTagStatus.innerHTML = &quot;creating tag&quot;
 
-        /* Slider Code*/
-        var slider = document.getElementById(&quot;myRange&quot;);
-        power = slider.value; // Display the default slider value
+            // get the name of Tag to create
+            var nameInput = createTagName.value;
+            var key = nameInput;
 
-        // Update the current slider value (each time you drag the slider handle)
-        slider.oninput = function () {
-            power = this.value;
+            // get the value to create the Tag with
+            var newValue = createTagValue.value;
 
+            // convert the value's type based on input
+            var convertedValue = convertValue(newValue);
+
+            // reset input fields
+            createTagValue.value = &quot;&quot;; 
+            createTagName.value = &quot;&quot;;
+
+            // create new Tag
+            mySL.createTag(key, newValue, function () {
+                populateSelection();
+                displayCurrentValue();
+                createTagStatus.innerHTML = &quot;tag was created!&quot;
+            })
+        })
+
+        // change value from &lt;input> to be of correct type
+        function convertValue(new_value) {
+            var convertedValue;
+            //if the value is not a number
+            if (isNaN(new_value)) {
+                //if the value is a boolean
+                if (new_value == true) {
+                    convertedValue = true;
+                } 
+                if (new_value == false) {
+                    convertedValue = false;
+                }
+                // value is a string, no change needed.
+                else {
+                    convertedValue = new_value;
+                }
+            }
+            //value is a number
+            else {
+                // value is a number, no change needed
+                convertedValue = new_value;
+            }
+
+            return convertedValue;
         }
     &lt;/script>
-    &lt;style>
-        .slidecontainer {
-            position: absolute;
-            top: 200px;
-            width: 400px; /* Width of the outside container */
-            background-color: #4CE0D2;
-            height: 200px;
-            border: solid;
-            left: 400px;
-        }
 
-        /* The slider itself */
-        .slider {
-            position: relative;
-            top: 50px;
-            -webkit-appearance: none;  /* Override default CSS styles */
-            appearance: none;
-            width: 100%; /* Full-width */
-            height: 25px; /* Specified height */
-            background: #d3d3d3; /* Grey background */
-            outline: none; /* Remove outline */
-            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-            transition: opacity .2s;
-        }
-
-        /* Mouse-over effects */
-        .slider:hover {
-            opacity: 5; /* Fully shown on mouse-over */
-        }
-    &lt;/style>
 &lt;/html>
+&lt;style>
+
+    input {
+        width: 100px;
+        height: 20px;
+    }
+
+    #interface {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        left: 400px;
+        top: 100px;
+        background-color: #4CE0D2;
+        height: 400px;
+        width: 500px;
+        border: solid;
+    }
+
+    .action {
+        margin: 5%;
+        position: relative;
+        justify-content: center;
+    }
+&lt;/style>
 </code></pre>
 <!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_motorSlider.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_systemlink.html"></iframe>
         </article>
     
 </section>

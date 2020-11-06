@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Motor Example | Tutorial: Motor Example</title>
+    <title>Tutorial: Tufts EN1-Simple Robotics Airtable Example | Tutorial: Tufts EN1-Simple Robotics Airtable Example</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Motor Example</a>
+            <a class = "currentPage">Tutorial: Tufts EN1-Simple Robotics Airtable Example</a>
         
         
     </div>
@@ -55,113 +55,231 @@
     <header>
         
 
-        <h2>Motor Example</h2>
+        <h2>Tufts EN1-Simple Robotics Airtable Example</h2>
     </header>
 
     
         <article class="readme">
-            <pre class="prettyprint source lang-html"><code>&lt;html>
-    &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
-            type=&quot;text/javascript&quot;>&lt;/script>
-        &lt;script src=&quot;./modules/libraries/jquery_351.js&quot; type=&quot;text/javascript&quot;>&lt;/script>
-        &lt;!--Service Dock-->
-        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
-        &lt;/div>
-    &lt;/head>
-
-    &lt;body>
-        &lt;div id = &quot;demobox&quot; class=&quot;slidecontainer&quot;>
-            &lt;p>Control a motor with the slider&lt;/p>
-            &lt;select id=&quot;portSelect&quot; class=&quot;select_components target_ignore&quot;>
-            &lt;/select>
-            &lt;input id=&quot;selectport&quot; type=&quot;button&quot; value=&quot;select&quot;>
-            &lt;input type=&quot;range&quot; min=&quot;-100&quot; max=&quot;100&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;myRange&quot;>
-        &lt;/div>
-    &lt;/body>
+            <pre class="prettyprint source lang-html"><code>
+&lt;html>
+&lt;head>
+    &lt;!-- Import ServiceDock -->
+    &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;>&lt;/script>
+    &lt;!-- Link Airtable functions to DOM Elements-->
     &lt;script>
-        /* SPIKE Service code*/
-        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService();
-        var motor;
-        var port; // port to which motor is connected
-        var power; // power to run motor with
-        mySPIKE.executeAfterInit(SPIKE_main);
+        // global variables for interacting with Service Dock's Airtable Service
+        var airtableElement;
+        var my_airtable;
 
-        /* append the motor ports to select HTML element */
-        async function initPortSelect(motorPorts) {
-            for (var port in motorPorts) {
-                $(&quot;#portSelect&quot;).append(&quot;&lt;option id = &quot; + motorPorts[port] + &quot;>&quot; + motorPorts[port] + &quot;&lt;/option>&quot;);
+        function updateOnAirtable(key, newValue) {
+            /* check if given key already exists on Airtable*/
+            var names = my_airtable.getNames();
+            var exists = false;
+            for (var index in names) {
+                if (names[index] == key) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            // key already exists, only update
+            if (exists) {
+                // update key and value on Airtable
+                my_airtable.updateValue(key, newValue);
+            }
+            // key does not exist, create a new pair
+            else {
+                my_airtable.createNameValuePair(key, newValue)
             }
         }
 
-        async function SPIKE_main() {
-            var motorPorts = await mySPIKE.getMotorPorts(); // get ports connected to motors
+        //Wrapper functions for updating airtable based on button, slider, and text input
+        function button_function(elem) {
+            // retrieve key & value pairs from buttons' attributes
+            var key = elem.getAttribute('airtable_value');
+            var newValue = elem.innerHTML;
 
-            initPortSelect(motorPorts); // append ports to &lt;select>
-            
-            $(&quot;#selectport&quot;).on(&quot;click&quot;, async function (){
-                // get the selected port
-                port = await $(&quot;#portSelect option:selected&quot;).val();
-                motor = new mySPIKE.Motor(port);
-                
-                var motorPowerInterval = setInterval(changeMotorPower, 500);
-                // control motor's power
-                
-                motor.start_at_power(power)
+            // update or create Name & Value pair on Airtable
+            updateOnAirtable(key, newValue);
 
-            })
-        }
-
-        function changeMotorPower() {
-            motor.start_at_power(power)
-        }
-
-
-        /* Slider Code*/
-        var slider = document.getElementById(&quot;myRange&quot;);
-        power = slider.value; // Display the default slider value
-
-        // Update the current slider value (each time you drag the slider handle)
-        slider.oninput = function () {
-            power = this.value;
+            // alert user of change
+            alert('Set airtable attribute &quot;' + key + '&quot; to be &quot;' + newValue + '&quot;');
 
         }
+        function range_function(elem) {
+            // retrieve key & value pairs from buttons' attributes
+            var key = elem.getAttribute('airtable_value');
+            var newValue = elem.value;
+
+            // update or create Name & Value pair on Airtable
+            updateOnAirtable(key, newValue);
+
+            // alert user of change
+            alert('Set airtable attribute &quot;' + key + '&quot; to be &quot;' + newValue + '&quot;');
+        }
+
+        function text_function(elem) {
+            // retrieve key & value pairs from buttons' attributes
+            var key = elem.getAttribute('airtable_value');
+            var newValue = elem.value;
+
+            // update or create Name & Value pair on Airtable
+            updateOnAirtable(key, newValue);
+
+            // alert user of change
+            alert('Set airtable attribute &quot;' + key + '&quot; to be &quot;' + newValue + '&quot;');
+        }
+
+        //Setup for assigning elements to wrapper functions
+        function setup() {
+            d = document.querySelectorAll(&quot;button&quot;);
+            for (i = 0; i &lt; d.length; i++) {
+                d[i].onclick = function () { button_function(this); }
+            }
+            d = document.querySelectorAll(&quot;input[type=range]&quot;);
+            for (i = 0; i &lt; d.length; i++) {
+                d[i].onclick = function () { range_function(this); }
+            }
+            d = document.querySelectorAll(&quot;form[type=textinput]&quot;);
+            for (i = 0; i &lt; d.length; i++) {
+
+                var current_form = d[i];
+                var text_entry = d[i].elements[0];
+                var submit_button = d[i].elements[1];
+
+                submit_button.onclick = function () { text_function(text_entry); }
+
+            }
+        }
+
+        window.addEventListener('load', function () {
+            // setup the onclick listeners for the interactive webpage elements
+            setup();
+            // setup the ServiceDock
+            airtableElement = document.getElementById(&quot;service_airtable&quot;);
+            airtableElement.init();
+            my_airtable = airtableElement.getService();
+        });
+
     &lt;/script>
     &lt;style>
-        .slidecontainer {
-            position: absolute;
-            top: 200px;
-            width: 400px; /* Width of the outside container */
-            background-color: #4CE0D2;
-            height: 200px;
-            border: solid;
-            left: 400px;
+        /* This is where you can make changes to the
+        appearance of your different blocks.
+
+        For info on CSS, copy and paste the link
+        below into your browser!
+
+        https://www.w3schools.com/css/default.asp
+
+        */
+
+        .buttonBlock{
+            /*Give your button block some style!
+            Add color, change the border, and
+            change the size using CSS styling*/
+            background-color:lightblue;
+            border:solid;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 40px;
+            width:30%;
         }
 
-        /* The slider itself */
-        .slider {
-            position: relative;
-            top: 50px;
-            -webkit-appearance: none;  /* Override default CSS styles */
-            appearance: none;
-            width: 100%; /* Full-width */
-            height: 25px; /* Specified height */
-            background: #d3d3d3; /* Grey background */
-            outline: none; /* Remove outline */
-            opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-            transition: opacity .2s;
+        .sliderBlock{
+            /*Give your slider block some style!
+            Add color, change the border, and
+            change the size using CSS styling*/
+            background-color:orange;
+            border:solid;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 40px;
+            width:30%;
         }
 
-        /* Mouse-over effects */
-        .slider:hover {
-            opacity: 5; /* Fully shown on mouse-over */
+        .textBlock{
+            /*Give your text block some style!
+            Add color, change the border, and
+            change the size using CSS styling*/
+            background-color:lightgreen;
+            border:solid;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 40px;
+            width:30%;
         }
+
     &lt;/style>
+&lt;!-- --------------------------------------------- -->
+&lt;/head>
+&lt;body style=&quot;background-color: none&quot;>
+
+    &lt;!-- Create ServiceDock visual interface-->
+    &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+        &lt;service-airtable id=&quot;service_airtable&quot;>&lt;/service-airtable>
+    &lt;/div>
+    &lt;br>
+
+    &lt;!-- INPUTS: -->
+
+    &lt;!-- Types of input: Button -->
+
+&lt;!--
+    Add buttons using the button tag. The name in airtable_value
+    will be set to whatever is in between the button tag.
+    In the case of the first button below, 'action' will be set
+    to 'Slower'
+-->
+
+    &lt;div class='buttonBlock'>
+    &lt;p>Robot Control Buttons&lt;/p> &lt;!-- Name your button(s) in this paragraph tag -->
+	&lt;button airtable_value='action'>Slower&lt;/button>
+	&lt;button airtable_value='action'>Faster&lt;/button>
+	&lt;button airtable_value='action'>Stop&lt;/button>
+    &lt;/div>
+
+    &lt;!-- Types of input: Slider -->
+
+&lt;!--
+    Add sliders & buttons together by using the &lt;input type='range'>
+    tag and the button tag. The slider can have a min/max value
+    and a starting value called 'value'. The name in airtable_value
+    will be set to the value of the slider whenever it is dragged.
+-->
+
+    &lt;div class='sliderBlock'>
+    &lt;p>Motor Control with Slider&lt;/p> &lt;!-- Name your slider(s) in this paragraph tag -->
+	&lt;button airtable_value='motor1'>Forward&lt;/button>
+	&lt;button airtable_value='motor1'>Backward&lt;/button>
+	&lt;button airtable_value='motor1'>Stop&lt;/button>
+    &lt;input type=&quot;range&quot; min=&quot;1&quot; max=&quot;100&quot; value=&quot;50&quot; airtable_value='motor1_speed'>
+    &lt;/div>
+
+    &lt;!-- Types of input: Text -->
+
+&lt;!--
+    Add text input using the &lt;form> tag with an &lt;input type='text'>
+    tag inside. The form requires a submit button, which can be
+    copied and pasted below the text input tag. Make sure to use
+    1 form per 1 text input! The name in airtable_value will be
+    set to whatever the user enters into the text input.
+-->
+
+    &lt;div class='textBlock'>
+    &lt;p>Text Input&lt;/p> &lt;!-- Name your text input in this paragraph tag -->
+    &lt;form type='textinput'>
+        &lt;input type='text' airtable_value='text_input'>
+        &lt;input type='button' value='Submit'>
+    &lt;/form>
+    &lt;/div>
+
+&lt;!-- That's it for the HTML side! -->
+
+&lt;/body>
 &lt;/html>
 </code></pre>
 <!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_motorSlider.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_airtableEN1.html"></iframe>
         </article>
     
 </section>
