@@ -101,17 +101,24 @@ class servicesystemlink extends HTMLElement {
     /* Ask user for API credentials */
     popUpBox() {
         var APIKeyExists = true;
-
-        var APIKeyResult = prompt("Please enter your System Link Cloud API Key:", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7");
-        // APIkey 
-        if ( APIKeyResult == null || APIKeyResult == "" ) {
-            console.log("You inserted no API key");
-            APIKeyExists = false;
+        // if apikey was not given in attributes
+        if (this.getAttribute("apikey") == undefined || this.getAttribute("apikey") == "") {
+            var APIKeyResult = prompt("Please enter your System Link Cloud API Key:");
+            
+            // APIkey 
+            if (APIKeyResult == null || APIKeyResult == "") {
+                console.log("You inserted no API key");
+                APIKeyExists = false;
+            }
+            else {
+                this.APIKey = APIKeyResult;
+            }
         }
         else {
-            APIKeyExists = true;
+            var APIKeyResult = this.getAttribute("apikey");
             this.APIKey = APIKeyResult;
         }
+        
 
         if ( APIKeyExists ) {
             this.proceed = true;
