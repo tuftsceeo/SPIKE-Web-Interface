@@ -2,8 +2,7 @@
 <html>
     <!-- Include ServiceDock -->
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"
-            type="text/javascript"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script>
         <div id="servicedock" style="float:left;">
             <!-- Include systemlink service-->
             <service-systemlink id="service_systemlink"></service-systemlink>
