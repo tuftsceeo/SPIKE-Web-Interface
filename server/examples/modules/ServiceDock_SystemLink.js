@@ -287,7 +287,7 @@ function Service_SystemLink() {
      * @public
      * @returns basic information about currently existing tags in the cloud
      * @example
-     * var tagsInfo = await mySL.getTagsInfo();
+     * var tagsInfo = mySL.getTagsInfo();
      * var astringValue = tagsInfo["astring"]["value"];
      * var astringType = tagsInfo["astring"]["type"];
      */
@@ -684,7 +684,7 @@ function Service_SystemLink() {
             request.onload = function () {
                 resolve(true);
             }
-
+            
             request.onerror = function () {
                 console.log("Error at deleteTagHelper", request.response);
                 reject(false);
@@ -747,7 +747,7 @@ function Service_SystemLink() {
      * 
      * @private
      * @param {any} new_value the variable containing the new value of a tag
-     * @returns {string} data type of tag
+     * @returns {any} data type of tag
      */
     function getValueType(new_value) {
         //if the value is not a number
