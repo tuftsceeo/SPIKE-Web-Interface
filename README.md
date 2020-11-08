@@ -1,8 +1,6 @@
 # ServiceDock for SPIKE Prime
 
-> A frontend Javascript framework for building web interfaces that combine SPIKE Prime with third party services
-
-Note: access to this GitHub repository requires signing a LEGO Education NDA. If you haven't signed a LEGO Education NDA, please do not proceed further and immediately contact Ethan Danahy (ethan.danahy@tufts.edu).
+## A frontend Javascript framework for building web interfaces that combine SPIKE Prime with third party services
 
 ## Overview
 
