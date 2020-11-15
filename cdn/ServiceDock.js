@@ -281,7 +281,7 @@ function Service_SystemLink() {
      * @param {function} callback function to execute after initialization
      * @example
      * mySL.executeAfterInit( function () {
-     *     var tagsInfo = await getTagsInfo();
+     *     var tagsInfo = getTagsInfo();
      * })
      */
     function executeAfterInit(callback) {
@@ -1310,7 +1310,12 @@ function Service_Airtable() {
      * @returns {any} Value associated with the given Name
      */
     function getValue(name) {
-      return convertToDataType(currentData[name]);
+      if ( currentData[name] == undefined ) {
+        return undefined;
+      }
+      else {
+        return convertToDataType(currentData[name]);
+      }
     }
 
     /** Update the Value field associated with a Name 
