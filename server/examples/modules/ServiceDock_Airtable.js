@@ -534,9 +534,10 @@ function Service_Airtable() {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
                 var recordID = records[key].id;
-
-                currentData[name] = value;
-                recordIDNameMap[name] = recordID;
+                if (name != undefined) {
+                  currentData[name] = value;
+                  recordIDNameMap[name] = recordID;
+                }
               }
             }
 
@@ -607,7 +608,7 @@ function Service_Airtable() {
      * @returns {any} type converted variable
      */
     function convertToDataType(input) {
-      input = input.trim();
+      //input = input.trim();
       var convertedInput;
       // string is not a pure number
       if (isNaN(input)) {
@@ -623,11 +624,42 @@ function Service_Airtable() {
           convertedInput = input;
         }
       }
-      // string is a pure number
+      // string is a pure number or spaces
       else {
-        convertedInput = Number(input);
+        // string is of spaces
+        if(checkCompletelySpace(input)){
+          convertedInput = input
+        }
+        // string is a number
+        else {
+          convertedInput = Number(input);
+        }
       }
       return convertedInput
+    }
+
+    /** checks if a given string is completely spaces
+    * @private
+    * @param {string} stringInput 
+    */
+    function checkCompletelySpace(stringInput) {
+      if (stringInput.length == 1) {
+        if (stringInput == " ") {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        if (stringInput[stringInput.length - 1] != " ") {
+          return false
+        }
+        else {
+          console.log(stringInput.slice(0, stringInput.length - 1))
+          return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
+        }
+      }
     }
 
     /** Convert any variable to its string format for Airtable

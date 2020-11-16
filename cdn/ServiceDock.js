@@ -1385,9 +1385,10 @@ function Service_Airtable() {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
                 var recordID = records[key].id;
-
-                currentData[name] = value;
-                recordIDNameMap[name] = recordID;
+                if (name != undefined) {
+                  currentData[name] = value;
+                  recordIDNameMap[name] = recordID;
+                }
               }
             }
 
@@ -1458,7 +1459,7 @@ function Service_Airtable() {
      * @returns {any} type converted variable
      */
     function convertToDataType(input) {
-      input = input.trim();
+      //input = input.trim();
       var convertedInput;
       // string is not a pure number
       if (isNaN(input)) {
@@ -1474,11 +1475,42 @@ function Service_Airtable() {
           convertedInput = input;
         }
       }
-      // string is a pure number
+      // string is a pure number or spaces
       else {
-        convertedInput = Number(input);
+        // string is of spaces
+        if(checkCompletelySpace(input)){
+          convertedInput = input
+        }
+        // string is a number
+        else {
+          convertedInput = Number(input);
+        }
       }
       return convertedInput
+    }
+
+    /** checks if a given string is completely spaces
+    * @private
+    * @param {string} stringInput 
+    */
+    function checkCompletelySpace(stringInput) {
+      if (stringInput.length == 1) {
+        if (stringInput == " ") {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        if (stringInput[stringInput.length - 1] != " ") {
+          return false
+        }
+        else {
+          console.log(stringInput.slice(0, stringInput.length - 1))
+          return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
+        }
+      }
     }
 
     /** Convert any variable to its string format for Airtable
@@ -2489,7 +2521,6 @@ function Service_SPIKE() {
     function micropython(slotid, program) {
         // initialize microPyUtils
         micropyUtils.init();
-
         /* add local variables of the caller of this function */
         // get the function definition of caller
         /* parse and add all local variable declarations to micropyUtils.storedVariables
@@ -2537,6 +2568,7 @@ function Service_SPIKE() {
             var variableName = name;
             if (typeof micropyUtils.storedVariables[name] !== "function" && typeof micropyUtils.storedVariables[name] !== "object") {
                 var variableValue = micropyUtils.convertToString(micropyUtils.storedVariables[name]);
+
                 lines.push("" + variableName + " = " + variableValue);
 
             }
@@ -2585,8 +2617,10 @@ function Service_SPIKE() {
 
         // add a tab before every newline (this is syntactically needed for concatenating with the template)
         for (var index in splitData) {
+            // parse wait_for_seconds
+            var parsedWaitForSeconds = await parseWaitForSeconds(splitData[index]);
 
-            var addedTab = "    " + splitData[index] + "\n";
+            var addedTab = "    " + parsedWaitForSeconds + "\n";
 
             result = result + addedTab;
         }
@@ -2635,7 +2669,7 @@ function Service_SPIKE() {
         * @returns {functions} - functions from PrimeHub.left_button
         * @example
         * var hub = mySPIKE.PrimeHub();
-        * var left_button = hub.left_button();
+        * var left_button = hub.left_button;
         * // do something with left_button
         */
         var left_button = {};
@@ -2684,7 +2718,7 @@ function Service_SPIKE() {
          * @returns {functions} functions from PrimeHub.right_button
          * @example
          * var hub = mySPIKE.PrimeHub();
-         * var right_button = hub.right_button();
+         * var right_button = hub.right_button;
          * // do something with right_button
          */
         var right_button = {};
@@ -2755,7 +2789,7 @@ function Service_SPIKE() {
          * @returns {functions} - functions from PrimeHub.light_matrix
          * @example
          * var hub = mySPIKE.PrimeHub();
-         * var light_matrix = hub.light_matrix();
+         * var light_matrix = hub.light_matrix;
          * // do something with light_matrix
          */
         var light_matrix = {};
@@ -2796,7 +2830,7 @@ function Service_SPIKE() {
          * @returns {functions} functions from Primehub.speaker
          * @example
          * var hub = mySPIKE.PrimeHub();
-         * var speaker = hub.speaker();
+         * var speaker = hub.speaker;
          * // do something with speaker
          */
         var speaker = {};
@@ -5063,6 +5097,44 @@ function Service_SPIKE() {
         return newOrientation;
     }
 
+
+    /**
+     * 
+     * @private
+     * @param {any} rawContent 
+     * @returns {string}
+     */
+    async function parseWaitForSeconds(rawContent) {
+        let index_waitForSeconds = await rawContent.indexOf("wait_for_seconds(");
+        if (index_waitForSeconds > -1) {
+            //find the index of rawContent at which the waitForSeconds function ends
+            let index_lastparen = await rawContent.indexOf(")", index_waitForSeconds);
+
+            //divide the rawContent into parts before the waitForSeconds and after
+            let first_rawContent_part = await rawContent.substring(0, index_waitForSeconds);
+            let second_rawContent_part = await rawContent.substring(index_lastparen + 1, rawContent.length);
+
+            //find the argument of the waitForSeconds
+            let waitForSeconds_string = await rawContent.substring(index_waitForSeconds, index_lastparen + 1);
+            let index_first_paren = await waitForSeconds_string.indexOf("(");
+            let index_last_paren = await waitForSeconds_string.indexOf(")");
+            let tagName = await waitForSeconds_string.substring(index_first_paren + 1, index_last_paren);
+
+            // get the tag's value from the cloud
+            var yieldCommand = "yield(" + tagName + "000)";
+
+            //send the final UJSONRPC script to the hub.
+            let final_RPC_command;
+
+            final_RPC_command = await first_rawContent_part + yieldCommand + second_rawContent_part;
+
+            return parseWaitForSeconds(final_RPC_command);
+        }
+        else {
+            return rawContent;
+        }
+    }
+
     // public members
     return {
         init: init,
@@ -5364,6 +5436,7 @@ micropyUtils.convertFromString = function (value) {
 
 // convert datatype value to string value
 micropyUtils.convertToString = function (value) {
+    console.log(value)
     // value is a string, enclose with single quots and return
     if (typeof value == "string") {
         return "'" + value + "'";
