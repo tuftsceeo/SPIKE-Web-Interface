@@ -3,30 +3,6 @@
     <!-- Include ServiceDock -->
     <head>
         <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script>
-        <style>
-            input {
-                width: 100px;
-                height: 20px;
-            }
-            
-            #interface {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                left: 400px;
-                top: 100px;
-                background-color: #4CE0D2;
-                height: 400px;
-                width: 500px;
-                border: solid;
-            }
-
-            .action {
-                margin: 5%;
-                position: relative;
-                justify-content: center;
-            }
-        </style>
     </head>
     <body>
         <div id="servicedock" style="float:left;">

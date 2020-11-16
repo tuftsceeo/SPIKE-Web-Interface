@@ -211,7 +211,7 @@
         var hub = new mySPIKE.PrimeHub();
 
         /* Testing automatic initialization of SD Airtable JEREMY CODE */
-        AirtableElement.setAttribute("apikey", "kaaaaaaaa");
+        AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
         AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
         // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
         AirtableElement.setAttribute("tablename", "Example");
@@ -798,11 +798,12 @@
                 var dataToWrite = dataTextBox.value;
 
                 console.log(dataToWrite);
+                /* using writeProgram (old way) */
+                // var programname = "test program"
+                // mySPIKE.writeProgram(btoa(programname), dataToWrite, 1);
 
-                var programname = "test program"
-
-                mySPIKE.writeProgram(btoa(programname), dataToWrite, 1);
-
+                /* using micropython (new way) */
+                mySPIKE.micropython(0, dataToWrite);
             })
             console.log("###### ENDING UNIT TEST ON writeProgram() #######");
         })
