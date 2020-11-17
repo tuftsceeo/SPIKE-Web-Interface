@@ -1310,12 +1310,7 @@ function Service_Airtable() {
      * @returns {any} Value associated with the given Name
      */
     function getValue(name) {
-      if ( currentData[name] == undefined ) {
-        return undefined;
-      }
-      else {
         return convertToDataType(currentData[name]);
-      }
     }
 
     /** Update the Value field associated with a Name 
@@ -1469,6 +1464,9 @@ function Service_Airtable() {
         }
         else if (input == "False" || input == "false") {
           convertedInput = false;
+        }
+        else if (input == undefined) {
+          convertedInput = "";
         }
         // string is just a string
         else {
