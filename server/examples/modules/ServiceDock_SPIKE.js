@@ -81,11 +81,59 @@ class servicespike extends HTMLElement {
         this.addEventListener("click", async function () {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
-                var initSuccessful = await this.service.init();
-                if (initSuccessful) {
-                    active = true;
-                    this.status.style.backgroundColor = "green";
+                if ('serial' in navigator) {
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
+                    var initSuccessful = await this.service.init();
+                    if (initSuccessful) {
+                        active = true;
+                        this.status.style.backgroundColor = "green";
+                    }
+                }
+                else {
+                    var bodyTags = document.getElementsByTagName("body"); 
+                    if (bodyTags != undefined) {
+                        var bodyTag = document.getElementsByTagName("body")[0];
+                        bodyTag.innerHTML = `
+                    <div>
+                    <h1>
+                    To use the ServiceDock's LEGO SPIKE Prime Service, you must enable the <em><b>WebSerial API</b></em> in your
+                    browser. To do so, please
+                    make sure:
+                    </h1>
+                    <h3>
+                    <ol style = "font-size: 20px">
+                        <li>You are using the
+                            <a id = "googlechromelink" href="https://www.google.com/chrome/" target="_blank">
+                                Google Chrome browser</a>.</li>
+                                <br/>
+                        <li>The following chrome flags are enabled on chrome://flags.</li>
+                    </ol>
+                    <ul>
+                    <li>Mac OSX user? #enable-experimental-web-platform-features</li>
+                    <li>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</li>
+                    </ul>
+                    </h3>
+                    <h2>
+                    To enable these flags:
+                    </h2>
+                    <h3>
+                    <ol style="font-size: 20px;">
+                        <li>In your Browser URL, visit
+                            <em>chrome://flags</em></li>
+                        <br/>
+                        <li> Set the your required flags to "Enabled" via dropdown</li>
+                        <br/>
+                        <li> Relaunch the browser to have changes take effect </li>
+                        <br/>
+                        <li> Revisit your Coding Rooms classroom (this website) </li>
+                        <br/>
+                    </ol>
+                    </h3>
+                    `;
+                    }
+                    else {
+                        alert("Error: Please make sure you are using GOOGLE CHROME with the #enable-experimental-web-platform-features flag ENABLED")
+                    }
                 }
             } 
         });
