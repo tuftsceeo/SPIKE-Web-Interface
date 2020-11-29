@@ -7,6 +7,7 @@
 ServiceDock allows you to easily integrate your LEGO SPIKE Prime into interactive web pages. 
 ![Demonstration](./jsdocTemplate/images/servicedockDemo.gif)
 
+*Geolocation icon attributed to Freepik
 ## Development
 
 ### Setup
