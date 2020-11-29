@@ -55,15 +55,15 @@ class servicespike extends HTMLElement {
 
         /* status circle definition and CSS */
 
-        this.status = document.createElement("div");
-        this.status.setAttribute("class", "status");
+        var status = document.createElement("div");
+        status.setAttribute("class", "status");
         var length = 20; // for width and height of circle
         var statusBackgroundColor = "red" // default background color of service (inactive color)
         var posLeft = 30;
         var posTop = 20;
         var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
             "; position: relative; left:" + posLeft + "px; top:" + posTop + "px;";
-        this.status.setAttribute("style", statusStyle);
+        status.setAttribute("style", statusStyle);
 
         /* event listeners */
         
@@ -86,7 +86,7 @@ class servicespike extends HTMLElement {
                     var initSuccessful = await this.service.init();
                     if (initSuccessful) {
                         active = true;
-                        this.status.style.backgroundColor = "green";
+                        status.style.backgroundColor = "green";
                     }
                 }
                 else {
@@ -140,7 +140,7 @@ class servicespike extends HTMLElement {
 
 
         shadow.appendChild(wrapper);
-        button.appendChild(this.status);
+        button.appendChild(status);
         wrapper.appendChild(button);
 
     }

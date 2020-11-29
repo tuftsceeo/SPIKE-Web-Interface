@@ -7,6 +7,8 @@ Users can interact with your dynamic webpage by clicking on the ServiceDock icon
 
 ![Demonstration](servicedockDemo.gif)
 
+*Geolocation icon attributed to Freepik
+
 ## Framework 
 
 To use ServiceDock, you will need to import the framework from a CDN as shown. 
