@@ -245,11 +245,11 @@
             // updates existing info entry in Airtable
             // var test2 = Airtable.updateName("recc3GIbPuDbIIk8T", {Name: "Mom", Value: "3"});
             // console.log(test2)
-            Airtable.updateValue("Grace", "hi hi")
-            Airtable.updateValue("hee", true)
-            Airtable.updateValue("ho", false)
-            Airtable.updateValue("Baby", 1)
-
+            // Airtable.updateValue("Grace", "hi hi")
+            // Airtable.updateValue("hee", true)
+            // Airtable.updateValue("ho", false)
+            // Airtable.updateValue("Baby", 1)
+            
             /* end testing setter functions */
         });
 
@@ -301,7 +301,9 @@
             
             motor.set_stall_detection(false);
             
-            motor.run_to_position(180);
+            motor.run_to_position(180, 100, function() {
+                console.log("done");
+            });
 
             console.log(motor.get_default_speed());
 

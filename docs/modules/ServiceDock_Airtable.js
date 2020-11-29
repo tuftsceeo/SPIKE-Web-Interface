@@ -265,23 +265,16 @@ window.customElements.define('service-airtable', serviceairtable);
 
 /* ServiceDock class Definition */
 
-/**
- *
- * Service_Airtable
- * // if you're using ServiceDock
- * var mySL = document.getElemenyById("service_Template").getService();
- * // if you're not using ServiceDock
- * var myExampleService = new Service_Template();
- *
- * myExampleService.init();
- **/
-
 /** Assumes your workspace only consists of two columns of records
  * that are "Name" and "Value", each of a single line text type
  * @class Service_Airtable
  * @example
  * // if you're using ServiceDock
- * var myAirtable = document.getElemenyById("service_airtable").getService();
+ * var AirtableElement = document.getElementById("service_airtable");
+ * AirtableElement.setAttribute("apikey", "APIKEY");
+ * AirtableElement.setAttribute("baseid", "BASEID");
+ * AirtableElement.setAttribute("tablename", "TABLENAME");
+ * AirtableElement.init();
  * // if you're not using ServiceDock
  * var myAirtable = new Service_Airtable();
  *
@@ -459,12 +452,7 @@ function Service_Airtable() {
      * @returns {any} Value associated with the given Name
      */
     function getValue(name) {
-      if ( currentData[name] == undefined ) {
-        return undefined;
-      }
-      else {
         return convertToDataType(currentData[name]);
-      }
     }
 
     /** Update the Value field associated with a Name 
@@ -534,9 +522,10 @@ function Service_Airtable() {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
                 var recordID = records[key].id;
-
-                currentData[name] = value;
-                recordIDNameMap[name] = recordID;
+                if (name != undefined) {
+                  currentData[name] = value;
+                  recordIDNameMap[name] = recordID;
+                }
               }
             }
 
@@ -607,7 +596,7 @@ function Service_Airtable() {
      * @returns {any} type converted variable
      */
     function convertToDataType(input) {
-      input = input.trim();
+      //input = input.trim();
       var convertedInput;
       // string is not a pure number
       if (isNaN(input)) {
@@ -618,16 +607,50 @@ function Service_Airtable() {
         else if (input == "False" || input == "false") {
           convertedInput = false;
         }
+        else if (input == undefined) {
+          convertedInput = "";
+        }
         // string is just a string
         else {
           convertedInput = input;
         }
       }
-      // string is a pure number
+      // string is a pure number or spaces
       else {
-        convertedInput = Number(input);
+        // string is of spaces
+        if(checkCompletelySpace(input)){
+          convertedInput = input
+        }
+        // string is a number
+        else {
+          convertedInput = Number(input);
+        }
       }
       return convertedInput
+    }
+
+    /** checks if a given string is completely spaces
+    * @private
+    * @param {string} stringInput 
+    */
+    function checkCompletelySpace(stringInput) {
+      if (stringInput.length == 1) {
+        if (stringInput == " ") {
+          return true
+        }
+        else {
+          return false
+        }
+      }
+      else {
+        if (stringInput[stringInput.length - 1] != " ") {
+          return false
+        }
+        else {
+          console.log(stringInput.slice(0, stringInput.length - 1))
+          return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
+        }
+      }
     }
 
     /** Convert any variable to its string format for Airtable

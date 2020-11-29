@@ -81,11 +81,59 @@ class servicespike extends HTMLElement {
         this.addEventListener("click", async function () {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
-                var initSuccessful = await this.service.init();
-                if (initSuccessful) {
-                    active = true;
-                    this.status.style.backgroundColor = "green";
+                if ('serial' in navigator) {
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
+                    var initSuccessful = await this.service.init();
+                    if (initSuccessful) {
+                        active = true;
+                        this.status.style.backgroundColor = "green";
+                    }
+                }
+                else {
+                    var bodyTags = document.getElementsByTagName("body"); 
+                    if (bodyTags != undefined) {
+                        var bodyTag = document.getElementsByTagName("body")[0];
+                        bodyTag.innerHTML = `
+                    <div>
+                    <h1>
+                    To use the ServiceDock's LEGO SPIKE Prime Service, you must enable the <em><b>WebSerial API</b></em> in your
+                    browser. To do so, please
+                    make sure:
+                    </h1>
+                    <h3>
+                    <ol style = "font-size: 20px">
+                        <li>You are using the
+                            <a id = "googlechromelink" href="https://www.google.com/chrome/" target="_blank">
+                                Google Chrome browser</a>.</li>
+                                <br/>
+                        <li>The following chrome flags are enabled on chrome://flags.</li>
+                    </ol>
+                    <ul>
+                    <li>Mac OSX user? #enable-experimental-web-platform-features</li>
+                    <li>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</li>
+                    </ul>
+                    </h3>
+                    <h2>
+                    To enable these flags:
+                    </h2>
+                    <h3>
+                    <ol style="font-size: 20px;">
+                        <li>In your Browser URL, visit
+                            <em>chrome://flags</em></li>
+                        <br/>
+                        <li> Set the your required flags to "Enabled" via dropdown</li>
+                        <br/>
+                        <li> Relaunch the browser to have changes take effect </li>
+                        <br/>
+                        <li> Revisit your Coding Rooms classroom (this website) </li>
+                        <br/>
+                    </ol>
+                    </h3>
+                    `;
+                    }
+                    else {
+                        alert("Error: Please make sure you are using GOOGLE CHROME with the #enable-experimental-web-platform-features flag ENABLED")
+                    }
                 }
             } 
         });
@@ -677,12 +725,12 @@ function Service_SPIKE() {
         return hubFrontEvent;
     }
 
-    /**  Get the most recently detected gesture of the hub
+    /**  Get the most recently detected gesture of the hub ( Gesture names differ from SPIKE app )
      * @public
-     * @returns {string} ['shake', 'freefall']
+     * @returns {string} ['shaken', 'freefall', 'tapped', 'doubletapped']
      * @example
      * var gesture = await mySPIKE.getHubGesture();
-     * if (gesture == "shake") {
+     * if (gesture == "shaken") {
      *      console.log("SPIKE is being shaked");
      * }
      */
@@ -937,8 +985,7 @@ function Service_SPIKE() {
     }
 
 
-    /**  Terminate currently running micropy progra
-     * @ignore
+    /**  Terminate currently running micropy program
      */
     function stopCurrentProgram() {
         UJSONRPC.programTerminate();
@@ -1030,9 +1077,8 @@ function Service_SPIKE() {
         })
     }
 
-    /**  write a micropy program into a slot of the SPIKE Prime
+    /** Write a micropy program into a slot of the SPIKE Prime (alternative to micropy without js variables intake)
      * 
-     * @ignore
      * @param {string} projectName name of the project to register
      * @param {string} data the micropy code to send (expecting an <input type="text">.value)
      * @param {integer} slotid slot number to assign the program in [0-9]
@@ -1082,7 +1128,6 @@ function Service_SPIKE() {
 
     /**  Execute a program in a slot
      * 
-     * @ignore
      * @param {integer} slotid slot of program to execute [0-9]
      */
     function executeProgram(slotid) {
@@ -1239,6 +1284,7 @@ function Service_SPIKE() {
 
         /**
          * @todo Implement this function
+         * @ignore
          * @param {string}
          */
         light_matrix.show_image = function show_image(image) {
@@ -1362,6 +1408,21 @@ function Service_SPIKE() {
         /** Executes callback when a new gesture happens
          * 
          * @param  {function(string)} callback - A callback whose signature is name of the gesture
+         * @example
+         * mySPIKE.wait_for_new_gesture( function ( newGesture ) {
+         *      if ( newGesture == 'tapped') {
+         *             console.log("SPIKE was tapped")
+         *      }
+         *      else if ( newGesture == 'doubletapped') {
+         *             console.log("SPIKE was doubletapped")
+         *      }
+         *      else if ( newGesture == 'shaken') {
+         *             console.log("SPIKE was shaken")
+         *      }
+         *      else if ( newGesture == 'freefall') {
+         *             console.log("SPIKE was freefall")
+         *      }
+         * })
          */
         motion_sensor.wait_for_new_gesture = function wait_for_new_gesture(callback) {
 
@@ -1372,6 +1433,27 @@ function Service_SPIKE() {
         /** Executes callback when the orientation of the Hub changes or when function was first called
          * 
          * @param  {function(string)} callback - A callback whose signature is name of the orientation
+         * @example
+         * mySPIKE.wait_for_new_orientation( function ( newOrientation ) {
+         *        if (newOrientation == "up") {
+         *              console.log("orientation is up");
+         *        }
+         *        else if (newOrientation == "down") {
+         *              console.log("orientation is down");
+         *        }
+         *        else if (newOrientation == "front") {
+         *              console.log("orientation is front");
+         *        }
+         *        else if (newOrientation == "back") {
+         *              console.log("orientation is back");
+         *        }
+         *        else if (newOrientation == "leftSide") {
+         *              console.log("orientation is leftSide");
+         *        }
+         *        else if (newOrientation == "rightSide") {
+         *              console.log("orientation is rightSide");
+         *        }
+         * })
          */
         motion_sensor.wait_for_new_orientation = function wait_for_new_orientation(callback) {
             // immediately return current orientation if the method was called for the first time
@@ -1559,7 +1641,11 @@ function Service_SPIKE() {
          * 
          * @param {integer} degrees [0 to 359]
          * @param {integer} speed [-100 to 100]
-         * @param {function} [callback==undefined] Parameters:"stalled" or "done"
+         * @param {function} callback Params: "stalled" or "done"
+         * @example
+         * mySPIKE.run_to_position(180, 100, function() {
+         *      console.log("motor finished moving");
+         * })
          */
         function run_to_position(degrees, speed, callback = undefined) {
             if (speed !== undefined && typeof speed == "number") {
@@ -1599,6 +1685,10 @@ function Service_SPIKE() {
          * @param {integer} seconds 
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
+         * @example
+         * mySPIKE.run_for_seconds(10, 100, function() {
+         *      console.log("motor just ran for 10 seconds");
+         * })
          */
         function run_for_seconds(seconds, speed, callback = undefined) {
             if (speed !== undefined && typeof speed == "number") {
@@ -1614,6 +1704,9 @@ function Service_SPIKE() {
          * @param {integer} degrees 
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
+         * mySPIKE.run_for_degrees(720, 100, function () {
+         *      console.log("motor just ran for 720 degrees");
+         * })
          */
         function run_for_degrees(degrees, speed, callback = undefined) {
             if (speed !== undefined && typeof speed == "number") {
@@ -2131,6 +2224,7 @@ function Service_SPIKE() {
             ', "stall":' + stall +
             ', "stop":' + stop +
             '} }';
+
         if (callback != undefined) {
             pushResponseCallback(randomId, callback);
         }
@@ -3265,7 +3359,7 @@ function Service_SPIKE() {
 
         }
         // gives orientation of the hub (leftside, up,..), tapping of hub, 
-        else if (messageType == 4) {
+        else if (messageType == 14) {
             /* this data stream is about hub orientation */
 
             var newOrientation = parsedUJSON.p;
@@ -3312,24 +3406,26 @@ function Service_SPIKE() {
         else if (messageType == 11) {
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
-        else if (messageType == 14) {
+        else if (messageType == 4) {
             var newGesture = parsedUJSON.p;
 
             if (newGesture == "3") {
                 hubGesture = "freefall";
-                hubGestures.push(newGesture);
+                hubGestures.push(hubGesture);
             }
             else if (newGesture == "2") {
-                hubGesture = "shake";
+                hubGesture = "shaken";
                 hubGestures.push("shaken"); // the string is different at higher level
             }
             else if (newGesture == "1") {
-                hubFrontEvent = "tapped";
-                hubGestures.push(newGesture);
+                hubFrontEvent = "doubletapped";
+                hubGesture = "doubletapped";
+                hubGestures.push(hubGesture);
             }
             else if (newGesture == "0") {
-                hubFrontEvent = "doubletapped";
-                hubGestures.push(newGesture);
+                hubFrontEvent = "tapped";
+                hubGesture = "tapped";
+                hubGestures.push(hubGesture);
             }
 
             // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
