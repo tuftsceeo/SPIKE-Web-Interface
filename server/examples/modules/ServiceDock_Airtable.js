@@ -374,6 +374,7 @@ function Service_Airtable() {
 
           beginDataStream(function () {
             console.log(funcAtInit)
+            serviceActive = true;
             // call funcAtInit if defined from executeAfterInit
             if (funcAtInit !== undefined) {
               funcAtInit();
