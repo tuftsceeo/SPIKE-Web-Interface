@@ -258,7 +258,7 @@ function Service_SystemLink() {
             // initialize the tagsInfo global variable
             updateTagsInfo(function () {
 
-                active = true;
+                serviceActive = true;
 
                 // call funcAtInit if defined
                 if (funcAtInit !== undefined) {
