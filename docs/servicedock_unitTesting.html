@@ -6,12 +6,13 @@
             <script src="./modules/ServiceDock_Gmail.js"></script>
             <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
         -->
-        <script src="./modules/ServiceDock_SPIKE.js"></script>
-        <script src="./modules/ServiceDock_SystemLink.js"></script>
-        <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
+            <script src="./modules/ServiceDock_SPIKE.js"></script>
+            <script src="./modules/ServiceDock_SystemLink.js"></script>
+            <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
+
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
-        <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"></script> -->
+        <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script> -->
     </head>
 
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
@@ -45,6 +46,7 @@
                 <option id="speakerOPTION"> Primehub.speaker functions </option>
                 <option id="buttonOPTION"> Primehub.button functions </option>
                 <option id="colorOPTION"> Color sensor functions </option>
+                <option id="ultrasonicOPTION"> Distance Sensor functions </option>
                 <option id="programOPTION"> write program functions </option>
                 <option id="miscOPTION"> miscellaneous functions </option>
             </select>
@@ -102,12 +104,16 @@
                 <input type="button" id="getColor" class="SPIKEtestCase color" value="get color test">
                 <input type="button" id="waitUntilColor" class="SPIKEtestCase color" value="wait until color test">
                 
+                <!-- color sensor functions -->
+                <input type="button" id="lightup" class="SPIKEtestCase ultrasonic" value="ultrasonic light up">
+
                 <!-- write Program functions -->
                 <input type="button" id="writeProgram" class="SPIKEtestCase program" value="test write program">
                 <input type="button" id="concatenateProgram" class="SPIKEtestCase program" value="test source code for concatenating micropy program">
                 <input type="button" id="getProjects" class="SPIKEtestCase program" value="test getProjects()">
                 <input type="button" id="parseUJSON" class="SPIKEtestCase program" value="test parseUJSONRPC source code">
                 <input type="button" id="micropython" class="SPIKEtestCase program" value="test micropython tempalte literal">
+                <input type="button" id="waitForSeconds" class="SPIKEtestCase program" value="test wait_for_seconds">
 
                 <!-- SPIKE Library functions-->
                 <input type="button" id="setHubOri" class="SPIKEtestCase misc" value="setHubOrientation()">
@@ -215,12 +221,12 @@
         AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
         // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
         AirtableElement.setAttribute("tablename", "Example");
-
+        console.log("SL Service is active: ", mySL.isActive());
         /* End testing automatic init */
-
+        console.log("Service is active: ", Airtable.isActive());
         /* set function to execute after init*/
         Airtable.executeAfterInit( async function() {
-
+            console.log("Service is active: ", Airtable.isActive());
             /* begin testing Airtable getter functions */
 
             // get all the "Name" fields on the table
@@ -257,8 +263,9 @@
         AirtableElement.init();
         
         /* Testing automatic initialization of SD Airtable */
-
-        var mySL = mySLElement.getService();
+        mySL.executeAfterInit(function() {
+            console.log("SL Service is active: ", mySL.isActive());
+        })
         //var mySL = document.getElementById("service_systemlink").getService();
         var output = document.getElementById("output");
 
@@ -783,6 +790,19 @@
         })
 
         //                                      //
+        //          ultrasonic Tests            //
+        //                                      //
+
+        var testLightUp = document.getElementById("lightup");
+            testLightUp.addEventListener("click", async function () {
+                console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
+                console.log("Test: Connect color sensor to port A and start the test");
+                var distance_sensor = mySPIKE.DistanceSensor("A");
+                distance_sensor.light_up(100,100,100,100);
+                console.log("###### ENDING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
+        })
+
+        //                                      //
         //            program Tests             //
         //                                      //
 
@@ -1062,6 +1082,25 @@ run_for_seconds(3)
                 }
             }
         
+        })
+        // DROPPED FEATURE AND TEST IS NOT CORRECT
+        var testWaitForSeconds = document.getElementById("waitForSeconds");
+        testWaitForSeconds.addEventListener("click", function () {
+            mySPIKE.micropython(0, `
+from spike import PrimeHub
+from spike.control import wait_for_seconds
+def sub_func():
+    hub.light_matrix.write('HAPPY')
+    wait_for_seconds(2)
+    hub.light_matrix.write('SAD')
+
+hub = PrimeHub()
+hub.light_matrix.write('start')
+wait_for_seconds(2)
+hub.light_matrix.write('start2')
+sub_func()
+hub.light_matrix.write('done')
+            `);
         })
 
 
@@ -1689,6 +1728,18 @@ run_for_seconds(3)
                 }
 
                 var selectedCases = document.getElementsByClassName("program");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "ultrasonicOPTION") {
+                var testCases = document.getElementsByClassName("SPIKEtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("ultrasonic");
                 for (var index = 0; index < selectedCases.length; index++) {
                     var aCase = selectedCases[index];
                     aCase.style.display = "block";

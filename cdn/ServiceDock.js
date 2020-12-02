@@ -3436,6 +3436,8 @@ function Service_SPIKE() {
      * @param {string} Port
      * @memberof Service_SPIKE
      * @returns {functions}
+     * @example
+     * var distance_sensor = mySPIKE.DistanceSensor("A");
      */
     DistanceSensor = function (port) {
 
@@ -3451,6 +3453,8 @@ function Service_SPIKE() {
          * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 200]
          * @todo find the short_range handling ujsonrpc script
+         * @example
+         * var distance_cm = distance_sensor.get_distance_cm(false);
          */
         function get_distance_cm(short_range) {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -3512,10 +3516,30 @@ function Service_SPIKE() {
 
         }
 
+        /** Sets the brightness of the individual lights on the Distance Sensor.
+         * 
+         * @param {integer} right_top [1-100]
+         * @param {integer} left_top [1-100]
+         * @param {integer} right_bottom [1-100]
+         * @param {integer} left_bottom [1-100]
+         * @example
+         * distance_sensor.light_up(100,100,100,100);
+         */
+        function light_up (right_top, left_top, right_bottom, left_bottom) {
+            let lightArray = [0,0,0,0];
+            lightArray[0] = right_top;
+            lightArray[1] = left_top;
+            lightArray[2] = right_bottom;
+            lightArray[3] = left_bottom;
+
+            UJSONRPC.ultrasonicLightUp(port, lightArray);
+        }
+
         return {
             get_distance_cm: get_distance_cm,
             get_distance_inches: get_distance_inches,
-            get_distance_percentage: get_distance_percentage
+            get_distance_percentage: get_distance_percentage,
+            light_up: light_up
         }
 
     }
@@ -3731,6 +3755,20 @@ function Service_SPIKE() {
     UJSONRPC.displayClear = async function displayClear() {
         var randomId = generateId();
         var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.display_clear" }';
+        sendDATA(command);
+    }
+    
+    /**
+     * @memberof! UJSONRPC
+     * @param {string} port 
+     * @param {array} array [1-100,1-100,1-100,1-100] array of size 4
+     */
+    UJSONRPC.ultrasonicLightUp = async function ultrasonicLightUp(port, array) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' + ', "m": "scratch.ultrasonic_light_up", "p": {' +
+            '"port": ' + '"' + port + '"' +
+            ', "lights": ' + '[' + array + ']' +
+        '} }';
         sendDATA(command);
     }
 
