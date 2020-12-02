@@ -1969,10 +1969,10 @@ function Service_SPIKE() {
 
         /** Sets the brightness of the individual lights on the Distance Sensor.
          * 
-         * @param {integer} right_top [1-100]
-         * @param {integer} left_top [1-100]
-         * @param {integer} right_bottom [1-100]
-         * @param {integer} left_bottom [1-100]
+         * @param {integer} right_top Brightness [1-100]
+         * @param {integer} left_top Brightness [1-100]
+         * @param {integer} right_bottom Brightness [1-100]
+         * @param {integer} left_bottom Brightness [1-100]
          * @example
          * distance_sensor.light_up(100,100,100,100);
          */
