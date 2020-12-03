@@ -3468,6 +3468,8 @@ function Service_SPIKE() {
          * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 79]
          * @todo find the short_range handling ujsonrpc script
+         * @example
+         * var distance_inches = distance_sensor.get_distance_inches(false);
          */
         function get_distance_inches(short_range) {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -3482,6 +3484,7 @@ function Service_SPIKE() {
          * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number/string} [0 to 100] or 'none' if can't read distance
          * @todo find the short_range handling ujsonrpc script
+         * var distance_percentage = distance_sensor.get_distance_percentage(false);
          */
         function get_distance_percentage(short_range) {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -3495,7 +3498,7 @@ function Service_SPIKE() {
         }
 
         /** Waits until the measured distance is greater than distance.
-         * 
+         * @ignore
          * @param {integer} distance 
          * @param {string} unit 'cm','in','%'
          * @param {integer} short_range 
@@ -3506,7 +3509,7 @@ function Service_SPIKE() {
         }
 
         /** xWaits until the measured distance is less than distance.
-         * 
+         * @ignore
          * @param {any} distance 
          * @param {any} unit 'cm','in','%'
          * @param {any} short_range 
@@ -3518,10 +3521,10 @@ function Service_SPIKE() {
 
         /** Sets the brightness of the individual lights on the Distance Sensor.
          * 
-         * @param {integer} right_top [1-100]
-         * @param {integer} left_top [1-100]
-         * @param {integer} right_bottom [1-100]
-         * @param {integer} left_bottom [1-100]
+         * @param {integer} right_top Brightness [1-100]
+         * @param {integer} left_top Brightness [1-100]
+         * @param {integer} right_bottom Brightness [1-100]
+         * @param {integer} left_bottom Brightness [1-100]
          * @example
          * distance_sensor.light_up(100,100,100,100);
          */
@@ -4562,6 +4565,11 @@ function Service_SPIKE() {
      */
     async function streamUJSONRPC() {
         try {
+
+            var triggerCurrentStateInterval = setInterval(function() {
+                UJSONRPC.triggerCurrentState();
+            }, 500);
+
             var firstReading = true;
             // read when port is set up
             while (port.readable) {

@@ -3016,6 +3016,11 @@ function Service_SPIKE() {
      */
     async function streamUJSONRPC() {
         try {
+
+            var triggerCurrentStateInterval = setInterval(function() {
+                UJSONRPC.triggerCurrentState();
+            }, 500);
+
             var firstReading = true;
             // read when port is set up
             while (port.readable) {
