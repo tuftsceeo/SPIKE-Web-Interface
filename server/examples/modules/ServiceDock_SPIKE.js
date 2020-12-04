@@ -1075,7 +1075,7 @@ function Service_SPIKE() {
 
         var programToWrite = linesChunk + program;
         writeProgram("micropython", programToWrite, slotid, function() {
-            console.log("micropy program write complete")
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy program write complete");
         })
     }
 
@@ -1088,42 +1088,50 @@ function Service_SPIKE() {
      */
     async function writeProgram(projectName, data, slotid, callback) {
 
-        // reinit witeProgramTimeout
-        if (writeProgramSetTimeout != undefined) {
-            clearTimeout(writeProgramSetTimeout);
-            writeProgramSetTimeout = undefined;
+        // check for non-ascii characters 
+        let ascii = /^[ -~\t\n\r]+$/;
+        if (!ascii.test(data)) {
+            throw new Error(
+                "non-ASCII characters detected in micropy program. Only ASCII characters are supported. Please check your micropy input."
+                )
         }
+        else {
+            // reinit witeProgramTimeout
+            if (writeProgramSetTimeout != undefined) {
+                clearTimeout(writeProgramSetTimeout);
+                writeProgramSetTimeout = undefined;
+            }
 
-        // template of python file that needs to be concatenated
-        var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
-        var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+            // template of python file that needs to be concatenated
+            var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
+            var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
 
-        // stringify data and strip trailing and leading quotation marks
-        var stringifiedData = JSON.stringify(data);
-        stringifiedData = stringifiedData.substring(1, stringifiedData.length - 1);
+            // stringify data and strip trailing and leading quotation marks
+            var stringifiedData = JSON.stringify(data);
+            stringifiedData = stringifiedData.substring(1, stringifiedData.length - 1);
 
-        var result = ""; // string to which the final code will be appended
+            var result = ""; // string to which the final code will be appended
 
-        var splitData = stringifiedData.split(/\\n/); // split the code by every newline
+            var splitData = stringifiedData.split(/\\n/); // split the code by every newline
 
-        // add a tab before every newline (this is syntactically needed for concatenating with the template)
-        for (var index in splitData) {
+            // add a tab before every newline (this is syntactically needed for concatenating with the template)
+            for (var index in splitData) {
 
-            var addedTab = "    " + splitData[index] + "\n";
+                var addedTab = "    " + splitData[index] + "\n";
 
-            result = result + addedTab;
+                result = result + addedTab;
+            }
+
+            // replace tab characters
+            result = result.replace(/\\t/g, "    ");
+
+            stringifiedData = firstPart + result + secondPart;
+
+            writeProgramCallback = callback;
+
+            // begin the write program process
+            UJSONRPC.startWriteProgram(projectName, "python", stringifiedData, slotid);
         }
-
-        // replace tab characters
-        result = result.replace(/\\t/g, "    ");
-
-        stringifiedData = firstPart + result + secondPart;
-
-        writeProgramCallback = callback;
-
-        // begin the write program process
-        UJSONRPC.startWriteProgram(projectName, "python", stringifiedData, slotid);
-
     }
 
     /**  Execute a program in a slot
