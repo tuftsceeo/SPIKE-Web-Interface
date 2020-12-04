@@ -498,8 +498,10 @@ function Service_SPIKE() {
     async function sendDATA(command) {
         // look up the command to send
         var commands = command.split("\n"); // split on new line
-        //commands = command
-        console.log("%cTuftsCEEO ", "color: #3ba336;", "sendDATA: " + commands);
+        
+        // ignore console logging trigger_current_state (to avoid it spamming)
+        if (command.indexOf("trigger_current_state") == -1)
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
@@ -3426,7 +3428,7 @@ function Service_SPIKE() {
                 lastHubOrientation = "rightSide";
             }
 
-            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
+            // console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
         else if (messageType == 7) {
             if (funcAfterPrint != undefined) {
@@ -3449,6 +3451,9 @@ function Service_SPIKE() {
         }
         else if (messageType == 11) {
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
+        }
+        else if (messageType == 12) {
+            // this is usually the response from trigger_current_state, don't console log to avoid spam
         }
         else if (messageType == 4) {
             var newGesture = parsedUJSON.p;
@@ -3525,8 +3530,9 @@ function Service_SPIKE() {
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
-
-            console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+            if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object ) {
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+            }
 
             // iterate over responseCallbacks global variable
             for (var index in responseCallbacks) {
