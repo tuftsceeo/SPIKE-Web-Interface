@@ -3530,7 +3530,12 @@ function Service_SPIKE() {
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
-            if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object ) {
+            if (parsedUJSON.r !== undefined && parsedUJSON.r !== null) {
+                if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object) {
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+                }
+            }
+            else {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
             }
 
