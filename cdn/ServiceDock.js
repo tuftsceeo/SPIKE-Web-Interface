@@ -1685,7 +1685,7 @@ class servicespike extends HTMLElement {
                     }
                 }
             } else {
-                // this.service.rebootHub();
+                this.service.rebootHub();
             }
         });
 
@@ -4558,11 +4558,11 @@ function Service_SPIKE() {
 
             }
             else {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
 
                 jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
 
                 // reset jsonline for next concatenation
                 // jsonline = "";
