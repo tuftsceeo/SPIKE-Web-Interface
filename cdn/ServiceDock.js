@@ -1684,7 +1684,9 @@ class servicespike extends HTMLElement {
                         alert("Error: Please make sure you are using GOOGLE CHROME with the #enable-experimental-web-platform-features flag ENABLED")
                     }
                 }
-            } 
+            } else {
+                // this.service.rebootHub();
+            }
         });
 
 
@@ -2638,8 +2640,8 @@ function Service_SPIKE() {
     async function writeProgram(projectName, data, slotid, callback) {
 
         // check for non-ascii characters 
-        let ascii = /^[ -~\t\n\r]+$/;
-        if (!ascii.test(data)) {
+        let ascii = /[^\x00-\x7F]/;
+        if (ascii.test(data)) {
             throw new Error(
                 "non-ASCII characters detected in micropy program. Only ASCII characters are supported. Please check your micropy input."
                 )
