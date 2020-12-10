@@ -4577,10 +4577,10 @@ function Service_SPIKE() {
      */
     async function streamUJSONRPC() {
         try {
-
-            var triggerCurrentStateInterval = setInterval(function() {
-                UJSONRPC.triggerCurrentState();
-            }, 500);
+            // COMMENTED BY JEREMY JUNG (DECEMBER/10/2020)
+            // var triggerCurrentStateInterval = setInterval(function() {
+                // UJSONRPC.triggerCurrentState();
+            // }, 500);
 
             var firstReading = true;
             // read when port is set up
