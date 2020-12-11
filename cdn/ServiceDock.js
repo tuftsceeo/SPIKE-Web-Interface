@@ -4540,7 +4540,7 @@ function Service_SPIKE() {
                         if ( i < conjoinedPacketsArray.length -1 ) {
                             lastUJSONRPC = conjoinedPacketsArray[i];
 
-                            processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
+                            await processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
                         }
                         else {
                             jsonline = conjoinedPacketsArray[i];
@@ -4551,18 +4551,18 @@ function Service_SPIKE() {
                 else {
                     lastUJSONRPC = jsonline.substring(0, carriageReIndex);
 
-                    processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
+                    await processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
 
                     jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
                 }
 
             }
             else {
-                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
 
                 jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
 
-                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
 
                 // reset jsonline for next concatenation
                 // jsonline = "";
@@ -4613,7 +4613,7 @@ function Service_SPIKE() {
 
                         //concatenate UJSONRPC packets into complete JSON objects
                         if (value) {
-                            parsePacket(value);
+                            await parsePacket(value);
                         }
                         if (done) {
                             serviceActive = false;
@@ -5089,14 +5089,17 @@ function Service_SPIKE() {
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
-            if (parsedUJSON.r !== undefined && parsedUJSON.r !== null) {
-                if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
-                }
-            }
-            else {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
-            }
+            // COMMENTED BY JEREMY JUNG ON DECEMBER 10TH AFTER REMOVING TRIGGER_CURRENT_STATE INTERVAL
+            // if (parsedUJSON.r !== undefined && parsedUJSON.r !== null) {
+                // if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object) {
+                    // console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+                // }
+            // }
+            // else {
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+            // }
+
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
 
             // iterate over responseCallbacks global variable
             for (var index in responseCallbacks) {
@@ -5126,7 +5129,7 @@ function Service_SPIKE() {
             // execute the callback function after sending start_write_program UJSONRPC
             if (startWriteProgramCallback != undefined) {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id: ", startWriteProgramCallback[0]);
 
                 // check if the message id of UJSONRPC corresponds to that of a response callback
                 if (startWriteProgramCallback[0] == parsedUJSON["i"]) {
@@ -5153,7 +5156,7 @@ function Service_SPIKE() {
             // check if the program should write packages for a program
             if (writePackageInformation != undefined) {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "writePackageInformation is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "writePackageInformation is defined. Looking for matching mesasage id: ", writePackageInformation[0]);
 
                 // check if the message id of UJSONRPC corresponds to that of the first write_package script that was sent
                 if (writePackageInformation[0] == parsedUJSON["i"]) {
