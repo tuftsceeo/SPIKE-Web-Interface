@@ -3580,7 +3580,7 @@ function Service_SPIKE() {
             // execute the callback function after sending start_write_program UJSONRPC
             if (startWriteProgramCallback != undefined) {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id: ", startWriteProgramCallback[0]);
 
                 // check if the message id of UJSONRPC corresponds to that of a response callback
                 if (startWriteProgramCallback[0] == parsedUJSON["i"]) {
