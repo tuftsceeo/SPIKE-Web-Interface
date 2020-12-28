@@ -3489,7 +3489,7 @@ function Service_SPIKE() {
 
             // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
             if (typeof funcAfterNewGesture === "function") {
-                funcAfterNewGesture(newGesture);
+                funcAfterNewGesture(hubGesture);
                 funcAfterNewGesture = undefined;
             }
 
