@@ -2913,7 +2913,7 @@ function Service_SPIKE() {
         try {
 
             var parseTest = await JSON.parse(lastUJSONRPC)
-
+            
             if (testing) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "processing FullUJSONRPC line: ", lastUJSONRPC);
             }
@@ -3344,7 +3344,12 @@ function Service_SPIKE() {
             }
         }
         else if (messageType == 0) {
-
+            /*
+                DEV NOTE (26/12/2020):
+                    messageType = 0 is regular UJSONRPC stream.
+                    Pixel matrix SOMETIMES shows in this message, but exactly when is not clear.
+            */
+            // console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
         // storage information
         else if (messageType == 1) {
@@ -3414,11 +3419,16 @@ function Service_SPIKE() {
             }
 
         }
-        // gives orientation of the hub (leftside, up,..), tapping of hub, 
+        // gives orientation of the hub (leftside, up,..)
         else if (messageType == 14) {
             /* this data stream is about hub orientation */
 
             var newOrientation = parsedUJSON.p;
+            /*
+                DEV NOTE (28/12/2020):
+                    Messages of this messagetype is only read once when the SPIKE connects, but not after.
+            */
+            // console.log(newOrientation);
             if (newOrientation == "1") {
                 lastHubOrientation = "up";
             }
@@ -3432,13 +3442,13 @@ function Service_SPIKE() {
                 lastHubOrientation = "back";
             }
             else if (newOrientation == "2") {
-                lastHubOrientation = "leftSide";
+                lastHubOrientation = "rightside";
             }
             else if (newOrientation == "5") {
-                lastHubOrientation = "rightSide";
+                lastHubOrientation = "leftside";
             }
 
-            // console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
+            console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
         else if (messageType == 7) {
             if (funcAfterPrint != undefined) {
@@ -3695,10 +3705,10 @@ function Service_SPIKE() {
                 newOrientation = "down";
             }
         } else if (gyro[0] > 500) {
-            newOrientation = "leftSide";
+            newOrientation = "rightside";
         }
         else if (gyro[0] < -500) {
-            newOrientation = "rightSide";
+            newOrientation = "leftside";
         }
 
         return newOrientation;
