@@ -2909,7 +2909,7 @@ function Service_SPIKE() {
      * @param {boolean} [testing=false] 
      * @param {any} callback 
      */
-    async function processFullUJSONRPC(lastUJSONRPC, json_string = "undefined", testing = false, callback) {
+    async function processFullUJSONRPC(lastUJSONRPC, cleanedJsonString = "undefined", json_string = "undefined", testing = false, callback) {
         try {
 
             var parseTest = await JSON.parse(lastUJSONRPC)
@@ -2960,7 +2960,8 @@ function Service_SPIKE() {
 
         // stringify the packet to look for carriage return
         var json_string = await JSON.stringify(value);
-
+        
+        // remove quotation marks from json_string
         var cleanedJsonString = cleanJsonString(json_string);
         // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
 
@@ -2990,10 +2991,27 @@ function Service_SPIKE() {
                         // for every JSON object in array except last, perform data handling
                         if ( i < conjoinedPacketsArray.length -1 ) {
                             lastUJSONRPC = conjoinedPacketsArray[i];
-
-                            await processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
+                            if (lastUJSONRPC[0] == "{") {
+                                await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
+                            }
+                            else {
+                                /* DEV NOTE (29/12/20):
+                                    Facts:
+                                    1. jsonline[0] == "{"
+                                    2. lastUJSONRPC was part of a jsonline of conjoined packets (two carriage returns)
+                                    3. In jsonline, the lastUJSONRPC portion was enclosed by carriage returns.
+                                    4. lastUJSONRPC[0] != "{"
+                                    Conclusion:
+                                    - This lastUJSONRPC is a micropython print statement. 
+                                */
+                                // console.log("micropy print: ", lastUJSONRPC);
+                                if (funcAfterPrint != undefined) {
+                                    funcAfterPrint(lastUJSONRPC);
+                                }
+                            }
                         }
                         else {
+                            // reset jsonline with ""
                             jsonline = conjoinedPacketsArray[i];
                         }
                     }
@@ -3002,18 +3020,88 @@ function Service_SPIKE() {
                 else {
                     lastUJSONRPC = jsonline.substring(0, carriageReIndex);
 
-                    await processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
+                    await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);
 
                     jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
                 }
 
             }
+            // concatenated packets do NOT start with a left curly brace
             else {
+                /*
+                    DEV NOTE (29/12/20):
+                    In this scope, 
+                    1. (conditional) jsonline does NOT begin with the start of an "m":"0" standard UJSONRPC data stream
+                    2. jsonline contains a carriage return
+                        - Case 1: \r is in the middle of two incomplete packets
+                        - Case 2: \r is in the middle of two micropy prints
+                        - Case 3: \r is in the middle of a combination of micropy print and an incomplete stream
+                        - Case 4: \r is at the end of jsonline, and jsonline is the last portion of a stream
+                        - Case 5: \r is at the end of jsonline, and jsonline is a single micropy print
+                */
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+                let splitJsonlineByCR = jsonline.split(/\\r/); // array that split jsonline by \r
 
-                jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+                // last index only contains "" as it would be after \r
+                for (var i = 0; i < splitJsonlineByCR.length; i++) {
+                    
+                    // for every JSON object in array except last, perform data handling
+                    if (i < splitJsonlineByCR.length - 1) {
+                        // console.log("RIGHT HERE")
+                        lastUJSONRPC = splitJsonlineByCR[i];
+
+                        /* remove any newline in the beginning of lastUJSONRPC */
+                        if (lastUJSONRPC.search(/\\n/g) == 0)
+                            lastUJSONRPC = lastUJSONRPC.substring(2, lastUJSONRPC.length);
+
+                        /* check if lastUJSONRPC is a "m":"0" standard data stream */
+
+                        if (lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1) {
+                            /* lastUJSONRPC does NOT appear to be a standard data stream, 
+                                so it must be a micropy print
+                            */
+                            // console.log("in here")
+
+                            if (lastUJSONRPC.search(/\\n/g) == 0)
+                                if (funcAfterPrint != undefined)
+                                    funcAfterPrint(lastUJSONRPC.substring(2, lastUJSONRPC.length));
+                            else
+                                if (funcAfterPrint != undefined)
+                                    funcAfterPrint(lastUJSONRPC);
+                        }
+                        else {
+                            /* DEV NOTE (29/12/20):
+                                Facts:
+                                1. (conditional) lastUJSONRPC appears to be a part of or a full "m":"0" data stream
+                                2. In jsonline, the lastUJSONRPC portion was enclosed by carriage returns.
+                                3. Jsonline does NOT start with a left curly brace
+                                Conclusion:
+                                - there is a possibility that lastUJSONRPC is a full, valid line of data stream
+                            */
+                            if (lastUJSONRPC[0] == "{" && lastUJSONRPC[lastUJSONRPC.length - 1] == "}")
+                                await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);
+                        }
+                        /* END OF CONDITIONAL (check if lastUJSONRPC is standard data stream)*/
+                    }
+                    else {
+                        // console.log("last splitJsonlineByCR: ", splitJsonlineByCR[i]);
+                        if (jsonline.search(/\\n/) == 0)
+                            jsonline = splitJsonlineByCR[i].substring(2, splitJsonlineByCR[i].length);
+                        else
+                            jsonline = splitJsonlineByCR[i];
+                    }
+                    /* END OF CONDITIONAL (last index of splitJsonline )*/
+                }
 
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+                
+                ///////////////////////////////////////////////////////
+                /* reset jsonline to portion that begins after a carriage return */
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
+                // 
+                // jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
+// 
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
 
                 // reset jsonline for next concatenation
                 // jsonline = "";
@@ -3424,10 +3512,6 @@ function Service_SPIKE() {
             /* this data stream is about hub orientation */
 
             var newOrientation = parsedUJSON.p;
-            /*
-                DEV NOTE (28/12/2020):
-                    Messages of this messagetype is only read once when the SPIKE connects, but not after.
-            */
             // console.log(newOrientation);
             if (newOrientation == "1") {
                 lastHubOrientation = "up";
@@ -3505,18 +3589,6 @@ function Service_SPIKE() {
 
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
 
-        }
-        else if (messageType == "userProgram.print") {
-            var printedMessage = parsedUJSON["p"]["value"];
-            var NLindex = printedMessage.search(/\\n/);
-            printedMessage = await printedMessage.substring(0, NLindex);
-
-            console.log("%cTuftsCEEO ", "color: #3ba336;", atob(printedMessage));
-
-            // execute function after print if defined
-            if (funcAfterPrint != undefined) {
-                funcAfterPrint(atob(printedMessage));
-            }
         }
         else {
 
