@@ -2997,10 +2997,18 @@ function Service_SPIKE() {
                     await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
                 }
                 /* Case 3: lastUJSONRPC is a micropy print result */
-                else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1) {
-                    console.log("micropy print: ", lastUJSONRPC);
-                    if (funcAfterPrint != undefined)
-                        funcAfterPrint(lastUJSONRPC);
+                else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1 && 
+                    lastUJSONRPC.indexOf('}') == -1 && lastUJSONRPC.indexOf('{"i":') == -1 ) {
+                        /* filter reboot message */
+                        var rebootMessage = 
+                        'Traceback (most recent call last): File "main.py", line 8, in <module> File "hub_runtime.py", line 1, in start File "event_loop/event_loop.py", line 1, in run_forever File "event_loop/event_loop.py", line 1, in step KeyboardInterrupt: MicroPython v1.12-1033-g97d7f7dd4 on 2020-09-18; LEGO Technic Large Hub with STM32F413xx Type "help()" for more in formation. >>> HUB: sync filesystems HUB: soft reboot'
+                        let rebootMessageRemovedWS = rebootMessage.replace(/[' ']/g, "");
+                        let lastUJSONRPCRemovedWS = lastUJSONRPC.replace(/[' ']/g, "");
+                        if (rebootMessageRemovedWS.indexOf(lastUJSONRPCRemovedWS) == -1) {
+                            console.log("micropy print: ", lastUJSONRPC);
+                            if (funcAfterPrint != undefined)
+                                funcAfterPrint(lastUJSONRPC);
+                        }
                 }
                 /* Case 3: lastUJSONRPC is only a portion of a standard UJSONRPC packet 
                     Then lastUJSONRPC must be EITHER THE FIRST OR THE LAST ELEMENT in jsonlineSplitByCR
@@ -3013,8 +3021,8 @@ function Service_SPIKE() {
                     /* Case 3A: */
                     if (lastUJSONRPC[0] == "{") {
                         jsonline = lastUJSONRPC;
-                        console.log("TEST (last elemnt in split array): ", i == jsonlineSplitByCR.length-1);
-                        console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+                        // console.log("TEST (last elemnt in split array): ", i == jsonlineSplitByCR.length-1);
+                        // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
                     }
                     /* Case 3B: */
                     else {
