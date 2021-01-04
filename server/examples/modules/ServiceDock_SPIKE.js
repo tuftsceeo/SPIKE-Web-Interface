@@ -3610,23 +3610,27 @@ function Service_SPIKE() {
 
                 var currCallbackInfo = responseCallbacks[index];
 
-                // check if the message id of UJSONRPC corresponds to that of a response callback
-                if (currCallbackInfo[0] == parsedUJSON["i"]) {
+                if (currCallbackInfo != undefined) {
 
-                    var response = "null";
+                    if (currCallbackInfo[0] == parsedUJSON["i"]) {
+                        /* the message id of UJSONRPC corresponds to that of a response callback */
+                        
+                        var response = "null";
 
-                    if (parsedUJSON["r"] == 0) {
-                        response = "done";
-                    }
-                    else if (parsedUJSON["r"] == 2) {
-                        response = "stalled";
-                    }
+                        // parse motor stoppage reason responses 
+                        if (parsedUJSON["r"] == 0) {
+                            response = "done";
+                        }
+                        else if (parsedUJSON["r"] == 2) {
+                            response = "stalled";
+                        }
 
-                    // execute callback with the response
-                    currCallbackInfo[1](response);
+                        // execute callback with the response
+                        currCallbackInfo[1](response);
 
-                    // empty the index of which callback that was just executed
-                    responseCallbacks[index] = undefined;
+                        // empty the index of which callback that was just executed
+                        responseCallbacks[index] = undefined;
+                    }   
                 }
             }
 
