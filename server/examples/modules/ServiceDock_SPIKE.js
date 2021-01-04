@@ -1664,6 +1664,7 @@ function Service_SPIKE() {
          * @param {string} direction "Clockwise" or "Counterclockwise"
          * @param {integer} speed [-100 to 100]
          * @param {function} callback Params: "stalled" or "done"
+         * @ignore
          * @example
          * mySPIKE.run_to_position(180, 100, function() {
          *      console.log("motor finished moving");
