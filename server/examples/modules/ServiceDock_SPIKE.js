@@ -1566,8 +1566,13 @@ function Service_SPIKE() {
 
         // default settings
         var defaultSpeed = 100;
-        var stopMethod = false; // stop method doesnt seem to work in this current ujsonrpc config
+        var stopMethod = 1; // stop method doesnt seem to work in this current ujsonrpc config
         var stallSetting = true;
+
+        var direction = {
+            COUNTERCLOCKWISE: 'counterClockwise',
+            CLOCKWISE: 'clockwise'
+        }
 
         // check if device is a motor
         if (motor.device != "smallMotor" && motor.device != "bigMotor") {
@@ -1585,14 +1590,17 @@ function Service_SPIKE() {
 
         }
 
-        /** Get current position of the motor
-         * 
+        /** Get current position of the motor. The position may differ by a little margin from 
+         * the position to which a motor ran with run_to_position()
          * @returns {number} position of motor [0 to 359]
          */
         function get_position() {
             var motor = ports[port]; // get the motor info by port
             var motorInfo = motor.data;
-            return motorInfo.angle;
+            let position = motorInfo.uAngle;
+            if (position < 0)
+                position = 360 + position;
+            return position;
         }
 
         /** Get current degrees counted of the motor
@@ -1602,7 +1610,7 @@ function Service_SPIKE() {
         function get_degrees_counted() {
             var motor = ports[port]; // get the motor info by port
             var motorInfo = motor.data;
-            return motorInfo.uAngle;
+            return motorInfo.angle;
         }
 
         /** Get the power of the motor
@@ -1647,9 +1655,13 @@ function Service_SPIKE() {
             }
         }
 
+
         /** Runs the motor to an absolute position.
-         * 
+         * The sign of the speed will be ignored (i.e., absolute value), and the motor will always travel in the direction that’s been specified by the "direction" parameter. 
+         * If the speed is greater than "100," it will be limited to "100."
+
          * @param {integer} degrees [0 to 359]
+         * @param {string} direction "Clockwise" or "Counterclockwise"
          * @param {integer} speed [-100 to 100]
          * @param {function} callback Params: "stalled" or "done"
          * @example
@@ -1657,13 +1669,26 @@ function Service_SPIKE() {
          *      console.log("motor finished moving");
          * })
          */
-        function run_to_position(degrees, speed, callback = undefined) {
-            if (speed !== undefined && typeof speed == "number") {
+        function run_to_position(degrees, direction, speed, callback = undefined) {
+            if (speed !== undefined && typeof speed == "number")
                 UJSONRPC.motorGoRelPos(port, degrees, speed, stallSetting, stopMethod, callback);
-            }
-            else {
+            else
                 UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
-            }
+        }
+
+        /** Runs the motor until the number of degrees counted is equal to the value that has been specified by the "degrees" parameter.
+         * 
+         * @param {integer} degrees any number
+         * @param {integer} speed [0 to 100]
+         * @param {any} [callback] (optional callback) callback param: "stalled" or "done"
+         */
+        function run_to_degrees_counted(degrees, speed, callback = undefined) {
+            if (speed !== undefined && typeof speed == "number")
+                UJSONRPC.motorGoRelPos(port, degrees, speed, stallSetting, stopMethod, callback);
+            else
+                UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
+
+
         }
 
         /** Start the motor at some power
@@ -1736,6 +1761,7 @@ function Service_SPIKE() {
 
         return {
             run_to_position: run_to_position,
+            run_to_degrees_counted: run_to_degrees_counted,
             start_at_power: start_at_power,
             start: start,
             stop: stop,
@@ -2282,6 +2308,26 @@ function Service_SPIKE() {
         sendDATA(command);
     }
 
+    UJSONRPC.motorGoDirToPosition = async function motorGoDirToPosition(port, position, direction, speed, stall, stop, callback) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "scratch.motor_go_direction_to_position"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "position":' + position +
+            ', "direction":' + direction +
+            ', "speed":' + speed +
+            ', "stall":' + stall +
+            ', "stop":' + stop +
+            '} }';
+
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
+        sendDATA(command);
+
+    }
+
     /**
      * 
      * @memberof! UJSONRPC
@@ -2749,7 +2795,6 @@ function Service_SPIKE() {
      * @param {string} funcName 
      */
     function pushResponseCallback(id, funcName) {
-
         var toPush = []; // [ ujson string id, function pointer ]
 
         toPush.push(id);
@@ -3559,9 +3604,8 @@ function Service_SPIKE() {
             // }
 
             console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
-
-            // iterate over responseCallbacks global variable
-            for (var index in responseCallbacks) {
+            /* See if any of the stored responseCallbacks need to be executed due to this UJSONRPC response */
+            for (var index = 0; index < responseCallbacks.length; index++) {
 
                 var currCallbackInfo = responseCallbacks[index];
 
