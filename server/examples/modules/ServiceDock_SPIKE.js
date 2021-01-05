@@ -361,7 +361,7 @@ function Service_SPIKE() {
     var funcAfterRightButtonPress = undefined;
     var funcAfterRightButtonRelease = undefined;
 
-    var funcUntilColor = undefined;
+    var waitUntilColorCallback = undefined; // [colorToDetect, function to execute]
     var funcAfterNewColor = undefined;
 
     var funcAfterForceSensorPress = undefined;
@@ -1248,7 +1248,7 @@ function Service_SPIKE() {
          */
         right_button.wait_until_released = function wait_until_released(callback) {
 
-            functAfterRightButtonRelease = callback;
+            funcAfterRightButtonRelease = callback;
         }
 
         /** Tests to see whether the button has been pressed since the last time this method called.
@@ -1417,7 +1417,7 @@ function Service_SPIKE() {
 
         /** Executes callback when a new gesture happens
          * 
-         * @param  {function(string)} callback - A callback whose signature is name of the gesture
+         * @param  {function(string)} callback - A callback of which argument is name of the gesture
          * @example
          * mySPIKE.wait_for_new_gesture( function ( newGesture ) {
          *      if ( newGesture == 'tapped') {
@@ -1796,7 +1796,7 @@ function Service_SPIKE() {
         }
 
         /** Get the name of the detected color
-         * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
+         * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white'
          */
         function get_color() {
             var colorsensor = ports[port]; // get the color sensor info by port
@@ -1878,14 +1878,13 @@ function Service_SPIKE() {
             return colorsensorData.RGB[2];
         }
 
-
         /** Waits until the Color Sensor detects the specified color.
-         * @ignore
-         * @todo Implement this function
+         * 
+         * @param {string} colorInput 'black','violet','blue','cyan','green','yellow','red','white'
+         * @param {function} callback callback function
          */
-        function wait_until_color(color) {
-            var color = get_color();
-            console.log(color);
+        function wait_until_color(colorInput, callback) {
+            waitUntilColorCallback = [colorInput, callback];
         }
 
 
@@ -1911,6 +1910,7 @@ function Service_SPIKE() {
 
         return {
             get_color: get_color,
+            wait_until_color: wait_until_color,
             get_ambient_light: get_ambient_light,
             get_reflected_light: get_reflected_light,
             get_rgb_intensity: get_rgb_intensity,
@@ -3311,7 +3311,19 @@ function Service_SPIKE() {
 
                         // populate value object
                         device_value.device = "color";
+
+                        // convert Ccolor to lower case because in the SPIKE APP the color is lower case
+                        Ccolor = Ccolor.toLowerCase();
                         device_value.data = { "reflected": Creflected, "color": Ccolor, "RGB": rgb_array };
+
+                        // execute wait_until_color callback when color matches its argument
+                        if (waitUntilColorCallback != undefined)
+                            if (Ccolor == waitUntilColorCallback[0]) {
+                                waitUntilColorCallback[1]();
+
+                                waitUntilColorCallback = undefined;
+                            }
+
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
@@ -3448,7 +3460,9 @@ function Service_SPIKE() {
                 hubLeftButton.pressed = true;
 
                 // execute callback for wait_until_pressed() if defined
-                typeof funcAfterLeftButtonPress === "function" && funcAfterLeftButtonPress();
+                if (funcAfterLeftButtonPress != undefined ) {
+                    funcAfterLeftButtonPress();
+                }
                 funcAfterLeftButtonPress = undefined;
 
                 if (parsedUJSON.p[1] > 0) {
@@ -3456,7 +3470,10 @@ function Service_SPIKE() {
                     hubLeftButton.duration = parsedUJSON.p[1];
 
                     // execute callback for wait_until_released() if defined
-                    typeof funcAfterLeftButtonRelease === "function" && funcAfterLeftButtonRelease();
+                    if (funcAfterLeftButtonRelease != undefined ) {
+                        funcAfterLeftButtonRelease();
+                    }
+
                     funcAfterLeftButtonRelease = undefined;
                 }
 
@@ -3465,7 +3482,10 @@ function Service_SPIKE() {
                 hubRightButton.pressed = true;
 
                 // execute callback for wait_until_pressed() if defined
-                typeof funcAfterRightButtonPress === "function" && funcAfterRightButtonPress();
+                if (funcAfterRightButtonPress != undefined) {
+                    funcAfterRightButtonPress();
+                }
+
                 funcAfterRightButtonPress = undefined;
 
                 if (parsedUJSON.p[1] > 0) {
@@ -3473,7 +3493,10 @@ function Service_SPIKE() {
                     hubRightButton.duration = parsedUJSON.p[1];
 
                     // execute callback for wait_until_released() if defined
-                    typeof funcAfterRightButtonRelease === "function" && funcAfterRightButtonRelease();
+                    if (funcAfterRightButtonRelease != undefined) {
+                        funcAfterRightButtonRelease();
+                    }
+
                     funcAfterRightButtonRelease = undefined;
                 }
             }
