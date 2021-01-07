@@ -362,7 +362,8 @@ function Service_SPIKE() {
     var funcAfterRightButtonRelease = undefined;
 
     var waitUntilColorCallback = undefined; // [colorToDetect, function to execute]
-    var funcAfterNewColor = undefined;
+    var waitForDistanceFartherThanCallback = undefined; // [distance, function to execute]
+    var waitForDistanceCloserThanCallback = undefined; // [distance, function to execute]
 
     var funcAfterForceSensorPress = undefined;
     var funcAfterForceSensorRelease = undefined;
@@ -2007,7 +2008,7 @@ function Service_SPIKE() {
          * @returns {number} [0 to 200]
          * @todo find the short_range handling ujsonrpc script
          * @example
-         * var distance_cm = distance_sensor.get_distance_cm(false);
+         * var distance_cm = distance_sensor.get_distance_cm();
          */
         function get_distance_cm() {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -2021,7 +2022,7 @@ function Service_SPIKE() {
          * @returns {number} [0 to 79]
          * @todo find the short_range handling ujsonrpc script
          * @example
-         * var distance_inches = distance_sensor.get_distance_inches(false);
+         * var distance_inches = distance_sensor.get_distance_inches();
          */
         function get_distance_inches() {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -2039,9 +2040,8 @@ function Service_SPIKE() {
 
         /** Retrieves the measured distance in percent.
          * 
-         * @returns {number/string} [0 to 100] or 'none' if can't read distance
-         * @todo find the short_range handling ujsonrpc script
-         * var distance_percentage = distance_sensor.get_distance_percentage(false);
+         * @returns {number/string} [0 to 100] or 'none' if no distance is read
+         * var distance_percentage = distance_sensor.get_distance_percentage();
          */
         function get_distance_percentage() {
             var distanceSensor = ports[port] // get the distance sensor info by port
@@ -2055,25 +2055,63 @@ function Service_SPIKE() {
         }
 
         /** Waits until the measured distance is greater than distance.
-         * @ignore
-         * @param {integer} distance 
+         * @param {integer} threshold 
          * @param {string} unit 'cm','in','%'
-         * @param {integer} short_range 
-         * @todo Implement this function
+         * @param {function} callback function to execute when distance is farther than threshold
+         * @example
+         * distance_sensor.wait_for_distance_farther_than(10, 'cm', function () {
+         *      console.log("distance is farther than 10 CM");
+         * })
          */
-        function wait_for_distance_farther_than(distance, unit, short_range) {
+        function wait_for_distance_farther_than(threshold, unit, callback) {
 
+            // set callbacks to be executed in updateHubPortsInfo()
+            if (unit == 'cm') {
+                waitForDistanceFartherThanCallback = [threshold, callback];
+            }
+            else if (unit == 'in') {
+                waitForDistanceFartherThanCallback = [threshold / 0.393701, callback];
+            }
+            else if (unit == '%') {
+                waitForDistanceFartherThanCallback = [(threshold * 0.01) * 200, callback];
+            }
+            else {
+                throw new Error("The 'unit' argument in wait_for_distance_farther_than(threshold, unit, callback) must be either 'cm', 'in', or '%'.")
+            }
         }
 
-        /** xWaits until the measured distance is less than distance.
-         * @ignore
-         * @param {any} distance 
-         * @param {any} unit 'cm','in','%'
-         * @param {any} short_range 
-         * @todo Implement this function
+        /** Waits until the measured distance is less than distance.
+         * @param {integer} threshold 
+         * @param {string} unit 'cm','in','%'
+         * @param {function} callback function to execute when distance is closer than threshold
+         * @example
+         * distance_sensor.wait_for_distance_closer_than(10, 'cm', function () {
+         *      console.log("distance is closer than 10 CM");
+         * })   
          */
-        function wait_for_distance_closer_than(distance, unit, short_range) {
+        function wait_for_distance_closer_than(threshold, unit, callback) {
+            // set callbacks to be executed in updateHubPortsInfo()
+            if (unit == 'cm') {
+                waitForDistanceCloserThanCallback = [threshold, callback];
+            }
+            else if (unit == 'in') {
+                waitForDistanceCloserThanCallback = [threshold / 0.393701, callback];
+            }
+            else if (unit == '%') {
 
+                /* floor or ceil thresholds larger or smaller than what's possible */
+                if (threshold > 100) {
+                    threshold = 100;
+                }
+                else if (threshold < 0) {
+                    threshold = 0;
+                }
+
+                waitForDistanceCloserThanCallback = [(threshold * 0.01) * 200, callback];
+            }
+            else {
+                throw new Error("The 'unit' argument in wait_for_distance_closer_than(threshold, unit, callback) must be either 'cm', 'in', or '%'.")
+            }
         }
 
         /** Sets the brightness of the individual lights on the Distance Sensor.
@@ -2099,7 +2137,9 @@ function Service_SPIKE() {
             get_distance_cm: get_distance_cm,
             get_distance_inches: get_distance_inches,
             get_distance_percentage: get_distance_percentage,
-            light_up: light_up
+            light_up: light_up,
+            wait_for_distance_closer_than: wait_for_distance_closer_than,
+            wait_for_distance_farther_than:wait_for_distance_farther_than
         }
 
     }
@@ -3300,9 +3340,11 @@ function Service_SPIKE() {
                         device_value.device = "smallMotor";
                         device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
+
                     }
                     // get BIG MOTOR information
                     else if (data_stream[key][0] == 49) {
+
                         // parse motor information
                         var Mspeed = await data_stream[key][1][0];
                         var Mangle = await data_stream[key][1][1];
@@ -3325,6 +3367,32 @@ function Service_SPIKE() {
                         device_value.device = "ultrasonic";
                         device_value.data = { "distance": Udist };
                         ports[letter] = device_value;
+
+                        /* check if callback from wait_for_distance_farther_than() can be executed */
+                        if (waitForDistanceFartherThanCallback != undefined) {
+                            let thresholdDistance = waitForDistanceFartherThanCallback[0];
+
+                            if (Udist > thresholdDistance) {
+                                
+                                // current distance is farther than threshold, so execute callback
+                                waitForDistanceFartherThanCallback[1]();
+                                waitForDistanceFartherThanCallback = undefined; // reset callback
+                            }
+                        }
+                    
+                        /* check if callback from wait_for_distance_closer_than() can be executed */
+                        if (waitForDistanceCloserThanCallback != undefined) {
+                            let thresholdDistance = waitForDistanceCloserThanCallback[0];
+                            
+                            if (Udist < thresholdDistance) {
+
+                                // current distance is closer than threshold, so execute callback
+                                waitForDistanceCloserThanCallback[1]();
+                                waitForDistanceCloserThanCallback = undefined; // reset callback
+                            }
+                        }
+
+
                     }
                     // get FORCE sensor information
                     else if (data_stream[key][0] == 63) {
