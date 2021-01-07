@@ -2133,11 +2133,25 @@ function Service_SPIKE() {
             UJSONRPC.ultrasonicLightUp(port, lightArray);
         }
 
+        /** Lights up all of the lights on the Distance Sensor at the specified brightness.
+         * 
+         * @param {number} [brightness=100] The specified brightness of all of the lights
+         * @example
+         * distance_sensor.light_up_all(50)
+         */
+        function light_up_all(brightness = 100) {
+
+            let lightArray = [brightness, brightness, brightness, brightness];
+
+            UJSONRPC.ultrasonicLightUp(port, lightArray);
+        }
+
         return {
             get_distance_cm: get_distance_cm,
             get_distance_inches: get_distance_inches,
             get_distance_percentage: get_distance_percentage,
             light_up: light_up,
+            light_up_all: light_up_all,
             wait_for_distance_closer_than: wait_for_distance_closer_than,
             wait_for_distance_farther_than:wait_for_distance_farther_than
         }
