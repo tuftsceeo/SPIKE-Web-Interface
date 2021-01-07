@@ -585,7 +585,7 @@ function Service_SPIKE() {
      * 
      * // Color Sensor on port A
      * var reflectedLight = portsInfo["A"]["reflected"]; // reflected light
-     * var ambientLight = portsInfo["A"]["ambient"]; // ambient light
+     * var color = portsInfo["A"]["color"]; // name of detected color
      * var RGB = portsInfo["A"]["RGB"]; // [R, G, B]
      * 
      * // Force Sensor on port A
@@ -809,6 +809,13 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to any kind of Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
+     * var motorPorts = mySPIKE.getMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a motor
+     * var randomPort = motorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
     async function getMotorPorts() {
 
@@ -826,6 +833,13 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Small Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
+     * var smallMotorPorts = mySPIKE.getSmallMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a small motor
+     * var randomPort = smallMotorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
     async function getSmallMotorPorts() {
 
@@ -843,6 +857,13 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Big Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
+     * var bigMotorPorts = mySPIKE.getBigMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a big motor
+     * var randomPort = bigMotorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
     async function getBigMotorPorts() {
         var portsInfo = ports;
@@ -858,6 +879,13 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Distance Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
+     * var distanceSensorPorts = mySPIKE.getDistancePorts();
+     *
+     * // get the alphabetically earliest port connected to a DistanceSensor
+     * var randomPort = distanceSensorPorts[0];
+     *
+     * // get DistanceSensor object connected to the port
+     * var mySensor = new DistanceSensor(randomPort);
      */
     async function getUltrasonicPorts() {
 
@@ -877,6 +905,14 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Color Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Color Sensors
+     * @example
+     * var colorSensorPorts = mySPIKE.getColorPorts();
+     *
+     * // get the alphabetically earliest port connected to a ColorSensor
+     * var randomPort = colorSensorPorts[0];
+     *
+     * // get ColorSensor object connected to the port
+     * var mySensor = new ColorSensor(randomPort);
      */
     async function getColorPorts() {
 
@@ -896,6 +932,14 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Force Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Force Sensors
+     * @example
+     * var forceSensorPorts = mySPIKE.getForcePorts();
+     * 
+     * // get the alphabetically earliest port connected to a ForceSensor
+     * var randomPort = forceSensorPorts[0];
+     * 
+     * // get ForceSensor object connected to the port
+     * var mySensor = new ForceSensor(randomPort);
      */
     async function getForcePorts() {
 
@@ -918,7 +962,12 @@ function Service_SPIKE() {
      * @returns {object} All connected Motor objects
      * @example
      * var motors = await mySPIKE.getMotors();
-     * var myMotor = motors["A"]  
+     * 
+     * // get Motor object connected to Port A
+     * var myMotor = motors["A"]
+     * 
+     * // run motor for 10 seconds at 100 speed
+     * myMotor.run_for_seconds(10,100);
      */
     async function getMotors() {
         var portsInfo = ports;
@@ -937,7 +986,12 @@ function Service_SPIKE() {
      * @returns {object} All connected DistanceSensor objects
      * @example
      * var distanceSensors = await mySPIKE.getDistanceSensors();
+     * 
+     * // get DistanceSensor object connected to Port A
      * var mySensor = distanceSensors["A"];
+     * 
+     * // get distance in centimeters
+     * console.log("distance in CM: ", mySensor.get_distance_cm())
      */
     async function getDistanceSensors() {
         var portsInfo = ports;
@@ -974,8 +1028,15 @@ function Service_SPIKE() {
      * @public
      * @returns {object} All connected ForceSensor objects
      * @example
-     * var forceSensors = await mySPIKE.getForceSensors();
+     * var forceSensors = mySPIKE.getForceSensors();
+     *
+     * // get ForceSensor object connected to port A
      * var mySensor = forceSensors["A"];
+     *
+     * // when ForceSensor is pressed, indicate button state on console
+     * mySensor.wait_until_pressed( function() {
+     *      console.log("ForceSensor at port A was pressed");
+     * })
      */
     async function getForceSensors() {
         var portsInfo = ports;
@@ -1082,11 +1143,11 @@ function Service_SPIKE() {
         })
     }
 
-    /** Write a micropy program into a slot of the SPIKE Prime (alternative to micropy without js variables intake)
+    /** Write a micropy program into a slot of the SPIKE Prime
      * 
-     * @param {string} projectName name of the project to register
-     * @param {string} data the micropy code to send (expecting an <input type="text">.value)
-     * @param {integer} slotid slot number to assign the program in [0-9]
+     * @param {string} projectName name of the program
+     * @param {string} data the micropython source code (expecting an <input type="text">.value). All characters must be ASCII
+     * @param {integer} slotid slot number to assign the program
      * @param {function} callback callback to run after program is written
      */
     async function writeProgram(projectName, data, slotid, callback) {
@@ -1137,9 +1198,12 @@ function Service_SPIKE() {
         }
     }
 
-    /**  Execute a program in a slot
+    /** Execute a program in SPIKE Prime
      * 
-     * @param {integer} slotid slot of program to execute [0-9]
+     * @param {integer} slotid slot of which program to execute
+     * @example
+     * // execute program in slot 1 of SPIKE Prime hub
+     * mySPIKE.executeProgram(1);
      */
     function executeProgram(slotid) {
         UJSONRPC.programExecute(slotid)
@@ -1933,7 +1997,6 @@ function Service_SPIKE() {
     DistanceSensor = function (port) {
 
         var distanceSensor = ports[port] // get the distance sensor info by port
-        var distanceSensorData = distanceSensor.data;
 
         // check if device is a distance sensor
         if (distanceSensor.device != "ultrasonic") {
@@ -1941,13 +2004,12 @@ function Service_SPIKE() {
         }
 
         /** Retrieves the measured distance in centimeters.
-         * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 200]
          * @todo find the short_range handling ujsonrpc script
          * @example
          * var distance_cm = distance_sensor.get_distance_cm(false);
          */
-        function get_distance_cm(short_range) {
+        function get_distance_cm() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
@@ -1956,28 +2018,32 @@ function Service_SPIKE() {
 
         /** Retrieves the measured distance in inches.
          * 
-         * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 79]
          * @todo find the short_range handling ujsonrpc script
          * @example
          * var distance_inches = distance_sensor.get_distance_inches(false);
          */
-        function get_distance_inches(short_range) {
+        function get_distance_inches() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
-            var inches = distanceSensorData.distance * 0.393701;
+            var inches = distanceSensorData.distance * 0.393701; // convert to inches
+
+            if (inches % 1 < 0.5)
+                inches = Math.floor(inches);
+            else
+                inches = Math.ceil(inches);
+
             return inches;
         }
 
         /** Retrieves the measured distance in percent.
          * 
-         * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number/string} [0 to 100] or 'none' if can't read distance
          * @todo find the short_range handling ujsonrpc script
          * var distance_percentage = distance_sensor.get_distance_percentage(false);
          */
-        function get_distance_percentage(short_range) {
+        function get_distance_percentage() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
