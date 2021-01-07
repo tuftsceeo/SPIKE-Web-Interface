@@ -1000,6 +1000,7 @@ function Service_SPIKE() {
      * @public
      * @param {integer} slotid 
      * @param {string} program program to write must be in TEMPLATE LITERAL
+     * @ignore
      * @example
      * mySPIKE.micropython(10, `
      *from spike import PrimeHub, LightMatrix, Motor, MotorPair
@@ -3011,6 +3012,8 @@ function Service_SPIKE() {
         var cleanedJsonString = cleanJsonString(json_string);
         // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
 
+        // console.log(cleanedJsonString);
+
         jsonline = jsonline + cleanedJsonString; // concatenate packet to data
         jsonline = jsonline.trim();
 
@@ -3051,7 +3054,7 @@ function Service_SPIKE() {
                         let rebootMessageRemovedWS = rebootMessage.replace(/[' ']/g, "");
                         let lastUJSONRPCRemovedWS = lastUJSONRPC.replace(/[' ']/g, "");
                         if (rebootMessageRemovedWS.indexOf(lastUJSONRPCRemovedWS) == -1) {
-                            console.log("micropy print: ", lastUJSONRPC);
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy print: ", lastUJSONRPC);
                             if (funcAfterPrint != undefined)
                                 funcAfterPrint(lastUJSONRPC);
                         }
