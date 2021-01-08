@@ -182,17 +182,13 @@ LICENSE: MIT
  * @classdesc
  * ServiceDock library for interfacing with LEGO® SPIKE™ Prime
  * @example
- * // if you're using ServiceDock 
+ * // assuming you declared <service-spike> with the id, "service_spike"
  * var mySPIKE = document.getElemenyById("service_spike").getService();
  * mySPIKE.executeAfterInit(async function() {
  *     // write code here
  * })
  * 
- * // if you're not using ServiceDock
- * var mySPIKE = new Service_SPIKE();
  * mySPIKE.init();
- * 
- * 
  */
 function Service_SPIKE() {
 
@@ -442,9 +438,9 @@ function Service_SPIKE() {
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
      * @example
-     * var motor = mySPIKE.Motor("A");
-     * mySPIKE.executeAfterInit( async function () {
-     *     var speed = await motor.get_speed();
+     * mySPIKE.executeAfterInit( function () {
+     *     var motor = mySPIKE.Motor("A");
+     *     var speed = motor.get_speed();
      *     // do something with speed
      * })
      */
@@ -594,7 +590,7 @@ function Service_SPIKE() {
      * var pressedBool = portsInfo["A"]["pressed"] // whether pressed or not ( true or false )
      * var forceSensitive = portsInfo["A"]["forceSensitive"] // More sensitive force output( 0 ~ 900 )
      */
-    async function getPortsInfo() {
+    function getPortsInfo() {
         return ports;
     }
 
@@ -603,7 +599,7 @@ function Service_SPIKE() {
      * @param {string} letter Port on the SPIKE hub
      * @returns {object} Keys as device and info as value
      */
-    async function getPortInfo(letter) {
+    function getPortInfo(letter) {
         return ports[letter];
     }
 
@@ -611,7 +607,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {integer} battery percentage
      */
-    async function getBatteryStatus() {
+    function getBatteryStatus() {
         return batteryAmount;
     }
 
@@ -635,7 +631,7 @@ function Service_SPIKE() {
      * 
      * 
      */
-    async function getHubInfo() {
+    function getHubInfo() {
         return hub;
     }
 
@@ -644,7 +640,7 @@ function Service_SPIKE() {
      * @public
      * @returns name of hub
      */
-    async function getHubName() {
+    function getHubName() {
         return hubName;
     }
 
@@ -726,7 +722,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is tapped");
      * }
      */
-    async function getHubEvent() {
+    function getHubEvent() {
         return hubFrontEvent;
     }
 
@@ -739,7 +735,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is being shaked");
      * }
      */
-    async function getHubGesture() {
+    function getHubGesture() {
         return hubGesture;
     }
 
@@ -752,7 +748,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is facing up");
      * }
      */
-    async function getHubOrientation() {
+    function getHubOrientation() {
         return lastHubOrientation;
     }
 
@@ -765,7 +761,7 @@ function Service_SPIKE() {
      * var pressedBool = bluetoothButtonInfo["pressed"];
      * var pressedDuration = bluetoothButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
-    async function getBluetoothButton() {
+    function getBluetoothButton() {
         return hubBluetoothButton;
     }
 
@@ -778,7 +774,7 @@ function Service_SPIKE() {
      * var pressedDuration = mainButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
      */
-    async function getMainButton() {
+    function getMainButton() {
         return hubMainButton;
     }
 
@@ -791,7 +787,7 @@ function Service_SPIKE() {
      * var pressedDuration = leftButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
      */
-    async function getLeftButton() {
+    function getLeftButton() {
         return hubLeftButton;
     }
 
@@ -803,13 +799,14 @@ function Service_SPIKE() {
      * var pressedBool = rightButtonInfo["pressed"];
      * var pressedDuration = rightButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
-    async function getRightButton() {
+    function getRightButton() {
         return hubRightButton;
     }
 
     /**  Get the letters of ports connected to any kind of Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
+     * @example
      * var motorPorts = mySPIKE.getMotorPorts();
      *
      * // get the alphabetically earliest port connected to a motor
@@ -818,7 +815,7 @@ function Service_SPIKE() {
      * // get Motor object connected to the port
      * var mySensor = new Motor(randomPort);
      */
-    async function getMotorPorts() {
+    function getMotorPorts() {
 
         var portsInfo = ports;
         var motorPorts = [];
@@ -834,6 +831,7 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Small Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
+     * @example
      * var smallMotorPorts = mySPIKE.getSmallMotorPorts();
      *
      * // get the alphabetically earliest port connected to a small motor
@@ -842,7 +840,7 @@ function Service_SPIKE() {
      * // get Motor object connected to the port
      * var mySensor = new Motor(randomPort);
      */
-    async function getSmallMotorPorts() {
+    function getSmallMotorPorts() {
 
         var portsInfo = ports;
         var motorPorts = [];
@@ -858,6 +856,7 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Big Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
+     * @example
      * var bigMotorPorts = mySPIKE.getBigMotorPorts();
      *
      * // get the alphabetically earliest port connected to a big motor
@@ -866,7 +865,7 @@ function Service_SPIKE() {
      * // get Motor object connected to the port
      * var mySensor = new Motor(randomPort);
      */
-    async function getBigMotorPorts() {
+    function getBigMotorPorts() {
         var portsInfo = ports;
         var motorPorts = [];
         for (var key in portsInfo) {
@@ -880,6 +879,7 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Distance Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
+     * @example
      * var distanceSensorPorts = mySPIKE.getDistancePorts();
      *
      * // get the alphabetically earliest port connected to a DistanceSensor
@@ -888,9 +888,9 @@ function Service_SPIKE() {
      * // get DistanceSensor object connected to the port
      * var mySensor = new DistanceSensor(randomPort);
      */
-    async function getUltrasonicPorts() {
+    function getUltrasonicPorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var ultrasonicPorts = [];
 
         for (var key in portsInfo) {
@@ -915,9 +915,9 @@ function Service_SPIKE() {
      * // get ColorSensor object connected to the port
      * var mySensor = new ColorSensor(randomPort);
      */
-    async function getColorPorts() {
+    function getColorPorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var colorPorts = [];
 
         for (var key in portsInfo) {
@@ -942,9 +942,9 @@ function Service_SPIKE() {
      * // get ForceSensor object connected to the port
      * var mySensor = new ForceSensor(randomPort);
      */
-    async function getForcePorts() {
+    function getForcePorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var forcePorts = [];
 
         for (var key in portsInfo) {
@@ -970,7 +970,7 @@ function Service_SPIKE() {
      * // run motor for 10 seconds at 100 speed
      * myMotor.run_for_seconds(10,100);
      */
-    async function getMotors() {
+    function getMotors() {
         var portsInfo = ports;
         var motors = {};
         for (var key in portsInfo) {
@@ -994,7 +994,7 @@ function Service_SPIKE() {
      * // get distance in centimeters
      * console.log("distance in CM: ", mySensor.get_distance_cm())
      */
-    async function getDistanceSensors() {
+    function getDistanceSensors() {
         var portsInfo = ports;
         var distanceSensors = {};
         for (var key in portsInfo) {
@@ -1013,7 +1013,7 @@ function Service_SPIKE() {
      * var colorSensors = await mySPIKE.getColorSensors();
      * var mySensor = colorSensors["A"];
      */
-    async function getColorSensors() {
+    function getColorSensors() {
         var portsInfo = ports;
         var colorSensors = {};
         for (var key in portsInfo) {
@@ -1039,7 +1039,7 @@ function Service_SPIKE() {
      *      console.log("ForceSensor at port A was pressed");
      * })
      */
-    async function getForceSensors() {
+    function getForceSensors() {
         var portsInfo = ports;
         var forceSensors = {};
         for (var key in portsInfo) {
@@ -1147,9 +1147,9 @@ function Service_SPIKE() {
     /** Write a micropy program into a slot of the SPIKE Prime
      * 
      * @param {string} projectName name of the program
-     * @param {string} data the micropython source code (expecting an <input type="text">.value). All characters must be ASCII
+     * @param {string} data the micropython source code (expecting an input tag's value). All characters must be ASCII
      * @param {integer} slotid slot number to assign the program
-     * @param {function} callback callback to run after program is written
+     * @param {function} callback function to run after program is written
      */
     async function writeProgram(projectName, data, slotid, callback) {
 
@@ -1216,37 +1216,49 @@ function Service_SPIKE() {
     //                                      //
     //////////////////////////////////////////
 
-    /** PrimeHub object
-    * @ignore
+    /** The PrimeHub object includes controllable interfaces ("constants") for your SPIKE Prime, such as left_button, right_button, motion_sensor, and light_matrix.
+    * @namespace
     * @memberof Service_SPIKE
-    * @returns {classes} 
-    * <p> left_button </p>
-    * <p> right_button </p>
-    * <p> motion_sensor </p>
-    * <p> light_matrix </p>
+    * @example
+    * // Initialize the Hub
+    * var hub = new mySPIKE.PrimeHub()
     */
     PrimeHub = function () {
         var newOrigin = 0;
 
         /** The left button on the hub
-        * @class
+        * @namespace
+        * @memberof! PrimeHub
         * @returns {functions} - functions from PrimeHub.left_button
         * @example
-        * var hub = mySPIKE.PrimeHub();
+        * var hub = new mySPIKE.PrimeHub();
         * var left_button = hub.left_button;
         * // do something with left_button
         */
         var left_button = {};
 
         /** execute callback after this button is pressed
-        * @param {function} callback
+        * @param {function} callback function to run when button is pressed
+        * @example
+        * var hub = new mySPIKE.PrimeHub();
+        * var left_button = hub.left_button;
+        * left_button.wait_until_pressed ( function () {
+        *     console.log("left_button was pressed");
+        * })
+        * 
         */
         left_button.wait_until_pressed = function wait_until_pressed(callback) {
             funcAfterLeftButtonPress = callback;
         }
         /** execute callback after this button is released
          *
-         * @param {function} callback
+         * @param {function} callback function to run when button is released
+         * @example
+         * var hub = new mySPIKE.PrimeHub();
+         * var left_button = hub.left_button;
+         * left_button.wait_until_released ( function () {
+         *     console.log("left_button was released");
+         * })
          */
         left_button.wait_until_released = function wait_until_released(callback) {
             funcAfterLeftButtonRelease = callback;
@@ -1254,6 +1266,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button has been pressed since the last time this method called.
          *
          * @returns {boolean} - True if was pressed, false otherwise
+         * @example
+         * if (left_button.was_pressed()) {
+         *      console.log("left_button was pressed")
+         * }
          */
         left_button.was_pressed = function was_pressed() {
             if (hubLeftButton.duration > 0) {
@@ -1267,6 +1283,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button is pressed
         *
         * @returns {boolean} True if pressed, false otherwise
+        * @example
+        * if (left_button.is_pressed()) {
+        *      console.log("left_button is pressed")
+        * }
         */
         left_button.is_pressed = function is_pressed() {
             if (hubLeftButton.pressed) {
@@ -1278,7 +1298,8 @@ function Service_SPIKE() {
         }
 
         /** The right button on the hub
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.right_button
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1289,7 +1310,7 @@ function Service_SPIKE() {
 
         /** execute callback after this button is pressed
         *
-        * @param {function} callback
+        * @param {function} callback function to run when button is pressed
         * @example
         * var hub = new mySPIKE.PrimeHub();
         * var right_button = hub.right_button;
@@ -1304,7 +1325,7 @@ function Service_SPIKE() {
 
         /** execute callback after this button is released
          * 
-         * @param {function} callback 
+         * @param {function} callback function to run when button is released
          * @example
          * var hub = new mySPIKE.PrimeHub();
          * var right_button = hub.right_button;
@@ -1338,6 +1359,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button is pressed
          * 
          * @returns {boolean} True if pressed, false otherwise
+         * @example
+         * if (right_button.is_pressed()) {
+         *      console.log("right_button is pressed")
+         * }
          */
         right_button.is_pressed = function is_pressed() {
             if (hubRightButton.pressed) {
@@ -1347,9 +1372,55 @@ function Service_SPIKE() {
                 return false;
             }
         }
+        /** Following are all of the functions that are linked to the Hub’s programmable Brick Status Light.
+         * @namespace
+         * @memberof! PrimeHub
+         * @returns {functions} - functions from PrimeHub.light_matrix
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var status_light = hub.status_light;
+         * // do something with status_light
+        */
+        var status_light = {};
+
+        /** Sets the color of the light.
+         * @param {string} color ["azure","black","blue","cyan","green","orange","pink","red","violet","yellow","white"]
+         * @example
+         * var hub = new Primehub()
+         * hub.status_light.on("blue")
+         * 
+         */
+        status_light.on = function on (color) {
+            let dictColor = {
+                "azure": 4,
+                "black": 12, 
+                "blue": 3, 
+                "cyan": 5, 
+                "green": 6, 
+                "orange": 8,
+                "pink": 1,
+                "red": 9, 
+                "violet": 2, 
+                "yellow": 7,
+                "white": 10
+            }
+
+            let intColor = dictColor[color];
+            UJSONRPC.centerButtonLightUp(intColor);
+        }
+
+        /** Turns off the light.
+         * @example
+         * var hub = new Primehub()
+         * hub.status_light.off()
+         */
+        status_light.off = function off () {
+            UJSONRPC.centerButtonLightUp(0);
+        }
 
         /** Hub's light matrix
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} - functions from PrimeHub.light_matrix
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1391,7 +1462,8 @@ function Service_SPIKE() {
         }
 
         /** Hub's speaker
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from Primehub.speaker
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1443,7 +1515,8 @@ function Service_SPIKE() {
         }
 
         /** Hub's motion sensor
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.motion_sensor
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1621,10 +1694,13 @@ function Service_SPIKE() {
     }
 
     /** Motor
-     * @class
+     * @namespace
+     * @memberof! Service_SPIKE
      * @param {string} Port
-     * @memberof Service_SPIKE
      * @returns {functions}
+     * @example
+     * // Initialize the Motor
+     * var motor = new mySPIKE.Motor("A")
      */
     Motor = function (port) {
 
@@ -1845,10 +1921,12 @@ function Service_SPIKE() {
     }
 
     /** ColorSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
+     * @example
+     * // Initialize the Color Sensor
+     * var color = new mySPIKE.ColorSensor("E")
      */
     ColorSensor = function (port) {
         var waitForNewColorFirst = false;
@@ -1988,12 +2066,12 @@ function Service_SPIKE() {
     }
 
     /** DistanceSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
      * @example
-     * var distance_sensor = mySPIKE.DistanceSensor("A");
+     * // Initialize the DistanceSensor
+     * var distance_sensor = new mySPIKE.DistanceSensor("A");
      */
     DistanceSensor = function (port) {
 
@@ -2159,10 +2237,12 @@ function Service_SPIKE() {
     }
 
     /** ForceSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
+     * @example
+     * // Initialize the ForceSensor
+     * var force = new mySPIKE.ForceSensor("E")
      */
     ForceSensor = function (port) {
 
@@ -2236,12 +2316,12 @@ function Service_SPIKE() {
     }
 
     /** MotorPair
-     * @class
+     * @namespace
      * @param {string} leftPort
      * @param {string} rightPort
      * @memberof Service_SPIKE
-     * @returns {functions}
-     * @todo implement the rest (what is differential (tank) steering? )
+     * @example
+     * var pair = new mySPIKE.MotorPair("A", "B")
      */
     MotorPair = function (leftPort, rightPort) {
         // settings 
@@ -2894,7 +2974,15 @@ function Service_SPIKE() {
 
     }
 
+    UJSONRPC.centerButtonLightUp = function centerButtonLightUp(color) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "scratch.center_button_lights", "p": {' +
+            '"color": '  + color + 
+            '} }';
 
+        sendDATA(command);
+    }
     //////////////////////////////////////////
     //                                      //
     //          Private Functions           //
