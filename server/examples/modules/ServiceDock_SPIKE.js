@@ -299,6 +299,7 @@ function Service_SPIKE() {
     let hubGestures = []; // array of hubGestures run since program started or since was_gesture() ran
     let hubButtonPresses = [];
     let hubName = undefined;
+    let lastDetectedColor = undefined;
 
     /* SPIKE Prime Projects */
 
@@ -356,6 +357,8 @@ function Service_SPIKE() {
     var funcAfterLeftButtonRelease = undefined;
     var funcAfterRightButtonPress = undefined;
     var funcAfterRightButtonRelease = undefined;
+
+    var funcAfterNewColor = undefined;
 
     var waitUntilColorCallback = undefined; // [colorToDetect, function to execute]
     var waitForDistanceFartherThanCallback = undefined; // [distance, function to execute]
@@ -2036,15 +2039,13 @@ function Service_SPIKE() {
          * The first time this method is called, it returns immediately the detected color. 
          * After that, it waits until the Color Sensor detects a color that is different from the color that
          * was detected the last time this method was used.
-         * @ignore
-         * @todo Implement this function
-         * @param {function(string)} callback  
+         * @param {function(string)} callback params: detected new color
          */
         function wait_for_new_color(callback) {
 
             // check if this method has been executed after start of program
             if (waitForNewColorFirst) {
-                waitForNewColorFirst = true;
+                waitForNewColorFirst = false;
 
                 var currentColor = get_color();
                 callback(currentColor)
@@ -2055,6 +2056,7 @@ function Service_SPIKE() {
         return {
             get_color: get_color,
             wait_until_color: wait_until_color,
+            wait_for_new_color: wait_for_new_color,
             get_ambient_light: get_ambient_light,
             get_reflected_light: get_reflected_light,
             get_rgb_intensity: get_rgb_intensity,
@@ -3562,6 +3564,16 @@ function Service_SPIKE() {
 
                                 waitUntilColorCallback = undefined;
                             }
+                        
+                        if (lastDetectedColor != Ccolor) {
+                            
+                            if (funcAfterNewColor != undefined) {
+                                funcAfterNewColor(Ccolor);
+                                funcAfterNewColor = undefined;
+                            }
+
+                            lastDetectedColor = Ccolor;
+                        }
 
                         ports[letter] = device_value;
                     }
@@ -3984,9 +3996,7 @@ function Service_SPIKE() {
                         writePackageInformation = [messageid, remainingData, transferID, blocksize];
                     }
                 }
-
             }
-
         }
     }
 
