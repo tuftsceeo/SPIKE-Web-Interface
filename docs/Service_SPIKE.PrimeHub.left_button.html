@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Class: speaker | Class: speaker</title>
+    <title>Namespace: left_button | Namespace: left_button</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Class: speaker</a>
+            <a class = "currentPage">Namespace: left_button</a>
         
         
     </div>
@@ -58,8 +58,8 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="Service_SPIKE.html">Service_SPIKE</a><a href="Service_SPIKE.PrimeHub.html">.PrimeHub</a>~</span>speaker<span class="signature">()</span><span class="type-signature"> &rarr; {functions}</span></h2>
+        <h2>
+            <span class="ancestors"><a href="Service_SPIKE.html">Service_SPIKE</a><a href="Service_SPIKE.PrimeHub.html">.PrimeHub</a>.</span>left_button</h2>
         
     
 </header>
@@ -69,17 +69,88 @@
         <div class="container-overview">
         
             
+                <div class="description"><p>The left button on the hub</p></div>
+            
+
+            
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+                <h3>Example</h3>
+                
+    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+var left_button = hub.left_button;
+// do something with left_button</code></pre>
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+                
 
 <dt>
     
-        <h4 class="name" id="speaker">
+        <h4 class="name" id=".wait_until_pressed">
             
-                new <span class="type-signature"></span>speaker<span class="signature">()</span><span class="type-signature"> &rarr; {functions}</span>
+                <span class="type-signature"><span class="icon green">static</span> </span>wait_until_pressed<span class="signature">(callback)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1431">line 1431</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1256">line 1256</a></code>
             </div>
             
         </h4>
@@ -91,7 +162,303 @@
 
     
     <div class="description">
-        <p>Hub's speaker</p>
+        <p>execute callback after this button is pressed</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>function to run when button is pressed</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+var left_button = hub.left_button;
+left_button.wait_until_pressed ( function () {
+    console.log("left_button was pressed");
+})</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".wait_until_released">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>wait_until_released<span class="signature">(callback)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
+                <code><a href="ServiceDock_SPIKE.js.html#line1269">line 1269</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>execute callback after this button is released</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>function to run when button is released</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+var left_button = hub.left_button;
+left_button.wait_until_released ( function () {
+    console.log("left_button was released");
+})</code></pre>
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".was_pressed">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>was_pressed<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span>
+                
+            
+            <div class="container-source members">
+                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
+                <code><a href="ServiceDock_SPIKE.js.html#line1280">line 1280</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Tests to see whether the button has been pressed since the last time this method called.</p>
     </div>
     
 
@@ -121,13 +488,15 @@
 
 
 
-<span class="param-type">functions</span>
+<span class="param-type">boolean</span>
 
 
 
 
 
-- <p>functions from Primehub.speaker</p>
+- <ul>
+<li>True if was pressed, false otherwise</li>
+</ul>
 
 
 
@@ -176,48 +545,27 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var hub = mySPIKE.PrimeHub();
-var speaker = hub.speaker;
-// do something with speaker</code></pre>
+    <pre class="prettyprint"><code>if (left_button.was_pressed()) {
+     console.log("left_button was pressed")
+}</code></pre>
 
     
 
 </dd>
 
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
+            
                 
 
 <dt>
     
-        <h4 class="name" id=".beep">
+        <h4 class="name" id=".is_pressed">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>beep<span class="signature">(note, seconds)</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>is_pressed<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span>
                 
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1440">line 1440</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1297">line 1297</a></code>
             </div>
             
         </h4>
@@ -229,397 +577,7 @@ var speaker = hub.speaker;
 
     
     <div class="description">
-        <p>Plays a beep on the Hub.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>note</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The MIDI note number [44 to 123 (60 is middle C note)]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>seconds</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The duration of the beep in seconds</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".start_beep">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>start_beep<span class="signature">(note)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1449">line 1449</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts playing a beep.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>note</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The MIDI note number [44 to 123 (60 is middle C note)]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".stop">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>stop<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1456">line 1456</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Stops any sound that is playing.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".get_volume">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>get_volume<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1463">line 1463</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Retrieves the value of the speaker volume.</p>
+        <p>Tests to see whether the button is pressed</p>
     </div>
     
 
@@ -649,13 +607,13 @@ var speaker = hub.speaker;
 
 
 
-<span class="param-type">number</span>
+<span class="param-type">boolean</span>
 
 
 
 
 
-- <p>The current volume [0 to 100]</p>
+- <p>True if pressed, false otherwise</p>
 
 
 
@@ -702,143 +660,11 @@ var speaker = hub.speaker;
 
 
     
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".set_volume">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>set_volume<span class="signature">(newVolume)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1471">line 1471</a></code>
-            </div>
-            
-        </h4>
-
+        <h5>Example</h5>
         
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the speaker volume.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>newVolume</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
+    <pre class="prettyprint"><code>if (left_button.is_pressed()) {
+     console.log("left_button is pressed")
+}</code></pre>
 
     
 
@@ -868,7 +694,7 @@ var speaker = hub.speaker;
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'Service_SPIKE.PrimeHub~speaker_sub'.replace(/"/g, '_');
+        var id = 'Service_SPIKE.PrimeHub.left_button_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

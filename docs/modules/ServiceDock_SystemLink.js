@@ -193,15 +193,10 @@ LICENSE: MIT
  * 
  * @class Service_SystemLink
  * @example
- * // if you're using ServiceDock
+ * // assuming you declared <service-systemlink> with the id, "service_systemlink"
  * var mySL = document.getElemenyById("service_systemlink").getService();
  * mySL.setAttribute("apikey", "YOUR API KEY");
  * mySL.init();
- * 
- * // if you're not using ServiceDock
- * var mySL = new Service_SystemLink();
- * 
- * mySL.init(APIKEY);
  */
 function Service_SystemLink() {
 

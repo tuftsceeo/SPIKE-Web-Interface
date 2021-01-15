@@ -6,7 +6,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 
 /* Navigation - LNB */
 .lnb {
-    width: 290px;
+    width: 300px;
     position: absolute;
     bottom: 30px;
     top: 0;
@@ -59,7 +59,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 /* "Classes", "namespaces" element is lnb-api*/
 .lnb .lnb-api a,
 .lnb .lnb-examples a {
-    font-size: 20px;
+    font-size: 17px;
     color: #7cafc2;
 }
 .lnb .lnb-api a:hover,
@@ -75,7 +75,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 }
 /* The "+" or "-" beside the class names*/
 .lnb .lnb-api .toggle-subnav {
-    font-size: 15px;
+    font-size: 10px;
 }
 /* The type of functions (e.g. "Methods" )*/
 .lnb .member-type {

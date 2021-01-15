@@ -13,15 +13,11 @@ LICENSE: MIT
 Note:
 -->
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_GeoLocation.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_Gmail.js"></script>
     </head>
 
     <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
-            <h1 style="left: 500px; position: absolute">servicedock_displayText</h1>
-        <div id="servicedock" style="float:left;">
+        <div id="servicedock" style="float:right;">
             <!-- this style must be kept for normal visualization-->
             <service-spike id="service_spike"></service-spike>
         </div>
@@ -43,32 +39,18 @@ Note:
         var textArea = document.getElementById("text");
 
         mySPIKE.executeAfterInit(function() {
+            
             displayButton.addEventListener("click", function () {
+
                 var messageToDisplay = textArea.value;
+
                 hub.light_matrix.write(messageToDisplay);
-            })
-        })
+            });
+        });
         
         window.addEventListener("load", function () {
                 dragElement("demobox");
         })
 
     </script>
-    <style>
-        #demobox {
-            position: absolute;
-            background-color: #4CE0D2;
-            color: black;
-            height: 300px;
-            width: 500px;
-            top: 200px;
-            left: 400px;
-            border: solid;
-        }
-
-        #text {
-            height: 80px;
-            width: 400px;
-        }
-    </style>
 </html>

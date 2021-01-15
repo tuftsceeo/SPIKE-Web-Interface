@@ -5,6 +5,9 @@
     "tutorialSpikeService": {
         "title": "SPIKE Service",
         "children":{
+            "exampleSpikeServiceBasicMotor": {
+                "title": "Basic - Start Single Motor"
+            },
             "tutorialSpikeServiceHub": {
                 "title": "Intro to SPIKE Service"
             },

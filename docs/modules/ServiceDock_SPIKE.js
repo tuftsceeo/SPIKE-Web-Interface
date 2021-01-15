@@ -135,7 +135,9 @@ class servicespike extends HTMLElement {
                         alert("Error: Please make sure you are using GOOGLE CHROME with the #enable-experimental-web-platform-features flag ENABLED")
                     }
                 }
-            } 
+            } else {
+                this.service.rebootHub();
+            }
         });
 
 
@@ -180,17 +182,13 @@ LICENSE: MIT
  * @classdesc
  * ServiceDock library for interfacing with LEGO® SPIKE™ Prime
  * @example
- * // if you're using ServiceDock 
+ * // assuming you declared <service-spike> with the id, "service_spike"
  * var mySPIKE = document.getElemenyById("service_spike").getService();
  * mySPIKE.executeAfterInit(async function() {
  *     // write code here
  * })
  * 
- * // if you're not using ServiceDock
- * var mySPIKE = new Service_SPIKE();
  * mySPIKE.init();
- * 
- * 
  */
 function Service_SPIKE() {
 
@@ -301,6 +299,7 @@ function Service_SPIKE() {
     let hubGestures = []; // array of hubGestures run since program started or since was_gesture() ran
     let hubButtonPresses = [];
     let hubName = undefined;
+    let lastDetectedColor = undefined;
 
     /* SPIKE Prime Projects */
 
@@ -359,8 +358,11 @@ function Service_SPIKE() {
     var funcAfterRightButtonPress = undefined;
     var funcAfterRightButtonRelease = undefined;
 
-    var funcUntilColor = undefined;
     var funcAfterNewColor = undefined;
+
+    var waitUntilColorCallback = undefined; // [colorToDetect, function to execute]
+    var waitForDistanceFartherThanCallback = undefined; // [distance, function to execute]
+    var waitForDistanceCloserThanCallback = undefined; // [distance, function to execute]
 
     var funcAfterForceSensorPress = undefined;
     var funcAfterForceSensorRelease = undefined;
@@ -439,9 +441,9 @@ function Service_SPIKE() {
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
      * @example
-     * var motor = mySPIKE.Motor("A");
-     * mySPIKE.executeAfterInit( async function () {
-     *     var speed = await motor.get_speed();
+     * mySPIKE.executeAfterInit( function () {
+     *     var motor = mySPIKE.Motor("A");
+     *     var speed = motor.get_speed();
      *     // do something with speed
      * })
      */
@@ -498,8 +500,10 @@ function Service_SPIKE() {
     async function sendDATA(command) {
         // look up the command to send
         var commands = command.split("\n"); // split on new line
-        //commands = command
-        console.log("%cTuftsCEEO ", "color: #3ba336;", "sendDATA: " + commands);
+        
+        // ignore console logging trigger_current_state (to avoid it spamming)
+        if (command.indexOf("trigger_current_state") == -1)
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "sendDATA: " + commands);
 
         // make sure ready to write to device
         setupWriter();
@@ -581,7 +585,7 @@ function Service_SPIKE() {
      * 
      * // Color Sensor on port A
      * var reflectedLight = portsInfo["A"]["reflected"]; // reflected light
-     * var ambientLight = portsInfo["A"]["ambient"]; // ambient light
+     * var color = portsInfo["A"]["color"]; // name of detected color
      * var RGB = portsInfo["A"]["RGB"]; // [R, G, B]
      * 
      * // Force Sensor on port A
@@ -589,7 +593,7 @@ function Service_SPIKE() {
      * var pressedBool = portsInfo["A"]["pressed"] // whether pressed or not ( true or false )
      * var forceSensitive = portsInfo["A"]["forceSensitive"] // More sensitive force output( 0 ~ 900 )
      */
-    async function getPortsInfo() {
+    function getPortsInfo() {
         return ports;
     }
 
@@ -598,7 +602,7 @@ function Service_SPIKE() {
      * @param {string} letter Port on the SPIKE hub
      * @returns {object} Keys as device and info as value
      */
-    async function getPortInfo(letter) {
+    function getPortInfo(letter) {
         return ports[letter];
     }
 
@@ -606,7 +610,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {integer} battery percentage
      */
-    async function getBatteryStatus() {
+    function getBatteryStatus() {
         return batteryAmount;
     }
 
@@ -630,7 +634,7 @@ function Service_SPIKE() {
      * 
      * 
      */
-    async function getHubInfo() {
+    function getHubInfo() {
         return hub;
     }
 
@@ -639,7 +643,7 @@ function Service_SPIKE() {
      * @public
      * @returns name of hub
      */
-    async function getHubName() {
+    function getHubName() {
         return hubName;
     }
 
@@ -721,7 +725,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is tapped");
      * }
      */
-    async function getHubEvent() {
+    function getHubEvent() {
         return hubFrontEvent;
     }
 
@@ -734,7 +738,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is being shaked");
      * }
      */
-    async function getHubGesture() {
+    function getHubGesture() {
         return hubGesture;
     }
 
@@ -747,7 +751,7 @@ function Service_SPIKE() {
      *      console.log("SPIKE is facing up");
      * }
      */
-    async function getHubOrientation() {
+    function getHubOrientation() {
         return lastHubOrientation;
     }
 
@@ -760,7 +764,7 @@ function Service_SPIKE() {
      * var pressedBool = bluetoothButtonInfo["pressed"];
      * var pressedDuration = bluetoothButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
-    async function getBluetoothButton() {
+    function getBluetoothButton() {
         return hubBluetoothButton;
     }
 
@@ -773,7 +777,7 @@ function Service_SPIKE() {
      * var pressedDuration = mainButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
      */
-    async function getMainButton() {
+    function getMainButton() {
         return hubMainButton;
     }
 
@@ -786,7 +790,7 @@ function Service_SPIKE() {
      * var pressedDuration = leftButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
      */
-    async function getLeftButton() {
+    function getLeftButton() {
         return hubLeftButton;
     }
 
@@ -798,15 +802,23 @@ function Service_SPIKE() {
      * var pressedBool = rightButtonInfo["pressed"];
      * var pressedDuration = rightButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
-    async function getRightButton() {
+    function getRightButton() {
         return hubRightButton;
     }
 
     /**  Get the letters of ports connected to any kind of Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
+     * @example
+     * var motorPorts = mySPIKE.getMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a motor
+     * var randomPort = motorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
-    async function getMotorPorts() {
+    function getMotorPorts() {
 
         var portsInfo = ports;
         var motorPorts = [];
@@ -822,8 +834,16 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Small Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
+     * @example
+     * var smallMotorPorts = mySPIKE.getSmallMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a small motor
+     * var randomPort = smallMotorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
-    async function getSmallMotorPorts() {
+    function getSmallMotorPorts() {
 
         var portsInfo = ports;
         var motorPorts = [];
@@ -839,8 +859,16 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Big Motors
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
+     * @example
+     * var bigMotorPorts = mySPIKE.getBigMotorPorts();
+     *
+     * // get the alphabetically earliest port connected to a big motor
+     * var randomPort = bigMotorPorts[0];
+     *
+     * // get Motor object connected to the port
+     * var mySensor = new Motor(randomPort);
      */
-    async function getBigMotorPorts() {
+    function getBigMotorPorts() {
         var portsInfo = ports;
         var motorPorts = [];
         for (var key in portsInfo) {
@@ -854,10 +882,18 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Distance Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
+     * @example
+     * var distanceSensorPorts = mySPIKE.getDistancePorts();
+     *
+     * // get the alphabetically earliest port connected to a DistanceSensor
+     * var randomPort = distanceSensorPorts[0];
+     *
+     * // get DistanceSensor object connected to the port
+     * var mySensor = new DistanceSensor(randomPort);
      */
-    async function getUltrasonicPorts() {
+    function getUltrasonicPorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var ultrasonicPorts = [];
 
         for (var key in portsInfo) {
@@ -873,10 +909,18 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Color Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Color Sensors
+     * @example
+     * var colorSensorPorts = mySPIKE.getColorPorts();
+     *
+     * // get the alphabetically earliest port connected to a ColorSensor
+     * var randomPort = colorSensorPorts[0];
+     *
+     * // get ColorSensor object connected to the port
+     * var mySensor = new ColorSensor(randomPort);
      */
-    async function getColorPorts() {
+    function getColorPorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var colorPorts = [];
 
         for (var key in portsInfo) {
@@ -892,10 +936,18 @@ function Service_SPIKE() {
     /**  Get the letters of ports connected to Force Sensors
      * @public
      * @returns {(string|Array)} Ports that are connected to Force Sensors
+     * @example
+     * var forceSensorPorts = mySPIKE.getForcePorts();
+     * 
+     * // get the alphabetically earliest port connected to a ForceSensor
+     * var randomPort = forceSensorPorts[0];
+     * 
+     * // get ForceSensor object connected to the port
+     * var mySensor = new ForceSensor(randomPort);
      */
-    async function getForcePorts() {
+    function getForcePorts() {
 
-        var portsInfo = await this.getPortsInfo();
+        var portsInfo = this.getPortsInfo();
         var forcePorts = [];
 
         for (var key in portsInfo) {
@@ -914,9 +966,14 @@ function Service_SPIKE() {
      * @returns {object} All connected Motor objects
      * @example
      * var motors = await mySPIKE.getMotors();
-     * var myMotor = motors["A"]  
+     * 
+     * // get Motor object connected to Port A
+     * var myMotor = motors["A"]
+     * 
+     * // run motor for 10 seconds at 100 speed
+     * myMotor.run_for_seconds(10,100);
      */
-    async function getMotors() {
+    function getMotors() {
         var portsInfo = ports;
         var motors = {};
         for (var key in portsInfo) {
@@ -933,9 +990,14 @@ function Service_SPIKE() {
      * @returns {object} All connected DistanceSensor objects
      * @example
      * var distanceSensors = await mySPIKE.getDistanceSensors();
+     * 
+     * // get DistanceSensor object connected to Port A
      * var mySensor = distanceSensors["A"];
+     * 
+     * // get distance in centimeters
+     * console.log("distance in CM: ", mySensor.get_distance_cm())
      */
-    async function getDistanceSensors() {
+    function getDistanceSensors() {
         var portsInfo = ports;
         var distanceSensors = {};
         for (var key in portsInfo) {
@@ -954,7 +1016,7 @@ function Service_SPIKE() {
      * var colorSensors = await mySPIKE.getColorSensors();
      * var mySensor = colorSensors["A"];
      */
-    async function getColorSensors() {
+    function getColorSensors() {
         var portsInfo = ports;
         var colorSensors = {};
         for (var key in portsInfo) {
@@ -970,10 +1032,17 @@ function Service_SPIKE() {
      * @public
      * @returns {object} All connected ForceSensor objects
      * @example
-     * var forceSensors = await mySPIKE.getForceSensors();
+     * var forceSensors = mySPIKE.getForceSensors();
+     *
+     * // get ForceSensor object connected to port A
      * var mySensor = forceSensors["A"];
+     *
+     * // when ForceSensor is pressed, indicate button state on console
+     * mySensor.wait_until_pressed( function() {
+     *      console.log("ForceSensor at port A was pressed");
+     * })
      */
-    async function getForceSensors() {
+    function getForceSensors() {
         var portsInfo = ports;
         var forceSensors = {};
         for (var key in portsInfo) {
@@ -996,6 +1065,7 @@ function Service_SPIKE() {
      * @public
      * @param {integer} slotid 
      * @param {string} program program to write must be in TEMPLATE LITERAL
+     * @ignore
      * @example
      * mySPIKE.micropython(10, `
      *from spike import PrimeHub, LightMatrix, Motor, MotorPair
@@ -1073,60 +1143,71 @@ function Service_SPIKE() {
 
         var programToWrite = linesChunk + program;
         writeProgram("micropython", programToWrite, slotid, function() {
-            console.log("micropy program write complete")
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy program write complete");
         })
     }
 
-    /** Write a micropy program into a slot of the SPIKE Prime (alternative to micropy without js variables intake)
+    /** Write a micropy program into a slot of the SPIKE Prime
      * 
-     * @param {string} projectName name of the project to register
-     * @param {string} data the micropy code to send (expecting an <input type="text">.value)
-     * @param {integer} slotid slot number to assign the program in [0-9]
-     * @param {function} callback callback to run after program is written
+     * @param {string} projectName name of the program
+     * @param {string} data the micropython source code (expecting an input tag's value). All characters must be ASCII
+     * @param {integer} slotid slot number to assign the program
+     * @param {function} callback function to run after program is written
      */
     async function writeProgram(projectName, data, slotid, callback) {
 
-        // reinit witeProgramTimeout
-        if (writeProgramSetTimeout != undefined) {
-            clearTimeout(writeProgramSetTimeout);
-            writeProgramSetTimeout = undefined;
+        // check for non-ascii characters 
+        let ascii = /[^\x00-\x7F]/;
+        if (ascii.test(data)) {
+            throw new Error(
+                "non-ASCII characters detected in micropy program. Only ASCII characters are supported. Please check your micropy input."
+                )
         }
+        else {
+            // reinit witeProgramTimeout
+            if (writeProgramSetTimeout != undefined) {
+                clearTimeout(writeProgramSetTimeout);
+                writeProgramSetTimeout = undefined;
+            }
 
-        // template of python file that needs to be concatenated
-        var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
-        var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
+            // template of python file that needs to be concatenated
+            var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
+            var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n    # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
 
-        // stringify data and strip trailing and leading quotation marks
-        var stringifiedData = JSON.stringify(data);
-        stringifiedData = stringifiedData.substring(1, stringifiedData.length - 1);
+            // stringify data and strip trailing and leading quotation marks
+            var stringifiedData = JSON.stringify(data);
+            stringifiedData = stringifiedData.substring(1, stringifiedData.length - 1);
 
-        var result = ""; // string to which the final code will be appended
+            var result = ""; // string to which the final code will be appended
 
-        var splitData = stringifiedData.split(/\\n/); // split the code by every newline
+            var splitData = stringifiedData.split(/\\n/); // split the code by every newline
 
-        // add a tab before every newline (this is syntactically needed for concatenating with the template)
-        for (var index in splitData) {
+            // add a tab before every newline (this is syntactically needed for concatenating with the template)
+            for (var index in splitData) {
 
-            var addedTab = "    " + splitData[index] + "\n";
+                var addedTab = "    " + splitData[index] + "\n";
 
-            result = result + addedTab;
+                result = result + addedTab;
+            }
+
+            // replace tab characters
+            result = result.replace(/\\t/g, "    ");
+
+            stringifiedData = firstPart + result + secondPart;
+
+            writeProgramCallback = callback;
+
+            // begin the write program process
+            UJSONRPC.startWriteProgram(projectName, "python", stringifiedData, slotid);
         }
-
-        // replace tab characters
-        result = result.replace(/\\t/g, "    ");
-
-        stringifiedData = firstPart + result + secondPart;
-
-        writeProgramCallback = callback;
-
-        // begin the write program process
-        UJSONRPC.startWriteProgram(projectName, "python", stringifiedData, slotid);
-
     }
 
-    /**  Execute a program in a slot
+    /** Execute a program in SPIKE Prime
      * 
-     * @param {integer} slotid slot of program to execute [0-9]
+     * @param {integer} slotid slot of which program to execute
+     * @example
+     * // execute program in slot 1 of SPIKE Prime hub
+     * mySPIKE.executeProgram(1);
      */
     function executeProgram(slotid) {
         UJSONRPC.programExecute(slotid)
@@ -1138,37 +1219,49 @@ function Service_SPIKE() {
     //                                      //
     //////////////////////////////////////////
 
-    /** PrimeHub object
-    * @ignore
+    /** The PrimeHub object includes controllable interfaces ("constants") for your SPIKE Prime, such as left_button, right_button, motion_sensor, and light_matrix.
+    * @namespace
     * @memberof Service_SPIKE
-    * @returns {classes} 
-    * <p> left_button </p>
-    * <p> right_button </p>
-    * <p> motion_sensor </p>
-    * <p> light_matrix </p>
+    * @example
+    * // Initialize the Hub
+    * var hub = new mySPIKE.PrimeHub()
     */
     PrimeHub = function () {
         var newOrigin = 0;
 
         /** The left button on the hub
-        * @class
+        * @namespace
+        * @memberof! PrimeHub
         * @returns {functions} - functions from PrimeHub.left_button
         * @example
-        * var hub = mySPIKE.PrimeHub();
+        * var hub = new mySPIKE.PrimeHub();
         * var left_button = hub.left_button;
         * // do something with left_button
         */
         var left_button = {};
 
         /** execute callback after this button is pressed
-        * @param {function} callback
+        * @param {function} callback function to run when button is pressed
+        * @example
+        * var hub = new mySPIKE.PrimeHub();
+        * var left_button = hub.left_button;
+        * left_button.wait_until_pressed ( function () {
+        *     console.log("left_button was pressed");
+        * })
+        * 
         */
         left_button.wait_until_pressed = function wait_until_pressed(callback) {
             funcAfterLeftButtonPress = callback;
         }
         /** execute callback after this button is released
          *
-         * @param {function} callback
+         * @param {function} callback function to run when button is released
+         * @example
+         * var hub = new mySPIKE.PrimeHub();
+         * var left_button = hub.left_button;
+         * left_button.wait_until_released ( function () {
+         *     console.log("left_button was released");
+         * })
          */
         left_button.wait_until_released = function wait_until_released(callback) {
             funcAfterLeftButtonRelease = callback;
@@ -1176,6 +1269,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button has been pressed since the last time this method called.
          *
          * @returns {boolean} - True if was pressed, false otherwise
+         * @example
+         * if (left_button.was_pressed()) {
+         *      console.log("left_button was pressed")
+         * }
          */
         left_button.was_pressed = function was_pressed() {
             if (hubLeftButton.duration > 0) {
@@ -1189,6 +1286,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button is pressed
         *
         * @returns {boolean} True if pressed, false otherwise
+        * @example
+        * if (left_button.is_pressed()) {
+        *      console.log("left_button is pressed")
+        * }
         */
         left_button.is_pressed = function is_pressed() {
             if (hubLeftButton.pressed) {
@@ -1200,7 +1301,8 @@ function Service_SPIKE() {
         }
 
         /** The right button on the hub
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.right_button
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1211,7 +1313,7 @@ function Service_SPIKE() {
 
         /** execute callback after this button is pressed
         *
-        * @param {function} callback
+        * @param {function} callback function to run when button is pressed
         * @example
         * var hub = new mySPIKE.PrimeHub();
         * var right_button = hub.right_button;
@@ -1226,7 +1328,7 @@ function Service_SPIKE() {
 
         /** execute callback after this button is released
          * 
-         * @param {function} callback 
+         * @param {function} callback function to run when button is released
          * @example
          * var hub = new mySPIKE.PrimeHub();
          * var right_button = hub.right_button;
@@ -1236,7 +1338,7 @@ function Service_SPIKE() {
          */
         right_button.wait_until_released = function wait_until_released(callback) {
 
-            functAfterRightButtonRelease = callback;
+            funcAfterRightButtonRelease = callback;
         }
 
         /** Tests to see whether the button has been pressed since the last time this method called.
@@ -1260,6 +1362,10 @@ function Service_SPIKE() {
         /** Tests to see whether the button is pressed
          * 
          * @returns {boolean} True if pressed, false otherwise
+         * @example
+         * if (right_button.is_pressed()) {
+         *      console.log("right_button is pressed")
+         * }
          */
         right_button.is_pressed = function is_pressed() {
             if (hubRightButton.pressed) {
@@ -1269,9 +1375,55 @@ function Service_SPIKE() {
                 return false;
             }
         }
+        /** Following are all of the functions that are linked to the Hub’s programmable Brick Status Light.
+         * @namespace
+         * @memberof! PrimeHub
+         * @returns {functions} - functions from PrimeHub.light_matrix
+         * @example
+         * var hub = mySPIKE.PrimeHub();
+         * var status_light = hub.status_light;
+         * // do something with status_light
+        */
+        var status_light = {};
+
+        /** Sets the color of the light.
+         * @param {string} color ["azure","black","blue","cyan","green","orange","pink","red","violet","yellow","white"]
+         * @example
+         * var hub = new Primehub()
+         * hub.status_light.on("blue")
+         * 
+         */
+        status_light.on = function on (color) {
+            let dictColor = {
+                "azure": 4,
+                "black": 12, 
+                "blue": 3, 
+                "cyan": 5, 
+                "green": 6, 
+                "orange": 8,
+                "pink": 1,
+                "red": 9, 
+                "violet": 2, 
+                "yellow": 7,
+                "white": 10
+            }
+
+            let intColor = dictColor[color];
+            UJSONRPC.centerButtonLightUp(intColor);
+        }
+
+        /** Turns off the light.
+         * @example
+         * var hub = new Primehub()
+         * hub.status_light.off()
+         */
+        status_light.off = function off () {
+            UJSONRPC.centerButtonLightUp(0);
+        }
 
         /** Hub's light matrix
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} - functions from PrimeHub.light_matrix
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1313,7 +1465,8 @@ function Service_SPIKE() {
         }
 
         /** Hub's speaker
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from Primehub.speaker
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1365,7 +1518,8 @@ function Service_SPIKE() {
         }
 
         /** Hub's motion sensor
-         * @class
+         * @namespace
+         * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.motion_sensor
          * @example
          * var hub = mySPIKE.PrimeHub();
@@ -1405,7 +1559,7 @@ function Service_SPIKE() {
 
         /** Executes callback when a new gesture happens
          * 
-         * @param  {function(string)} callback - A callback whose signature is name of the gesture
+         * @param  {function(string)} callback - A callback of which argument is name of the gesture
          * @example
          * mySPIKE.wait_for_new_gesture( function ( newGesture ) {
          *      if ( newGesture == 'tapped') {
@@ -1543,10 +1697,13 @@ function Service_SPIKE() {
     }
 
     /** Motor
-     * @class
+     * @namespace
+     * @memberof! Service_SPIKE
      * @param {string} Port
-     * @memberof Service_SPIKE
      * @returns {functions}
+     * @example
+     * // Initialize the Motor
+     * var motor = new mySPIKE.Motor("A")
      */
     Motor = function (port) {
 
@@ -1554,8 +1711,13 @@ function Service_SPIKE() {
 
         // default settings
         var defaultSpeed = 100;
-        var stopMethod = false; // stop method doesnt seem to work in this current ujsonrpc config
+        var stopMethod = 1; // stop method doesnt seem to work in this current ujsonrpc config
         var stallSetting = true;
+
+        var direction = {
+            COUNTERCLOCKWISE: 'counterClockwise',
+            CLOCKWISE: 'clockwise'
+        }
 
         // check if device is a motor
         if (motor.device != "smallMotor" && motor.device != "bigMotor") {
@@ -1573,14 +1735,17 @@ function Service_SPIKE() {
 
         }
 
-        /** Get current position of the motor
-         * 
+        /** Get current position of the motor. The position may differ by a little margin from 
+         * the position to which a motor ran with run_to_position()
          * @returns {number} position of motor [0 to 359]
          */
         function get_position() {
             var motor = ports[port]; // get the motor info by port
             var motorInfo = motor.data;
-            return motorInfo.angle;
+            let position = motorInfo.uAngle;
+            if (position < 0)
+                position = 360 + position;
+            return position;
         }
 
         /** Get current degrees counted of the motor
@@ -1590,7 +1755,7 @@ function Service_SPIKE() {
         function get_degrees_counted() {
             var motor = ports[port]; // get the motor info by port
             var motorInfo = motor.data;
-            return motorInfo.uAngle;
+            return motorInfo.angle;
         }
 
         /** Get the power of the motor
@@ -1635,23 +1800,41 @@ function Service_SPIKE() {
             }
         }
 
+
         /** Runs the motor to an absolute position.
-         * 
+         * The sign of the speed will be ignored (i.e., absolute value), and the motor will always travel in the direction that’s been specified by the "direction" parameter. 
+         * If the speed is greater than "100," it will be limited to "100."
+
          * @param {integer} degrees [0 to 359]
+         * @param {string} direction "Clockwise" or "Counterclockwise"
          * @param {integer} speed [-100 to 100]
          * @param {function} callback Params: "stalled" or "done"
+         * @ignore
          * @example
          * mySPIKE.run_to_position(180, 100, function() {
          *      console.log("motor finished moving");
          * })
          */
-        function run_to_position(degrees, speed, callback = undefined) {
-            if (speed !== undefined && typeof speed == "number") {
+        function run_to_position(degrees, direction, speed, callback = undefined) {
+            if (speed !== undefined && typeof speed == "number")
                 UJSONRPC.motorGoRelPos(port, degrees, speed, stallSetting, stopMethod, callback);
-            }
-            else {
+            else
                 UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
-            }
+        }
+
+        /** Runs the motor until the number of degrees counted is equal to the value that has been specified by the "degrees" parameter.
+         * 
+         * @param {integer} degrees any number
+         * @param {integer} speed [0 to 100]
+         * @param {any} [callback] (optional callback) callback param: "stalled" or "done"
+         */
+        function run_to_degrees_counted(degrees, speed, callback = undefined) {
+            if (speed !== undefined && typeof speed == "number")
+                UJSONRPC.motorGoRelPos(port, degrees, speed, stallSetting, stopMethod, callback);
+            else
+                UJSONRPC.motorGoRelPos(port, degrees, defaultSpeed, stallSetting, stopMethod, callback);
+
+
         }
 
         /** Start the motor at some power
@@ -1724,6 +1907,7 @@ function Service_SPIKE() {
 
         return {
             run_to_position: run_to_position,
+            run_to_degrees_counted: run_to_degrees_counted,
             start_at_power: start_at_power,
             start: start,
             stop: stop,
@@ -1740,10 +1924,12 @@ function Service_SPIKE() {
     }
 
     /** ColorSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
+     * @example
+     * // Initialize the Color Sensor
+     * var color = new mySPIKE.ColorSensor("E")
      */
     ColorSensor = function (port) {
         var waitForNewColorFirst = false;
@@ -1757,7 +1943,7 @@ function Service_SPIKE() {
         }
 
         /** Get the name of the detected color
-         * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white',None
+         * @returns {string} 'black','violet','blue','cyan','green','yellow','red','white'
          */
         function get_color() {
             var colorsensor = ports[port]; // get the color sensor info by port
@@ -1839,14 +2025,13 @@ function Service_SPIKE() {
             return colorsensorData.RGB[2];
         }
 
-
         /** Waits until the Color Sensor detects the specified color.
-         * @ignore
-         * @todo Implement this function
+         * 
+         * @param {string} colorInput 'black','violet','blue','cyan','green','yellow','red','white'
+         * @param {function} callback callback function
          */
-        function wait_until_color(color) {
-            var color = get_color();
-            console.log(color);
+        function wait_until_color(colorInput, callback) {
+            waitUntilColorCallback = [colorInput, callback];
         }
 
 
@@ -1854,15 +2039,13 @@ function Service_SPIKE() {
          * The first time this method is called, it returns immediately the detected color. 
          * After that, it waits until the Color Sensor detects a color that is different from the color that
          * was detected the last time this method was used.
-         * @ignore
-         * @todo Implement this function
-         * @param {function(string)} callback  
+         * @param {function(string)} callback params: detected new color
          */
         function wait_for_new_color(callback) {
 
             // check if this method has been executed after start of program
             if (waitForNewColorFirst) {
-                waitForNewColorFirst = true;
+                waitForNewColorFirst = false;
 
                 var currentColor = get_color();
                 callback(currentColor)
@@ -1872,6 +2055,8 @@ function Service_SPIKE() {
 
         return {
             get_color: get_color,
+            wait_until_color: wait_until_color,
+            wait_for_new_color: wait_for_new_color,
             get_ambient_light: get_ambient_light,
             get_reflected_light: get_reflected_light,
             get_rgb_intensity: get_rgb_intensity,
@@ -1883,17 +2068,16 @@ function Service_SPIKE() {
     }
 
     /** DistanceSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
      * @example
-     * var distance_sensor = mySPIKE.DistanceSensor("A");
+     * // Initialize the DistanceSensor
+     * var distance_sensor = new mySPIKE.DistanceSensor("A");
      */
     DistanceSensor = function (port) {
 
         var distanceSensor = ports[port] // get the distance sensor info by port
-        var distanceSensorData = distanceSensor.data;
 
         // check if device is a distance sensor
         if (distanceSensor.device != "ultrasonic") {
@@ -1901,13 +2085,12 @@ function Service_SPIKE() {
         }
 
         /** Retrieves the measured distance in centimeters.
-         * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 200]
          * @todo find the short_range handling ujsonrpc script
          * @example
-         * var distance_cm = distance_sensor.get_distance_cm(false);
+         * var distance_cm = distance_sensor.get_distance_cm();
          */
-        function get_distance_cm(short_range) {
+        function get_distance_cm() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
@@ -1916,28 +2099,31 @@ function Service_SPIKE() {
 
         /** Retrieves the measured distance in inches.
          * 
-         * @param {boolean} short_range Whether to use or not the short range mode.
          * @returns {number} [0 to 79]
          * @todo find the short_range handling ujsonrpc script
          * @example
-         * var distance_inches = distance_sensor.get_distance_inches(false);
+         * var distance_inches = distance_sensor.get_distance_inches();
          */
-        function get_distance_inches(short_range) {
+        function get_distance_inches() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
-            var inches = distanceSensorData.distance * 0.393701;
+            var inches = distanceSensorData.distance * 0.393701; // convert to inches
+
+            if (inches % 1 < 0.5)
+                inches = Math.floor(inches);
+            else
+                inches = Math.ceil(inches);
+
             return inches;
         }
 
         /** Retrieves the measured distance in percent.
          * 
-         * @param {boolean} short_range Whether to use or not the short range mode.
-         * @returns {number/string} [0 to 100] or 'none' if can't read distance
-         * @todo find the short_range handling ujsonrpc script
-         * var distance_percentage = distance_sensor.get_distance_percentage(false);
+         * @returns {number/string} [0 to 100] or 'none' if no distance is read
+         * var distance_percentage = distance_sensor.get_distance_percentage();
          */
-        function get_distance_percentage(short_range) {
+        function get_distance_percentage() {
             var distanceSensor = ports[port] // get the distance sensor info by port
             var distanceSensorData = distanceSensor.data;
 
@@ -1949,25 +2135,63 @@ function Service_SPIKE() {
         }
 
         /** Waits until the measured distance is greater than distance.
-         * @ignore
-         * @param {integer} distance 
+         * @param {integer} threshold 
          * @param {string} unit 'cm','in','%'
-         * @param {integer} short_range 
-         * @todo Implement this function
+         * @param {function} callback function to execute when distance is farther than threshold
+         * @example
+         * distance_sensor.wait_for_distance_farther_than(10, 'cm', function () {
+         *      console.log("distance is farther than 10 CM");
+         * })
          */
-        function wait_for_distance_farther_than(distance, unit, short_range) {
+        function wait_for_distance_farther_than(threshold, unit, callback) {
 
+            // set callbacks to be executed in updateHubPortsInfo()
+            if (unit == 'cm') {
+                waitForDistanceFartherThanCallback = [threshold, callback];
+            }
+            else if (unit == 'in') {
+                waitForDistanceFartherThanCallback = [threshold / 0.393701, callback];
+            }
+            else if (unit == '%') {
+                waitForDistanceFartherThanCallback = [(threshold * 0.01) * 200, callback];
+            }
+            else {
+                throw new Error("The 'unit' argument in wait_for_distance_farther_than(threshold, unit, callback) must be either 'cm', 'in', or '%'.")
+            }
         }
 
-        /** xWaits until the measured distance is less than distance.
-         * @ignore
-         * @param {any} distance 
-         * @param {any} unit 'cm','in','%'
-         * @param {any} short_range 
-         * @todo Implement this function
+        /** Waits until the measured distance is less than distance.
+         * @param {integer} threshold 
+         * @param {string} unit 'cm','in','%'
+         * @param {function} callback function to execute when distance is closer than threshold
+         * @example
+         * distance_sensor.wait_for_distance_closer_than(10, 'cm', function () {
+         *      console.log("distance is closer than 10 CM");
+         * })   
          */
-        function wait_for_distance_closer_than(distance, unit, short_range) {
+        function wait_for_distance_closer_than(threshold, unit, callback) {
+            // set callbacks to be executed in updateHubPortsInfo()
+            if (unit == 'cm') {
+                waitForDistanceCloserThanCallback = [threshold, callback];
+            }
+            else if (unit == 'in') {
+                waitForDistanceCloserThanCallback = [threshold / 0.393701, callback];
+            }
+            else if (unit == '%') {
 
+                /* floor or ceil thresholds larger or smaller than what's possible */
+                if (threshold > 100) {
+                    threshold = 100;
+                }
+                else if (threshold < 0) {
+                    threshold = 0;
+                }
+
+                waitForDistanceCloserThanCallback = [(threshold * 0.01) * 200, callback];
+            }
+            else {
+                throw new Error("The 'unit' argument in wait_for_distance_closer_than(threshold, unit, callback) must be either 'cm', 'in', or '%'.")
+            }
         }
 
         /** Sets the brightness of the individual lights on the Distance Sensor.
@@ -1989,20 +2213,38 @@ function Service_SPIKE() {
             UJSONRPC.ultrasonicLightUp(port, lightArray);
         }
 
+        /** Lights up all of the lights on the Distance Sensor at the specified brightness.
+         * 
+         * @param {number} [brightness=100] The specified brightness of all of the lights
+         * @example
+         * distance_sensor.light_up_all(50)
+         */
+        function light_up_all(brightness = 100) {
+
+            let lightArray = [brightness, brightness, brightness, brightness];
+
+            UJSONRPC.ultrasonicLightUp(port, lightArray);
+        }
+
         return {
             get_distance_cm: get_distance_cm,
             get_distance_inches: get_distance_inches,
             get_distance_percentage: get_distance_percentage,
-            light_up: light_up
+            light_up: light_up,
+            light_up_all: light_up_all,
+            wait_for_distance_closer_than: wait_for_distance_closer_than,
+            wait_for_distance_farther_than:wait_for_distance_farther_than
         }
 
     }
 
     /** ForceSensor
-     * @class
+     * @namespace
      * @param {string} Port
      * @memberof Service_SPIKE
-     * @returns {functions}
+     * @example
+     * // Initialize the ForceSensor
+     * var force = new mySPIKE.ForceSensor("E")
      */
     ForceSensor = function (port) {
 
@@ -2076,12 +2318,12 @@ function Service_SPIKE() {
     }
 
     /** MotorPair
-     * @class
+     * @namespace
      * @param {string} leftPort
      * @param {string} rightPort
      * @memberof Service_SPIKE
-     * @returns {functions}
-     * @todo implement the rest (what is differential (tank) steering? )
+     * @example
+     * var pair = new mySPIKE.MotorPair("A", "B")
      */
     MotorPair = function (leftPort, rightPort) {
         // settings 
@@ -2268,6 +2510,26 @@ function Service_SPIKE() {
             pushResponseCallback(randomId, callback);
         }
         sendDATA(command);
+    }
+
+    UJSONRPC.motorGoDirToPosition = async function motorGoDirToPosition(port, position, direction, speed, stall, stop, callback) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "scratch.motor_go_direction_to_position"' +
+            ', "p": {' +
+            '"port":' + '"' + port + '"' +
+            ', "position":' + position +
+            ', "direction":' + direction +
+            ', "speed":' + speed +
+            ', "stall":' + stall +
+            ', "stop":' + stop +
+            '} }';
+
+        if (callback != undefined) {
+            pushResponseCallback(randomId, callback);
+        }
+        sendDATA(command);
+
     }
 
     /**
@@ -2714,7 +2976,15 @@ function Service_SPIKE() {
 
     }
 
+    UJSONRPC.centerButtonLightUp = function centerButtonLightUp(color) {
+        var randomId = generateId();
+        var command = '{"i":' + '"' + randomId + '"' +
+            ', "m": "scratch.center_button_lights", "p": {' +
+            '"color": '  + color + 
+            '} }';
 
+        sendDATA(command);
+    }
     //////////////////////////////////////////
     //                                      //
     //          Private Functions           //
@@ -2737,7 +3007,6 @@ function Service_SPIKE() {
      * @param {string} funcName 
      */
     function pushResponseCallback(id, funcName) {
-
         var toPush = []; // [ ujson string id, function pointer ]
 
         toPush.push(id);
@@ -2897,11 +3166,11 @@ function Service_SPIKE() {
      * @param {boolean} [testing=false] 
      * @param {any} callback 
      */
-    async function processFullUJSONRPC(lastUJSONRPC, json_string = "undefined", testing = false, callback) {
+    async function processFullUJSONRPC(lastUJSONRPC, cleanedJsonString = "undefined", json_string = "undefined", testing = false, callback) {
         try {
 
             var parseTest = await JSON.parse(lastUJSONRPC)
-
+            
             if (testing) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "processing FullUJSONRPC line: ", lastUJSONRPC);
             }
@@ -2940,7 +3209,7 @@ function Service_SPIKE() {
 
     /**  Process a packet in UJSONRPC
     * @private
-    *
+    * 
     */
     async function parsePacket(value, testing = false, callback) {
 
@@ -2948,9 +3217,12 @@ function Service_SPIKE() {
 
         // stringify the packet to look for carriage return
         var json_string = await JSON.stringify(value);
-
+        
+        // remove quotation marks from json_string
         var cleanedJsonString = cleanJsonString(json_string);
         // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
+
+        // console.log(cleanedJsonString);
 
         jsonline = jsonline + cleanedJsonString; // concatenate packet to data
         jsonline = jsonline.trim();
@@ -2961,50 +3233,63 @@ function Service_SPIKE() {
 
         // there is at least one carriage return in this packet
         if (carriageReIndex > -1) {
+            //////////////////////////////// NEW parsePacket implementation ongoing since (29/12/20)
 
-            // the concatenated packets start with a left curly brace (start of JSON)
-            if (jsonline[0] == "{") {
+            let jsonlineSplitByCR = jsonline.split(/\\r/); // array of jsonline split by \r
+            
+            jsonline = ""; //reset jsonline
+            /*
+                each element in this array will be assessed for processing, 
+                and the last element, if unable to be processed, will be concatenated to jsonline
+            */
 
-                lastUJSONRPC = jsonline.substring(0, carriageReIndex);
+            for (let i = 0; i < jsonlineSplitByCR.length; i++) {
 
-                // look for conjoined JSON packets: there's at least two carriage returns in jsonline
-                if (jsonline.match(/\\r/g).length > 1) {
+                // set lastUJSONRPC to an element in split array
+                lastUJSONRPC = jsonlineSplitByCR[i]; 
+                // remove any newline character in the beginning of lastUJSONRPC
+                if (lastUJSONRPC.search(/\\n/g) == 0)
+                    lastUJSONRPC = lastUJSONRPC.substring(2, lastUJSONRPC.length);
 
-                    var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
-
-                    // last index only contains "" as it would be after \r
-                    for (var i = 0; i < conjoinedPacketsArray.length ; i++) {
-
-                        // for every JSON object in array except last, perform data handling
-                        if ( i < conjoinedPacketsArray.length -1 ) {
-                            lastUJSONRPC = conjoinedPacketsArray[i];
-
-                            processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
+                /* Case 1: lastUJSONRPC is a valid, complete, and standard UJSONRPC packet */
+                if (lastUJSONRPC[0] == "{" && lastUJSONRPC[lastUJSONRPC.length - 1] == "}") {
+                    await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
+                }
+                /* Case 3: lastUJSONRPC is a micropy print result */
+                else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1 && 
+                    lastUJSONRPC.indexOf('}') == -1 && lastUJSONRPC.indexOf('{"i":') == -1 && lastUJSONRPC.indexOf('{"') == -1 ) {
+                        /* filter reboot message */
+                        var rebootMessage = 
+                        'Traceback (most recent call last): File "main.py", line 8, in <module> File "hub_runtime.py", line 1, in start File "event_loop/event_loop.py", line 1, in run_forever File "event_loop/event_loop.py", line 1, in step KeyboardInterrupt: MicroPython v1.12-1033-g97d7f7dd4 on 2020-09-18; LEGO Technic Large Hub with STM32F413xx Type "help()" for more in formation. >>> HUB: sync filesystems HUB: soft reboot'
+                        let rebootMessageRemovedWS = rebootMessage.replace(/[' ']/g, "");
+                        let lastUJSONRPCRemovedWS = lastUJSONRPC.replace(/[' ']/g, "");
+                        if (rebootMessageRemovedWS.indexOf(lastUJSONRPCRemovedWS) == -1) {
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy print: ", lastUJSONRPC);
+                            if (funcAfterPrint != undefined)
+                                funcAfterPrint(lastUJSONRPC);
                         }
-                        else {
-                            jsonline = conjoinedPacketsArray[i];
-                        }
+                }
+                /* Case 3: lastUJSONRPC is only a portion of a standard UJSONRPC packet 
+                    Then lastUJSONRPC must be EITHER THE FIRST OR THE LAST ELEMENT in jsonlineSplitByCR
+                    because
+                    an incomplete UJSONRPC can either be 
+                    Case 3A: the beginning portion of a UJSONRPC packet with no \r in the end (LAST)
+                    Case 3B: the last portion of a UJSONRPC packet with \r in the end (FIRST)
+                */
+                else {
+                    /* Case 3A: */
+                    if (lastUJSONRPC[0] == "{") {
+                        jsonline = lastUJSONRPC;
+                        // console.log("TEST (last elemnt in split array): ", i == jsonlineSplitByCR.length-1);
+                        // console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
+                    }
+                    /* Case 3B: */
+                    else {
+                        /* the last portion of UJSONRPC cannot be concatenated to form a full packet
+                            -> need to purge lastUJSONRPC
+                        */
                     }
                 }
-                // there are no conjoined packets in this jsonline
-                else {
-                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                    processFullUJSONRPC(lastUJSONRPC, json_string, testing, callback);
-
-                    jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
-                }
-
-            }
-            else {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline needs reset: ", jsonline);
-
-                jsonline = jsonline.substring(carriageReIndex + 2, jsonline.length);
-
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline was reset to:" + jsonline);
-
-                // reset jsonline for next concatenation
-                // jsonline = "";
             }
         }
 
@@ -3016,6 +3301,11 @@ function Service_SPIKE() {
      */
     async function streamUJSONRPC() {
         try {
+            // COMMENTED BY JEREMY JUNG (DECEMBER/10/2020)
+            // var triggerCurrentStateInterval = setInterval(function() {
+                // UJSONRPC.triggerCurrentState();
+            // }, 500);
+
             var firstReading = true;
             // read when port is set up
             while (port.readable) {
@@ -3047,7 +3337,7 @@ function Service_SPIKE() {
 
                         //concatenate UJSONRPC packets into complete JSON objects
                         if (value) {
-                            parsePacket(value);
+                            await parsePacket(value);
                         }
                         if (done) {
                             serviceActive = false;
@@ -3154,9 +3444,11 @@ function Service_SPIKE() {
                         device_value.device = "smallMotor";
                         device_value.data = { "speed": Mspeed, "angle": Mangle, "uAngle": Muangle, "power": Mpower };
                         ports[letter] = device_value;
+
                     }
                     // get BIG MOTOR information
                     else if (data_stream[key][0] == 49) {
+
                         // parse motor information
                         var Mspeed = await data_stream[key][1][0];
                         var Mangle = await data_stream[key][1][1];
@@ -3179,6 +3471,32 @@ function Service_SPIKE() {
                         device_value.device = "ultrasonic";
                         device_value.data = { "distance": Udist };
                         ports[letter] = device_value;
+
+                        /* check if callback from wait_for_distance_farther_than() can be executed */
+                        if (waitForDistanceFartherThanCallback != undefined) {
+                            let thresholdDistance = waitForDistanceFartherThanCallback[0];
+
+                            if (Udist > thresholdDistance) {
+                                
+                                // current distance is farther than threshold, so execute callback
+                                waitForDistanceFartherThanCallback[1]();
+                                waitForDistanceFartherThanCallback = undefined; // reset callback
+                            }
+                        }
+                    
+                        /* check if callback from wait_for_distance_closer_than() can be executed */
+                        if (waitForDistanceCloserThanCallback != undefined) {
+                            let thresholdDistance = waitForDistanceCloserThanCallback[0];
+                            
+                            if (Udist < thresholdDistance) {
+
+                                // current distance is closer than threshold, so execute callback
+                                waitForDistanceCloserThanCallback[1]();
+                                waitForDistanceCloserThanCallback = undefined; // reset callback
+                            }
+                        }
+
+
                     }
                     // get FORCE sensor information
                     else if (data_stream[key][0] == 63) {
@@ -3234,7 +3552,29 @@ function Service_SPIKE() {
 
                         // populate value object
                         device_value.device = "color";
+
+                        // convert Ccolor to lower case because in the SPIKE APP the color is lower case
+                        Ccolor = Ccolor.toLowerCase();
                         device_value.data = { "reflected": Creflected, "color": Ccolor, "RGB": rgb_array };
+
+                        // execute wait_until_color callback when color matches its argument
+                        if (waitUntilColorCallback != undefined)
+                            if (Ccolor == waitUntilColorCallback[0]) {
+                                waitUntilColorCallback[1]();
+
+                                waitUntilColorCallback = undefined;
+                            }
+                        
+                        if (lastDetectedColor != Ccolor) {
+                            
+                            if (funcAfterNewColor != undefined) {
+                                funcAfterNewColor(Ccolor);
+                                funcAfterNewColor = undefined;
+                            }
+
+                            lastDetectedColor = Ccolor;
+                        }
+
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
@@ -3327,7 +3667,12 @@ function Service_SPIKE() {
             }
         }
         else if (messageType == 0) {
-
+            /*
+                DEV NOTE (26/12/2020):
+                    messageType = 0 is regular UJSONRPC stream.
+                    Pixel matrix SOMETIMES shows in this message, but exactly when is not clear.
+            */
+            // console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
         // storage information
         else if (messageType == 1) {
@@ -3366,7 +3711,9 @@ function Service_SPIKE() {
                 hubLeftButton.pressed = true;
 
                 // execute callback for wait_until_pressed() if defined
-                typeof funcAfterLeftButtonPress === "function" && funcAfterLeftButtonPress();
+                if (funcAfterLeftButtonPress != undefined ) {
+                    funcAfterLeftButtonPress();
+                }
                 funcAfterLeftButtonPress = undefined;
 
                 if (parsedUJSON.p[1] > 0) {
@@ -3374,7 +3721,10 @@ function Service_SPIKE() {
                     hubLeftButton.duration = parsedUJSON.p[1];
 
                     // execute callback for wait_until_released() if defined
-                    typeof funcAfterLeftButtonRelease === "function" && funcAfterLeftButtonRelease();
+                    if (funcAfterLeftButtonRelease != undefined ) {
+                        funcAfterLeftButtonRelease();
+                    }
+
                     funcAfterLeftButtonRelease = undefined;
                 }
 
@@ -3383,7 +3733,10 @@ function Service_SPIKE() {
                 hubRightButton.pressed = true;
 
                 // execute callback for wait_until_pressed() if defined
-                typeof funcAfterRightButtonPress === "function" && funcAfterRightButtonPress();
+                if (funcAfterRightButtonPress != undefined) {
+                    funcAfterRightButtonPress();
+                }
+
                 funcAfterRightButtonPress = undefined;
 
                 if (parsedUJSON.p[1] > 0) {
@@ -3391,17 +3744,21 @@ function Service_SPIKE() {
                     hubRightButton.duration = parsedUJSON.p[1];
 
                     // execute callback for wait_until_released() if defined
-                    typeof funcAfterRightButtonRelease === "function" && funcAfterRightButtonRelease();
+                    if (funcAfterRightButtonRelease != undefined) {
+                        funcAfterRightButtonRelease();
+                    }
+
                     funcAfterRightButtonRelease = undefined;
                 }
             }
 
         }
-        // gives orientation of the hub (leftside, up,..), tapping of hub, 
+        // gives orientation of the hub (leftside, up,..)
         else if (messageType == 14) {
             /* this data stream is about hub orientation */
 
             var newOrientation = parsedUJSON.p;
+            // console.log(newOrientation);
             if (newOrientation == "1") {
                 lastHubOrientation = "up";
             }
@@ -3415,10 +3772,10 @@ function Service_SPIKE() {
                 lastHubOrientation = "back";
             }
             else if (newOrientation == "2") {
-                lastHubOrientation = "leftSide";
+                lastHubOrientation = "rightside";
             }
             else if (newOrientation == "5") {
-                lastHubOrientation = "rightSide";
+                lastHubOrientation = "leftside";
             }
 
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
@@ -3445,6 +3802,9 @@ function Service_SPIKE() {
         else if (messageType == 11) {
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
         }
+        else if (messageType == 12) {
+            // this is usually the response from trigger_current_state, don't console log to avoid spam
+        }
         else if (messageType == 4) {
             var newGesture = parsedUJSON.p;
 
@@ -3469,24 +3829,12 @@ function Service_SPIKE() {
 
             // execute funcAfterNewGesture callback that was taken at wait_for_new_gesture()
             if (typeof funcAfterNewGesture === "function") {
-                funcAfterNewGesture(newGesture);
+                funcAfterNewGesture(hubGesture);
                 funcAfterNewGesture = undefined;
             }
 
             console.log("%cTuftsCEEO ", "color: #3ba336;", lastUJSONRPC);
 
-        }
-        else if (messageType == "userProgram.print") {
-            var printedMessage = parsedUJSON["p"]["value"];
-            var NLindex = printedMessage.search(/\\n/);
-            printedMessage = await printedMessage.substring(0, NLindex);
-
-            console.log("%cTuftsCEEO ", "color: #3ba336;", atob(printedMessage));
-
-            // execute function after print if defined
-            if (funcAfterPrint != undefined) {
-                funcAfterPrint(atob(printedMessage));
-            }
         }
         else {
 
@@ -3520,38 +3868,50 @@ function Service_SPIKE() {
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
+            // COMMENTED BY JEREMY JUNG ON DECEMBER 10TH AFTER REMOVING TRIGGER_CURRENT_STATE INTERVAL
+            // if (parsedUJSON.r !== undefined && parsedUJSON.r !== null) {
+                // if (Object.keys(parsedUJSON.r).length !== 0 && parsedUJSON.r.constructor === Object) {
+                    // console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+                // }
+            // }
+            // else {
+                // console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
+            // }
 
             console.log("%cTuftsCEEO ", "color: #3ba336;", "received response: ", lastUJSONRPC);
-
-            // iterate over responseCallbacks global variable
-            for (var index in responseCallbacks) {
+            /* See if any of the stored responseCallbacks need to be executed due to this UJSONRPC response */
+            for (var index = 0; index < responseCallbacks.length; index++) {
 
                 var currCallbackInfo = responseCallbacks[index];
 
-                // check if the message id of UJSONRPC corresponds to that of a response callback
-                if (currCallbackInfo[0] == parsedUJSON["i"]) {
+                if (currCallbackInfo != undefined) {
 
-                    var response = "null";
+                    if (currCallbackInfo[0] == parsedUJSON["i"]) {
+                        /* the message id of UJSONRPC corresponds to that of a response callback */
+                        
+                        var response = "null";
 
-                    if (parsedUJSON["r"] == 0) {
-                        response = "done";
-                    }
-                    else if (parsedUJSON["r"] == 2) {
-                        response = "stalled";
-                    }
+                        // parse motor stoppage reason responses 
+                        if (parsedUJSON["r"] == 0) {
+                            response = "done";
+                        }
+                        else if (parsedUJSON["r"] == 2) {
+                            response = "stalled";
+                        }
 
-                    // execute callback with the response
-                    currCallbackInfo[1](response);
+                        // execute callback with the response
+                        currCallbackInfo[1](response);
 
-                    // empty the index of which callback that was just executed
-                    responseCallbacks[index] = undefined;
+                        // empty the index of which callback that was just executed
+                        responseCallbacks[index] = undefined;
+                    }   
                 }
             }
 
             // execute the callback function after sending start_write_program UJSONRPC
             if (startWriteProgramCallback != undefined) {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "startWriteProgramCallback is defined. Looking for matching mesasage id: ", startWriteProgramCallback[0]);
 
                 // check if the message id of UJSONRPC corresponds to that of a response callback
                 if (startWriteProgramCallback[0] == parsedUJSON["i"]) {
@@ -3578,7 +3938,7 @@ function Service_SPIKE() {
             // check if the program should write packages for a program
             if (writePackageInformation != undefined) {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "writePackageInformation is defined. Looking for matching mesasage id...")
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "writePackageInformation is defined. Looking for matching mesasage id: ", writePackageInformation[0]);
 
                 // check if the message id of UJSONRPC corresponds to that of the first write_package script that was sent
                 if (writePackageInformation[0] == parsedUJSON["i"]) {
@@ -3636,9 +3996,7 @@ function Service_SPIKE() {
                         writePackageInformation = [messageid, remainingData, transferID, blocksize];
                     }
                 }
-
             }
-
         }
     }
 
@@ -3666,10 +4024,10 @@ function Service_SPIKE() {
                 newOrientation = "down";
             }
         } else if (gyro[0] > 500) {
-            newOrientation = "leftSide";
+            newOrientation = "rightside";
         }
         else if (gyro[0] < -500) {
-            newOrientation = "rightSide";
+            newOrientation = "leftside";
         }
 
         return newOrientation;

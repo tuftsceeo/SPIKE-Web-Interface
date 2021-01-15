@@ -34,7 +34,7 @@
         </div>
         <div id = "onlyForWriteProgram" >
             <textarea id="writeProgramData" name="data" value=""
-                style="font-family: Courier; position: relative; left: 20px; z-index: 5;" /></textarea>
+                style="font-family: Courier; position: relative; left: 20px; z-index: 5;" ></textarea>
             <input style = "position: relative; left: 20px;" type="button" id = "writeTheProgram" value="write program">
         </div>
         <div id = "SPIKEbox">
@@ -53,8 +53,14 @@
             <input type="button" id="SPIKE_test_select" value="display test cases for this function">
             <div id="SPIKEtests">
                 <!-- motor functions -->
-                <input type="button" id="motorrelpos" class="SPIKEtestCase motor" value="motor go to rel pos ( with stall detection )">
-                <input type="button" id="motorrelpos1" class="SPIKEtestCase motor" value="motor go to rel pos ( NO stall detection )">
+                <input type="button" id="motordeg" class="SPIKEtestCase motor"
+                    value="motor.run_to_degrees_counted() ( with stall detection )">
+                <input type="button" id="motordeg1" class="SPIKEtestCase motor"
+                                        value="motor.run_to_degrees_counted() ( NO stall detection )">
+                <input type="button" id="motordegcb" class="SPIKEtestCase motor"
+                    value="motor.run_to_degrees_counted() with CALLBACK ( with stall detection )">
+                <input type="button" id="motordeg1cb" class="SPIKEtestCase motor"
+                    value="motor.run_to_degrees_counted() with CALLBACK ( NO stall detection )">
                 <input type="button" id="degreesCounted" class="SPIKEtestCase motor" value="motor get degrees counted">
                 <input type="button" id="motorPosition" class="SPIKEtestCase motor" value="motor get position">
                 <input type="button" id="getPower" class="SPIKEtestCase motor" value="motor get power">
@@ -103,10 +109,16 @@
                 <!-- color sensor functions -->
                 <input type="button" id="getColor" class="SPIKEtestCase color" value="get color test">
                 <input type="button" id="waitUntilColor" class="SPIKEtestCase color" value="wait until color test">
+                <input type="button" id="waitForNewColor" class="SPIKEtestCase color" value="wait for new color test">
                 
-                <!-- color sensor functions -->
+                <!-- ultrasonic sensor functions -->
                 <input type="button" id="lightup" class="SPIKEtestCase ultrasonic" value="ultrasonic light up">
-
+                <input type="button" id="testGetDistanceCM" class="SPIKEtestCase ultrasonic" value="DistanceSensor.get_distance_cm()">
+                <input type="button" id="testGetDistanceIN" class="SPIKEtestCase ultrasonic" value="DistanceSensor.get_distance_inches()">
+                <input type="button" id="testWaitForDistanceFartherThan" class="SPIKEtestCase ultrasonic"
+                    value="DistanceSensor.wait_for_distance_farther_than()">
+                <input type="button" id="testWaitForDistanceCloserThan" class="SPIKEtestCase ultrasonic"
+                    value="DistanceSensor.wait_for_distance_closer_than()">
                 <!-- write Program functions -->
                 <input type="button" id="writeProgram" class="SPIKEtestCase program" value="test write program">
                 <input type="button" id="concatenateProgram" class="SPIKEtestCase program" value="test source code for concatenating micropy program">
@@ -228,7 +240,7 @@
         Airtable.executeAfterInit( async function() {
             console.log("Service is active: ", Airtable.isActive());
             /* begin testing Airtable getter functions */
-
+            
             // get all the "Name" fields on the table
             var names = Airtable.getNames();
             console.log(names);
@@ -279,51 +291,86 @@
         //              Motor Tests             //
         //                                      //
 
-        /* go to rel pos stall detection */
-        var testMotorRelPos = document.getElementById("motorrelpos");
-        testMotorRelPos.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_position(100) #######");
-            console.log("Test: motor connected to port A will move to a certain position.\n" +
-            "Check stall detection: Hold the motor. Because stall detect is on, the motor will stop after it being unable to move for some time" + "\n" +
-            "Check stall detection response: (example response that detected stall: {'i':4973,'r':2})" + "if not detect stall: {'i':2117,'r':0}");
+        var testMotorDegreesCounted = document.getElementById("motordeg");
+        var testMotorDegreesCounted1 = document.getElementById("motordeg1");
+        var testMotorDegreesCountedCB = document.getElementById("motordegcb");
+        var testMotorDegreesCounted1CB = document.getElementById("motordeg1cb");
+        var testDegreesCounted = document.getElementById("degreesCounted");
+        var testMotorStartAtPower = document.getElementById("motorStartAtPower");
+        var testMotorPosition = document.getElementById("motorPosition");
+        
+        testMotorDegreesCounted.addEventListener("click", async function() {
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
             var motor = new mySPIKE.Motor("A");
-            motor.set_default_speed(50);
+            
+            motor.set_stall_detection(true);
+
+            motor.run_to_degrees_counted(200, 50);
+
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
+        })
+
+        testMotorDegreesCounted1.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
+
+            var motor = new mySPIKE.Motor("A");
+
+            motor.set_stall_detection(false);
+
+            motor.run_to_degrees_counted(200, 50);
+
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
+        })
+
+        testMotorDegreesCountedCB.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
+            var motor = new mySPIKE.Motor("A");
 
             motor.set_stall_detection(true);
-            
-            motor.run_to_position(180);
 
-            console.log("default speed", motor.get_default_speed());
-
-            console.log("###### ENDING UNIT TEST ON motor.run_to_position(100) #######");
-
+            motor.run_to_degrees_counted(200, 50, function(result) {
+                console.log("MOTOR STOPPED WITH RESULT: ", result)
+            });
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
         })
 
-        /* go to rel pos without stall detection */
-        var testMotorRelPos1 = document.getElementById("motorrelpos1");
-        testMotorRelPos1.addEventListener("click", async function () {
+        testMotorDegreesCounted1CB.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
 
             var motor = new mySPIKE.Motor("A");
-            motor.set_default_speed(50);
-            
+
             motor.set_stall_detection(false);
-            
-            motor.run_to_position(180, 100, function() {
-                console.log("done");
+
+            motor.run_to_degrees_counted(200, 50, function(result) {
+                console.log("MOTOR STOPPED WITH RESULT: ", result)
             });
 
-            console.log(motor.get_default_speed());
-
+            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
         })
-
+        
+        
         /* go to rel pos without stall detection */
-        var testMotorStartAtPower = document.getElementById("motorStartAtPower");
         testMotorStartAtPower.addEventListener("click", async function () {
 
             var motor = new mySPIKE.Motor("A");
             motor.run_for_degrees(30,100);
 
         })
+        
+        testDegreesCounted.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motor.get_degrees_counted() #######");
+            var motor = new mySPIKE.Motor("A");
+            console.log(motor.get_degrees_counted())
+            console.log("###### ENDING UNIT TEST ON motor.get_degrees_counted() #######");
+        })
+
+        testMotorPosition.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON motor.get_position() #######");
+            var motor = new mySPIKE.Motor("A");
+            console.log(motor.get_position())
+            console.log("###### ENDING UNIT TEST ON motor.get_position() #######");
+        })
+
 
         //                                      //
         //           MotorPair Tests            //
@@ -779,6 +826,9 @@
         //                                      //
 
         var testGetColor = document.getElementById("getColor");
+        var testWaitUntilColor = document.getElementById("waitUntilColor");
+        var testWaitForNewColor = document.getElementById("waitForNewColor");
+
         testGetColor.addEventListener("click", async function () {
             console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').get_color() #######");
             console.log("Test: Connect color sensor to port A and start the test");
@@ -789,18 +839,94 @@
             console.log("###### ENDING UNIT TEST ON ColorSensor('A').get_color() #######");
         })
 
+        testWaitUntilColor.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
+            console.log("Test: Connect color sensor to port A and start the test");
+            var color_sensor = mySPIKE.ColorSensor("A");
+            color_sensor.wait_until_color('yellow', function() {  
+                console.log("Detected yellow");
+            });
+
+            console.log("###### ENDING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
+        })
+
+        testWaitForNewColor.addEventListener("click", async function() {
+            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
+            console.log("Test: Connect color sensor to port A and start the test");
+            var color_sensor = mySPIKE.ColorSensor("A");
+            
+            color_sensor.wait_for_new_color( function(color) {
+                console.log("New color detected: ", color);
+            })
+
+            console.log("###### ENDING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
+        })
+
         //                                      //
         //          ultrasonic Tests            //
         //                                      //
 
         var testLightUp = document.getElementById("lightup");
-            testLightUp.addEventListener("click", async function () {
-                console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
-                console.log("Test: Connect color sensor to port A and start the test");
-                var distance_sensor = mySPIKE.DistanceSensor("A");
-                distance_sensor.light_up(100,100,100,100);
-                console.log("###### ENDING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
+        var testGetDistanceCM = document.getElementById("testGetDistanceCM");
+        var testGetDistanceIN = document.getElementById("testGetDistanceIN");
+        var testWaitForDistanceFartherThan = document.getElementById("testWaitForDistanceFartherThan");
+        var testWaitForDistanceCloserThan = document.getElementById("testWaitForDistanceCloserThan");
+        testLightUp.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
+            console.log("Test: Connect DistanceSensor to port A and start the test");
+            var distance_sensor = new mySPIKE.DistanceSensor("A");
+            distance_sensor.light_up(100,100,100,100);
+            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
         })
+
+        testGetDistanceCM.addEventListener("click", async function() {
+            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').get_distance_cm() #######");
+            console.log("Test: Connect DistanceSensor to port A and start the test");
+
+            var distance_sensor = new mySPIKE.DistanceSensor("A");
+
+            console.log("Distance at port A: ", distance_sensor.get_distance_cm())
+
+            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').get_distance_cm() #######");
+        })
+
+        testGetDistanceIN.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').get_distance_inches() #######");
+            console.log("Test: Connect DistanceSensor to port A and start the test");
+
+            var distance_sensor = new mySPIKE.DistanceSensor("A");
+
+            console.log("Distance at port A in inches: ", distance_sensor.get_distance_inches())
+
+            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').get_distance_inches() #######");
+        })
+
+        testWaitForDistanceCloserThan.addEventListener("click", async function() {
+            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').wait_for_distance_closer_than() #######");
+            console.log("Test: Connect DistanceSensor to port A and start the test");
+
+            var distance_sensor = new mySPIKE.DistanceSensor("A");
+
+            distance_sensor.wait_for_distance_closer_than(10, "cm", function() {
+                console.log("Distance at port A is closer than 10 CM");
+            })
+
+            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').wait_for_distance_closer_than() #######");
+        })
+
+        testWaitForDistanceFartherThan.addEventListener("click", async function () {
+            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').wait_for_distance_farther_than() #######");
+            console.log("Test: Connect DistanceSensor to port A and start the test");
+
+            var distance_sensor = new mySPIKE.DistanceSensor("A");
+
+            distance_sensor.wait_for_distance_farther_than(10, "cm", function() {
+                console.log("Distance at port A is farther than 10 CM");
+            })
+
+            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').wait_for_distance_farther_than() #######");
+        })
+
 
         //                                      //
         //            program Tests             //
@@ -821,29 +947,17 @@
 
                 console.log(dataToWrite);
                 /* using writeProgram (old way) */
-                // var programname = "test program"
-                // mySPIKE.writeProgram(btoa(programname), dataToWrite, 1);
+                var programname = "test program";
+                mySPIKE.writeProgram(programname, dataToWrite, 0);
 
                 /* using micropython (new way) */
-                mySPIKE.micropython(0, dataToWrite);
+                // mySPIKE.micropython(0, dataToWrite);
             })
             console.log("###### ENDING UNIT TEST ON writeProgram() #######");
         })
 
         var testMicropython = document.getElementById("micropython");
         testMicropython.addEventListener("click", function () {
-//             mySPIKE.writeProgram("micropython test", 
-//                 `
-// from spike import PrimeHub, LightMatrix, Motor, MotorPair
-// from spike.control import wait_for_seconds, wait_until, Timer
-
-// hub = PrimeHub()
-
-// hub.light_matrix.show_image('HAPPY')
-//                 `, "10", function () {
-//                     mySPIKE.executeProgram("10");
-//                 }
-//             );
 
         parseCommand(`
 from spike import PrimeHub, LightMatrix, Motor, MotorPair
@@ -1005,12 +1119,6 @@ run_for_seconds(3)
                                             var parseTest = await JSON.parse(lastUJSONRPC)
 
                                             // // update hub information using lastUJSONRPC
-                                            // await updateHubPortsInfo();
-                                            // await PrimeHubEventHandler();
-
-                                            // if (funcWithStream) {
-                                            //     await funcWithStream();
-                                            // }
                                             console.log("lastUJSONRPC: ", lastUJSONRPC);
 
                                         }
@@ -1021,10 +1129,6 @@ run_for_seconds(3)
                                             console.log("current cleaned json_string: ", cleanedJsonString)
                                             console.log("current json_string: ", json_string);
                                             console.log("current value: ", value);
-
-                                            // if (funcAfterError != undefined) {
-                                            //     funcAfterError("Fatal Error: Please refresh this environment");
-                                            // }
 
                                         }
 
@@ -1037,15 +1141,6 @@ run_for_seconds(3)
 
                                     // // parsing test
                                     try {
-                                        var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                        // // update hub information using lastUJSONRPC
-                                        // await updateHubPortsInfo();
-                                        // await PrimeHubEventHandler();
-
-                                        // if (funcWithStream) {
-                                        //     await funcWithStream();
-                                        // }
                                         console.log("lastUJSONRPC: ", lastUJSONRPC);
                                     }
                                     catch (e) {
@@ -1056,10 +1151,6 @@ run_for_seconds(3)
                                         console.log("current json_string: ", json_string);
                                         console.log("current value: ", value);
                                         console.log("from a jsonline that has only one carriage return")
-
-                                        // if (funcAfterError != undefined) {
-                                        //     funcAfterError("Fatal Error: Please refresh this environment");
-                                        // }
 
                                     }
 
@@ -1311,8 +1402,9 @@ hub.light_matrix.write('done')
 
         var testRandom = document.getElementById("random");
         testRandom.addEventListener("click", function () {
-            mySPIKE.rebootHub();
+            mySPIKE.UJSONRPC.centerButtonLightUp(13);
         })
+
 
         //////////////////////////////////////////
         //                                      //
@@ -1484,41 +1576,58 @@ hub.light_matrix.write('done')
         })
 
         window.addEventListener("load", function () {
+            
+            // TEST MOTOR BUTTONS
+            testMotorDegreesCounted.style.backgroundColor = "lightgreen"; 
+            testMotorDegreesCounted1.style.backgroundColor = "lightgreen"; 
+            testMotorDegreesCountedCB.style.backgroundColor = "lightgreen"; 
+            testMotorDegreesCounted1CB.style.backgroundColor = "lightgreen";
+            testDegreesCounted.style.backgroundColor = "lightgreen";
+            testMotorStartAtPower.style.backgroundColor = "lightgreen";
+            testMotorPosition.style.backgroundColor = "lightgreen";
 
-            test_getMotorPorts.style.backgroundColor = "lightgreen";
-            testBeep.style.backgroundColor = "lightgreen";
-            testStartBeep.style.backgroundColor = "lightgreen";
-            testStopBeep.style.backgroundColor = "lightgreen";
-            testMotorRelPos.style.backgroundColor = "lightgreen";
-            testMotorRelPos1.style.backgroundColor = "lightgreen";
+            // TEST motion sensor functions
+            testGetAngles.style.backgroundColor = "lightgreen";
             testWasGesture.style.backgroundColor = "lightgreen";
             testWaitForNewGesture.style.backgroundColor = "lightgreen";
             testWaitForNewOri.style.backgroundColor = "lightgreen";
             testSetHubOrientation.style.backgroundColor = "lightgreen";
+            testResetYaw.style.backgroundColor = "red";
+            testResetYawSource.style.backgroundColor = "red";
+            testGetGesture.style.backgroundColor = "lightgreen";
+            testGetOrientation.style.backgroundColor = "lightgreen";
+
+            // TEST Forcesensor functions
             testForceSensorIsPressed.style.backgroundColor = "lightgreen";
             testForceSensorWaitUntilPress.style.backgroundColor = "lightgreen";
             testForceSensorWaitUntilRelease.style.backgroundColor = "lightgreen";
             testGetForceNewton.style.backgroundColor = "lightgreen";
             testGetForcePercentage.style.backgroundColor = "lightgreen";
-            testGetAngles.style.backgroundColor = "lightgreen";
-            testUJSONRPC.style.backgroundColor = "lightgreen";
-            testGetGesture.style.backgroundColor = "lightgreen";
-            testGetOrientation.style.backgroundColor = "lightgreen";
+
+            // TEST Primehub.speaker functions
+            testBeep.style.backgroundColor = "lightgreen";
+            testStartBeep.style.backgroundColor = "lightgreen";
+            testStopBeep.style.backgroundColor = "lightgreen";
+
+            // TEST Primehub.button functions
             testButtonIsPressed.style.backgroundColor = "lightgreen";
             testButtonWaitPressed.style.backgroundColor = "lightgreen";
             testButtonWaitRelease.style.backgroundColor = "lightgreen";
             testButtonWasPressed.style.backgroundColor = "lightgreen";
-            testResetYaw.style.backgroundColor = "red";
-            testResetYawSource.style.backgroundColor = "red";
+
+            //testMotorPairStart
             testMotorPairStop.style.backgroundColor = "lightgreen";
             testMotorPairMove.style.backgroundColor = "red";
-            //testMotorPairStart
             testMotorPairMoveLeft.style.backgroundColor = "red";
             testMotorPairMoveRight.style.backgroundColor = "red";
             testMotorPairMoveLeftSlightly.style.backgroundColor = "red";
             testMotorPairMoveRightSlightly.style.backgroundColor = "red";
 
-            // ujsonrpc functions
+            // test MISC buttons
+            test_getMotorPorts.style.backgroundColor = "lightgreen";
+
+            // test MISC buttons: UJSONRPC
+            testUJSONRPC.style.backgroundColor = "lightgreen";
             testUJSONRPCdisplayClear.style.backgroundColor = "lightgreen";
             testUJSONRPCdisplaySetPixel.style.backgroundColor = "lightgreen";
             testUJSONRPCdisplayText.style.backgroundColor = "lightgreen";
@@ -1749,9 +1858,9 @@ hub.light_matrix.write('done')
         }
 
         //sleep function
-            function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     </script>
     <style>
         #SPIKEbox {

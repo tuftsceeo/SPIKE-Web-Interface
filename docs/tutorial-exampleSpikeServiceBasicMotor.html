@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: General SystemLink Interface Example | Tutorial: General SystemLink Interface Example</title>
+    <title>Tutorial: Basic - Start Single Motor | Tutorial: Basic - Start Single Motor</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: General SystemLink Interface Example</a>
+            <a class = "currentPage">Tutorial: Basic - Start Single Motor</a>
         
         
     </div>
@@ -55,188 +55,75 @@
     <header>
         
 
-        <h2>General SystemLink Interface Example</h2>
+        <h2>Basic - Start Single Motor</h2>
     </header>
 
     
         <article class="readme">
-            <pre class="prettyprint source lang-html"><code>&lt;html>
-    &lt;!-- Include ServiceDock -->
+            <h2>ServiceDock HTML template</h2>
+<p>Begin your HTML file with the ServiceDock template and include &lt;service-spike&gt;, the SPIKE Service. Once you render this page, you should only see your ServiceDock on the top left corner of your page with the SPIKE Service button. Refer to code below for the template.</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js&quot;>&lt;/script>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js&quot;>&lt;/script>
     &lt;/head>
     &lt;body>
         &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;!-- Include systemlink service-->
-            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;/div>
-        &lt;div id = &quot;interface&quot;>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Change existing tags
-                &lt;/h3>
-                &lt;div id=&quot;changeTag&quot;>
-                    &lt;select id=&quot;existingTags&quot;>
-                    
-                    &lt;/select>
-                    &lt;input id=&quot;changeTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id=&quot;changeTagSubmit&quot; type=&quot;submit&quot; value=&quot;change&quot;>
-                &lt;/div>
-                &lt;div>
-                    Current value:
-                    &lt;span id=&quot;currentValue&quot;>
-                    
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Create tags
-                &lt;/h3>
-                &lt;div id=&quot;createTag&quot;>
-                    &lt;input id=&quot;createTagName&quot; type=&quot;text&quot; placeholder=&quot;Tag Name&quot;>
-                    &lt;input id=&quot;createTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id = &quot;createTagSubmit&quot; type=&quot;submit&quot; value=&quot;Create&quot;>
-                &lt;/div>
-                &lt;div>
-                    Status:
-                    &lt;span id=&quot;createTagStatus&quot;>
-                
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
+            &lt;!-- this style must be kept for normal visualization-->
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
     &lt;/body>
     &lt;script>
-        //Use ServiceDock here!
-        var SystemLinkService = document.getElementById(&quot;service_systemlink&quot;);
-
-        var mySL = SystemLinkService.getService(); // your Service object
-
-        var realTimeTagsInfo = {}; // real time System Link Cloud tags
-
-        /* HTML Elements */
-        var existingTagsElement = document.getElementById(&quot;existingTags&quot;);
-        var currentValue = document.getElementById(&quot;currentValue&quot;);
-        var changeTagValue = document.getElementById(&quot;changeTagValue&quot;);
-        var createTagValue = document.getElementById(&quot;createTagValue&quot;);
-        var createTagName = document.getElementById(&quot;createTagName&quot;);
-        var createTagStatus = document.getElementById(&quot;createTagStatus&quot;);
-
-        // populate &lt;select> with all tags on the cloud and display the selected Tag's (first Tag) value
-        mySL.executeAfterInit( function() {
-            populateSelection();
-            displayCurrentValue();
-        });
-        
-        SystemLinkService.init(); 
-        
-        // append &lt;option> of Tags to &lt;select>
-        function populateSelection() {
-            existingTagsElement.innerHTML = &quot;&quot;; //reset &lt;select>
-            // get all tags information from Cloud
-            realTimeTagsInfo = mySL.getTagsInfo();
-
-            // append each to &lt;select>
-            for (var key in realTimeTagsInfo) {
-                var optionElement = document.createElement(&quot;option&quot;);
-                optionElement.innerHTML = key;
-                existingTagsElement.appendChild(optionElement);
-            }
-        }
-
-        // when another &lt;option> is selected
-        existingTagsElement.addEventListener(&quot;change&quot;, function() {
-            displayCurrentValue();
-        })
-
-        // display the value of the currently &quot;selected&quot; Tag option
-        function displayCurrentValue() {
-            // get the name of currently selected Tag
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value of the Tag
-            var value = mySL.getTagValue(key);
-
-            // update display
-            currentValue.innerHTML = value;
-        }
-
-        // button to change Tag's value was clicked
-        var changeTagButton = document.getElementById(&quot;changeTagSubmit&quot;);
-        changeTagButton.addEventListener(&quot;click&quot;, function () {
-            // get the name of Tag to change
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value to change Tag to
-            var newValue = changeTagValue.value;
-            
-            changeTagValue.value = &quot;&quot;; // reset input field
-            
-            // change Tag's value
-            mySL.setTagValue(key, newValue, function() {
-                displayCurrentValue();
-            })
-        })
-
-        var createTagButton = document.getElementById(&quot;createTagSubmit&quot;);
-        createTagButton.addEventListener(&quot;click&quot;, function() {
-
-            createTagStatus.innerHTML = &quot;creating tag&quot;
-
-            // get the name of Tag to create
-            var nameInput = createTagName.value;
-            var key = nameInput;
-
-            // get the value to create the Tag with
-            var newValue = createTagValue.value;
-
-            // convert the value's type based on input
-            var convertedValue = convertValue(newValue);
-
-            // reset input fields
-            createTagValue.value = &quot;&quot;; 
-            createTagName.value = &quot;&quot;;
-
-            // create new Tag
-            mySL.createTag(key, newValue, function () {
-                populateSelection();
-                displayCurrentValue();
-                createTagStatus.innerHTML = &quot;tag was created!&quot;
-            })
-        })
-
-        // change value from &lt;input> to be of correct type
-        function convertValue(new_value) {
-            var convertedValue;
-            //if the value is not a number
-            if (isNaN(new_value)) {
-                //if the value is a boolean
-                if (new_value == true) {
-                    convertedValue = true;
-                } 
-                if (new_value == false) {
-                    convertedValue = false;
-                }
-                // value is a string, no change needed.
-                else {
-                    convertedValue = new_value;
-                }
-            }
-            //value is a number
-            else {
-                // value is a number, no change needed
-                convertedValue = new_value;
-            }
-
-            return convertedValue;
-        }
+        // Use ServiceDock here!
     &lt;/script>
+&lt;/html>
+</code></pre>
+<h2>Initializing SPIKE Service</h2>
+<p>You can connect your SPIKE Prime to ServiceDock. Try clicking on the button and selecting the serial port to which your brick is connected.</p>
+<p>The status light for your SPIKE Service should have turned from red to green. You just initialized the SPIKE Service. In this tutorial, we will use the SPIKE Service to start a Motor.</p>
+<h2>Programming ServiceDock</h2>
+<p>Let's go back to the HTML file. You will now write the code within the &lt;script&gt; that, after SPIKE Service is initialized, starts the Motor that is connected to port &quot;A&quot;. First, you need to make sure that the code you write will execute after the SPIKE Service initializes. If you were to execute the code before initialization, you would be attempting to run a motor when your ServiceDock is not even connected to your SPIKE Prime.</p>
+<p>The method below allows you to write code that runs after initialization.</p>
+<pre class="prettyprint source lang-javascript"><code>mySPIKE.executeAfterInit( function () {
+    // code in this scope will be executed after SPIKE Service is initialized
+})
+</code></pre>
+<p>Next, you have to start the Motor in the scope. Refer to the API documentation to find the Motor object and its methods. You can find more interfaces other than the Motor in the API documentation. Feel free to change things up, but the code below will simply start the motor with speed of 100.</p>
+<pre class="prettyprint source lang-javascript"><code>mySPIKE.executeAfterInit( function () {
 
+    // declare Motor object at port &quot;A&quot;
+    var motor = new mySPIKE.Motor(&quot;A&quot;)
+
+    // start Motor at speed 100
+    motor.start(100)
+})
+</code></pre>
+<h2>Running the Example</h2>
+<p>Now save the HTML and run the web page again. Connect a Motor to port &quot;A&quot;. Click the SPIKE Service button, and see your motor run. The final HTML is below.</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;!-- this style must be kept for normal visualization-->
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        mySPIKE.executeAfterInit(function () {
+
+            var motor = new mySPIKE.Motor(&quot;A&quot;)
+
+            motor.start(100)
+        })
+
+    &lt;/script>
 &lt;/html>
 </code></pre>
 <!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_systemlink.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_simpleMotor.html"></iframe>
         </article>
     
 </section>

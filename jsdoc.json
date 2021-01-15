@@ -3,7 +3,8 @@
         "template": "./jsdocTemplate/tui-jsdoc-template/",
         "encoding": "utf8",
         "destination": "./docs/",
-        "tutorials": "./docs/tutorials"
+        "tutorials": "./docs/tutorials",
+        "sort": false
     },
     "plugins": [
         "plugins/markdown"

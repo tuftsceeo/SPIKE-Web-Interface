@@ -1,0 +1,38 @@
+<!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_python.html
+Author: Jeremy Jung
+Last update: 8/4/20
+Description: execute python script from the web interface
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+    </body>
+    <!-- SPIKE Prime -->
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+
+        mySPIKE.executeAfterInit(function () {
+            var motor = new mySPIKE.Motor("A")
+
+            motor.start(100)
+        })
+
+    </script>
+
+</html>

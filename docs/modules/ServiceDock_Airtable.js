@@ -269,16 +269,11 @@ window.customElements.define('service-airtable', serviceairtable);
  * that are "Name" and "Value", each of a single line text type
  * @class Service_Airtable
  * @example
- * // if you're using ServiceDock
  * var AirtableElement = document.getElementById("service_airtable");
  * AirtableElement.setAttribute("apikey", "APIKEY");
  * AirtableElement.setAttribute("baseid", "BASEID");
  * AirtableElement.setAttribute("tablename", "TABLENAME");
  * AirtableElement.init();
- * // if you're not using ServiceDock
- * var myAirtable = new Service_Airtable();
- *
- * myAirtable.init(APIKEY, BASEID, TABLENAME);
  */
 function Service_Airtable() {
 
