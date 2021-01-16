@@ -389,9 +389,6 @@ function Service_SPIKE() {
 
     var triggerCurrentStateCallback = undefined;
 
-    /* micropython print handling */
-    var stringsPrintedExpected = [];
-
     //////////////////////////////////////////
     //                                      //
     //          Public Functions            //
@@ -1192,8 +1189,6 @@ function Service_SPIKE() {
 
                 result = result + addedTab;
             }
-
-            parsePrintInProgramWrite(data);
 
             // replace tab characters
             result = result.replace(/\\t/g, "    ");
@@ -3262,27 +3257,17 @@ function Service_SPIKE() {
                 }
                 /* Case 3: lastUJSONRPC is a micropy print result */
                 else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1 && 
-                    lastUJSONRPC.indexOf('}') == -1 && lastUJSONRPC.indexOf('{"i":') == -1 && lastUJSONRPC.indexOf('{') == -1 ) {
-
-                    /* Case 3: lastUJSONRPC is a micropy print result */
-
-                    // iterate through expected print results and see if there is a match
-                    let stringToPrintMatched = false;
-                    for (let j = 0; j < stringsPrintedExpected.length; j++) {
-                        let currString = stringsPrintedExpected[j];
-
-                        let percentageMatch = getMatchPercentageBetweenStrings(currString, lastUJSONRPC);
-                        if (percentageMatch >= 0.4)
-                            stringToPrintMatched = true
-                    }
-
-                    if (stringToPrintMatched == true) {
-
-                        console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy print: ", lastUJSONRPC);
-
-                        if (funcAfterPrint != undefined)
-                            funcAfterPrint(lastUJSONRPC);
-                    }
+                    lastUJSONRPC.indexOf('}') == -1 && lastUJSONRPC.indexOf('{"i":') == -1 && lastUJSONRPC.indexOf('{"') == -1 ) {
+                        /* filter reboot message */
+                        var rebootMessage = 
+                        'Traceback (most recent call last): File "main.py", line 8, in <module> File "hub_runtime.py", line 1, in start File "event_loop/event_loop.py", line 1, in run_forever File "event_loop/event_loop.py", line 1, in step KeyboardInterrupt: MicroPython v1.12-1033-g97d7f7dd4 on 2020-09-18; LEGO Technic Large Hub with STM32F413xx Type "help()" for more in formation. >>> HUB: sync filesystems HUB: soft reboot'
+                        let rebootMessageRemovedWS = rebootMessage.replace(/[' ']/g, "");
+                        let lastUJSONRPCRemovedWS = lastUJSONRPC.replace(/[' ']/g, "");
+                        if (rebootMessageRemovedWS.indexOf(lastUJSONRPCRemovedWS) == -1) {
+                            console.log("%cTuftsCEEO ", "color: #3ba336;", "micropy print: ", lastUJSONRPC);
+                            if (funcAfterPrint != undefined)
+                                funcAfterPrint(lastUJSONRPC);
+                        }
                 }
                 /* Case 3: lastUJSONRPC is only a portion of a standard UJSONRPC packet 
                     Then lastUJSONRPC must be EITHER THE FIRST OR THE LAST ELEMENT in jsonlineSplitByCR
@@ -4084,96 +4069,6 @@ function Service_SPIKE() {
         else {
             return rawContent;
         }
-    }
-
-    /**
-     * 
-     * @private
-     * @param {any} rawContent 
-     * @returns {string}
-     */
-    async function parsePrintInProgramWrite(rawContent) {
-        let index_print = await rawContent.indexOf("print(");
-        if (index_print > -1) {
-            //find the index of rawContent at which the print function ends
-            let index_lastparen = await rawContent.indexOf(")", index_print);
-
-            //divide the rawContent into parts before the print and after
-            let first_rawContent_part = await rawContent.substring(0, index_print);
-            let second_rawContent_part = await rawContent.substring(index_lastparen + 1, rawContent.length);
-
-            //find the argument of the print
-            let print_string = await rawContent.substring(index_print, index_lastparen + 1);
-            let index_first_paren = await print_string.indexOf("(");
-            let index_last_paren = await print_string.indexOf(")");
-            let tagName = await print_string.substring(index_first_paren + 2, index_last_paren-1);
-            
-            console.log("tagName: ", tagName);
-            stringsPrintedExpected.push(tagName);
-            // get the tag's value from the cloud
-            var yieldCommand = "aaaa(" + tagName + ")";
-
-            //send the final UJSONRPC script to the hub.
-            let final_RPC_command;
-
-            final_RPC_command = await first_rawContent_part + yieldCommand + second_rawContent_part;
-
-            return parsePrintInProgramWrite(final_RPC_command);
-        }
-        else {
-            return rawContent;
-        }
-    }
-
-    /** Get the percentage of the match of stringB inside stringA
-     * @private
-     * @param {string} stringA 
-     * @param {string} stringB 
-     */
-    function getMatchPercentageBetweenStrings(stringA, stringB) {
-        let numberSubstrings = stringA.length;
-        let arrayMatches = [];
-        
-        for ( let i = 0; i < numberSubstrings; i++ ) {
-
-            if ((i + 1 ) > stringB.length)
-                break;
-
-            let substringA = stringA.substr(0, i + 1);
-            let substringB = stringB.substr(0, i + 1);
-
-            if (substringA === substringB)
-                arrayMatches.push(1);
-            else
-                arrayMatches.push(0);
-            
-        }
-
-        for ( let i = numberSubstrings; i > 0; i-- ) {
-
-            if ( i  <= stringB.length ) {
-                let substringA = stringA.substr(i, stringA.length);
-                let substringB = stringB.substr(0, stringA.length);
-
-                if (substringA === substringB)
-                    arrayMatches.push(1);
-                else
-                    arrayMatches.push(0);
-            }
-        }
-        let totalMatches = 0;
-        let totalResults = arrayMatches.length;
-
-        for (let i in arrayMatches) {
-
-            if (arrayMatches[i] == 1)
-                totalMatches++;
-        }
-
-        let percentage = totalMatches / totalResults;
-
-        return percentage
-
     }
 
     // public members
