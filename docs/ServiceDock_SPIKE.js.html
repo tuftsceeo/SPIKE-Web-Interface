@@ -3317,7 +3317,7 @@ function Service_SPIKE() {
                 }
                 /* Case 3: lastUJSONRPC is a micropy print result */
                 else if (lastUJSONRPC != "" &amp;&amp; lastUJSONRPC.indexOf('"p":') == -1 &amp;&amp; lastUJSONRPC.indexOf('],') == -1 &amp;&amp; lastUJSONRPC.indexOf('"m":') == -1 &amp;&amp; 
-                    lastUJSONRPC.indexOf('}') == -1 &amp;&amp; lastUJSONRPC.indexOf('{"i":') == -1 &amp;&amp; lastUJSONRPC.indexOf('{"') == -1 ) {
+                    lastUJSONRPC.indexOf('}') == -1 &amp;&amp; lastUJSONRPC.indexOf('{"i":') == -1 &amp;&amp; lastUJSONRPC.indexOf('{') == -1 ) {
                         /* filter reboot message */
                         var rebootMessage = 
                         'Traceback (most recent call last): File "main.py", line 8, in &lt;module> File "hub_runtime.py", line 1, in start File "event_loop/event_loop.py", line 1, in run_forever File "event_loop/event_loop.py", line 1, in step KeyboardInterrupt: MicroPython v1.12-1033-g97d7f7dd4 on 2020-09-18; LEGO Technic Large Hub with STM32F413xx Type "help()" for more in formation. >>> HUB: sync filesystems HUB: soft reboot'

@@ -23,9 +23,9 @@ class serviceairtable extends HTMLElement {
         this.active = false; // whether the service was activated
         this.service = new Service_Airtable(); // instantiate a service object ( one object per button )
         this.proceed = false; // if there are credentials input
-        this.APIKey;
-        this.BaseID;
-        this.TableName;
+        this.APIKey = "";
+        this.BaseID = "";
+        this.TableName = "";
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -80,23 +80,23 @@ class serviceairtable extends HTMLElement {
         this.addEventListener("click", async function () {
 
             if (!this.active) {
-                this.popUpBox();
-            }
-
-            // check active flag so once activated, the service doesnt reinit
-            if (!this.active && this.proceed) {
+              if (this.APIKey != "" && this.BaseID != "" && this.TableName != "") {
+                // check active flag so once activated, the service doesnt reinit
 
                 console.log("activating service");
 
-                var initSuccessful = await this.service.init(this.APIKey);
-                var initSuccessful2 = await this.service.init(this.BaseID);
-                var initSuccessful3 = await this.service.init(this.TableName);
+                var initSuccessful = await this.service.init(this.APIKey, this.BaseID, this.TableName);
 
-                if (initSuccessful && initSuccessful2 && initSuccessful3) {
-                    this.active = true;
-                    this.status.style.backgroundColor = "green";
+                if (initSuccessful) {
+
+                  this.active = true;
+                  this.status.style.backgroundColor = "green";
                 }
-
+                
+              }
+              else {
+                this.popUpBox();
+              }
             }
 
         });
@@ -160,9 +160,6 @@ class serviceairtable extends HTMLElement {
         if (APIKeyExists && BaseIDKeyExists && TableNameExists) {
             this.proceed = true;
         }
-
-        
-
     }
 
     /* allow credentials input through HTML attributes */
@@ -219,14 +216,16 @@ class serviceairtable extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         // console.log("changing attribute: ", name);
         if (name == "apikey") {
-            console.log("newvalue of apikey:", newValue);
-            this.APIKey = newValue;
+          console.log("new value of apikey:", newValue);
+          this.APIKey = newValue;
         }
         else if (name == "baseid") {
-            this.BaseID = newValue
+          console.log("new value of baseid:", newValue);
+          this.BaseID = newValue
         }
         else if (name == "tablename") {
-            this.TableName = newValue
+          console.log("new value of tablename:", newValue);
+          this.TableName = newValue
         }
         
     }

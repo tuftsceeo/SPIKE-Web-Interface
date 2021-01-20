@@ -150,10 +150,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// assuming you declared &lt;service-systemlink> with the id, "service_systemlink"
-var mySL = document.getElemenyById("service_systemlink").getService();
-mySL.setAttribute("apikey", "YOUR API KEY");
-mySL.init();</code></pre>
+    <pre class="prettyprint"><code>// assuming you declared &lt;service-systemlink> with the id, "service_systemlink"var mySL = document.getElemenyById("service_systemlink").getService();mySL.setAttribute("apikey", "YOUR API KEY");mySL.init();</code></pre>
 
     
 
@@ -504,9 +501,7 @@ mySL.init();</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySL.executeAfterInit( function () {
-    var tagsInfo = getTagsInfo();
-})</code></pre>
+    <pre class="prettyprint"><code>mySL.executeAfterInit( function () {    var tagsInfo = getTagsInfo();})</code></pre>
 
     
 
@@ -616,9 +611,7 @@ mySL.init();</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var tagsInfo = mySL.getTagsInfo();
-var astringValue = tagsInfo["astring"]["value"];
-var astringType = tagsInfo["astring"]["type"];</code></pre>
+    <pre class="prettyprint"><code>var tagsInfo = mySL.getTagsInfo();var astringValue = tagsInfo["astring"]["value"];var astringType = tagsInfo["astring"]["type"];</code></pre>
 
     
 
@@ -1263,9 +1256,7 @@ var astringType = tagsInfo["astring"]["type"];</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySL.createTag("message", "hi", function () {
-     mySL.setTagValue("message", "bye"); 
-})</code></pre>
+    <pre class="prettyprint"><code>mySL.createTag("message", "hi", function () {     mySL.setTagValue("message", "bye"); })</code></pre>
 
     
 
