@@ -8,12 +8,6 @@
             "exampleSpikeServiceBasicMotor": {
                 "title": "Basic - Start Single Motor"
             },
-            "exampleSpikeServiceTwoMotors": {
-                "title": "Controlling Multiple Motors"
-            },
-            "exampleSpikeServiceSensorDisplay": {
-                "title": "Displaying Sensor Output"
-            },
             "tutorialSpikeServiceHub": {
                 "title": "Intro to SPIKE Service"
             },
