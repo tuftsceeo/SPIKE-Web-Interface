@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="controls">
+            <label for="dist-box">Distance (wheel rotations):</label>
+            <input id="dist-box">
+            <button onclick="goCurrentDistance()">Go!</button>
+            <button onclick="abort()">Stop</button>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+        var leftWheel, rightWheel;
+
+        // initializing left and right wheen variables for later use (cannot be done until SPIKE itself is initialized)
+        mySPIKE.executeAfterInit(function() {
+            leftWheel = mySPIKE.Motor('A')
+            rightWheel = mySPIKE.Motor('B')
+        })
+
+        function goCurrentDistance() {
+            // getting distance from textbox input, or setting it to zero if input is invalid
+            distance = document.getElementById("dist-box").value
+            if(isNaN(distance))
+                distance = 0
+            
+            // running motors specified distance
+            leftWheel.run_for_degrees(360 * distance)
+            rightWheel.run_for_degrees(360 * distance)
+        }
+
+        function abort() {
+            leftWheel.stop()
+            rightWheel.stop()
+        }
+    </script>
+</html>

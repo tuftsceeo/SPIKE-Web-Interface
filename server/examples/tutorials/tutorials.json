@@ -14,14 +14,14 @@
             "exampleSpikeServiceTwoMotors": {
                 "title": "Controlling Multiple Motors"
             },
-            "exampleSpikeServiceSensorDisplay": {
-                "title": "Reading From Sensors"
+            "exampleSpikeServicePython": {
+                "title": "Integrating MicroPython"
             },
             "exampleSpikeServiceBeep": {
                 "title": "Beeping Pitch Example"
             },
             "exampleSpikeServiceMotor": {
-                "title": "Motor Example"
+                "title": "Slider-Controlled Motor Example"
             }
         }
     },
