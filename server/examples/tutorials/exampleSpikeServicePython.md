@@ -34,14 +34,22 @@ In some cases, we may not know all of the python code before beginning the progr
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
         </div>
-        <!-- text input goes here -->
-        <button>Stop</button>
+        <label for="dist-box">Distance (cm):</label>
+        <input id="dist-box">
+        <button onclick="goCurrentDistance()">Go!</button>
+        <button onclick="abort()">Stop</button>
     </body>
     <script>
         var mySPIKE = document.getElementById("service_spike").getService()
 
-        function goDistance(dist) {
-            mySPIKE.writeProgram("drive distance", "", 0);
+        function goCurrentDistance() {
+            // getting distance from textbox input, or setting it to zero if input is invalid
+            distance = document.getElementById("dist-box").value
+            if(isNan(distance))
+                distance = 0
+            
+            //TODO: write python program
+            mySPIKE.writeProgram("drive distance", "python goes here", 0);
         }
 
         function abort() {
@@ -50,3 +58,6 @@ In some cases, we may not know all of the python code before beginning the progr
     </script>
 </html>
 ```
+EXAMPLE GOES HERE
+
+And here would be the same program withouth the use of python, for comparison:
