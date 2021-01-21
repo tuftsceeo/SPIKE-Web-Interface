@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: MotorPair | Namespace: MotorPair</title>
+    <title>Tutorial: exampleSpikeServicePython | Tutorial: exampleSpikeServicePython</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Namespace: MotorPair</a>
+            <a class = "currentPage">Tutorial: exampleSpikeServicePython</a>
         
         
     </div>
@@ -51,680 +51,65 @@
 <div class="main" id="main">
     
 
-
-
-
 <section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="Service_SPIKE.html">Service_SPIKE</a>.</span>MotorPair</h2>
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description"><p>MotorPair</p></div>
-            
-
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-                <h3>Example</h3>
-                
-    <pre class="prettyprint"><code>var pair = new mySPIKE.MotorPair("A", "B")</code></pre>
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-                
-
-<dt>
-    
-        <h4 class="name" id="~set_motor_rotation">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>set_motor_rotation<span class="signature">(amount, unit)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2356">line 2356</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the ratio of one motor rotation to the distance traveled.</p>
-<p>If there are no gears used between the motors and the wheels of the Driving Base,
-then amount is the circumference of one wheel.</p>
-<p>Calling this method does not affect the Driving Base if it is already currently running.
-It will only have an effect the next time one of the move or start methods is used.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
+    <header>
         
 
-        <th>Type</th>
+        <h2>exampleSpikeServicePython</h2>
+    </header>
 
+    
+        <article class="readme">
+            <h2>Python Integration</h2>
+<p>For cases when a project seems better suited to MicroPython control rather than JavaScript, but you still want to connect it to a webpage, the JavaScript library allows you to upload and run MicroPython programs using the SPIKE Service. The following program, for example, would simply run whatever was pre-loaded into slot 1 on the SPIKE Prime:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        mySPIKE.executeAfterInit(function () {
+
+            mySPIKE.executeProgram(1)
+        })
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<h2>Writing Programs to the SPIKE</h2>
+<p>In some cases, we may not know all of the python code before beginning the program, such as when taking speeds or distances as user input. Instead of using pre-loaded code, then, we have to write code to the hub using writeProgram(projectName, data, slotid, callback). The following example is of a robotic car, with motors plugged into ports &quot;A&quot; and &quot;B,&quot; that drives a user-specified distance when the &quot;Go&quot; button is pressed. It also uses stopCurrentProgram() to give the user a failsafe in case they input a wrong distance:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;!-- text input goes here -->
+        &lt;button>Stop&lt;/button>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
         
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>amount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>unit</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>'cm','in'</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank<span class="signature">(left_speed, right_speed)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2373">line 2373</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank_at_power">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank_at_power<span class="signature">(leftPower, rightPower)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2392">line 2392</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>leftPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>rightPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
+        function goDistance(dist) {
+            mySPIKE.writeProgram(&quot;drive distance&quot;, &quot;&quot;, 0);
+        }
+
+        function abort() {
+            mySPIKE.stopCurrentProgram()
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+        </article>
     
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~stop">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>stop<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2399">line 2399</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Stops the 2 motors simultaneously, which will stop a Driving Base.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            </dl>
-    
-
-    
-
-    
-</article>
-
 </section>
-
 
 
 
@@ -739,13 +124,7 @@ It will only have an effect the next time one of the move or start methods is us
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'Service_SPIKE.MotorPair_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>

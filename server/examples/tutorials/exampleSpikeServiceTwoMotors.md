@@ -27,6 +27,8 @@ Unlike in the Python library, the JavaScript functions for running motors for sp
 </html>
 ```
 
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_twoMotors.html"></iframe>
+
 ## MotorPairs
 You can also use MotorPairs to control motors simultaneously, though they can get complicated if trying to move for specified distances/degrees of rotation. The following code runs two motors, plugged into ports "A" and "B", for three seconds. Note the use of the JavaScript "setTimeout" function, which can be used to delay the running of a function for a specified number of miliseconds.
 
