@@ -5,11 +5,17 @@
     "tutorialSpikeService": {
         "title": "SPIKE Service",
         "children":{
+            "tutorialSpikeServiceHub": {
+                "title": "Intro to SPIKE Service"
+            },
             "exampleSpikeServiceBasicMotor": {
                 "title": "Basic - Start Single Motor"
             },
-            "tutorialSpikeServiceHub": {
-                "title": "Intro to SPIKE Service"
+            "exampleSpikeServiceTwoMotors": {
+                "title": "Controlling Multiple Motors"
+            },
+            "exampleSpikeServiceSensorDisplay": {
+                "title": "Reading From Sensors"
             },
             "exampleSpikeServiceBeep": {
                 "title": "Beeping Pitch Example"

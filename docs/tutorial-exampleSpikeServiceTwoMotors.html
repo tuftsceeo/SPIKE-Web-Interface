@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: SPIKE Service | Tutorial: SPIKE Service</title>
+    <title>Tutorial: Controlling Multiple Motors | Tutorial: Controlling Multiple Motors</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: SPIKE Service</a>
+            <a class = "currentPage">Tutorial: Controlling Multiple Motors</a>
         
         
     </div>
@@ -54,49 +54,65 @@
 <section>
     <header>
         
-        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
-        <ul>
-            <li style = "font-size: 20px;"><a href="tutorial-tutorialSpikeServiceHub.html">Intro to SPIKE Service</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBasicMotor.html">Basic - Start Single Motor</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceTwoMotors.html">Controlling Multiple Motors</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSensorDisplay.html">Reading From Sensors</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBeep.html">Beeping Pitch Example</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceMotor.html">Motor Example</a></li>
-        </ul>
-        
 
-        <h2>SPIKE Service</h2>
+        <h2>Controlling Multiple Motors</h2>
     </header>
 
     
         <article class="readme">
-            <h2>SPIKE Service</h2>
-<p>ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection.</p>
-<h2>Dependencies</h2>
-<p>The webserial API is only supported on Google Chrome. <strong>Visitors that wish to connect their SPIKE Prime to your web page must ensure that the following requirements are fulfilled</strong>:</p>
-<p>To use the SPIKE™ Prime hardware, you must enable the <strong>WebSerial API</strong> in your browser. To do so, please make sure:</p>
-<ol>
-<li>You are using the <a href="https://www.google.com/chrome/">Google Chrome browser</a>.</li>
-<li>The following chrome flags are enabled on chrome://flags.
-Mac OSX user? #enable-experimental-web-platform-features</li>
-</ol>
-<p>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</p>
-<p>To enable these flags:</p>
-<ol>
-<li>In your Chrome Browser URL, visit chrome://flags</li>
-<li>Set the your required flags to &quot;Enabled&quot; via dropdown</li>
-<li>Relaunch the browser to have changes take effect</li>
-</ol>
-<p>When using SPIKE Service, make sure that your SPIKE Prime is connected (via USB or Bluetooth) to your computer and <em>you don't have any other applications or browser windows connected to your SPIKE Prime.</em></p>
-<p>#enable-experimental-web-platform-features</p>
-<p><img src="enableflag.png" alt="ExperimentalWebPlatformFeatures"></p>
-<p>#new-usb-backend</p>
-<p><img src="enableflagwindows.png" alt="NewUSBBackend"></p>
+            <h2>Moving Multiple Motors</h2>
+<p>Unlike in the Python library, the JavaScript functions for running motors for specific distances or times are <strong>non-blocking</strong>. This is helpful if you want to, say, make two different motors go specified distances at the same time, without having to worry about directly checking sensors. The following example code makes two motors, plugged into ports 'A' and 'B,' start at the same time and each move one full rotation at differing speeds.</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        mySPIKE.executeAfterInit(function () {
+
+            var fastMotor = new mySPIKE.Motor(&quot;A&quot;)
+            var slowMotor = new mySPIKE.Motor(&quot;B&quot;)
+
+            fastMotor.run_for_degrees(360, 100)
+            slowMotor.run_for_degrees(360, 50)
+        })
+
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<h2>MotorPairs</h2>
+<p>You can also use MotorPairs to control motors simultaneously, though they can get complicated if trying to move for specified distances/degrees of rotation. The following code runs two motors, plugged into ports &quot;A&quot; and &quot;B&quot;, for three seconds. Note the use of the JavaScript &quot;setTimeout&quot; function, which can be used to delay the running of a function for a specified number of miliseconds.</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        mySPIKE.executeAfterInit(function () {
+
+            var pair = new mySPIKE.MotorPair(&quot;A&quot;, &quot;B&quot;)
+
+            pair.start(50, 50)
+
+            setTimeout(function(){ pair.stop() }, 3000)
+        })
+
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_twoMotors.html"></iframe>
         </article>
     
 </section>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: SPIKE Service | Tutorial: SPIKE Service</title>
+    <title>Tutorial: Reading From Sensors | Tutorial: Reading From Sensors</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: SPIKE Service</a>
+            <a class = "currentPage">Tutorial: Reading From Sensors</a>
         
         
     </div>
@@ -54,49 +54,44 @@
 <section>
     <header>
         
-        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
-        <ul>
-            <li style = "font-size: 20px;"><a href="tutorial-tutorialSpikeServiceHub.html">Intro to SPIKE Service</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBasicMotor.html">Basic - Start Single Motor</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceTwoMotors.html">Controlling Multiple Motors</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSensorDisplay.html">Reading From Sensors</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBeep.html">Beeping Pitch Example</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceMotor.html">Motor Example</a></li>
-        </ul>
-        
 
-        <h2>SPIKE Service</h2>
+        <h2>Reading From Sensors</h2>
     </header>
 
     
         <article class="readme">
-            <h2>SPIKE Service</h2>
-<p>ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection.</p>
-<h2>Dependencies</h2>
-<p>The webserial API is only supported on Google Chrome. <strong>Visitors that wish to connect their SPIKE Prime to your web page must ensure that the following requirements are fulfilled</strong>:</p>
-<p>To use the SPIKE™ Prime hardware, you must enable the <strong>WebSerial API</strong> in your browser. To do so, please make sure:</p>
-<ol>
-<li>You are using the <a href="https://www.google.com/chrome/">Google Chrome browser</a>.</li>
-<li>The following chrome flags are enabled on chrome://flags.
-Mac OSX user? #enable-experimental-web-platform-features</li>
-</ol>
-<p>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</p>
-<p>To enable these flags:</p>
-<ol>
-<li>In your Chrome Browser URL, visit chrome://flags</li>
-<li>Set the your required flags to &quot;Enabled&quot; via dropdown</li>
-<li>Relaunch the browser to have changes take effect</li>
-</ol>
-<p>When using SPIKE Service, make sure that your SPIKE Prime is connected (via USB or Bluetooth) to your computer and <em>you don't have any other applications or browser windows connected to your SPIKE Prime.</em></p>
-<p>#enable-experimental-web-platform-features</p>
-<p><img src="enableflag.png" alt="ExperimentalWebPlatformFeatures"></p>
-<p>#new-usb-backend</p>
-<p><img src="enableflagwindows.png" alt="NewUSBBackend"></p>
+            <h2>Sensor Interaction</h2>
+<p>One of the main advantages of using the ServiceDock SPIKE to control the robot directly instead of uploading python is the ability to receive and process information from your robot on the webpage. The following code receives data every two seconds from a distance sensor plugged into port &quot;A&quot;, and displays that data on the webpage.</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id=&quot;text-box&quot;>Distance: unknown&lt;/div>
+    &lt;/body>
+    &lt;script>
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+        var textBox = document.getElementById(&quot;text-box&quot;)
+
+        mySPIKE.executeAfterInit(updateDist)
+
+        function updateDist() {
+            var sensor = mySPIKE.DistanceSensor(&quot;A&quot;)
+
+            //updating onscreen text with current distance
+            textBox.innerText = &quot;Distance: &quot; + sensor.get_distance_cm()
+
+            //setting up for next update if SPIKE is still connected
+            if(mySpike.isActive())
+                setTimeout(updateDist, 2000)
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_sensorDisplay.html"></iframe>
         </article>
     
 </section>
