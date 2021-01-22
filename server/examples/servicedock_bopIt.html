@@ -1,0 +1,118 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_bopIt.html
+    Author: Emma Bethel
+    Last Update: 1/19/21
+    Purpose: turn the SPIKE prime into a bop-it
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+            #message {
+                font-size: 50px;
+            }
+        </style>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="controls">
+            <button onclick = startGame(0)>Start</button>
+            <div id="message"><br></div>
+            <div id="score">Score: 0</div>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+        var commands = ["Bop It!", "Shake It!", "Flip Left!", "Flip Right!"]
+        var messageDisplay = document.getElementById("message");
+        var score = 0;
+
+        function startGame() {
+            updateScore(0)
+            messageDisplay.innerHTML = "Ready... Set..."
+
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function() { startNewRound(0) })
+        }
+
+        function updateScore(newScore) {
+            score = newScore
+            document.getElementById("score").innerText = "Score: " + score
+        }
+
+        function startNewRound(roundNum) {
+            var command = commands[Math.floor(Math.random() * 4)]
+            var roundTime = calculateRoundTime(roundNum)
+
+            giveCommand(command, roundTime)
+        }
+
+        function giveCommand(command, roundTime) {
+            document.getElementById("message").innerText = command
+            switch(command) {
+                case "Bop It!":
+                    checkGesture("tapped", roundTime)
+                    break
+                case "Shake It!":
+                    checkGesture("shaken", roundTime)
+                    break
+                case "Flip Left!":
+                    checkOrientation("leftside", roundTime)
+                    break
+                case "Flip Right!":
+                    checkOrientation("rightside", roundTime)
+                    break
+            }
+        }
+
+        function calculateRoundTime(roundNum) {
+            return Math.max(5000 - roundNum * 100, 1000);
+        }
+
+        function checkGesture(targetGesture, maxTime){
+            var startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { processMove(newGesture, targetGesture, startTime, Date.now(), maxTime) })
+        }
+
+        function checkTime(startTime, endTime, maxTime) {
+            if (endTime - startTime <= maxTime) {
+                updateScore(score + 1)
+                messageDisplay.innerText = "Ready... Set..."
+                setTimeout(function() { startNewRound(score) }, 1000)
+            } else {
+                messageDisplay.innerText = "Too Slow!"
+                setTimeout(gameOver, 2000);
+            }
+        }
+
+        function processMove(newVal, targetVal, startTime, endTime, maxTime) {
+            console.log("looking for " + targetVal + " found " + newVal);
+            if(newVal == targetVal) {
+                checkTime(startTime, Date.now(), maxTime)
+            } else {
+                gameOver()
+            }
+        }
+
+       function checkOrientation(targetOrientation, maxTime) {
+            startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { processMove(newOrientation, targetOrientation, startTime, Date.now(), maxTime) })
+        }
+
+        function gameOver() {
+            timesUp = true
+            messageDisplay.innerText = "Game Over!"
+            console.log("ran gameover")
+        }
+    </script>
+
+</html>

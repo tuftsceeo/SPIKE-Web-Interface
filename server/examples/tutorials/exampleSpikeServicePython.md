@@ -56,6 +56,7 @@ In some cases, we may not know all of the python code before beginning the progr
                 distance = 0
             
             // writing micropython program to hub slot 0 using specified distance
+            // in this example, the python lines are in separate strings for readability, but this is not necessary as long as the whitespace is correct
             mySPIKE.writeProgram("drive distance", "from spike import MotorPair \n"
                                                     + "driveTrain = MotorPair('A', 'B') \n"
                                                     + "driveTrain.move(" + distance + ", 'rotations', 0)", 
