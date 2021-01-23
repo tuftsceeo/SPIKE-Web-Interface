@@ -7,6 +7,18 @@
             <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
         -->
             <script src="./modules/ServiceDock_SPIKE.js"></script>
+            <!--
+            <script type="text/javascript" src="./modules/SPIKE/classSPIKE.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/HTML_SPIKE.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/general/initUtils.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/ujsonrpc.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/webserial/parsing.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/webserial/webserial.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/misc/misc.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/motor.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/interfaces.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/getters.js"></script>
+                -->
             <script src="./modules/ServiceDock_SystemLink.js"></script>
             <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
 
@@ -16,6 +28,7 @@
     </head>
 
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
+        <!-- SERVICE DOCK -->
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
             <service-systemlink id="service_systemlink"></service-systemlink>
@@ -23,11 +36,15 @@
             <service-gmail ></service-gmail>
             <service-geolocation></service-geolocation>
         </div>
+
+        <!-- WRITE PROGRAM TEXTBOX FOR SPIKE PRIME -->
         <div id = "onlyForWriteProgram" >
             <textarea id="writeProgramData" name="data" value=""
                 style="font-family: Courier; position: relative; left: 20px; z-index: 5;" ></textarea>
             <input style = "position: relative; left: 20px;" type="button" id = "writeTheProgram" value="write program">
         </div>
+
+        <!-- SERVICE SELECTION INTERFACE -->
         <div id = "selectServiceBox">
             <select id = "ServiceSelect">
                 <option id = "SPIKETests">Get tests for SPIKE Service</option>
@@ -35,6 +52,8 @@
                 <option id="ATTests">Get tests for Airtable Service</option>
             </select>
         </div>
+
+        <!-- SPIKE TESTING INTERFACE -->
         <div id = "SPIKEbox">
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
@@ -165,6 +184,7 @@
             </div>
         </div>
 
+        <!-- SYSTEMLINK TESTING INTERFACE  -->
         <div id="SLbox">
             <div>
                 <select id="SLselectTest">
@@ -212,14 +232,32 @@
             </div>
         </div>
 
+        <!-- AIRTABLE TESTING INTERFACE -->
         <div id="ATbox">
             <div>
                 <select id="ATselectTest">
-                    <option id="AT_getTagsInfoOPTION">getTagsInfo</option>
+                    <option id = "generalOPTION_AT">General</option>
+                    <option id="edgeOPTION_AT">Edge cases</option>
                 </select>
                 <input type="button" id="AT_test_select" value="display test cases for this function">
             </div>
             <div id="ATtests">
+
+                <!-- general cases -->
+                <input type = "button" id ="testGetTagsInfo_AT" class = "ATtestCase general" value = "testGetTagsInfo">
+                <input type = "button" id ="testSetTagValue_AT" class = "ATtestCase general" value = "testSetTagValue">
+                <input type = "button" id ="testSetTagValueNonString_AT" class = "ATtestCase general" value = "testSetTagValueNonString">
+                <input type = "button" id ="testGetTagValue_AT" class = "ATtestCase general" value = "testGetTagValue">
+                <input type = "button" id ="testCreateTag_AT" class = "ATtestCase general" value = "testCreateTag">
+                <input type = "button" id ="testDeleteTag_AT" class = "ATtestCase general" value = "testDeleteTag">
+                <input type = "button" id ="testIsActive_AT" class = "ATtestCase general" value = "testIsActive">
+
+                <!-- edge cases -->
+                <input type="button" id="testCreateExisting_AT" class="ATtestCase edge_AT" value="Create an already existing tag">
+                <input type="button" id="testDeleteNonExistant_AT" class="ATtestCase edge_AT" value="Delete a nonexistant tag">
+                <input type="button" id="testDeleteWhenTwoExist_AT" class="ATtestCase edge_AT" value="Delete a tag when there are two tags in the database with same name">
+                <input type="button" id="testDeleteAfterCreateTag_AT" class="ATtestCase edge_AT"
+                    value="Delete tag after creation in callback">
             </div>
         </div>
     </body>
@@ -245,13 +283,12 @@
                     AirtableElement.setAttribute("apikey", key);
                     AirtableElement.setAttribute("baseid", baseid);
                     AirtableElement.setAttribute("tablename", tablename);
-
                 })
             })
         })
         
         
-        var hub = new mySPIKE.PrimeHub();
+        // var hub = new mySPIKE.PrimeHub(); (commented by jeremy 1/19/21)
     </script>
 
     <!-- SPIKE tests -->
@@ -270,6 +307,11 @@
     <script src="./tests/SystemLink/delete.js"></script>
     <script src="./tests/SystemLink/get.js"></script>
     <script src="./tests/SystemLink/set.js"></script>
+
+    <!-- Airtable tests  -->
+    <script src ="./tests/Airtable/general.js"></script>
+    <script src="./tests/Airtable/edges.js"></script>
+
     <!-- UI event listeners -->
     <script>
         let selectService = document.getElementById("ServiceSelect");
@@ -280,6 +322,7 @@
         })
 
         function displayTests () {
+            
             let testsSPIKE = document.getElementById("SPIKEbox");
             let testsSL = document.getElementById("SLbox");
             let testsAT = document.getElementById("ATbox");
@@ -318,28 +361,11 @@
 
             // get all the "Value" fields associated with a "Name"
             for ( var index in names ) {
-                var value = Airtable.getValue(names[index]);
+                var value = Airtable.getTagValue(names[index]);
                 console.log("value of " + names[index] + " is: ", value);
             }
 
-            /* end testing Airtable getter functions */
-
-            /* begin testing setter functions */
-
-            // creates new data and pushes it to Airtable
-            Airtable.createNameValuePair("newTag", "testNewTag");
-            // var test1 = Airtable.createName({ Name: "Happy", Value: "2"});
-            // console.log(test1)
-
-            // updates existing info entry in Airtable
-            // var test2 = Airtable.updateName("recc3GIbPuDbIIk8T", {Name: "Mom", Value: "3"});
-            // console.log(test2)
-            // Airtable.updateValue("Grace", "hi hi")
-            // Airtable.updateValue("hee", true)
-            // Airtable.updateValue("ho", false)
-            // Airtable.updateValue("Baby", 1)
-            
-            /* end testing setter functions */
+            console.log(Airtable.getTagsInfo());
         });
 
         /* initialize Airtable */
@@ -438,19 +464,25 @@
 
             SLTestDecisionHandler();
             SPIKETestDecisionHandler();
+            ATTestDecisionHandler();
 
             var selectTest = document.getElementById("SL_test_select");
-            
             selectTest.addEventListener("click", function () {
                 SLTestDecisionHandler();
             })
 
 
             var SPIKEselectTest = document.getElementById("SPIKE_test_select");
-
             SPIKEselectTest.addEventListener("click", function () {
                 SPIKETestDecisionHandler();
             })
+
+            var ATselectTest = document.getElementById("AT_test_select");
+            ATselectTest.addEventListener("click", function () {
+                ATTestDecisionHandler();
+            })
+
+
         })
 
         function SLTestDecisionHandler() {
@@ -499,6 +531,36 @@
                 }
 
                 var selectedCases = document.getElementsByClassName("setTagValue");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+        }
+
+        function ATTestDecisionHandler() {
+            var testCases = undefined;
+            var testFunction = $("#ATselectTest option:selected").attr('id');
+
+            if (testFunction == "generalOPTION_AT") {
+                var testCases = document.getElementsByClassName("ATtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("general");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "edgeOPTION_AT") {
+                var testCases = document.getElementsByClassName("ATtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("edge_AT");
                 for (var index = 0; index < selectedCases.length; index++) {
                     var aCase = selectedCases[index];
                     aCase.style.display = "block";
@@ -658,14 +720,8 @@
             background-color: #4CE0D2;
             border: solid;
         }
-
-        .testCase {
-            display:none;
-            display:flex;
-            flex-direction: column;
-        }
-
-        #SPIKE_test_select, #SL_test_select {
+        
+        #SPIKE_test_select, #SL_test_select, #AT_test_select {
             background-color: rgb(247, 250, 48);
         }
     </style>
