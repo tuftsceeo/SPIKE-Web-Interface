@@ -22,6 +22,9 @@
             },
             "exampleSpikeServiceMotor": {
                 "title": "Slider-Controlled Motor Example"
+            },
+            "exampleSpikeServiceBopIt": {
+                "title": "Making a Game (Bop-It)"
             }
         }
     },

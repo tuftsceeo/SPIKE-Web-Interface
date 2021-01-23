@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Integrating MicroPython | Tutorial: Integrating MicroPython</title>
+    <title>Tutorial: Making a Game (Bop-It) | Tutorial: Making a Game (Bop-It)</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Integrating MicroPython</a>
+            <a class = "currentPage">Tutorial: Making a Game (Bop-It)</a>
         
         
     </div>
@@ -55,118 +55,190 @@
     <header>
         
 
-        <h2>Integrating MicroPython</h2>
+        <h2>Making a Game (Bop-It)</h2>
     </header>
 
     
         <article class="readme">
-            <h2>Running Pre-Loaded Programs</h2>
-<p>For cases when a project seems better suited to MicroPython control rather than JavaScript, but you still want to connect it to a webpage, the JavaScript library allows you to upload and run MicroPython programs using the SPIKE Service. The following program, for example, would simply run whatever was pre-loaded into slot 1 on the SPIKE Prime:</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;html>
-    &lt;head>
-        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
-    &lt;/head>
-    &lt;body>
-        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
-        &lt;/div>
-    &lt;/body>
-    &lt;script>
-        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
-
-        mySPIKE.executeAfterInit(function () {
-
-            mySPIKE.executeProgram(1)
-        })
-    &lt;/script>
-&lt;/html>
+            <h2>Making a Bop-It</h2>
+<p>A Bop-It is a popular toy from the late 90s/early 2000s, which is essentially an electronic game of Simon Says; the toy gives the user commands such as &quot;Bop It!&quot; and &quot;Twist It!&quot; which correspond to various knobs and buttons, and the user has an ever-deacreasing amount of time to hit/pull/twist the appropriate piece. In this tutorial, we're going to turn the SPIKE Prime hub into a simple Bop-It, which gives commands to the user through a webpage. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.</p>
+<h2>Callback Functions</h2>
+<p>In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a &quot;callback&quot; function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. Fore example, if we wanted to print the message &quot;done!&quot; to the console after spinning a motor 360 degrees at half speed, the following code</p>
+<pre class="prettyprint source lang-javascript"><code>mySPIKE.Motor('A').run_for_degrees(360, 50)
+console.log(&quot;done!&quot;)
 </code></pre>
-<h2>Writing Programs to the SPIKE</h2>
-<p>In some cases, we may not know all of the python code before beginning the program, such as when taking speeds or distances as user input. Instead of using pre-loaded code, then, we have to write code to the hub using writeProgram(projectName, data, slotid, callback). The following example is of a robotic car, with motors plugged into ports &quot;A&quot; and &quot;B,&quot; that drives a user-specified distance (in wheel rotations) when the &quot;Go&quot; button is pressed:</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;html>
-    &lt;head>
-        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
-        &lt;style>
-            #controls {
-                text-align: center;
-                padding: 20px;
-            }
-        &lt;/style>
-    &lt;/head>
-    &lt;body>
-        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
-        &lt;/div>
-        &lt;div id=&quot;controls&quot;>
-            &lt;label for=&quot;dist-box&quot;>Distance (wheel rotations):&lt;/label>
-            &lt;input id=&quot;dist-box&quot;>
-            &lt;button onclick=&quot;goCurrentDistance()&quot;>Go!&lt;/button>
-        &lt;/div>
-    &lt;/body>
-    &lt;script>
-        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+<p>wouldn't actually work as intended; since <code>run_for_degrees</code> is non-blocking, &quot;done!&quot; would print right after the motor started running, instead of waiting until 360 degrees was reached. Luckily, if we look at the definition of <code>run_for_degrees</code> in the <code>Service_SPIKE.Motor</code> documentation, we see that it can actually take a callback function as an optional third parameter. Therefore, we can amend our code to</p>
+<pre class="prettyprint source lang-javascript"><code>mySPIKE.Motor('A').run_for_degrees(360, 50, function() { console.log(&quot;done!&quot;) })
+</code></pre>
+<p>Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (<code>console.log</code>), I still had to wrap it in an inline function instead using console.log as the callback directly (ie <code>run_for_degrees(360, 50, console.log(&quot;done!&quot;))</code>. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function <code>foo(callback)</code> and wanted to pass in the function <code>bar()</code> as callback, we would say <code>foo(bar)</code> rather than <code>foo(bar())</code>. A consequence of this is that we couldn't use <code>bar</code> directly if it needed any parameters, and would instead have to say <code>foo(function() { bar(parameter) })</code>.</p>
+<h2>The Game</h2>
+<p>In any round of this game, the three major steps are: 1. choose and display a desired move, as well as a time that move must be completed in, 2. read in the move made by the user and how long that move took, and 3. check that move/time combination against the desired move/time, and either end the game or begin antoher round.</p>
+<p>Step 1 could be done in many ways, and is fairly independent of the SPIKE Prime. In this example, we're going to hold the four possible commands in an array, and then use the command stored at a random index of that array for each round. For time, we're going to start at 5000 miliseconds, and subtract 100 ms for each successful round played until we reach a minimum time of 1000 ms. Those two functions would look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>function calculateRoundTime(roundNum) {
+    return Math.max(5000 - roundNum * 100, 1000);
+}
 
-        function goCurrentDistance() {
-            // getting distance from textbox input, or setting it to zero if input is invalid
-            distance = document.getElementById(&quot;dist-box&quot;).value
-            if(isNaN(distance))
-                distance = 0
-            
-            // writing micropython program to hub slot 0 using specified distance
-            // in this example, the python lines are in separate strings for readability, but this is not necessary as long as the whitespace is correct
-            mySPIKE.writeProgram(&quot;drive distance&quot;, &quot;from spike import MotorPair \n&quot;
-                                                    + &quot;driveTrain = MotorPair('A', 'B') \n&quot;
-                                                    + &quot;driveTrain.move(&quot; + distance + &quot;, 'rotations', 0)&quot;, 
-                                 0), function() { mySPIKE.executeProgram(0) }; // note the callback function- this runs after the code is successfully uploaded to the SPIKE, and in this case tells the SPIKE to run whatever was just uploaded
+function getNewCommand() {
+    var commands = [&quot;Bop It!&quot;, &quot;Shake It!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
+    return commands[Math.floor(Math.random() * 4)]
+}
+</code></pre>
+<p>Steps 2 and 3 are where it gets more interesting. For step 2, we're going to use the hub's built in motion sensor, accessed with <code>mySPIKE.PrimeHub().motion_sensor</code>, which tracks both its orientation in space and various &quot;gestures&quot; such as being tapped or shaken. The motion sensor has a <code>wait_for_new_gesture(callback)</code> function, which waits for a new gesture to occur and then runs a callback function with the name of the gesture (&quot;tapped&quot;, &quot;doubletapped&quot;, &quot;shaken&quot;, or &quot;freefall&quot;) as a parameter. If we use this function as our step 2, we can have our step 3 be the callback function, ensuring that it will run only after a move is made. There is also an analogous function for orientations (with each orientation correspinding to which side of the spike is facing up) called `wait_for_new_orientation(callback)</p>
+<p>In code, that would look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>function checkGesture(targetGesture, roundTime){
+    var startTime = Date.now(); // storing the time right before the hub starts waiting for a gesture, to be compared to the time after gesture is completed
+    mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
+        processMove(newGesture, targetGesture, Date.now() - startTime, roundTime) 
+    })
+}
+
+function checkOrientation(targetOrientation, roundTime) {
+    var startTime = Date.now();
+    mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
+        processMove(newOrientation, targetOrientation, Date.now() - startTime, roundTime) 
+    })
+}
+
+function processMove(newVal, targetVal, timeSpent, roundTime) {
+    if(newVal == targetVal) {
+        if(timeSpent &lt;= roundTime) {
+            // update score and move on to next round
+        } else {
+            // move was too slow! end game
         }
-    &lt;/script>
-&lt;/html>
+    } else {
+        // move was incorrect! end game
+    }
+}
 </code></pre>
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_usingPython.html"></iframe>
-<p>And here would be the same program purely in JavaScript, for comparison:</p>
+<p>Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter of linking commands to gesture names and writing a function that plays one round by calling <code>checkGesture</code> using the generated target gesture and time. We also need to add some HTML interaction functions for displaying commands and game over messages on the webpage. These functions are all pretty short, and will be on display in...</p>
+<h2>The Final Product</h2>
 <pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
         &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
         &lt;style>
             #controls {
                 text-align: center;
-                padding: 20px;
+                font-size: 30px;
+                padding: 100px;
+            }
+            #message {
+                font-size: 50px;
             }
         &lt;/style>
     &lt;/head>
+
     &lt;body>
         &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
             &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
         &lt;div id=&quot;controls&quot;>
-            &lt;label for=&quot;dist-box&quot;>Distance (wheel rotations):&lt;/label>
-            &lt;input id=&quot;dist-box&quot;>
-            &lt;button onclick=&quot;goCurrentDistance()&quot;>Go!&lt;/button>
+            &lt;button onclick = startGame()>Start&lt;/button>
+            &lt;div id=&quot;message&quot;>&lt;br>&lt;/div>
+            &lt;div id=&quot;score&quot;>Score: 0&lt;/div>
         &lt;/div>
     &lt;/body>
     &lt;script>
         var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
-        var leftWheel, rightWheel;
+        var messageDisplay = document.getElementById(&quot;message&quot;);
+        var score = 0;
 
-        // initializing left and right wheen variables for later use (cannot be done until SPIKE itself is initialized)
+        // workaround for wait_for_new_orientation giving starting orientation of hub the first time it is called
         mySPIKE.executeAfterInit(function() {
-            leftWheel = mySPIKE.Motor('A')
-            rightWheel = mySPIKE.Motor('B')
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation( function() { console.log(&quot;Ready to go!&quot;)})
         })
 
-        function goCurrentDistance() {
-            // getting distance from textbox input, or setting it to zero if input is invalid
-            distance = document.getElementById(&quot;dist-box&quot;).value
-            if(isNaN(distance))
-                distance = 0
-            
-            // running motors specified distance
-            leftWheel.run_for_degrees(360 * distance)
-            rightWheel.run_for_degrees(360 * distance)
+        // resets score to zero and begins a new game
+        function startGame() {
+            updateScore(0)
+            messageDisplay.innerHTML = &quot;Ready... Set...&quot;
+
+            setTimeout(function() { startNewRound(0) }, 1000);
+        }
+
+        // picks a command and time for new round, shows command to user, and gives them roundTime amount of miliseconds to follow given command
+        function startNewRound(roundNum) {
+            var command = getNewCommand()
+            var roundTime = calculateRoundTime(roundNum)
+
+            document.getElementById(&quot;message&quot;).innerText = command
+            switch(command) {
+                case &quot;Bop It!&quot;:
+                    checkGesture(&quot;tapped&quot;, roundTime)
+                    break
+                case &quot;Shake It!&quot;:
+                    checkGesture(&quot;shaken&quot;, roundTime)
+                    break
+                case &quot;Flip Left!&quot;:
+                    checkOrientation(&quot;leftside&quot;, roundTime)
+                    break
+                case &quot;Flip Right!&quot;:
+                    checkOrientation(&quot;rightside&quot;, roundTime)
+                    break
+            }
+        }
+
+        // waits for player to tap or shake hub, records move made and time taken for further processing
+        function checkGesture(targetGesture, roundTime){
+            var startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
+                processMove(newGesture, targetGesture, Date.now() - startTime, roundTime) 
+            })
+        }
+
+        // waits for player to turn hub (for flip commands), records move made and time taken for further processing
+        function checkOrientation(targetOrientation, roundTime) {
+            var startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
+                processMove(newOrientation, targetOrientation, Date.now() - startTime, roundTime) 
+            })
+        }
+
+        // uses move made, target move, time spent making the move, and maximum round time to discern whether user has won or lost round, and either continues or ends game accordingly
+        function processMove(newVal, targetVal, timeSpent, roundTime) {
+            // checking if correct move was made
+            if(newVal == targetVal) {
+                // checking if move was made in appropriate time
+                if(timeSpent &lt;= roundTime) {
+                    updateScore(score + 1)
+                    messageDisplay.innerText = &quot;Ready... Set...&quot;
+                    setTimeout(function() { startNewRound(score) }, 1000)
+                } else {
+                    messageDisplay.innerText = &quot;Too Slow!&quot;
+                    setTimeout(gameOver, 2000);
+                }
+            } else {
+                messageDisplay.innerText = &quot;Wrong Move!&quot;
+                setTimeout(gameOver, 2000);
+            }
+        }
+
+        // notifies user of game ending
+        function gameOver() {
+            messageDisplay.innerText = &quot;Game Over!&quot;
+        }
+    
+        // calculates time for next round based om how many rounds have already occured (such that difficulty decreases as the game goes on)
+        function calculateRoundTime(roundNum) {
+            return Math.max(5000 - roundNum * 100, 1000);
+        }
+
+        // randomly chooses and returns a new command
+        function getNewCommand() {
+            var commands = [&quot;Bop It!&quot;, &quot;Shake It!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
+            return commands[Math.floor(Math.random() * 4)]
+        }
+
+        // sets score to given newScore and updates onscreen display to match
+        function updateScore(newScore) {
+            score = newScore
+            document.getElementById(&quot;score&quot;).innerText = &quot;Score: &quot; + score
         }
     &lt;/script>
 &lt;/html>
 </code></pre>
+<p>Feel free to plug in a hub and play a few rounds below, or copy-and-paste the game into your own code and see what new commands, cool graphics, or more sophisticated time/command-choosing algorithms you can add.</p>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_bopIt.html"></iframe>
         </article>
     
 </section>
