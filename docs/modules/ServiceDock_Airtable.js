@@ -23,9 +23,9 @@ class serviceairtable extends HTMLElement {
         this.active = false; // whether the service was activated
         this.service = new Service_Airtable(); // instantiate a service object ( one object per button )
         this.proceed = false; // if there are credentials input
-        this.APIKey;
-        this.BaseID;
-        this.TableName;
+        this.APIKey = "";
+        this.BaseID = "";
+        this.TableName = "";
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -80,23 +80,23 @@ class serviceairtable extends HTMLElement {
         this.addEventListener("click", async function () {
 
             if (!this.active) {
-                this.popUpBox();
-            }
-
-            // check active flag so once activated, the service doesnt reinit
-            if (!this.active && this.proceed) {
+              if (this.APIKey != "" && this.BaseID != "" && this.TableName != "") {
+                // check active flag so once activated, the service doesnt reinit
 
                 console.log("activating service");
 
-                var initSuccessful = await this.service.init(this.APIKey);
-                var initSuccessful2 = await this.service.init(this.BaseID);
-                var initSuccessful3 = await this.service.init(this.TableName);
+                var initSuccessful = await this.service.init(this.APIKey, this.BaseID, this.TableName);
 
-                if (initSuccessful && initSuccessful2 && initSuccessful3) {
-                    this.active = true;
-                    this.status.style.backgroundColor = "green";
+                if (initSuccessful) {
+
+                  this.active = true;
+                  this.status.style.backgroundColor = "green";
                 }
-
+                
+              }
+              else {
+                this.popUpBox();
+              }
             }
 
         });
@@ -160,9 +160,6 @@ class serviceairtable extends HTMLElement {
         if (APIKeyExists && BaseIDKeyExists && TableNameExists) {
             this.proceed = true;
         }
-
-        
-
     }
 
     /* allow credentials input through HTML attributes */
@@ -219,14 +216,16 @@ class serviceairtable extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         // console.log("changing attribute: ", name);
         if (name == "apikey") {
-            console.log("newvalue of apikey:", newValue);
-            this.APIKey = newValue;
+          console.log("new value of apikey:", newValue);
+          this.APIKey = newValue;
         }
         else if (name == "baseid") {
-            this.BaseID = newValue
+          console.log("new value of baseid:", newValue);
+          this.BaseID = newValue
         }
         else if (name == "tablename") {
-            this.TableName = newValue
+          console.log("new value of tablename:", newValue);
+          this.TableName = newValue
         }
         
     }
@@ -307,6 +306,7 @@ function Service_Airtable() {
     var table = undefined;
 
     var funcAtInit = undefined; // function to call after init
+    var funcAfterChangeTagValue = undefined; // callback function to call after setTagValue
     
 
     //////////////////////////////////////////
@@ -406,61 +406,43 @@ function Service_Airtable() {
     function isActive() {
         return serviceActive;
     }
-    
-    /** Get all the entries only in 'Name' column, which are keys
-     * @public
-     * @returns {array}
+
+    /** Get all tags on the cloud
+     * @returns data
      */
-    function getNames() {
-      var names = [];
-
-      for (var key in currentData) {
-        names.push(key);
-      }
-
-      return names;
+    function getTagsInfo () {
+      return currentData;
     }
 
-    /** Create a Name & Value pair if it doesn't exist
-     * @public
+    /**
+     * 
      * @param {string} name 
      * @param {string} value 
-     * @param {function} callback
+     * @param {function} callback 
      */
-    function createNameValuePair(name, value, callback) {
+    async function setTagValue(name, value, callback) {
       // only create new pair if name does not yet exist
       if (currentData[name] == undefined) {
-        createName({Name: name, Value: value});
-        if (callback != undefined ) {
-          callback();
+        createName({ Name: name, Value: value });
+        if (callback != undefined) {
+          funcAfterChangeTagValue = callback;
         }
       }
       else {
+        await updateValue(name, value);
         if (callback != undefined) {
-          callback();
+          funcAfterChangeTagValue = callback;
         }
       }
     }
 
     /** Get the Value field associated with a Name
-     * @public
-     * @param {string} name name of the Name entry
-     * @returns {any} Value associated with the given Name
-     */
-    function getValue(name) {
-        return convertToDataType(currentData[name]);
-    }
-
-    /** Update the Value field associated with a Name 
-     * @public
-     * @param {string} name 
-     * @param {string} newValue 
-     */
-    function updateValue(name, newValue) {
-      var recordID = recordIDNameMap[name];
-      var convertedValue = convertToString(newValue);
-      var requestBody = { Name: name, Value: convertedValue };
-      updateRecord(recordID, requestBody);
+    * @public
+    * @param {string} name name of the Name entry
+    * @returns {any} Value associated with the given Name
+    */
+    function getTagValue(name) {
+      return currentData[name];
     }
 
     /** Delete a record given a record ID
@@ -482,6 +464,17 @@ function Service_Airtable() {
     //                                      //
     //////////////////////////////////////////
 
+    /** Update the Value field associated with a Name 
+    * @private
+    * @param {string} name 
+    * @param {string} newValue 
+    */
+    function updateValue(name, newValue) {
+      var recordID = recordIDNameMap[name];
+      var convertedValue = convertToString(newValue);
+      var requestBody = { Name: name, Value: convertedValue };
+      updateRecord(recordID, requestBody);
+    }
 
     /** get an initial reading of the table, and then initialize global variable currentData
      * @private
@@ -500,7 +493,7 @@ function Service_Airtable() {
           var value = records[key].fields.Value;
           var recordID = records[key].id;
 
-          currentData[name] = value;
+          currentData[name] = convertToDataType(value);
           recordIDNameMap[name] = recordID;
         }
 
@@ -519,10 +512,13 @@ function Service_Airtable() {
                 var value = records[key].fields.Value;
                 var recordID = records[key].id;
                 if (name != undefined) {
-                  currentData[name] = value;
+                  currentData[name] = convertToDataType(value);
                   recordIDNameMap[name] = recordID;
                 }
               }
+              if (funcAfterChangeTagValue != undefined)
+                funcAfterChangeTagValue();
+                funcAfterChangeTagValue = undefined;
             }
 
           }, 200)
@@ -540,7 +536,7 @@ function Service_Airtable() {
      */
     async function updateRecord(recordID, fields) {
       const updatedRecord = await table.update(recordID, fields);
-      console.log(minifyRecord(updatedRecord));
+      // console.log(minifyRecord(updatedRecord));
     }
 
     /** Creates a new entry of specified data fields that gets pushed to Airtable
@@ -548,7 +544,7 @@ function Service_Airtable() {
     */
     const createName = async (fields) => {
       const createdName = await table.create(fields);
-      console.log(minifyRecord(createdName));
+      // console.log(minifyRecord(createdName));
     };
 
     /** Get the content of a record/row in minified format
@@ -569,7 +565,7 @@ function Service_Airtable() {
     */
     const getRecordById = async (id) => {
       const record = await table.find(id);
-      console.log(record);
+      // console.log(record);
     };
 
 
@@ -672,20 +668,35 @@ function Service_Airtable() {
       return convertedInput
     }
 
+    /** Get all the entries only in 'Name' column, which are keys
+    * @private
+    * @returns {array}
+    */
+    function getNames() {
+      var names = [];
+
+      for (var key in currentData) {
+        names.push(key);
+      }
+
+      return names;
+    }
+
     /* public members */
     return {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
         updateValue: updateValue,
-        createNameValuePair: createNameValuePair,
         getRecords: getRecords,
-        getValue: getValue,
+        getTagValue: getTagValue,
         getNames: getNames,
+        getTagsInfo: getTagsInfo,
         convertToString, convertToString,
         deleteRecord: deleteRecord,
         getRecordById: getRecordById,
-        minifyRecord: minifyRecord
+        minifyRecord: minifyRecord,
+        setTagValue: setTagValue
 
     }
 }
