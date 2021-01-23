@@ -2,7 +2,7 @@
 In this tutorial, we're going to use the SPIKE Prime hub to play a simple game of Simon Says, where we give commands on a webpage that the user then has an ever-decreasing amount of time to follow. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.
 
 ## Callback Functions
-In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a "callback" function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. Fore example, if we wanted to print the message "done!" to the console after spinning a motor 360 degrees at half speed, the following code
+In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a "callback" function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. For example, if we wanted to print the message "done!" to the console after spinning a motor 360 degrees at half speed, the following code
 ```javascript
 mySPIKE.Motor('A').run_for_degrees(360, 50)
 console.log("done!")
@@ -11,7 +11,7 @@ wouldn't actually work as intended; since `run_for_degrees` is non-blocking, "do
 ```javascript
 mySPIKE.Motor('A').run_for_degrees(360, 50, function() { console.log("done!") })
 ```
-Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (`console.log`), I still had to wrap it in an inline function instead using console.log as the callback directly (ie `run_for_degrees(360, 50, console.log("done!"))`. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function `foo(callback)` and wanted to pass in the function `bar()` as callback, we would say `foo(bar)` rather than `foo(bar())`. A consequence of this is that we couldn't use `bar` directly if it needed any parameters, and would instead have to say `foo(function() { bar(parameter) })`.
+Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (`console.log`), I still had to wrap it in an inline function instead of using console.log as the callback directly (ie `run_for_degrees(360, 50, console.log("done!"))`. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function `foo(callback)` and wanted to pass in the function `bar()` as callback, we would say `foo(bar)` rather than `foo(bar())`. A consequence of this is that we couldn't use `bar` directly if it needed any parameters, and would instead have to say `foo(function() { bar(parameter) })`.
 
 ## Timeouts
 Another helpful tool for timing events in JavaScript programs is `setTimeout(function, milliseconds)`. This is a built-in JavaScript function that sets up `function` to run after `milliseconds` milliseconds have elapsed. Notably, `setTimeout` is also non-blocking; the program
@@ -24,7 +24,7 @@ would print "world" first, followed by "hello" a second later. Still, it can be 
 ## The Game
 In any round of this game, the three major steps are: 1. choose and display a desired move, as well as a time that move must be completed in, 2. read in the move made by the user and how long that move took, and 3. check that move/time combination against the desired move/time, and either end the game or begin another round. 
 
-Step 1 could be done in many ways, and is fairly independent of the SPIKE Prime. In this example, we're going to hold the four possible commands in an array, and then use the command stored at a random index of that array for each round. For time, we're going to start at 5000 miliseconds, and subtract 100 ms for each successful round played until we reach a minimum time of 1000 ms. Those two functions would look like this:
+Step 1 could be done in many ways, and is fairly independent of the SPIKE Prime. In this example, we're going to hold the four possible commands in an array, and then use the command stored at a random index of that array for each round. For time, we're going to start at 5000 milliseconds, and subtract 100 ms for each successful round played until we reach a minimum time of 1000 ms. Those two functions would look like this:
 
 ```javascript
 function calculateRoundTime(roundNum) {
@@ -37,7 +37,7 @@ function getNewCommand() {
 }
 ```
 
-Steps 2 and 3 are where it gets more interesting. For step 2, we're going to use the hub's built in motion sensor, accessed with `mySPIKE.PrimeHub().motion_sensor`, which tracks both its orientation in space and various "gestures" such as being tapped or shaken. The motion sensor has a `wait_for_new_gesture(callback)` function, which waits for a new gesture to occur and then runs a callback function with the name of the gesture ("tapped", "doubletapped", "shaken", or "freefall") as a parameter. If we use this function as our step 2, we can have our step 3 be the callback function, ensuring that it will run only after a move is made. There is also an analogous function for orientations (with each orientation correspinding to which side of the spike is facing up) called `wait_for_new_orientation(callback)`
+Steps 2 and 3 are where it gets more interesting. For step 2, we're going to use the hub's built-in motion sensor, accessed with `mySPIKE.PrimeHub().motion_sensor`, which tracks both its orientation in space and various "gestures" such as being tapped or shaken. The motion sensor has a `wait_for_new_gesture(callback)` function, which waits for a new gesture to occur and then runs a callback function with the name of the gesture ("tapped", "doubletapped", "shaken", or "freefall") as a parameter. If we use this function as our step 2, we can have our step 3 be the callback function, ensuring that it will run only after a move is made. There is also an analogous function for orientations (with each orientation corresponding to which side of the spike is facing up) called `wait_for_new_orientation(callback)`
 
 In code, that would look like this:
 
