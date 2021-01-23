@@ -1,9 +1,9 @@
 <!--
     Project: SPIKE Prime Web Interface
-    File: servicedock_bopIt.html
+    File: servicedock_simonSays.html
     Author: Emma Bethel
     Last Update: 1/19/21
-    Purpose: turn the SPIKE prime into a bop-it
+    Purpose: play a simon says game w/ user based on hub gestures/orientation
 -->
 <html>
     <head>
@@ -43,7 +43,7 @@
         // resets score to zero and begins a new game
         function startGame() {
             updateScore(0)
-            messageDisplay.innerHTML = "Ready... Set..."
+            messageDisplay.innerHTML = "Simon Says..."
 
             setTimeout(function() { startNewRound(0) }, 1000);
         }
@@ -55,10 +55,10 @@
 
             document.getElementById("message").innerText = command
             switch(command) {
-                case "Bop It!":
+                case "Tap!":
                     checkGesture("tapped", roundTime)
                     break
-                case "Shake It!":
+                case "Shake!":
                     checkGesture("shaken", roundTime)
                     break
                 case "Flip Left!":
@@ -94,7 +94,7 @@
                 // checking if move was made in appropriate time
                 if(timeSpent <= roundTime) {
                     updateScore(score + 1)
-                    messageDisplay.innerText = "Ready... Set..."
+                    messageDisplay.innerText = "Simon Says..."
                     setTimeout(function() { startNewRound(score) }, 1000)
                 } else {
                     messageDisplay.innerText = "Too Slow!"
@@ -118,7 +118,7 @@
 
         // randomly chooses and returns a new command
         function getNewCommand() {
-            var commands = ["Bop It!", "Shake It!", "Flip Left!", "Flip Right!"]
+            var commands = ["Tap!", "Shake!", "Flip Left!", "Flip Right!"]
             return commands[Math.floor(Math.random() * 4)]
         }
 

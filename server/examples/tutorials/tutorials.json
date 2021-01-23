@@ -23,8 +23,8 @@
             "exampleSpikeServiceMotor": {
                 "title": "Slider-Controlled Motor Example"
             },
-            "exampleSpikeServiceBopIt": {
-                "title": "Making a Game (Bop-It)"
+            "exampleSpikeServiceSimonSays": {
+                "title": "Making a Game (Simon Says)"
             }
         }
     },

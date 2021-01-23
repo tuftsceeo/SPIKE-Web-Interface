@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Making a Game (Bop-It) | Tutorial: Making a Game (Bop-It)</title>
+    <title>Tutorial: Making a Game (Simon Says) | Tutorial: Making a Game (Simon Says)</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Making a Game (Bop-It)</a>
+            <a class = "currentPage">Tutorial: Making a Game (Simon Says)</a>
         
         
     </div>
@@ -55,13 +55,13 @@
     <header>
         
 
-        <h2>Making a Game (Bop-It)</h2>
+        <h2>Making a Game (Simon Says)</h2>
     </header>
 
     
         <article class="readme">
-            <h2>Making a Bop-It</h2>
-<p>A Bop-It is a popular toy from the late 90s/early 2000s, which is essentially an electronic game of Simon Says; the toy gives the user commands such as &quot;Bop It!&quot; and &quot;Twist It!&quot; which correspond to various knobs and buttons, and the user has an ever-deacreasing amount of time to hit/pull/twist the appropriate piece. In this tutorial, we're going to turn the SPIKE Prime hub into a simple Bop-It, which gives commands to the user through a webpage. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.</p>
+            <h2>Simon Says</h2>
+<p>In this tutorial, we're going to use the SPIKE Prime hub to play a simple game of Simon Says, where we give commands on a webpage that the user then has an ever-decreasing amount of time to follow. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.</p>
 <h2>Callback Functions</h2>
 <p>In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a &quot;callback&quot; function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. Fore example, if we wanted to print the message &quot;done!&quot; to the console after spinning a motor 360 degrees at half speed, the following code</p>
 <pre class="prettyprint source lang-javascript"><code>mySPIKE.Motor('A').run_for_degrees(360, 50)
@@ -79,7 +79,7 @@ console.log(&quot;done!&quot;)
 }
 
 function getNewCommand() {
-    var commands = [&quot;Bop It!&quot;, &quot;Shake It!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
+    var commands = [&quot;Tap!&quot;, &quot;Shake!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
     return commands[Math.floor(Math.random() * 4)]
 }
 </code></pre>
@@ -151,7 +151,7 @@ function processMove(newVal, targetVal, timeSpent, roundTime) {
         // resets score to zero and begins a new game
         function startGame() {
             updateScore(0)
-            messageDisplay.innerHTML = &quot;Ready... Set...&quot;
+            messageDisplay.innerHTML = &quot;Simon Says...&quot;
 
             setTimeout(function() { startNewRound(0) }, 1000);
         }
@@ -163,10 +163,10 @@ function processMove(newVal, targetVal, timeSpent, roundTime) {
 
             document.getElementById(&quot;message&quot;).innerText = command
             switch(command) {
-                case &quot;Bop It!&quot;:
+                case &quot;Tap!&quot;:
                     checkGesture(&quot;tapped&quot;, roundTime)
                     break
-                case &quot;Shake It!&quot;:
+                case &quot;Shake!&quot;:
                     checkGesture(&quot;shaken&quot;, roundTime)
                     break
                 case &quot;Flip Left!&quot;:
@@ -201,7 +201,7 @@ function processMove(newVal, targetVal, timeSpent, roundTime) {
                 // checking if move was made in appropriate time
                 if(timeSpent &lt;= roundTime) {
                     updateScore(score + 1)
-                    messageDisplay.innerText = &quot;Ready... Set...&quot;
+                    messageDisplay.innerText = &quot;Simon Says...&quot;
                     setTimeout(function() { startNewRound(score) }, 1000)
                 } else {
                     messageDisplay.innerText = &quot;Too Slow!&quot;
@@ -225,7 +225,7 @@ function processMove(newVal, targetVal, timeSpent, roundTime) {
 
         // randomly chooses and returns a new command
         function getNewCommand() {
-            var commands = [&quot;Bop It!&quot;, &quot;Shake It!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
+            var commands = [&quot;Tap!&quot;, &quot;Shake!&quot;, &quot;Flip Left!&quot;, &quot;Flip Right!&quot;]
             return commands[Math.floor(Math.random() * 4)]
         }
 
@@ -238,7 +238,7 @@ function processMove(newVal, targetVal, timeSpent, roundTime) {
 &lt;/html>
 </code></pre>
 <p>Feel free to plug in a hub and play a few rounds below, or copy-and-paste the game into your own code and see what new commands, cool graphics, or more sophisticated time/command-choosing algorithms you can add.</p>
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_bopIt.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_simonSays.html"></iframe>
         </article>
     
 </section>

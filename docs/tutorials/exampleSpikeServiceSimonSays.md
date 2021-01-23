@@ -1,5 +1,5 @@
-## Making a Bop-It
-A Bop-It is a popular toy from the late 90s/early 2000s, which is essentially an electronic game of Simon Says; the toy gives the user commands such as "Bop It!" and "Twist It!" which correspond to various knobs and buttons, and the user has an ever-deacreasing amount of time to hit/pull/twist the appropriate piece. In this tutorial, we're going to turn the SPIKE Prime hub into a simple Bop-It, which gives commands to the user through a webpage. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.
+## Simon Says
+In this tutorial, we're going to use the SPIKE Prime hub to play a simple game of Simon Says, where we give commands on a webpage that the user then has an ever-decreasing amount of time to follow. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.
 
 ## Callback Functions
 In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a "callback" function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. Fore example, if we wanted to print the message "done!" to the console after spinning a motor 360 degrees at half speed, the following code
@@ -24,7 +24,7 @@ function calculateRoundTime(roundNum) {
 }
 
 function getNewCommand() {
-    var commands = ["Bop It!", "Shake It!", "Flip Left!", "Flip Right!"]
+    var commands = ["Tap!", "Shake!", "Flip Left!", "Flip Right!"]
     return commands[Math.floor(Math.random() * 4)]
 }
 ```
@@ -102,7 +102,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
         // resets score to zero and begins a new game
         function startGame() {
             updateScore(0)
-            messageDisplay.innerHTML = "Ready... Set..."
+            messageDisplay.innerHTML = "Simon Says..."
 
             setTimeout(function() { startNewRound(0) }, 1000);
         }
@@ -114,10 +114,10 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
 
             document.getElementById("message").innerText = command
             switch(command) {
-                case "Bop It!":
+                case "Tap!":
                     checkGesture("tapped", roundTime)
                     break
-                case "Shake It!":
+                case "Shake!":
                     checkGesture("shaken", roundTime)
                     break
                 case "Flip Left!":
@@ -152,7 +152,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
                 // checking if move was made in appropriate time
                 if(timeSpent <= roundTime) {
                     updateScore(score + 1)
-                    messageDisplay.innerText = "Ready... Set..."
+                    messageDisplay.innerText = "Simon Says..."
                     setTimeout(function() { startNewRound(score) }, 1000)
                 } else {
                     messageDisplay.innerText = "Too Slow!"
@@ -176,7 +176,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
 
         // randomly chooses and returns a new command
         function getNewCommand() {
-            var commands = ["Bop It!", "Shake It!", "Flip Left!", "Flip Right!"]
+            var commands = ["Tap!", "Shake!", "Flip Left!", "Flip Right!"]
             return commands[Math.floor(Math.random() * 4)]
         }
 
@@ -191,4 +191,4 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
 
 Feel free to plug in a hub and play a few rounds below, or copy-and-paste the game into your own code and see what new commands, cool graphics, or more sophisticated time/command-choosing algorithms you can add.
 
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_bopIt.html"></iframe>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_simonSays.html"></iframe>
