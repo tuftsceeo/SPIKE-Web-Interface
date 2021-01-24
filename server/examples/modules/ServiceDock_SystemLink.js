@@ -304,9 +304,9 @@ function Service_SystemLink() {
     /** Change the current value of a tag on SystemLink cloud
      * 
      * @public
-     * @param {string} tagName 
-     * @param {any} newValue 
-     * @param {function} callback executes 1 second after this function is called
+     * @param {string} name name of tag to update
+     * @param {any} value value to update tag to
+     * @param {function} callback function to execute after tag is updated
      * @example
      * // set a string type Value of a Tag and display
      * mySL.setTagValue("message", "hello there", function () {
@@ -324,10 +324,31 @@ function Service_SystemLink() {
      */
     function setTagValue(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
-        changeValue(tagName, newValue, function(valueChanged) {
+        changeValue(tagName, newValue, false, function(valueChanged) {
             if (valueChanged) {
                 // wait for changed value to be retrieved
                 setTimeout(function() {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }, 1000)
+            }
+        });
+    }
+
+    /** Change the current value of a tag on SystemLink cloud with strict data types. There will be no implicit data type conversions. E.g. Updating tags of INT type will only work with javascript number.
+     * 
+     * @public
+     * @param {any} name name of tag to update
+     * @param {any} value value to update tag to
+     * @param {any} callback function to execute after tag is updated
+     */
+    function setTagValueStrict(tagName, newValue, callback) {
+        // changes the value of a tag on the cloud
+        changeValue(tagName, newValue, true, function (valueChanged) {
+            if (valueChanged) {
+                // wait for changed value to be retrieved
+                setTimeout(function () {
                     if (typeof callback === 'function') {
                         callback();
                     }
@@ -392,7 +413,7 @@ function Service_SystemLink() {
         createNewTagHelper(tagName, valueType, function (newTagCreated) {
             
             // after tag is created, assign a value to it
-            changeValue(tagName, tagValue, function (newTagValueAssigned) {
+            changeValue(tagName, tagValue, false, function (newTagValueAssigned) {
 
                 // execute callback if successful
                 if (newTagCreated) {
@@ -610,7 +631,7 @@ function Service_SystemLink() {
      * @param {any} newValue value to assign tag
      * @param {function} callback
      */
-    async function changeValue(tagPath, newValue, callback) {
+    async function changeValue(tagPath, newValue, strict, callback) {
         new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
@@ -627,12 +648,19 @@ function Service_SystemLink() {
             }
             // Tag to change exists; find the SL data type of tag from locally stored tagsInfo
             else {
-                expectedValueType = tagsInfo[tagPath].type;
-                inputValueType = getValueTypeStrict(newValue);
-                console.log(expectedValueType, " vs ", inputValueType);
-                if (inputValueType !== expectedValueType) {
-                    console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on SystemLink Cloud. The given value is not of the data type defined for the tag in the database");
-                    throw new Error("Could not update value of tag on SystemLink Cloud.The given value is not of the data type defined for the tag in the database");
+                if (strict === true) {
+                    /* strict changeValue. So no implicit data type conversions. All newValue's types need to match the tag's type */
+
+                    expectedValueType = tagsInfo[tagPath].type;
+                    inputValueType = getValueTypeStrict(newValue);
+                    console.log(expectedValueType, " vs ", inputValueType);
+                    if (inputValueType !== expectedValueType) {
+                        console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on SystemLink Cloud. The given value is not of the data type defined for the tag in the database");
+                        throw new Error("Could not update value of tag on SystemLink Cloud.The given value is not of the data type defined for the tag in the database");
+                    }
+                    else {
+                        valueType = tagsInfo[tagPath].type;
+                    }
                 }
                 else {
                     valueType = tagsInfo[tagPath].type;
@@ -899,6 +927,7 @@ function Service_SystemLink() {
         init: init,
         getTagsInfo: getTagsInfo,
         setTagValue: setTagValue,
+        setTagValueStrict: setTagValueStrict,
         getTagValue: getTagValue,
         executeAfterInit: executeAfterInit,
         setAPIKey: setAPIKey,
