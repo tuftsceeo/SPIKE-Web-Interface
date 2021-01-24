@@ -349,7 +349,7 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue.
+    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue. 
      * @public
      * @param {string} tagName name of tag to create
      * @param {any} tagValue value to assign the tag after creation

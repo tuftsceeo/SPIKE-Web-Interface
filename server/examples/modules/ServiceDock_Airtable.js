@@ -321,7 +321,6 @@ function Service_Airtable() {
      * <em> this function needs to be executed after executeAfterInit but before all other public functions </em> 
      * 
      * @public
-     * @ignore
      * @param {string} APIKeyInput API Key
      * @param {string} BaseIDInput Base ID for Table in which data is stored
      * @param {string} TableNameInput Table Name of Base
@@ -409,6 +408,7 @@ function Service_Airtable() {
     }
 
     /** Get all tags on the cloud
+     * @public
      * @returns data
      */
     function getTagsInfo () {
@@ -416,6 +416,7 @@ function Service_Airtable() {
     }
 
     /**
+     * @public
      * @param {string} name 
      * @param {string} value 
      * @param {function} callback 
@@ -713,6 +714,7 @@ function Service_Airtable() {
     }
 
     /** Creates a new entry of specified data fields that gets pushed to Airtable
+     * @private
     * @param {string} fields passed in data fields
     */
     const createName = async (fields) => {
@@ -859,7 +861,7 @@ function Service_Airtable() {
      * 
      * @private
      * @param {any} array 
-     * @returns 
+     * @returns {number}
      */
     function getEmptyIndex (array) {
       if (array.length === 0 )
