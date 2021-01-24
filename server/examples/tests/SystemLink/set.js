@@ -54,3 +54,25 @@ setBOOLEANtagwithString.addEventListener("click", function () {
     mySL.setTagValue("abool", "true");
     console.log("check abool");
 })
+
+var setINTtagwithBool = document.getElementById("setINTtagwithBool");
+setINTtagwithBool.addEventListener("click", function () {
+    console.log("changing an int data type tag's value with string input");
+    let tagsInfo = mySL.getTagsInfo();
+    console.log(tagsInfo);
+    mySL.setTagValue("integer1", true, function () {
+        console.log("check integer1");
+        let tagsInfo = mySL.getTagsInfo();
+        console.log(tagsInfo);
+    })
+})
+
+var setBOOLEANtagWithBoolean = document.getElementById("setBOOLEANtagWithBoolean");
+setBOOLEANtagWithBoolean.addEventListener("click", function () {
+    console.log("changing a BOOLEAN data type tag's value with boolean input");
+    mySL.setTagValue("abool", false, function () {
+        console.log("check abool");
+        let tagsInfo = mySL.getTagsInfo();
+        console.log(tagsInfo);
+    });
+})

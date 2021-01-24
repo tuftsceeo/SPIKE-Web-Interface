@@ -5,6 +5,7 @@ var testGetTagValue = document.getElementById("testGetTagValue_AT");
 var testCreateTag = document.getElementById("testCreateTag_AT");
 var testDeleteTag = document.getElementById("testDeleteTag_AT");
 var testIsActive = document.getElementById("testIsActive_AT");
+var testSetTagValueNoCB_AT = document.getElementById("testSetTagValueNoCB_AT");
 
 testGetTagsInfo.addEventListener("click", function () {
     console.log("##### BEGINNING TEST getTagsInfo() AIRTABLE #####");
@@ -69,4 +70,12 @@ testIsActive.addEventListener("click", function () {
     console.log("##### BEGINNING TEST isActive() AIRTABLE #####");
 
     console.log("##### ENDING TEST isActive() AIRTABLE #####");
+})
+
+testSetTagValueNoCB_AT.addEventListener("click", function () {
+    console.log("##### BEGINNING TEST setTagValue() without callback AIRTABLE #####");
+
+    Airtable.setTagValue("message", 100);
+
+    console.log("##### ENDING TEST setTagValue() without callback AIRTABLE #####");
 })
