@@ -321,13 +321,17 @@ function Service_Airtable() {
      * <em> this function needs to be executed after executeAfterInit but before all other public functions </em> 
      * 
      * @public
-     * @param {string} APIKeyInput API Key
-     * @param {string} BaseIDInput Base ID for Table in which data is stored
-     * @param {string} TableNameInput Table Name of Base
+     * @param {string} APIKey API Key
+     * @param {string} BaseID Base ID for Table in which data is stored
+     * @param {string} TableName Table Name of Base
+     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS. Default value is 1000 ms.
      * @returns {boolean} True if service was successsfully initialized, false otherwise
-     * 
+     * @example
+     * var AirtableElement = document.getElementById("service_airtable");
+     * var myAirtable = AirtableElement.getService();
+     * myAirtable.init("APIKEY", "BASEID", "TABLENAME")
      */
-    async function init(APIKeyInput, BaseIDInput, TableNameInput) {
+    async function init(APIKeyInput, BaseIDInput, TableNameInput, pollIntervalInput) {
 
         var credentialsValid = false;
         
@@ -366,6 +370,10 @@ function Service_Airtable() {
 
         // if the credentials are valid authorization
         if (credentialsValid) {
+          
+          if (pollIntervalInput !== undefined) {
+            pollInterval = await pollIntervalInput;
+          }
 
           beginDataStream(function () {
             // console.log(funcAtInit)
@@ -399,27 +407,52 @@ function Service_Airtable() {
     }
 
     /** Get whether the Service was initialized or not
-    *
     * @public
     * @returns {boolean} whether Service was initialized or not
+    * @example
+    * if (myAirtable.isActive() == true)
+    *   // do something if Airtable service is active
     */
     function isActive() {
         return serviceActive;
     }
 
-    /** Get all tags on the cloud
+    /** Get all tags on the cloud.
      * @public
-     * @returns data
+     * @returns {object} all tags on the cloud, an object with Name fields as keys and Value fields as values
+     * @example
+     * let tagsInfo = myAirtable.getTagsInfo(); 
+     * console.log(tagsInfo); // display all tags information
+     * 
+     * // display message tag info
+     * let messageTagType = tagsInfo["message"].type;
+     * let messageTagValue = tagsInfo["message"].value;
+     * console.log("message has value of ", messageTagValue, "that is of type ", messageTagType);
      */
     function getTagsInfo () {
       return currentData;
     }
 
-    /**
+    /** Update Value of a tag on Airtable by tag Name. If the tag does not exist, create a new tag and assign given properties.
+     * 
      * @public
-     * @param {string} name 
-     * @param {string} value 
-     * @param {function} callback 
+     * @param {string} name Name of tag
+     * @param {string} value new Value to update tag to
+     * @param {function} callback function to run after new tag value or new tag creation
+     * @example
+     * // set a string type Value of a Tag and display
+     * myAirtable.setTagValue("message", "hello there", function () {
+     *    let messageValue = myAirtable.getTagValue("message");
+     *    console.log("message: ", messageValue); // display the updated value
+     * })
+     * // set value of a boolean Tag
+     * myAirtable.setTagValue("aBoolean", true);
+     * 
+     * // set value of an integer Tag
+     * myAirtable.setTagValue("anInteger", 10);
+     * 
+     * // set value of a double Tag
+     * myAirtable.setTagValue("aDouble", 5.2);
      */
     async function setTagValue(name, value, callback) {
 
@@ -429,33 +462,53 @@ function Service_Airtable() {
         createTag(name, value, callback); // create a new tag
       }
       else {
-        // append callback function
-        if (callback != undefined) {
-          let index = getEmptyIndex(funcAfterChangeTagValue);
-          if (index === -1)
-            funcAfterChangeTagValue.push([name, callback])
-          else
-            funcAfterChangeTagValue[index] = [name, callback]
-        }
+        /* the tag exists in the database */
 
-        updateValue(name, value); // update tag in database
+        let dataType = getValueTypeStrict(value);
+        let expectedDataType = currentData[name].type;
+        
+        if (dataType === expectedDataType) {
+          /* the data type of given value is the same as one stored */
+
+          // append callback function
+          if (callback != undefined) {
+            let index = getEmptyIndex(funcAfterChangeTagValue);
+            if (index === -1)
+              funcAfterChangeTagValue.push([name, callback])
+            else
+              funcAfterChangeTagValue[index] = [name, callback]
+          }
+
+          updateValue(name, value); // update tag in database
+        }
+        else {
+          console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on Airtable. The given value is not of the data type defined for the tag in the database");
+          throw new Error("Could not update value of tag on Airtable.The given value is not of the data type defined for the tag in the database");
+        }
       }
     }
 
-    /** Get the Value field associated with a Name
+    /** Get the Value field associated with a tag by its Name
     * @public
-    * @param {string} name name of the Name entry
-    * @returns {any} Value associated with the given Name
+    * @param {string} name Name of tag
+    * @returns {any} the Value field in any JS data type. data type conversion is implicit. 
+    * @example
+    * let value = myAirtable.getTagValue("message");
+    * console.log("message: ", value); 
     */
     function getTagValue(name) {
-      return currentData[name];
+      return currentData[name].value;
     }
 
-    /**Delete a tag from the database
+    /** Delete tag from the Airtable database given its Name field. 
      * @public
-     * 
-     * @param {any} id 
+     * @param {any} name the Name of tag to delete
      * @param {any} callback callback function to run after tag deletion
+     * @example
+     * myAirtable.deleteTag("message", function () {
+     *     let tagsInfo = myAirtable.getTagsInfo();
+     *     console.log("tagsInfo: ", tagsInfo); // tagsInfo will no longer contain the tag that was deleted
+     * })
      */
     const deleteTag = async (tagName, callback) => {
         try {
@@ -485,11 +538,18 @@ function Service_Airtable() {
         }
     };
 
-    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue.
-     *  
-     * @param {string} tagName 
-     * @param {any} tagValue 
-     * @param {function} callback 
+    /** Create a new tag given its Name field and Value field. If a tag with given name already exists, the method will throw an Error.
+     * @public
+     * @param {string} name name of tag to create
+     * @param {any} value value to give tag (can be of any JS data type)
+     * @param {function} callback function to run after tag creation
+     * @example
+     * myAirtable.createTag("aBoolean", false, function () {
+     *    let aBoolean = myAirtable.getTagValue("aBoolean");
+     *    if (aBoolean == false)
+     *       console.log ("aBoolean is false");
+     * })
+     * 
      */
     const createTag = async (tagName, tagValue, callback) => {
       try {
@@ -533,7 +593,7 @@ function Service_Airtable() {
       var recordIDs = recordIDNameMap[name];
       var convertedValue = convertToString(newValue);
       
-      if (currentData[name] == convertedValue) {
+      if (currentData[name].value == convertedValue) {
         /* value to update to is the same as value already in currentData */
 
         // execute funcAfterChangeTagValue since value won't change
@@ -612,7 +672,7 @@ function Service_Airtable() {
                 if (key != undefined) {
                   if (currentData[key] !== undefined && newTags[key] !== undefined) {
                     /*  values are defined for the key */
-                    if (currentData[key] !== newTags[key]) {
+                    if (currentData[key].value !== newTags[key].value) {
                       /* values are different */
                       // console.log("Different values detected in: ", key);
                       changedTags.push(key);
@@ -695,7 +755,7 @@ function Service_Airtable() {
               }
 
             }
-          }, 200)
+          }, pollInterval)
 
           callback();
         }, 2000);
@@ -918,7 +978,16 @@ function Service_Airtable() {
         var value = records[key].fields.Value;
 
         if (name != undefined) {
-          currentData[name] = convertToDataType(value);
+          currentData[name] = {
+            "value": undefined,
+            "type": undefined
+          };
+
+          let convertedValue = convertToDataType(value);
+          let dataType = getValueTypeStrict(convertedValue);
+
+          currentData[name].value = convertedValue;
+          currentData[name].type = dataType;
         }
       }
     }
@@ -942,6 +1011,60 @@ function Service_Airtable() {
 
       return arrayIds;
     }
+
+    /** Helper function for getting data types in a format
+    * 
+    * @private
+    * @param {any} new_value the variable containing the new value of a tag
+    * @returns {any} data type of tag
+    */
+    function getValueType(new_value) {
+      //if the value is not a number
+      if (isNaN(new_value)) {
+        //if the value is a boolean
+        if (new_value == "true" || new_value == "false" || new_value == "True" || new_value == "False") {
+          return "BOOLEAN";
+        }
+        //if the value is a string
+        return "STRING";
+      }
+      //value is a number
+      else {
+        //if value is an integer
+        if (Number.isInteger(parseFloat(new_value))) {
+          return "INT"
+        }
+        //if value is a double
+        else {
+          return "DOUBLE"
+        }
+      }
+    }
+
+    /**
+    * @private
+    * @param {any} new_value 
+    * @returns {string} data type of tag 
+    */
+    function getValueTypeStrict(new_value) {
+      //if the value is a boolean
+      if (typeof new_value === "boolean") {
+        return "BOOLEAN";
+      }
+      else if (typeof new_value === "string") {
+        return "STRING";
+      }
+      else if (typeof new_value === "number") {
+        if (Number.isInteger(parseFloat(new_value))) {
+          return "INT"
+        }
+        //if value is a double
+        else {
+          return "DOUBLE"
+        }
+      }
+    }
+
 
     /* public members */
     return {
