@@ -230,8 +230,12 @@ function Service_SystemLink() {
      * 
      * @public
      * @param {string} APIKeyInput SYstemlink APIkey
-     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS
+     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS. Default value is 1000 ms.
      * @returns {boolean} True if service was successsfully initialized, false otherwise
+     * @example
+     * var SystemLinkElement = document.getElemenyById("service_systemlink");
+     * var mySL = SystemLinkElement.getService();
+     * mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval of 10 ms
      * 
      */
     async function init(APIKeyInput, pollIntervalInput) {
@@ -276,7 +280,7 @@ function Service_SystemLink() {
      * @param {function} callback function to execute after initialization
      * @example
      * mySL.executeAfterInit( function () {
-     *     var tagsInfo = getTagsInfo();
+     *     var tagsInfo = mySL.getTagsInfo();
      * })
      */
     function executeAfterInit(callback) {
@@ -303,6 +307,20 @@ function Service_SystemLink() {
      * @param {string} tagName 
      * @param {any} newValue 
      * @param {function} callback executes 1 second after this function is called
+     * @example
+     * // set a string type Value of a Tag and display
+     * mySL.setTagValue("message", "hello there", function () {
+     *    let messageValue = mySL.getTagValue("message");
+     *    console.log("message: ", messageValue); // display the updated value
+     * })
+     * // set value of a boolean Tag
+     * mySL.setTagValue("aBoolean", true);
+     *
+     * // set value of an integer Tag
+     * mySL.setTagValue("anInteger", 10);
+     *
+     * // set value of a double Tag
+     * mySL.setTagValue("aDouble", 5.2);
      */
     function setTagValue(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
@@ -323,6 +341,9 @@ function Service_SystemLink() {
      * @public
      * @param {string} tagName 
      * @returns {any} current value of tag
+     * @example
+     * messageValue = mySL.getTagValue("message");
+     * console.log("message: ", messageValue);
      */
     function getTagValue(tagName) {
 
@@ -335,6 +356,9 @@ function Service_SystemLink() {
      * 
      * @public
      * @returns {boolean} whether Service was initialized or not
+     * @example
+     * if (mySL.isActive() === true)
+     *     // do something if SystemLink Service is active
      */
     function isActive() {
         return serviceActive;
@@ -349,14 +373,14 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue.
+    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue. 
      * @public
      * @param {string} tagName name of tag to create
      * @param {any} tagValue value to assign the tag after creation
      * @param {function} callback optional callback
      * @example
      * mySL.createTag("message", "hi", function () {
-     *      mySL.setTagValue("message", "bye"); 
+     *      mySL.setTagValue("message", "bye"); // change the value of 'message' from "hi" to "bye"
      * })
      */
     function createTag(tagName, tagValue, callback) {
@@ -390,6 +414,11 @@ function Service_SystemLink() {
      * @public
      * @param {string} tagName name of tag to delete
      * @param {function} callback optional callback
+     * @example
+     * mySL.deleteTag("message", function () {
+     *      let tagsInfo = mySL.getTagsInfo();
+     *      console.log("tagsInfo: ", tagsInfo); // tags information will now not contain the 'message' tag
+     * })
      */
     function deleteTag(tagName, callback) {
         // delete the tag on System Link cloud
@@ -515,7 +544,6 @@ function Service_SystemLink() {
                 var tagsAmount = responseJSON.totalCount;
 
                 for (var i = 0; i < tagsAmount; i++) {
-
                     // parse information of the tags
 
                     try {
@@ -593,13 +621,22 @@ function Service_SystemLink() {
             var newValueStringified;
 
             // if Tag to change does not yet exist (possibly due to it being created very recently)
-            if (tagsInfo[tagPath] == undefined) {
+            if (tagsInfo[tagPath] === undefined) {
                 // refer to newValue's JS type to deduce Tag's data type
-                valueType = getValueType(newValue);
+                valueType = getValueTypeStrict(newValue);
             }
             // Tag to change exists; find the SL data type of tag from locally stored tagsInfo
             else {
-                valueType = tagsInfo[tagPath].type;
+                expectedValueType = tagsInfo[tagPath].type;
+                inputValueType = getValueTypeStrict(newValue);
+                console.log(expectedValueType, " vs ", inputValueType);
+                if (inputValueType !== expectedValueType) {
+                    console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on SystemLink Cloud. The given value is not of the data type defined for the tag in the database");
+                    throw new Error("Could not update value of tag on SystemLink Cloud.The given value is not of the data type defined for the tag in the database");
+                }
+                else {
+                    valueType = tagsInfo[tagPath].type;
+                }
             }
             
             newValueStringified = changeToString(newValue);
@@ -764,10 +801,11 @@ function Service_SystemLink() {
      * @returns {any} data type of tag
      */
     function getValueType(new_value) {
+
         //if the value is not a number
         if (isNaN(new_value)) {
             //if the value is a boolean
-            if (new_value == "true" || new_value == "false") {
+            if (new_value === "true" || new_value === "false") {
                 return "BOOLEAN";
             }
             //if the value is a string
@@ -785,6 +823,31 @@ function Service_SystemLink() {
             }
         }
     }
+
+    /**
+     * @private
+     * @param {any} new_value 
+     * @returns {string} data type of tag 
+     */
+    function getValueTypeStrict(new_value) {
+        //if the value is a boolean
+        if (typeof new_value === "boolean") {
+            return "BOOLEAN";
+        }
+        else if (typeof new_value === "string") {
+            return "STRING";
+        }
+        else if (typeof new_value === "number") {
+            if (Number.isInteger(parseFloat(new_value))) {
+                return "INT"
+            }
+            //if value is a double
+            else {
+                return "DOUBLE"
+            }
+        }
+    }
+
 
     /** stringify newValue
      * Note: for POST request

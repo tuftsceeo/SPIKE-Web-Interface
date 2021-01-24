@@ -7,6 +7,18 @@
             <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
         -->
             <script src="./modules/ServiceDock_SPIKE.js"></script>
+            <!--
+            <script type="text/javascript" src="./modules/SPIKE/classSPIKE.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/HTML_SPIKE.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/general/initUtils.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/ujsonrpc.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/webserial/parsing.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/webserial/webserial.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/misc/misc.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/motor.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/interfaces.js"></script>
+            <script type="text/javascript" src="./modules/SPIKE/spike/getters.js"></script>
+                -->
             <script src="./modules/ServiceDock_SystemLink.js"></script>
             <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
 
@@ -16,27 +28,32 @@
     </head>
 
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
+        <!-- SERVICE DOCK -->
         <div id="servicedock" style="float:left;">
             <service-spike id="service_spike"></service-spike>
-
-            <service-systemlink id="service_systemlink" 
-            apikey = "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"></service-systemlink>
-            
-            <!--<service-systemlink id ="service_systemlink"></service-systemlink>-->
-            <!--<service-airtable id="service_airtable" apikey = "keyFiNlvyTdd2Vs1b" baseid = "appHoo8e4oPG9YJIH" tablename = "Artists"></service-airtable>-->
-            <service-airtable id="service_airtable">
-            </service-airtable>
+            <service-systemlink id="service_systemlink"></service-systemlink>
+            <service-airtable id="service_airtable"></service-airtable>
             <service-gmail ></service-gmail>
             <service-geolocation></service-geolocation>
-       
-
-            
         </div>
+
+        <!-- WRITE PROGRAM TEXTBOX FOR SPIKE PRIME -->
         <div id = "onlyForWriteProgram" >
             <textarea id="writeProgramData" name="data" value=""
                 style="font-family: Courier; position: relative; left: 20px; z-index: 5;" ></textarea>
             <input style = "position: relative; left: 20px;" type="button" id = "writeTheProgram" value="write program">
         </div>
+
+        <!-- SERVICE SELECTION INTERFACE -->
+        <div id = "selectServiceBox">
+            <select id = "ServiceSelect">
+                <option id = "SPIKETests">Get tests for SPIKE Service</option>
+                <option id="SLTests">Get tests for SystemLink Service</option>
+                <option id="ATTests">Get tests for Airtable Service</option>
+            </select>
+        </div>
+
+        <!-- SPIKE TESTING INTERFACE -->
         <div id = "SPIKEbox">
             <select id="SPIKEselectTest">
                 <option id="motorOPTION"> motor functions </option>
@@ -167,6 +184,7 @@
             </div>
         </div>
 
+        <!-- SYSTEMLINK TESTING INTERFACE  -->
         <div id="SLbox">
             <div>
                 <select id="SLselectTest">
@@ -203,6 +221,8 @@
                 <input type="button" id="setTagValue" class="SLtestCase setTagValue" value="create 'newTag' with value 4 and change it to 5">
                 <input type="button" id="setINTtagwithString" class="SLtestCase setTagValue"
                     value="set an INT tag's value with a string input">
+                <input type="button" id="setINTtagwithBool" class="SLtestCase setTagValue"
+                                        value="set an INT tag's value with a boolean input">
                 <input type="button" id="setINTtagwithNumber" class="SLtestCase setTagValue"
                     value="set an INT tag's value with a number input">
                 <input type="button" id="setSTRINGtagwithString" class="SLtestCase setTagValue"
@@ -210,35 +230,133 @@
                 <input type="button" id="setSTRINGtagwithNumber" class="SLtestCase setTagValue"
                     value="set a string tag's value with a number input">
                 <input type="button" id="setBOOLEANtagwithString" class="SLtestCase setTagValue"
-                        value="set a BOOLEAN tag's value with a string input">
+                        value="set a BOOLEAN tag's value with a string input"> 
+                <input type = "button" id = "setBOOLEANtagWithBoolean" class = "SLtestCase setTagValue" value = "set a BOOLEAN tag's value with a boolean input">
             </div>
-            
         </div>
-    
 
-        
+        <!-- AIRTABLE TESTING INTERFACE -->
+        <div id="ATbox">
+            <div>
+                <select id="ATselectTest">
+                    <option id = "generalOPTION_AT">General</option>
+                    <option id="edgeOPTION_AT">Edge cases</option>
+                </select>
+                <input type="button" id="AT_test_select" value="display test cases for this function">
+            </div>
+            <div id="ATtests">
+
+                <!-- general cases -->
+                <input type = "button" id ="testGetTagsInfo_AT" class = "ATtestCase general" value = "testGetTagsInfo">
+                <input type = "button" id ="testSetTagValue_AT" class = "ATtestCase general" value = "testSetTagValue">
+                <input type = "button" id ="testSetTagValueNonString_AT" class = "ATtestCase general" value = "testSetTagValueNonString">
+                <input type = "button" id ="testGetTagValue_AT" class = "ATtestCase general" value = "testGetTagValue">
+                <input type = "button" id ="testCreateTag_AT" class = "ATtestCase general" value = "testCreateTag">
+                <input type = "button" id ="testDeleteTag_AT" class = "ATtestCase general" value = "testDeleteTag">
+                <input type="button" id="testSetTagValueNoCB_AT" class="ATtestCase general" value="test setTagVakye w/o callback">
+                <input type = "button" id ="testIsActive_AT" class = "ATtestCase general" value = "testIsActive">
+
+                <!-- edge cases -->
+                <input type="button" id="testCreateExisting_AT" class="ATtestCase edge_AT" value="Create an already existing tag">
+                <input type="button" id="testDeleteNonExistant_AT" class="ATtestCase edge_AT" value="Delete a nonexistant tag">
+                <input type="button" id="testDeleteWhenTwoExist_AT" class="ATtestCase edge_AT" value="Delete a tag when there are two tags in the database with same name">
+                <input type="button" id="testDeleteAfterCreateTag_AT" class="ATtestCase edge_AT"
+                    value="Delete tag after creation in callback">
+            </div>
+        </div>
     </body>
+    <script src = "./tests/utils/api.js"></script>
     <script>
         var mySLElement = document.getElementById("service_systemlink");
         var AirtableElement = document.getElementById("service_airtable");
-        
-        //mySLElement.setAttribute("apikey", "daciN5xlHb-J_eABvDQPRIYt4jrKmbUbCl-Zc2vta7"); // this works too,
+
         var mySL = mySLElement.getService();
         var Airtable = AirtableElement.getService();
         var mySPIKE = document.getElementById("service_spike").getService();
-        var hub = new mySPIKE.PrimeHub();
 
-        /* Testing automatic initialization of SD Airtable JEREMY CODE */
-        AirtableElement.setAttribute("apikey", "keyFiNlvyTdd2Vs1b");
-        AirtableElement.setAttribute("baseid", "appHoo8e4oPG9YJIH");
-        // NOTE: the tablename is "Example", not "Artists" to simulate students' workspace
-        AirtableElement.setAttribute("tablename", "Example");
+        /* initialize systemlink */
+
+        getCredentials("SL_master", (key) => {
+            mySLElement.setAttribute("apikey", key); // this works too,
+        })
+        
+        /* initialize airtable */
+        getCredentials("AT_test_key", (key) => {
+            getCredentials("AT_test_baseid", (baseid) => {
+                getCredentials("AT_test_tablename", (tablename) => {
+                    AirtableElement.setAttribute("apikey", key);
+                    AirtableElement.setAttribute("baseid", baseid);
+                    AirtableElement.setAttribute("tablename", tablename);
+                })
+            })
+        })
+        
+        
+        // var hub = new mySPIKE.PrimeHub(); (commented by jeremy 1/19/21)
+    </script>
+
+    <!-- SPIKE tests -->
+    <script src="./tests/SPIKE/motor.js"></script>
+    <script src="./tests/SPIKE/motorpair.js"></script>
+    <script src="./tests/SPIKE/buttons.js"></script>
+    <script src="./tests/SPIKE/colorsensor.js"></script>
+    <script src="./tests/SPIKE/forcesensor.js"></script>
+    <script src="./tests/SPIKE/misc.js"></script>
+    <script src="./tests/SPIKE/motionsensor.js"></script>
+    <script src="./tests/SPIKE/program.js"></script>
+    <script src="./tests/SPIKE/speaker.js"></script>
+    <script src="./tests/SPIKE/ultrasonic.js"></script>
+
+    <!-- Systemlink tests -->
+    <script src="./tests/SystemLink/delete.js"></script>
+    <script src="./tests/SystemLink/get.js"></script>
+    <script src="./tests/SystemLink/set.js"></script>
+
+    <!-- Airtable tests  -->
+    <script src ="./tests/Airtable/general.js"></script>
+    <script src="./tests/Airtable/edges.js"></script>
+
+    <!-- UI event listeners -->
+    <script>
+        let selectService = document.getElementById("ServiceSelect");
+
+        displayTests(); // display the tests of Service picked during window load
+        selectService.addEventListener("change", () => {
+            displayTests();
+        })
+
+        function displayTests () {
+            
+            let testsSPIKE = document.getElementById("SPIKEbox");
+            let testsSL = document.getElementById("SLbox");
+            let testsAT = document.getElementById("ATbox");
+
+            let selectedService = $("#ServiceSelect option:selected").attr('id');
+            if (selectedService == "SPIKETests") {
+                testsSPIKE.style.display = "block";
+                testsSL.style.display = "none";
+                testsAT.style.display = "none";
+            }
+            else if (selectedService == "SLTests") {
+                testsSPIKE.style.display = "none";
+                testsSL.style.display = "block";
+                testsAT.style.display = "none";
+            }
+            else if (selectedService == "ATTests") {
+                testsSPIKE.style.display = "none";
+                testsSL.style.display = "none";
+                testsAT.style.display = "block";
+            }
+        }
+
+    </script>
+    <script>
         console.log("SL Service is active: ", mySL.isActive());
         /* End testing automatic init */
-        console.log("Service is active: ", Airtable.isActive());
+        console.log("Airtable Service is active: ", Airtable.isActive());
         /* set function to execute after init*/
         Airtable.executeAfterInit( async function() {
-            console.log("Service is active: ", Airtable.isActive());
+            console.log("Airtable Service is active: ", Airtable.isActive());
             /* begin testing Airtable getter functions */
             
             // get all the "Name" fields on the table
@@ -247,1333 +365,21 @@
 
             // get all the "Value" fields associated with a "Name"
             for ( var index in names ) {
-                var value = Airtable.getValue(names[index]);
+                var value = Airtable.getTagValue(names[index]);
                 console.log("value of " + names[index] + " is: ", value);
             }
 
-            /* end testing Airtable getter functions */
-
-            /* begin testing setter functions */
-
-            // creates new data and pushes it to Airtable
-            Airtable.createNameValuePair("newTag", "testNewTag");
-            // var test1 = Airtable.createName({ Name: "Happy", Value: "2"});
-            // console.log(test1)
-
-            // updates existing info entry in Airtable
-            // var test2 = Airtable.updateName("recc3GIbPuDbIIk8T", {Name: "Mom", Value: "3"});
-            // console.log(test2)
-            // Airtable.updateValue("Grace", "hi hi")
-            // Airtable.updateValue("hee", true)
-            // Airtable.updateValue("ho", false)
-            // Airtable.updateValue("Baby", 1)
-            
-            /* end testing setter functions */
+            console.log(Airtable.getTagsInfo());
         });
 
         /* initialize Airtable */
-        AirtableElement.init();
+        // AirtableElement.init();
         
         /* Testing automatic initialization of SD Airtable */
         mySL.executeAfterInit(function() {
             console.log("SL Service is active: ", mySL.isActive());
         })
         //var mySL = document.getElementById("service_systemlink").getService();
-        var output = document.getElementById("output");
-
-        //////////////////////////////////////////
-        //                                      //
-        //             SPIKE Testing            //
-        //                                      //
-        //////////////////////////////////////////
-        
-        //                                      //
-        //              Motor Tests             //
-        //                                      //
-
-        var testMotorDegreesCounted = document.getElementById("motordeg");
-        var testMotorDegreesCounted1 = document.getElementById("motordeg1");
-        var testMotorDegreesCountedCB = document.getElementById("motordegcb");
-        var testMotorDegreesCounted1CB = document.getElementById("motordeg1cb");
-        var testDegreesCounted = document.getElementById("degreesCounted");
-        var testMotorStartAtPower = document.getElementById("motorStartAtPower");
-        var testMotorPosition = document.getElementById("motorPosition");
-        
-        testMotorDegreesCounted.addEventListener("click", async function() {
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
-            var motor = new mySPIKE.Motor("A");
-            
-            motor.set_stall_detection(true);
-
-            motor.run_to_degrees_counted(200, 50);
-
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
-        })
-
-        testMotorDegreesCounted1.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
-
-            var motor = new mySPIKE.Motor("A");
-
-            motor.set_stall_detection(false);
-
-            motor.run_to_degrees_counted(200, 50);
-
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
-        })
-
-        testMotorDegreesCountedCB.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
-            var motor = new mySPIKE.Motor("A");
-
-            motor.set_stall_detection(true);
-
-            motor.run_to_degrees_counted(200, 50, function(result) {
-                console.log("MOTOR STOPPED WITH RESULT: ", result)
-            });
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
-        })
-
-        testMotorDegreesCounted1CB.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
-
-            var motor = new mySPIKE.Motor("A");
-
-            motor.set_stall_detection(false);
-
-            motor.run_to_degrees_counted(200, 50, function(result) {
-                console.log("MOTOR STOPPED WITH RESULT: ", result)
-            });
-
-            console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
-        })
-        
-        
-        /* go to rel pos without stall detection */
-        testMotorStartAtPower.addEventListener("click", async function () {
-
-            var motor = new mySPIKE.Motor("A");
-            motor.run_for_degrees(30,100);
-
-        })
-        
-        testDegreesCounted.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.get_degrees_counted() #######");
-            var motor = new mySPIKE.Motor("A");
-            console.log(motor.get_degrees_counted())
-            console.log("###### ENDING UNIT TEST ON motor.get_degrees_counted() #######");
-        })
-
-        testMotorPosition.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motor.get_position() #######");
-            var motor = new mySPIKE.Motor("A");
-            console.log(motor.get_position())
-            console.log("###### ENDING UNIT TEST ON motor.get_position() #######");
-        })
-
-
-        //                                      //
-        //           MotorPair Tests            //
-        //                                      //
-
-        var testMotorPairStop = document.getElementById("motorPairStop");
-        testMotorPairStop.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.stop() #######");
-            console.log("Test: stop the motorPair of motors connected to A and B");
-
-            var motorPair = new mySPIKE.MotorPair("A","B");
-
-            motorPair.stop();
-
-            console.log("###### ENDING UNIT TEST ON motorPair.stop() #######");
-        })
-
-        var testMotorPairMove = document.getElementById("motorPairMove");
-        testMotorPairMove.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 0, 100) #######");
-            console.log("Test: moving the driving base 100 cm with 0 steering on speed of 100");
-
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-
-            motorPair.move(100, "cm", 0, 100);
-
-            console.log("Expected result: base moving forward without turning and stopping at 100 cm");
-
-            console.log("###### ENDING UNIT TEST ON motorPair.move() #######");
-        })
-
-        var testMotorPairStart = document.getElementById("motorPairStart");
-        testMotorPairStart.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.start() #######");
-            console.log(" Test: moving the drving base with 0 steering on speed of 100");
-
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-
-            motorPair.start(0, 100);
-
-            console.log("Expected result: base moving forward without turning");
-
-            console.log("###### ENDING UNIT TEST ON motorPair.start() #######");
-        })
-
-        var testMotorPairMoveLeft = document.getElementById("motorPairMoveLeft");
-        testMotorPairMoveLeft.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', -100, 100) #######");
-            
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-
-            motorPair.move(100, "cm", -100, 100);
-
-            console.log("Expected result: driving base moving left and stopping")
-            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', -100, 100) #######");
-
-        })
-
-        var testMotorPairMoveRight = document.getElementById("motorPairMoveRight");
-        testMotorPairMoveRight.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 100, 100) #######");
-            
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-            
-            motorPair.move(100, "cm", 100, 100);
-            
-            console.log("Expected result: driving base moving right and stopping")
-            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', 100, 100) #######");
-        })
-
-
-        var testMotorPairMoveLeftSlightly = document.getElementById("motorPairMoveLeftSlightly");
-        testMotorPairMoveLeftSlightly.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', -50, 100) #######");
-
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-
-            motorPair.move(100, "cm", -50, 100);
-
-            console.log("Expected result: driving base moving left SLIGHTLY and stopping")
-            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', -50, 100) #######");
-
-        })
-
-        var testMotorPairMoveRightSlightly = document.getElementById("motorPairMoveRightSlightly");
-        testMotorPairMoveRightSlightly.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motorPair.move(100, 'cm', 50, 100) #######");
-
-            var motorPair = new mySPIKE.MotorPair("A", "B");
-
-            motorPair.move(100, "cm", 50, 100);
-
-            console.log("Expected result: driving base moving right SLIGHTLY and stopping")
-            console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', 50, 100) #######");
-        })
-
-        //                                      //
-        //         Motion Sensor Tests          //
-        //                                      //
-
-        /* wait for new gesture */
-        var testWaitForNewGesture = document.getElementById("waitForNewGesture");
-        testWaitForNewGesture.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
-            console.log("Test: Program will detect either 'tapped' or 'doubletapped' gestures. Tap the hub display");
-
-            
-            hub.motion_sensor.wait_for_new_gesture( function(gesture) {
-
-                console.log(">>> in callback")
-                
-                console.log(">>> gesture argument in callback, ", gesture);
-                
-                if (gesture == "tapped") {
-                    console.log(">>> tapped event handler");
-                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
-                }
-                else if ( gesture == "doubletapped" ) {
-                    console.log(">>> doubletapped event handler");
-                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
-                }
-                else {
-                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_gesture(callback) #######")
-                }
-            })
-            
-        })
-
-        /* was gesture */
-        var testWasGesture = document.getElementById("wasGesture");
-        testWasGesture.addEventListener("click", async function () {
-            
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor.was_gesture('doubletapped') #######")
-            console.log("Test (First Time): Sees if 'doubletapped' gesture has occurred since the beginning of the program (for the first use).");
-            console.log("Test (Second Time): Sees if 'doubletapped' gesture has occurred since the last execution of was_gesture().");
-            
-            if (hub.motion_sensor.was_gesture("doubletapped")) {
-                console.log(">>> doubletapped did occur");
-            } else {
-                console.log(">>> doubletapped did NOT occur ");
-            }
-
-            console.log("###### ENDING UNIT TEST ON motion_sensor.was_gesture('doubletapped') #######")
-        })
-
-        /* wait for new orientation */
-        var testWaitForNewOri = document.getElementById("waitForNewOri");
-        testWaitForNewOri.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor.wait_for_new_orientation(callback) #######")
-            console.log("Test (First Time): the returned orientation will be the current orientation.");
-            console.log("Test (Second Time): Sees if there's a new orientation different from the previously detected");
-
-            console.log(">>> change the orientation of the hub");
-            hub.motion_sensor.wait_for_new_orientation( function ( orientation ) {
-
-                if ( orientation ) {
-                    console.log(">>> the orientation is ", orientation);
-                    console.log("###### ENDING UNIT TEST ON motionSensor.wait_for_new_orientation(callback)#######");
-                }
-            })
-            
-        })
-
-        var testGetAngles = document.getElementById("getAngles");
-        testGetAngles.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor get_***_angle() functions #######");
-            
-            console.log("yaw angle: ", hub.motion_sensor.get_yaw_angle());
-            console.log("pitch angle: ", hub.motion_sensor.get_pitch_angle());
-            console.log("roll angle: ", hub.motion_sensor.get_roll_angle());
-            console.log("###### ENDING UNIT TEST ON get_***_angle() functions #######");
-        })
-
-        var testGetGesture = document.getElementById("getGesture");
-        testGetGesture.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor.get_gesture() #######");
-            
-            var gesture = hub.motion_sensor.get_gesture();
-            console.log("gesture: ", gesture);
-            
-            console.log("###### ENDING UNIT TEST ON motion_sensor.get_gesture() #######");
-        })
-
-        var testGetOrientation = document.getElementById("getOrientation");
-        testGetOrientation.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor.get_orientation() #######");
-
-
-            var orientation = hub.motion_sensor.get_orientation();
-            console.log("orientation: ", orientation);
-
-            console.log("###### ENDING UNIT TEST ON motion_sensor.get_orientation() #######");
-        })
-
-        var testResetYaw = document.getElementById("resetYaw");
-        testResetYaw.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON motion_sensor.reset_yaw_angle() #######");
-            console.log("Test: reset yaw angle and get yaw angle after 3 seconds");
-            
-
-            hub.motion_sensor.reset_yaw_angle();
-
-            setTimeout(function () {
-                console.log(hub.motion_sensor.get_yaw_angle());
-            }, 3000 );
-
-            console.log("###### ENDING UNIT TEST ON motion_sensor.reset_yaw_angle() #######");
-        })
-
-        var testResetYawSource = document.getElementById("resetYawSource");
-        testResetYawSource.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST (logic) ON motion_sensor.reset_yaw_angle() #######");
-            /* randomly generate current position */
-            // get the digits
-            var currPos = Math.floor(Math.random() * 1000);
-            while ( currPos > 180 ) {
-                currPos = Math.floor(Math.random() * 1000)
-            }
-
-            // get the sign
-            var negativeOrPositive = Math.random() * 1000;
-            if (negativeOrPositive > 500) {
-                var currPos = currPos * -1;
-            }
-
-            console.log("current position: ", currPos)
-
-            /* randomly generate new origin */
-            // get the digits
-            var newOrigin = Math.floor(Math.random() * 1000);
-            while (newOrigin > 180) {
-                newOrigin = Math.floor(Math.random() * 1000);
-            }
-
-            // get the sign
-            var negativeOrPositive = Math.random() * 1000;
-            if (negativeOrPositive > 500) {
-                var newOrigin = newOrigin * -1;
-            }
-
-            console.log("new origin", newOrigin);
-
-            var difference = currPos - newOrigin;
-
-
-            if ( -180 > difference && difference > -360 ) {
-                var newPos = Math.abs(difference) % 180;
-            }
-            else if ( 180 < difference && difference < 360 ) {
-                var newPos = (Math.abs(difference) % 180) * -1;
-            }
-            else {
-                console.log("difference", difference);
-                var newPos = difference % 360;
-            }
-
-            console.log("translated position: ", newPos);
-        })
-
-        //                                      //
-        //        Force Sensor Tests            //
-        //                                      //
-        
-        var testGetForceNewton = document.getElementById("getForceNewton");
-        testGetForceNewton.addEventListener("click", async function() {
-            console.log("###### BEGINNING UNIT TEST ON ForceSensor.get_force_newton() #######");
-            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
-            var force_sensor = new mySPIKE.ForceSensor("A");
-            var newtons = force_sensor.get_force_newton();
-            console.log("Force in Newtons: ", newtons);
-            console.log("Expected Result: [1 to 10] reading on force on sensor");
-            console.log("###### ENDING UNIT TEST ON ForceSensor.get_force_newton() #######");
-        })
-
-        var testGetForcePercentage = document.getElementById("getForcePercentage");
-        testGetForcePercentage.addEventListener("click", function() {
-            console.log("###### BEGINNING UNIT TEST ON ForceSensor.get_force_percentage() #######");
-            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
-            var force_sensor = new mySPIKE.ForceSensor("A");
-            var percentage = force_sensor.get_force_percentage();
-            console.log("Force in percentage: ", percentage);
-            console.log("Expected Result: [0 to 100] reading of force on sensor");
-            console.log("###### ENDING UNIT TEST ON ForceSensor.get_force_percentage() #######");
-        })
-
-        var testForceSensorIsPressed = document.getElementById("forceSensorIsPressed");
-        testForceSensorIsPressed.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON ForceSensor.is_pressed() #######");
-            console.log("Test: Execute this test while pressing on a Force Sensor connected at port A");
-            var force_sensor = new mySPIKE.ForceSensor("A");
-            var isPressed = force_sensor.is_pressed();
-            console.log("is pressed? ", isPressed);
-            console.log("Expected Result: get true when force sensor is pressed, false otherwise");
-            console.log("###### ENDING UNIT TEST ON ForceSensor.is_pressed() #######");
-        })
-
-        var testForceSensorWaitUntilPress = document.getElementById("forceSensorWaitUntilPress");
-        testForceSensorWaitUntilPress.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON ForceSensor.wait_until_pressed() #######");
-            console.log("Test: Execute this test and then after some time press on a Force Sensor connected at port A");
-            var force_sensor = new mySPIKE.ForceSensor("A");
-            force_sensor.wait_until_pressed( function () {
-                console.log("Force Sensor press event handler");
-                console.log("###### ENDING UNIT TEST ON ForceSensor.wait_until_pressed() #######");
-            })
-            console.log("Expected Result: when pressed, console logs 'Force Sensor press event handler'");
-        })
-
-        var testForceSensorWaitUntilRelease = document.getElementById("forceSensorWaitUntilRelease");
-        testForceSensorWaitUntilRelease.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON ForceSensor.wait_until_released() #######");
-            console.log("Test: Execute this test and then after some time press on a Force Sensor connected at port A and then release it");
-            var force_sensor = new mySPIKE.ForceSensor("A");
-            force_sensor.wait_until_released( function() {
-                console.log("Force Sensor release event handler");
-                console.log("###### ENDING UNIT TEST ON ForceSensor.wait_until_released() #######");
-            })
-            console.log("Expected Result: when force sensor RELEASED, console logs 'Force Sensor release event handler'");
-        })
-        
-        //                                      //
-        //            Speaker Tests             //
-        //                                      //
-
-        
-        var testBeep = document.getElementById("beep");
-        testBeep.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.beep(100,3) #######")
-            console.log("Test: Hub will beep for 3 seconds")
-            var hub = mySPIKE.PrimeHub();
-            var speaker = hub.speaker;
-            console.log("speaker object", speaker);
-            speaker.beep(100, 3);
-            console.log("###### ENDING UNIT TEST ON Primehub.speaker.beep(100,3)#######")
-        })
-        
-        var testStartBeep = document.getElementById("startBeep");
-        testStartBeep.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.start_beep(100) #######")
-            console.log("Test: Hub will beep unless stopped (use speaker.stop())");
-            var hub = mySPIKE.PrimeHub();
-            var speaker = hub.speaker;
-            speaker.start_beep(100);
-            console.log("###### ENDING UNIT TEST ON Primehub.speaker.start_beep(100)#######")
-        })
-
-        var testStopBeep = document.getElementById("stopBeep");
-        testStopBeep.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON Primehub.speaker.stop() #######")
-            console.log("hub beeping will stop");
-            var hub = mySPIKE.PrimeHub();
-            var speaker = hub.speaker;
-            speaker.stop();
-            console.log("###### ENDING UNIT TEST ON Primehub.speaker.stop() #######")
-        })
-
-        //                                      //
-        //              Button Tests            //
-        //                                      //
-
-        
-        var testButtonIsPressed = document.getElementById("buttonIsPress");
-        testButtonIsPressed.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON button.is_pressed() #######");
-            console.log("Test: start the test pressing either the left button or the right button");
-            
-            
-            var left_button = hub.left_button;
-            var right_button = hub.right_button;
-            
-            if (left_button.is_pressed()) {
-                console.log("left_button is pressed");
-            }
-            
-            if (right_button.is_pressed()) {
-                console.log("right_button is pressed");
-            }
-            console.log("Expected result: the console logs whether the button is pressed");
-            console.log("###### ENDING UNIT TEST ON button.is_pressed() #######");
-        })
-        
-        var testButtonWasPressed = document.getElementById("buttonWasPress");
-        testButtonWasPressed.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON button.was_pressed() #######");
-            console.log("Test: press either the left button or the right button. Then, after some time start the test.");
-            
-            
-            var left_button = hub.left_button;
-            var right_button = hub.right_button;
-            
-            if (left_button.was_pressed()) {
-                console.log("left_button was pressed");
-            }
-            
-            if (right_button.was_pressed()) {
-                console.log("right_button was pressed");
-            }
-            console.log("Expected result: console identifies previous button presses")
-            console.log("###### ENDING UNIT TEST ON button.was_pressed() #######");
-        })
-
-        var testButtonWaitPressed = document.getElementById("buttonWaitPress");
-        testButtonWaitPressed.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON button.wait_until_pressed() #######");
-            console.log("Test: Start the test. Then, after some time press either left button or right button");
-            
-
-            var left_button = hub.left_button;
-            var right_button = hub.right_button;
-
-            console.log("waiting for left_button press")
-            left_button.wait_until_pressed( function () {
-                console.log("left_button was pressed");
-                console.log("###### ENDING UNIT TEST ON button.wait_until_pressed() #######");
-            })
-
-            console.log("waiting for right_button press")
-            right_button.wait_until_pressed( function () {
-                console.log("right_button was pressed");
-                console.log("###### ENDING UNIT TEST ON button.wait_until_pressed() #######");
-            })
-
-            console.log("Expected result: console identifies button presses")
-        })
-        
-        
-        var testButtonWaitRelease = document.getElementById("buttonWaitRelease");
-        testButtonWaitRelease.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON button.wait_until_released() #######");
-            console.log("Test: Start the test. Then, after some time press either left button or right button and release them");
-            
-
-            var left_button = hub.left_button;
-            var right_button = hub.right_button;
-
-            console.log("waiting for left_button release")
-            left_button.wait_until_released(function () {
-                console.log("left_button was released");
-                console.log("###### ENDING UNIT TEST ON button.wait_until_released() #######");
-            })
-
-            console.log("waiting for right_button release")
-            right_button.wait_until_released(function () {
-                console.log("right_button was released");
-                console.log("###### ENDING UNIT TEST ON button.wait_until_released() #######");
-            })
-
-            console.log("Expected result: console identifies button releases")
-        })
-
-        //                                      //
-        //         ColorSensor Tests            //
-        //                                      //
-
-        var testGetColor = document.getElementById("getColor");
-        var testWaitUntilColor = document.getElementById("waitUntilColor");
-        var testWaitForNewColor = document.getElementById("waitForNewColor");
-
-        testGetColor.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').get_color() #######");
-            console.log("Test: Connect color sensor to port A and start the test");
-            var color_sensor = mySPIKE.ColorSensor("A");
-            var color = await color_sensor.get_color();
-            console.log("Detected color: ", color);
-
-            console.log("###### ENDING UNIT TEST ON ColorSensor('A').get_color() #######");
-        })
-
-        testWaitUntilColor.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
-            console.log("Test: Connect color sensor to port A and start the test");
-            var color_sensor = mySPIKE.ColorSensor("A");
-            color_sensor.wait_until_color('yellow', function() {  
-                console.log("Detected yellow");
-            });
-
-            console.log("###### ENDING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
-        })
-
-        testWaitForNewColor.addEventListener("click", async function() {
-            console.log("###### BEGINNING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
-            console.log("Test: Connect color sensor to port A and start the test");
-            var color_sensor = mySPIKE.ColorSensor("A");
-            
-            color_sensor.wait_for_new_color( function(color) {
-                console.log("New color detected: ", color);
-            })
-
-            console.log("###### ENDING UNIT TEST ON ColorSensor('A').wait_until_color('YELLOW') #######");
-        })
-
-        //                                      //
-        //          ultrasonic Tests            //
-        //                                      //
-
-        var testLightUp = document.getElementById("lightup");
-        var testGetDistanceCM = document.getElementById("testGetDistanceCM");
-        var testGetDistanceIN = document.getElementById("testGetDistanceIN");
-        var testWaitForDistanceFartherThan = document.getElementById("testWaitForDistanceFartherThan");
-        var testWaitForDistanceCloserThan = document.getElementById("testWaitForDistanceCloserThan");
-        testLightUp.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
-            console.log("Test: Connect DistanceSensor to port A and start the test");
-            var distance_sensor = new mySPIKE.DistanceSensor("A");
-            distance_sensor.light_up(100,100,100,100);
-            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').light_up(100,100,100,100) #######");
-        })
-
-        testGetDistanceCM.addEventListener("click", async function() {
-            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').get_distance_cm() #######");
-            console.log("Test: Connect DistanceSensor to port A and start the test");
-
-            var distance_sensor = new mySPIKE.DistanceSensor("A");
-
-            console.log("Distance at port A: ", distance_sensor.get_distance_cm())
-
-            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').get_distance_cm() #######");
-        })
-
-        testGetDistanceIN.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').get_distance_inches() #######");
-            console.log("Test: Connect DistanceSensor to port A and start the test");
-
-            var distance_sensor = new mySPIKE.DistanceSensor("A");
-
-            console.log("Distance at port A in inches: ", distance_sensor.get_distance_inches())
-
-            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').get_distance_inches() #######");
-        })
-
-        testWaitForDistanceCloserThan.addEventListener("click", async function() {
-            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').wait_for_distance_closer_than() #######");
-            console.log("Test: Connect DistanceSensor to port A and start the test");
-
-            var distance_sensor = new mySPIKE.DistanceSensor("A");
-
-            distance_sensor.wait_for_distance_closer_than(10, "cm", function() {
-                console.log("Distance at port A is closer than 10 CM");
-            })
-
-            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').wait_for_distance_closer_than() #######");
-        })
-
-        testWaitForDistanceFartherThan.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON DistanceSensor('A').wait_for_distance_farther_than() #######");
-            console.log("Test: Connect DistanceSensor to port A and start the test");
-
-            var distance_sensor = new mySPIKE.DistanceSensor("A");
-
-            distance_sensor.wait_for_distance_farther_than(10, "cm", function() {
-                console.log("Distance at port A is farther than 10 CM");
-            })
-
-            console.log("###### ENDING UNIT TEST ON DistanceSensor('A').wait_for_distance_farther_than() #######");
-        })
-
-
-        //                                      //
-        //            program Tests             //
-        //                                      //
-
-        var testWriteProgram = document.getElementById("writeProgram");
-        testWriteProgram.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON writeProgram() #######");
-            console.log("Test: write hello world progam on slot 1 in python");
-            console.log("write your python command for SPIKE on textbox and press write program");
-            
-            var writeProgramButton = document.getElementById("writeTheProgram");
-            
-            writeProgramButton.addEventListener("click", function () {
-                var dataTextBox = document.getElementById("writeProgramData");
-                
-                var dataToWrite = dataTextBox.value;
-
-                console.log(dataToWrite);
-                /* using writeProgram (old way) */
-                var programname = "test program";
-                mySPIKE.writeProgram(programname, dataToWrite, 0);
-
-                /* using micropython (new way) */
-                // mySPIKE.micropython(0, dataToWrite);
-            })
-            console.log("###### ENDING UNIT TEST ON writeProgram() #######");
-        })
-
-        var testMicropython = document.getElementById("micropython");
-        testMicropython.addEventListener("click", function () {
-
-        parseCommand(`
-from spike import PrimeHub, LightMatrix, Motor, MotorPair
-from spike.control import wait_for_seconds, wait_until, Timer
-
-hub = PrimeHub() 
-
-hub.light_matrix.write(run_for_seconds(2))
-
-run_for_seconds(3)
-        `)
-        })
-
-        //parse the cloudTagValue() command inserted at the textbox and execute it
-        async function parseCommand(rawContent) {
-
-            let index_runForSeconds = await rawContent.indexOf("run_for_seconds(");
-            if ( index_runForSeconds > -1 ) {
-                //find the index of rawContent at which the runForSeconds function ends
-                let index_lastparen = await rawContent.indexOf(")", index_runForSeconds);
-
-                //divide the rawContent into parts before the runForSeconds and after
-                let first_rawContent_part = await rawContent.substring(0, index_runForSeconds);
-                let second_rawContent_part = await rawContent.substring(index_lastparen + 1, rawContent.length);
-
-                //find the argument of the runForSeconds
-                let runForSeconds_string = await rawContent.substring(index_runForSeconds, index_lastparen + 1);
-                let index_first_paren = runForSeconds_string.indexOf("(");
-                let index_last_paren = runForSeconds_string.indexOf(")");
-                let tagName = runForSeconds_string.substring(index_first_paren + 1, index_last_paren);
-
-                // get the tag's value from the cloud
-                var yield = "yield(" + tagName + "000)";
-
-                //send the final UJSONRPC script to the hub.
-                let final_RPC_command;
-
-                console.log("typeof", typeof yield);
-
-                final_RPC_command = await first_rawContent_part + yield + second_rawContent_part;
-
-                return parseCommand(final_RPC_command);
-            }
-            else {
-                console.log(rawContent);
-                return rawContent;
-            }
-        }
-
-        var testConcatProgram = document.getElementById("concatenateProgram");
-        testConcatProgram.addEventListener("click", function () {
-            console.log("###### BEGINNING UNIT TEST ON source code for concatenating micropy with template.py #######");
-            console.log("Test: write micropy program in the textbox");
-
-            var writeProgramButton = document.getElementById("writeTheProgram");
-
-            writeProgramButton.addEventListener("click", function () {
-                var firstPart = "from runtime import VirtualMachine\n\n# Stack for execution:\nasync def stack_1(vm, stack):\n"
-                var secondPart = "# Setup for execution:\ndef setup(rpc, system, stop):\n\n # Initialize VM:\n    vm = VirtualMachine(rpc, system, stop, \"Target__1\")\n\n    # Register stack on VM:\n    vm.register_on_start(\"stack_1\", stack_1)\n\n    return vm"
-
-                var dataTextBox = document.getElementById("writeProgramData");
-
-                var dataToWrite = dataTextBox.value;
-
-                var stringifiedData = JSON.stringify(dataToWrite);
-                stringifiedData = stringifiedData.substring(1, stringifiedData.length-1);
-                var result = "";
-
-                var splitData = stringifiedData.split(/\\n/);
-                console.log(splitData);
-                for (var index in splitData) {
-
-                    var addedTab = "    " + splitData[index] + "\n"; 
-                    console.log(addedTab);
-                    result = result + addedTab;
-                }
-
-                console.log("result before parsed: ")
-                console.log("\n" + result);
-
-                console.log("converted data without parse");
-                result = firstPart + result + secondPart;
-                console.log("converted data: ");
-                console.log("\n" + result);
-
-
-            })
-            console.log("###### ENDING UNIT TEST ON source code for concatenating micropy with template.py #######");
-        })
-
-        var testGetProjects = document.getElementById("getProjects");
-        testGetProjects.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON mySPIKE.getProjects() #######");
-            
-            var hubProjects = await mySPIKE.getProjects();
-            console.log(hubProjects);
-            console.log("Expected result: console log of an object listing all slots in the SPIKE Prime");
-            console.log("###### ENDING UNIT TEST ON mySPIKE.getProjects()#######");
-        })
-
-        var testParseUJSON = document.getElementById("parseUJSON");
-        testParseUJSON.addEventListener("click", async function () {
-
-            var array = ['{ "m": 2, "p": ','[8.326, 100] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -8, 989], [0, 0, 0], [-4, ','0, 0], "", 0] }\r{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49',', [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -8, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, ','null, 7, 7, 7]], [62, [','10]]',', [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]','], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109',', 0]], [48, ','[0, 0, -177, 0]], ','[49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61',', [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48',', [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -','6, 992], [0, 0, 0], [-4, 0, 0], ""',', 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [','62, [10]], [4, -5, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, ','[0, 0, -176, 0]], [49, [0, 0, ','166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [5, -8',', 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0]], [','48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [3, -10, 991], [','0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, n','ull, 7, 9, 7]], [62, [10]], [4, -5, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48',', [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], ','[62, [10]], ','[5, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ ','"m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [2, -8, ','989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0',']], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0',']], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -8, 991], ','[0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, ','0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0','], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, ','7, 7]], [62, [10]], [6, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r{ "m": 2, "p": [8.323, 100] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -6, 991], [0, 0, 0], [-4, ','0, 0], "", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -5, 991], [0, 0, 0], [-4, 0, ','0], "", 0] }\r','{ "m": 0, "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -177, 0]], [','49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [5, -7, 991], [0, 0, 0], [-4, ','0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, ','0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1',', null, 7, 9, 7]], [62, [10',']], [4, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0',']], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]','], [4, -5, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 1','09, 0]], [48, [','0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [','[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [','61, [1, null, 7, 7, 7]], [62, [10]], [5, -7, 991], [0, 0, 0], [-4',', 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [6, -5, 989], [0, 0, 0], [-4, 0, 0], ','"", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [','1, null, 7, 7, 7]]',', [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [0, 0, 109, 0]], [48, [0, ','0, -177, 0]], [49, [0, ','0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], ','[3, -6, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109',', 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]','], [4, ',' - 8, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [','61, [1, null, 7, 7, 7]], [62, [10]], [5, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], ','[48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, [','0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, ','null, 7, 7, 7]], [62, [10]], [4, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [','0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [5, -6, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[','48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [4, -7, 990], [0, 0, 0]',', [-4, 0, 0], "", 0]','}\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -176, 0]], [49, [0, 0, 166, ','0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10]], [3, -7, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, ','[0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]]',', [62, [10]], [5, -6, 990]',', [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0',', "p": [[48, ','[0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -6, ','992], [0, 0, 0], [-4, 0, 0], "", 0]','}\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0',', 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -8, 992], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 2, "p": [8.323, 100] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, ','[0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, ','384]], [61, [1, null, 7, 7, 7]], [62, [10]], [5, -7, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62',', [10]], [3, -6, 990], [0, 0, 0], [-4',', 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [','10]], [4, -6, 991], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0, 0, 109, 0]], [','48, [0, 0, -177, 0]], ','[49, [0, 0, 166, 0]], [63, [0, 0, 383]], [61, [1, null, 7, 7, 7]], [62, [10]], [4, -8, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": ','[[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]','], [62, [1','0]], [4, -6, 989], [0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, [0',', 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 7, 7]], [62, [10]], [3, -7, 992], [','0, 0, 0], [-4, 0, 0], "", 0] }\r','{ "m": 0, "p": [[48, ','[0, 0, ','109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 8, 9, 7]], [62, [10]], [','3,- 7, 989], [0, 0, 0], [-4, 0, 0], "", 0]}\r', '{ "m": 0, "p": [[', '48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], ', '[61, [1, null, 7, 9, 7]], [62, [10]], [4, -6, 990], [0, 0, 0], [-4, 0, 0], "", 0] }\r ', '{ "m": 0, "p": [[48, [0, 0, 109, 0]], [48, [0, 0, -177, 0]], [49, [0, 0, 166, 0]], [63, [0, 0, 384]], [61, [1, null, 7, 9, 7]], [62, [10', ']], [4, -7, 990], [0, 0, 0], [-4, 0, 0], ', '"", 0] }\r {"i": "ECSn", "r": ', '{ "blocksize": 512', ', "transferid": "53766" }', '}\r' ]
-            var array2 = ['']
-            parseUJSON(array);
-
-            async function parseUJSON(streamArray) {
-
-                console.log("here");
-
-                //define for json concatenation
-                let jsonline = "";
-
-                // contains latest full json object from SPIKE readings
-                let lastUJSONRPC;
-
-                for ( var index in streamArray ) {
-                    var value = streamArray[index];
-                    //concatenate UJSONRPC packets into complete JSON objects
-                    if (value) {
-                        // stringify the packet to look for carriage return
-                        var json_string = await JSON.stringify(value);
-
-                        let findEscapedQuotes = /\\"/g;
-                        let findNewLines = /\\n/g;
-
-                        var cleanedJsonString = json_string.replace(findEscapedQuotes, '"');
-                        cleanedJsonString = cleanedJsonString.substring(1, cleanedJsonString.length - 1);
-                        // cleanedJsonString = cleanedJsonString.replace(findNewLines,'');
-
-                        jsonline = jsonline + cleanedJsonString; // concatenate packet to data
-
-                        // regex search for carriage return
-                        let pattern = /\\r/g;
-                        var carriageReIndex = jsonline.search(pattern);
-
-                        // there is at least one carriage return in this packet
-                        if (carriageReIndex > -1) {
-
-                            // the concatenated packets start with a left curly brace (start of JSON)
-                            if (jsonline[0] == "{" || jsonline.substring(0, 2) == " {") {
-
-                                lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                // look for conjoined JSON packets: there's at least two carriage returns in jsonline
-                                if (jsonline.match(/\\r/g).length > 1) {
-
-                                    var conjoinedPacketsArray = jsonline.split(/\\r/); // array that split jsonline by \r
-
-                                    // last index only contains "" as it would be after \r
-                                    for (var i = 0; i < conjoinedPacketsArray.length - 1; i++) {
-
-                                        // for every JSON object in array, perform data handling
-
-                                        lastUJSONRPC = conjoinedPacketsArray[i];
-
-                                        try {
-                                            var parseTest = await JSON.parse(lastUJSONRPC)
-
-                                            // // update hub information using lastUJSONRPC
-                                            console.log("lastUJSONRPC: ", lastUJSONRPC);
-
-                                        }
-                                        catch (e) {
-                                            console.log(e);
-                                            console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                            console.log("current jsonline: ", jsonline);
-                                            console.log("current cleaned json_string: ", cleanedJsonString)
-                                            console.log("current json_string: ", json_string);
-                                            console.log("current value: ", value);
-
-                                        }
-
-                                        jsonline = "";
-
-                                    }
-                                }
-                                else {
-                                    lastUJSONRPC = jsonline.substring(0, carriageReIndex);
-
-                                    // // parsing test
-                                    try {
-                                        console.log("lastUJSONRPC: ", lastUJSONRPC);
-                                    }
-                                    catch (e) {
-                                        console.log(e);
-                                        console.log("error parsing lastUJSONRPC: ", lastUJSONRPC);
-                                        console.log("current jsonline: ", jsonline);
-                                        console.log("current cleaned json_string: ", cleanedJsonString)
-                                        console.log("current json_string: ", json_string);
-                                        console.log("current value: ", value);
-                                        console.log("from a jsonline that has only one carriage return")
-
-                                    }
-
-                                    jsonline = jsonline.substring(carriageReIndex+1, jsonline.length);
-                                }
-
-                            }
-                            // there was a carriage return in jsonline but a full JSON object wasnt formed
-                            // usually when it's the first packet
-                            else {
-
-                                console.log("RESETTING JSONLINE WOOOOOOOOOO")
-                                console.log("jsonline: ", jsonline);
-                                // reset jsonline for next concatenation
-                                jsonline = "";
-                            }
-                        }
-
-                    }
-                }
-            }
-        
-        })
-        // DROPPED FEATURE AND TEST IS NOT CORRECT
-        var testWaitForSeconds = document.getElementById("waitForSeconds");
-        testWaitForSeconds.addEventListener("click", function () {
-            mySPIKE.micropython(0, `
-from spike import PrimeHub
-from spike.control import wait_for_seconds
-def sub_func():
-    hub.light_matrix.write('HAPPY')
-    wait_for_seconds(2)
-    hub.light_matrix.write('SAD')
-
-hub = PrimeHub()
-hub.light_matrix.write('start')
-wait_for_seconds(2)
-hub.light_matrix.write('start2')
-sub_func()
-hub.light_matrix.write('done')
-            `);
-        })
-
-
-
-
-        //                                      //
-        //               Misc Tests             //
-        //                                      //
-
-        var testSetHubOrientation = document.getElementById("setHubOri");
-        testSetHubOrientation.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON setHubOrientation() #######");
-            console.log("Test: Move the hub to an orientation and press the test button to see if the measured orientation is correct");
-            mySPIKE.setHubOrientation();
-            console.log("###### ENDING UNIT TEST ON setHubOrientation() #######");
-        })
-
-        var testUJSONRPC = document.getElementById("testUJSONRPC");
-        testUJSONRPC.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON UJSONRPC.displayText #######");
-            console.log("Expected Result: 'hello' on hub display");
-            mySPIKE.UJSONRPC.displayText("hello");
-            console.log("###### ENDING UNIT TEST ON UJSONRPC.displayText #######");
-        })
-
-        var testNew = document.getElementById("testNewKeyword");
-        testNew.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON new keywords with Motor connected to port A #######");
-            console.log("Test: see the difference of using 'new' keyword on SPIKE device object instantiations");
-            console.log("motor1 = mySPIKE.Motor('A')")
-            console.log("motor2 = new mySPIKE.Motor('A')")
-            console.log("motor1's default speed changed to 50")
-            var motor1 = mySPIKE.Motor("A");
-            motor1.set_default_speed(50);
-
-            var motor1_defaultSpeed = motor1.get_default_speed();
-
-            console.log("motor1's default_speed, ", motor1_defaultSpeed);
-            
-            var motor2 = new mySPIKE.Motor("A");
-            var motor2_defaultSpeed = motor2.get_default_speed();
-            console.log("motor2's default_speed, ", motor2_defaultSpeed);
-
-            console.log("###### ENDING UNIT TEST ON new keywords with Motor connected to port A #######");
-        });
-
-        var testNew1 = document.getElementById("testNewKeyword1");
-        testNew1.addEventListener("click", async function () {
-            console.log("###### BEGINNING UNIT TEST ON two Motor objects declared without 'new' keywords #######");
-            console.log("Test: see if Motor objects defined without 'new' keywords cause issues");
-            console.log("motor1 = mySPIKE.Motor('A')")
-            console.log("motor2 = mySPIKE.Motor('B')")
-            console.log("motor1's default speed changed to 50")
-            var motor1 = mySPIKE.Motor("A");
-            motor1.set_default_speed(50);
-            var motor1_defaultSpeed = motor1.get_default_speed();
-            console.log("motor1's default_speed, ", motor1_defaultSpeed);
-            var motor2 = mySPIKE.Motor("B");
-            var motor2_defaultSpeed = motor2.get_default_speed();
-            console.log("motor2's default_speed, ", motor2_defaultSpeed);
-            console.log("###### ENDING UNIT TEST ON two Motor objects declared without 'new' keywords #######");
-        });
-
-        var testGetMotors = document.getElementById("testGetMotors");
-        testGetMotors.addEventListener("click", async function () {
-            var motors = await mySPIKE.getMotors();
-            console.log(motors);
-        })
-        
-        /* test mySPIKE.getMotorPorts() */
-        var test_getMotorPorts = document.getElementById("getMotorPorts");
-        test_getMotorPorts.addEventListener("click", async function () {
-            var motorPorts = await mySPIKE.getMotorPorts();
-            console.log(motorPorts);
-        })
-
-        var testUJSONRPCdisplayClear = document.getElementById("displayClear")
-        testUJSONRPCdisplayClear.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.displayClear();
-            
-        })
-        var testUJSONRPCdisplaySetPixel = document.getElementById("displaySetPixel")
-        testUJSONRPCdisplaySetPixel.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.displaySetPixel(0, 0, 100);
-            
-        })
-        var testUJSONRPCdisplayText = document.getElementById("displayText")
-        testUJSONRPCdisplayText.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.displayText('hello');
-            
-        })
-        var testUJSONRPCmotorGoRelPos = document.getElementById("motorGoRelPos")
-        testUJSONRPCmotorGoRelPos.addEventListener("click", function () {
-                mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, true, true)
-            
-        })
-        var testUJSONRPCmotorGoRelPos1 = document.getElementById("motorGoRelPos1")
-        testUJSONRPCmotorGoRelPos1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, false, true)
-            
-        })
-        var testUJSONRPCmotorGoRelPos2 = document.getElementById("motorGoRelPos2")
-        testUJSONRPCmotorGoRelPos2.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, true, false)
-            
-        })
-        var testUJSONRPCmotorGoRelPos3 = document.getElementById("motorGoRelPos3")
-        testUJSONRPCmotorGoRelPos3.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorGoRelPos('A', 180, 100, false, false)
-            
-        })
-        var testUJSONRPCmotorPwm = document.getElementById("motorPwm")
-        testUJSONRPCmotorPwm.addEventListener("click", function () {
- 
-                mySPIKE.UJSONRPC.motorPwm('A', 100, true)
-        })
-        var testUJSONRPCmotorPwm1 = document.getElementById("motorPwm1")
-        testUJSONRPCmotorPwm1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorPwm('A', 100, false)
-            
-        })
-        var testUJSONRPCmotorRunDegrees = document.getElementById("motorRunDegrees")
-        testUJSONRPCmotorRunDegrees.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, true, true)
-        })
-        var testUJSONRPCmotorRunDegrees1 = document.getElementById("motorRunDegrees1")
-        testUJSONRPCmotorRunDegrees1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, false, true)
-            
-        })
-        var testUJSONRPCmotorRunDegrees2 = document.getElementById("motorRunDegrees2")
-        testUJSONRPCmotorRunDegrees2.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, true, false)
-        })
-        var testUJSONRPCmotorRunDegrees3 = document.getElementById("motorRunDegrees3")
-        testUJSONRPCmotorRunDegrees3.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunDegrees('A', 400, 100, false, false)
-
-        })
-        var testUJSONRPCmotorRunTimed = document.getElementById("motorRunTimed")
-        testUJSONRPCmotorRunTimed.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, true, true)
-
-        })
-        var testUJSONRPCmotorRunTimed1 = document.getElementById("motorRunTimed1")
-        testUJSONRPCmotorRunTimed1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, false, true)
-
-        })
-        var testUJSONRPCmotorRunTimed2 = document.getElementById("motorRunTimed2")
-        testUJSONRPCmotorRunTimed2.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, true, false)
-
-        })
-        var testUJSONRPCmotorRunTimed3 = document.getElementById("motorRunTimed3")
-        testUJSONRPCmotorRunTimed3.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorRunTimed('A', 3000, 100, false, false)
-
-        })
-        var testUJSONRPCmotorStart = document.getElementById("motorStart")
-        testUJSONRPCmotorStart.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorStart('A', 100, true)
-
-        })
-        var testUJSONRPCmotorStart1 = document.getElementById("motorStart1")
-        testUJSONRPCmotorStart1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.motorStart('A', 100, false)
-
-        })
-        var testUJSONRPCmoveTankDegrees = document.getElementById("moveTankDegrees")
-        testUJSONRPCmoveTankDegrees.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankDegrees(300, 100, 100, 'A', 'B', true)
-
-        })
-        var testUJSONRPCmoveTankDegrees1 = document.getElementById("moveTankDegrees1")
-        testUJSONRPCmoveTankDegrees1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankDegrees(300, 100, 100, 'A', 'B', false)
-
-        })
-        var testUJSONRPCmoveTankPowers = document.getElementById("moveTankPowers")
-        testUJSONRPCmoveTankPowers.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankPowers(100, 100, 'A', 'B')
-
-        })
-        var testUJSONRPCmoveTankSpeeds = document.getElementById("moveTankSpeeds")
-        testUJSONRPCmoveTankSpeeds.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankSpeeds(100, 100, 'A', 'B')
-
-        })
-        var testUJSONRPCmoveTankTime = document.getElementById("moveTankTime")
-        testUJSONRPCmoveTankTime.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankTime(3000, 100, 100, 'A', 'B', true)
-
-        })
-        var testUJSONRPCmoveTankTime1 = document.getElementById("moveTankTime1")
-        testUJSONRPCmoveTankTime1.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.moveTankTime(3000, 100, 100, 'A', 'B', false)
-        })
-        var testUJSONRPCsoundBeep = document.getElementById("soundBeep")
-        testUJSONRPCsoundBeep.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.soundBeep(100, 300)
-
-        })
-        var testUJSONRPCsoundStop = document.getElementById("soundStop")
-        testUJSONRPCsoundStop.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.soundStop()
-        })
-
-        var testRandom = document.getElementById("random");
-        testRandom.addEventListener("click", function () {
-            mySPIKE.UJSONRPC.centerButtonLightUp(13);
-        })
-
-
-        //////////////////////////////////////////
-        //                                      //
-        //           SystemLink Testing         //
-        //                                      //
-        //////////////////////////////////////////
-
-        /* test getTagsInfo */
-        var getTagsInfo = document.getElementById("getTagsInfo");
-        getTagsInfo.addEventListener("click", async function () {
-            var tagsInfo = await mySL.getTagsInfo();
-            console.log(tagsInfo);
-        })
-
-        /* test createNewTag */
-        var createNewTag = document.getElementById("createNewTag");
-        createNewTag.addEventListener("click", async function () {
-            mySL.createTag("newTag", 4, async function () {
-                var tagsInfo = await mySL.getTagsInfo();
-                console.log(tagsInfo);
-            });
-        })
-
-        /* test deleteTag */
-
-        // create "newTag" and delete it
-        var deleteTag = document.getElementById("deleteTag");
-        deleteTag.addEventListener("click", async function () {
-            console.log("creating 'newTag' with value 4 "); 
-            
-            // create 'newTag'
-            mySL.createTag("newTag", 4, async function () {
-
-                console.log("'newTag' was created");
-                
-                await sleep(1000);
-
-                console.log(await mySL.getTagsInfo());
-                //delete 'newTag'
-
-                mySL.deleteTag("newTag", async function () {
-
-                    console.log("'newTag' has been deleted")
-                    console.log(await mySL.getTagsInfo());
-
-                });
-            });
-        });
-
-        // delete "newTag" once if it doesnt exist, twice if it does
-        var deleteTag1 = document.getElementById("deleteTag1");
-        deleteTag1.addEventListener("click", async function () {
-            console.log("checking if 'newTag' exists");
-            
-            var tagsInfo = await mySL.getTagsInfo();
-            var newTagExists = false;
-
-            for ( key in tagsInfo ) {
-                if ( key == "newTag" ) {
-                    newTagExists = true;
-                }
-            }
-
-            if ( newTagExists ) {
-
-                console.log("newTag exists, deleting it twice")
-
-                mySL.deleteTag("newTag", async function() {
-                    console.log("newTag deleted");
-
-                    await sleep(2000);
-
-                    tagsInfo = await mySL.getTagsInfo();
-
-                    console.log(tagsInfo);
-
-                    mySL.deleteTag("newTag", async function() 
-                    {
-                        console.log("newTag deleted again");
-
-                        await sleep(2000);
-
-                        tagsInfo = await mySL.getTagsInfo();
-
-                        console.log(tagsInfo);
-                    })
-                })
-            } else {
-                console.log("newTag doesn't exist, deleting it");
-                mySL.deleteTag("newTag", async function () {
-                    console.log("newTag deleted");
-
-                    await sleep(2000);
-
-                    tagsInfo = await mySL.getTagsInfo();
-
-                    console.log(tagsInfo);
-                })
-            }
-        });
-
-
-        // just delete
-        var deleteTag2 = document.getElementById("deleteTag2");
-        deleteTag2.addEventListener("click", async function () {
-            mySL.deleteTag("newTag", async function () {
-                console.log("newTag deleted");
-
-                await sleep(2000);
-
-                tagsInfo = await mySL.getTagsInfo();
-
-                console.log(tagsInfo);
-            })
-        });
-
-        /* TEST setTagValue CASES*/
-
-        var setTagValue = document.getElementById("setTagValue");
-        setTagValue.addEventListener("click", async function () {
-            console.log("creating 'newTag' with value 4 ");
-            
-            // create 'newTag'
-            mySL.createTag("newTag", 4, async function () {
-                
-                console.log("'newTag' was created")
-                
-                await sleep(2000);
-
-                console.log(await mySL.getTagsInfo());
-                
-                //set tag value to 5
-                mySL.setTagValue("newTag", 5);
-                console.log("'newTag' value was changed to 5. run tagsinfo to check");
-            });
-        })
-
-        var setINTtagwithString = document.getElementById("setINTtagwithString");
-        setINTtagwithString.addEventListener("click", function() {
-            console.log("changing an INT data type tag's value with string input");
-
-            mySL.setTagValue("integer1", "1");
-
-        })
-
-        var setINTtagwithNumber = document.getElementById("setINTtagwithNumber");
-        setINTtagwithNumber.addEventListener("click", function() {
-            console.log("changing an INT data type tag's value with number input");
-
-            mySL.setTagValue("integer1", 1);
-        })
-
-        var setSTRINGtagwithNumber = document.getElementById("setSTRINGtagwithNumber");
-        setSTRINGtagwithNumber.addEventListener("click", function() {
-            console.log("changing an STRING data type tag's value with number input");
-            mySL.setTagValue("message", 1);
-        })
-
-        var setSTRINGtagwithString = document.getElementById("setSTRINGtagwithString");
-        setSTRINGtagwithString.addEventListener("click", function() {
-            console.log("changing an STRING data type tag's value with string input");
-            mySL.setTagValue("message", "hi");
-        })
-
-        var setBOOLEANtagwithString = document.getElementById("setBOOLEANtagwithString");
-        setBOOLEANtagwithString.addEventListener("click", function() {
-            console.log("changing a BOOLEAN data type tag's value with string input");
-            mySL.setTagValue("abool", "true");
-        })
 
         window.addEventListener("load", function () {
             
@@ -1662,23 +468,29 @@ hub.light_matrix.write('done')
 
             SLTestDecisionHandler();
             SPIKETestDecisionHandler();
+            ATTestDecisionHandler();
 
             var selectTest = document.getElementById("SL_test_select");
-            
             selectTest.addEventListener("click", function () {
                 SLTestDecisionHandler();
             })
 
 
             var SPIKEselectTest = document.getElementById("SPIKE_test_select");
-
             SPIKEselectTest.addEventListener("click", function () {
                 SPIKETestDecisionHandler();
             })
+
+            var ATselectTest = document.getElementById("AT_test_select");
+            ATselectTest.addEventListener("click", function () {
+                ATTestDecisionHandler();
+            })
+
+
         })
 
         function SLTestDecisionHandler() {
-                            var testFunction = $("#SLselectTest option:selected").attr('id');
+            var testFunction = $("#SLselectTest option:selected").attr('id');
 
             if (testFunction == "getTagsInfoOPTION") {
                 var testCases = document.getElementsByClassName("SLtestCase");
@@ -1730,8 +542,38 @@ hub.light_matrix.write('done')
             }
         }
 
+        function ATTestDecisionHandler() {
+            var testCases = undefined;
+            var testFunction = $("#ATselectTest option:selected").attr('id');
+
+            if (testFunction == "generalOPTION_AT") {
+                var testCases = document.getElementsByClassName("ATtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("general");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+            else if (testFunction == "edgeOPTION_AT") {
+                var testCases = document.getElementsByClassName("ATtestCase");
+                for (var index = 0; index < testCases.length; index++) {
+                    testCases[index].style.display = "none";
+                }
+
+                var selectedCases = document.getElementsByClassName("edge_AT");
+                for (var index = 0; index < selectedCases.length; index++) {
+                    var aCase = selectedCases[index];
+                    aCase.style.display = "block";
+                }
+            }
+        }
+
         function SPIKETestDecisionHandler() {
-                            var testCases = undefined;
+            var testCases = undefined;
             var testFunction = $("#SPIKEselectTest option:selected").attr('id');
 
             if (testFunction == "motorOPTION") {
@@ -1863,17 +705,17 @@ hub.light_matrix.write('done')
         }
     </script>
     <style>
-        #SPIKEbox {
+        #selectServiceBox {
             position: absolute;
-            top: 200px;
-            left: 50px;
-            height: 400px;
-            width: 400px;
+            top: 10px;
+            left: 500px;
+            height: 50px;
+            width: 100px;
             background-color: #4CE0D2;
             border: solid;
         }
 
-        #SLbox {
+        #SLbox, #SPIKEbox, #ATbox {
             position: absolute;
             top: 200px;
             left: 500px;
@@ -1882,14 +724,8 @@ hub.light_matrix.write('done')
             background-color: #4CE0D2;
             border: solid;
         }
-
-        .testCase {
-            display:none;
-            display:flex;
-            flex-direction: column;
-        }
-
-        #SPIKE_test_select, #SL_test_select {
+        
+        #SPIKE_test_select, #SL_test_select, #AT_test_select {
             background-color: rgb(247, 250, 48);
         }
     </style>
