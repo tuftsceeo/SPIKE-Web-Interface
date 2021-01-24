@@ -286,7 +286,7 @@ function Service_Airtable() {
 
     /*
     currentData = {
-      Name_field: Value_field
+      Name_field: {value: Value_field, type: dataTYPE }
     };
     */
     let currentData= {}; // contains real-time information of the tags in the cloud
