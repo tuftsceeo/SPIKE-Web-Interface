@@ -83,7 +83,7 @@ class serviceairtable extends HTMLElement {
               if (this.APIKey != "" && this.BaseID != "" && this.TableName != "") {
                 // check active flag so once activated, the service doesnt reinit
 
-                console.log("activating service");
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating Airtable Service");
 
                 var initSuccessful = await this.service.init(this.APIKey, this.BaseID, this.TableName);
 
@@ -125,7 +125,7 @@ class serviceairtable extends HTMLElement {
         
         // if the user did not input any field, flag nonexistant field
         if (APIKeyResult == null || APIKeyResult == "") {
-            console.log("You inserted no API key");
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no API key");
             APIKeyExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -136,7 +136,7 @@ class serviceairtable extends HTMLElement {
 
         // if the user did not input any field, flag nonexistant field
         if (BaseIDKeyResult == null || BaseIDKeyResult == "") {
-            console.log("You inserted no Base key");
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no Base key");
             BaseIDKeyExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -147,7 +147,7 @@ class serviceairtable extends HTMLElement {
 
         // if the user did not input any field, flag nonexistant field
         if (TableNameResult == null || TableNameResult == "") {
-            console.log("You inserted no Base Table Name");
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no Base Table Name");
             TableNameExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -216,15 +216,15 @@ class serviceairtable extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         // console.log("changing attribute: ", name);
         if (name == "apikey") {
-          console.log("new value of apikey:", newValue);
+          console.log("%cTuftsCEEO ", "color: #3ba336;", "new value of apikey:", newValue);
           this.APIKey = newValue;
         }
         else if (name == "baseid") {
-          console.log("new value of baseid:", newValue);
+          console.log("%cTuftsCEEO ", "color: #3ba336;","new value of baseid:", newValue);
           this.BaseID = newValue
         }
         else if (name == "tablename") {
-          console.log("new value of tablename:", newValue);
+          console.log("%cTuftsCEEO ", "color: #3ba336;","new value of tablename:", newValue);
           this.TableName = newValue
         }
         
@@ -244,9 +244,9 @@ class serviceairtable extends HTMLElement {
 
     // initialize the service (is not used in this class but available for use publicly)
     async init() {
-        console.log("apikey attribute value: ", this.APIKey);
-        console.log("baseid attribute value: ", this.BaseID);
-        console.log("tablename attribute value: ", this.TableName);
+        console.log("%cTuftsCEEO ", "color: #3ba336;","apikey attribute value: ", this.APIKey);
+        console.log("%cTuftsCEEO ", "color: #3ba336;","baseid attribute value: ", this.BaseID);
+        console.log("%cTuftsCEEO ", "color: #3ba336;","tablename attribute value: ", this.TableName);
         var initSuccess = await this.service.init(this.APIKey, this.BaseID, this.TableName);
         if (initSuccess) {
           this.status.style.backgroundColor = "green";
@@ -434,7 +434,8 @@ function Service_Airtable() {
     }
 
     /** Update Value of a tag on Airtable by tag Name. If the tag does not exist, create a new tag and assign given properties.
-     * 
+     * <br>
+     * The data type of the Tag is the Javascript data type of the new Value. 
      * @public
      * @param {string} name Name of tag
      * @param {string} value new Value to update tag to
@@ -456,37 +457,60 @@ function Service_Airtable() {
      */
     async function setTagValue(name, value, callback) {
 
+      setTagValueStrict(name, value, callback);
+
+    }
+
+    /** Update Value of a tag on Airtable by tag Name.
+     * <br>
+     * NotStrict property indicates that the data type of the Value supplied will be implicitly converted. For example, allowing for setting an INT tag's value with a string, "123" or a STRING tag's value with * a number. This method exists for convenience but please avoid using it extensively as it can lead to unpredictable outcomes.
+     * @public
+     * @param {any} name  Name of tag 
+     * @param {any} value  new Value to update tag to. 
+     * @param {any} callback  function to run after new tag value or new tag creation 
+     * @example
+     * // set a string type Value of a Tag and display
+     * myAirtable.setTagValueNotStrict("message", 123, function () {
+     *    let messageValue = myAirtable.getTagValue("message");
+     *    console.log("message: ", messageValue); // display the updated value, which will be 123. 
+     * })
+     * // set value of a boolean Tag
+     * myAirtable.setTagValueNotStrict("aBoolean", true);
+     *
+     * // set value of an integer Tag
+     * myAirtable.setTagValueNotStrict("anInteger", 10);
+     * myAirtable.setTagValueNotStrict("anInteger", "10");
+     * 
+     * // set value of a double Tag
+     * myAirtable.setTagValueNotStrict("aDouble", 5.2);
+     * myAirtable.setTagValueNotStrict("aDouble", "5.2");
+     */
+    async function setTagValueNotStrict(name, value, callback) {
       if (currentData[name] == undefined) {
         /* no tags exist in the database with the given name */
 
-        createTag(name, value, callback); // create a new tag
+        throw new Error("Tag with given name does not exist in the database. Please supply a Name of a Tag that exists on Airtable.")
       }
       else {
         /* the tag exists in the database */
 
-        let dataType = getValueTypeStrict(value);
-        let expectedDataType = currentData[name].type;
-        
-        if (dataType === expectedDataType) {
-          /* the data type of given value is the same as one stored */
 
-          // append callback function
-          if (callback != undefined) {
-            let index = getEmptyIndex(funcAfterChangeTagValue);
-            if (index === -1)
-              funcAfterChangeTagValue.push([name, callback])
-            else
-              funcAfterChangeTagValue[index] = [name, callback]
-          }
+        // append callback function
+        // if (callback != undefined) {
 
-          updateValue(name, value); // update tag in database
-        }
-        else {
-          console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on Airtable. The given value is not of the data type defined for the tag in the database");
-          throw new Error("Could not update value of tag on Airtable.The given value is not of the data type defined for the tag in the database");
-        }
+        //   let index = getEmptyIndex(funcAfterChangeTagValue);
+
+        //   if (index === -1)
+        //     funcAfterChangeTagValue.push([name, callback])
+        //   else
+        //     funcAfterChangeTagValue[index] = [name, callback]
+        // }
+        setTimeout(callback, 1500);
+
+        updateValue(name, value); // update tag in database
       }
     }
+
 
     /** Get the Value field associated with a tag by its Name
     * @public
@@ -525,13 +549,14 @@ function Service_Airtable() {
           }
 
           // append callback function
-          if (callback != undefined) {
-            let index = getEmptyIndex(funcAfterDeleteTag);
-            if (index === -1)
-              funcAfterDeleteTag.push([tagName, callback])
-            else
-              funcAfterDeleteTag[index] = [tagName, callback]
-          }
+          // if (callback != undefined) {
+            // let index = getEmptyIndex(funcAfterDeleteTag);
+            // if (index === -1)
+              // funcAfterDeleteTag.push([tagName, callback])
+            // else
+              // funcAfterDeleteTag[index] = [tagName, callback]
+          // }
+          setTimeout( callback, 2000);
 
         } catch (err) {
           throw new Error(err);
@@ -561,13 +586,14 @@ function Service_Airtable() {
           createName({ Name: tagName, Value: convertedValue }); // create Tag in database
 
           // append callback function
-          if (callback != undefined) {
-            let index = getEmptyIndex(funcAfterCreateTag);
-            if (index === -1)
-              funcAfterCreateTag.push([tagName, callback])
-            else
-              funcAfterCreateTag[index] = [tagName, callback]
-          }
+          // if (callback != undefined) {
+          //   let index = getEmptyIndex(funcAfterCreateTag);
+          //   if (index === -1)
+          //     funcAfterCreateTag.push([tagName, callback])
+          //   else
+          //     funcAfterCreateTag[index] = [tagName, callback]
+          // }
+          setTimeout(callback, 1500);
         }
         else {
           throw new Error("A tag with the name, " + tagName.toString() +  ", already exists");
@@ -599,7 +625,7 @@ function Service_Airtable() {
         // execute funcAfterChangeTagValue since value won't change
         for (let j = 0; j < funcAfterChangeTagValue.length; j++) {
           if (funcAfterChangeTagValue[j] !== undefined) {
-            console.log(funcAfterChangeTagValue)
+            console.log("%cTuftsCEEO ", "color: #3ba336;", funcAfterChangeTagValue)
             let changedTag = name;
             let expectedTag = funcAfterChangeTagValue[j][0];
 
@@ -627,7 +653,7 @@ function Service_Airtable() {
     async function beginDataStream(callback) {
       var records = await base(TableName).select().firstPage(function(err, records) {
         if (err) {
-          console.log(err);
+          console.error("%cTuftsCEEO ", "color: #3ba336;", err);
           return false;
         }
         // initialize recordIDNameMap
@@ -762,6 +788,61 @@ function Service_Airtable() {
 
       });
     }
+    /** Update Value of a tag on Airtable by tag Name. If the tag does not exist, create a new tag and assign given properties.
+    * <br>
+    * The value of the Tag is not implicitly converted. E.g. setting a string Tag's value with a number will no longer work
+    * @public
+    * @param {any} name  Name of tag
+    * @param {any} value  new Value to update tag to
+    * @param {any} callback  function to run after new tag value or new tag creation
+    */
+    async function setTagValueStrict(name, value, callback) {
+      if (currentData[name] == undefined) {
+        /* no tags exist in the database with the given name */
+
+        throw new Error("Tag with given name does not exist in the database. Please supply a Name of a Tag that exists on Airtable.")
+      }
+      else {
+        /* the tag exists in the database */
+
+        let dataType = getValueTypeStrict(value);
+
+        if (dataType === "INT" && typeof value === "string")
+          throw new TypeError("A new Value of string data type was given, but the string does not at least contain one chracter that is not a number. E.g. '123'. Please supply a string that contains at least one character that is not a number, or use the less strict alternative method, setTagValueNotStrict(). NOTE: getTagValue() of a Tag set to '123' with " +
+          "setTagValueNotStrict() will still return a javascript number type");
+
+        let expectedDataType = currentData[name].type;
+        console.log("%cTuftsCEEO ", "color: #3ba336;", dataType, " vs ", expectedDataType);
+        if (dataType === expectedDataType) {
+          /* the data type of given value is the same as one stored */
+
+          // append callback function
+          // if (callback != undefined) {
+          //   let index = getEmptyIndex(funcAfterChangeTagValue);
+          //   if (index === -1)
+          //     funcAfterChangeTagValue.push([name, callback])
+          //   else
+          //     funcAfterChangeTagValue[index] = [name, callback]
+          // }
+          setTimeout(callback, 1500);
+
+          updateValue(name, value); // update tag in database
+        }
+        else {
+          // expected a STRING but got an INT
+          if (dataType === "INT" && expectedDataType === "STRING") {
+            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type STRING but got an INT. This could happen if a string value you supplied is entirely of a number. E.g. '123'. " +
+            "Please supply a string that contains at least one character that is not a number, or setuse the less strict alternative method, setTagValueNotStrict(). NOTE: getTagValue() of a Tag set to '123' with " +
+            "setTagValueNotStrict() will still return a javascript number type");
+          }
+          else if (dataType === "STRING" && expectedDataType === "INT") {
+            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type INT but got a STRING. Please supply a number.");
+          }
+          
+          throw new TypeError("Could not update value of tag on Airtable. The given value is not of the data type defined for the tag in the database");
+        }
+      }
+    }
 
     /** Update the record(row) with given fields
      * @private
@@ -874,7 +955,7 @@ function Service_Airtable() {
           return false
         }
         else {
-          console.log(stringInput.slice(0, stringInput.length - 1))
+          console.log("%cTuftsCEEO ", "color: #3ba336;", stringInput.slice(0, stringInput.length - 1))
           return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
         }
       }
@@ -1051,20 +1132,47 @@ function Service_Airtable() {
       if (typeof new_value === "boolean") {
         return "BOOLEAN";
       }
-      else if (typeof new_value === "string") {
-        return "STRING";
-      }
-      else if (typeof new_value === "number") {
-        if (Number.isInteger(parseFloat(new_value))) {
-          return "INT"
+      else {
+        if (isNaN(new_value) === false) {
+          if (Number.isInteger(parseFloat(new_value))) {
+            return "INT"
+          }
+          //if value is a double
+          else {
+            return "DOUBLE"
+          }
         }
-        //if value is a double
         else {
-          return "DOUBLE"
-        }
+          return "STRING";
+        } 
       }
     }
 
+    /** Helper function for converting values to correct type based on data type
+    * 
+    * @private
+    * @param {string} valueType data type of value in systemlink format
+    * @param {string} value value to convert
+    * @returns {any} converted value
+    */
+    function getValueFromType(valueType, value) {
+      if (valueType == "BOOLEAN") {
+        if (value == "true") {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else if (valueType == "STRING") {
+        return value;
+      }
+      else if (valueType == "INT" || valueType == "DOUBLE") {
+        return parseFloat(value);
+      }
+      return value;
+    }
+  
 
     /* public members */
     return {
@@ -1074,6 +1182,7 @@ function Service_Airtable() {
         updateValue: updateValue,
         getRecords: getRecords,
         getTagValue: getTagValue,
+        setTagValueNotStrict: setTagValueNotStrict,
         getNames: getNames,
         getTagsInfo: getTagsInfo,
         convertToString, convertToString,
