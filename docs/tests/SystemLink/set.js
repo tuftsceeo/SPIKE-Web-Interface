@@ -29,7 +29,7 @@ var setINTtagwithNumber = document.getElementById("setINTtagwithNumber");
 setINTtagwithNumber.addEventListener("click", function () {
     console.log("changing an INT data type tag's value with number input");
 
-    mySL.setTagValue("integer1", 1);
+    mySL.setTagValue("integer1", 1.0);
 
     console.log("check integer1");
 })
@@ -46,6 +46,17 @@ setSTRINGtagwithString.addEventListener("click", function () {
     console.log("changing an STRING data type tag's value with string input");
     mySL.setTagValue("message", "hi");
     console.log("check message");
+})
+
+var setSTRINGtagwithBoolean = document.getElementById("setSTRINGtagwithBoolean");
+setSTRINGtagwithBoolean.addEventListener("click", function () {
+    console.log("changing an STRING data type tag's value with boolean input");
+    mySL.setTagValue("message", "hi", function () {
+        console.log("message tag value: ", mySL.getTagValue("message"));
+        mySL.setTagValue("message", true, function () {
+            console.log("message tag value: ", mySL.getTagValue("message"));
+        });
+    })
 })
 
 var setBOOLEANtagwithString = document.getElementById("setBOOLEANtagwithString");
