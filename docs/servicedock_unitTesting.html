@@ -229,6 +229,8 @@
                     value="set a string tag's value with a string input">
                 <input type="button" id="setSTRINGtagwithNumber" class="SLtestCase setTagValue"
                     value="set a string tag's value with a number input">
+                <input type = "button" id = "setSTRINGtagwithBoolean" class = "SLtestCase setTagValue" value = "set a string tag's value with a boolean input">
+
                 <input type="button" id="setBOOLEANtagwithString" class="SLtestCase setTagValue"
                         value="set a BOOLEAN tag's value with a string input"> 
                 <input type = "button" id = "setBOOLEANtagWithBoolean" class = "SLtestCase setTagValue" value = "set a BOOLEAN tag's value with a boolean input">
@@ -249,12 +251,17 @@
                 <!-- general cases -->
                 <input type = "button" id ="testGetTagsInfo_AT" class = "ATtestCase general" value = "testGetTagsInfo">
                 <input type = "button" id ="testSetTagValue_AT" class = "ATtestCase general" value = "testSetTagValue">
-                <input type = "button" id ="testSetTagValueNonString_AT" class = "ATtestCase general" value = "testSetTagValueNonString">
+                <input type = "button" id ="testSetTagValueNonString_AT" class = "ATtestCase general" value = "testSetTagValue with numbers">
                 <input type = "button" id ="testGetTagValue_AT" class = "ATtestCase general" value = "testGetTagValue">
                 <input type = "button" id ="testCreateTag_AT" class = "ATtestCase general" value = "testCreateTag">
                 <input type = "button" id ="testDeleteTag_AT" class = "ATtestCase general" value = "testDeleteTag">
                 <input type="button" id="testSetTagValueNoCB_AT" class="ATtestCase general" value="test setTagVakye w/o callback">
                 <input type = "button" id ="testIsActive_AT" class = "ATtestCase general" value = "testIsActive">
+                <input type = "button" id = "testSetStringTagValueWithNumber_AT" class = "ATtestCase general" value = "testSetStringTagValueWithNumber">
+                <input type="button" id="testSetStringTagValueWithStringThatIsNumber_AT" class="ATtestCase general"
+                    value="testSetStringTagValueWithStringThatIsNumber">
+                <input type = "button" id = "testSetStringTagValueWithBoolean_AT" class = "ATtestCase general" value = "testSetStringTagValueWithBoolean">
+                <input type = "button" id = "testSetIntTagValueWithStringThatIsNumber_AT" class = "ATtestCase general" value = "testSetIntTagValueWithStringThatIsNumber">
 
                 <!-- edge cases -->
                 <input type="button" id="testCreateExisting_AT" class="ATtestCase edge_AT" value="Create an already existing tag">
@@ -262,6 +269,7 @@
                 <input type="button" id="testDeleteWhenTwoExist_AT" class="ATtestCase edge_AT" value="Delete a tag when there are two tags in the database with same name">
                 <input type="button" id="testDeleteAfterCreateTag_AT" class="ATtestCase edge_AT"
                     value="Delete tag after creation in callback">
+                    
             </div>
         </div>
     </body>

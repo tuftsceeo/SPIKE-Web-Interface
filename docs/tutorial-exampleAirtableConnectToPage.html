@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: status_light | Namespace: status_light</title>
+    <title>Tutorial: exampleAirtableConnectToPage | Tutorial: exampleAirtableConnectToPage</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Namespace: status_light</a>
+            <a class = "currentPage">Tutorial: exampleAirtableConnectToPage</a>
         
         
     </div>
@@ -51,342 +51,41 @@
 <div class="main" id="main">
     
 
-
-
-
 <section>
-
-<header>
-    
-        <h2>status_light</h2>
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description"><p>Following are all of the functions that are linked to the Hub’s programmable Brick Status Light.</p></div>
-            
-
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-                <h3>Example</h3>
-                
-    <pre class="prettyprint"><code>var hub = mySPIKE.PrimeHub();
-var status_light = hub.status_light;
-// do something with status_light</code></pre>
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-                
-
-<dt>
-    
-        <h4 class="name" id=".on">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>on<span class="signature">(color)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1396">line 1396</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the color of the light.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
+    <header>
         
 
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[&quot;azure&quot;,&quot;black&quot;,&quot;blue&quot;,&quot;cyan&quot;,&quot;green&quot;,&quot;orange&quot;,&quot;pink&quot;,&quot;red&quot;,&quot;violet&quot;,&quot;yellow&quot;,&quot;white&quot;]</p></td>
-        </tr>
+        <h2>exampleAirtableConnectToPage</h2>
+    </header>
 
     
-    </tbody>
-</table>
+        <article class="readme">
+            <h2>Initializing Your Airtable</h2>
+<p>Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. You probably want to store these in variables so you know which is which and can easily edit them if needed later.</p>
+<p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. Then, you can link it to your existing table with <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (TODO: add short explanation for pollIntevalInput). All of that put together would look like this:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+         &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
+            &lt;service-systemlink id = &quot;service_airtable&quot;>&lt;/service-systemlink>
+    &lt;/body>
+    &lt;script>
+        var myAirtable = document.getElementById(&quot;service_airtable&quot;).getService();
+        //TODO: make a table & initialize these
+        var baseID;
+        var apiKey;
+        var tableName;
 
-    </div>
+        myAirtable.init(baseID, apiKey, tableName, 2000)
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<h2>Sending Values</h2>
+        </article>
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var hub = new Primehub()
-hub.status_light.on("blue")</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".off">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>off<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1420">line 1420</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Turns off the light.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var hub = new Primehub()
-hub.status_light.off()</code></pre>
-
-    
-
-</dd>
-
-            </dl>
-    
-
-    
-
-    
-</article>
-
 </section>
-
 
 
 
@@ -401,13 +100,7 @@ hub.status_light.off()</code></pre>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'PrimeHub.status_light_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>
