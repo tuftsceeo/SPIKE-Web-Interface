@@ -37,7 +37,7 @@ Suppose we want to build a robot with a motor that can be controlled **remotely*
     </head>
     <body>
          <div id = "servicedock" style = "float:left;">
-            <service-systemlink id = "service_airtable"></service-systemlink>
+            <service-airtable id = "service_airtable"></service-airtable>
         </div>
         <label for="speed_slider">Motor Speed (-100 to 100): </label>
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
