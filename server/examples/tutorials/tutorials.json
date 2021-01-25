@@ -5,17 +5,14 @@
     "tutorialSpikeService": {
         "title": "SPIKE Service",
         "children":{
-            "tutorialSpikeServiceHub": {
-                "title": "Intro to SPIKE Service"
-            },
             "exampleSpikeServiceBasicMotor": {
                 "title": "Basic - Start Single Motor"
             },
             "exampleSpikeServiceTwoMotors": {
-                "title": "Controlling Multiple Motors"
+                "title": "Basic - Controlling Multiple Motors"
             },
             "exampleSpikeServicePython": {
-                "title": "Integrating MicroPython"
+                "title": "Intermediate - Integrating MicroPython"
             },
             "exampleSpikeServiceBeep": {
                 "title": "Beeping Pitch Example"
