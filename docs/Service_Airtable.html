@@ -155,11 +155,7 @@ that are &quot;Name&quot; and &quot;Value&quot;, each of a single line text type
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");
-AirtableElement.setAttribute("apikey", "APIKEY");
-AirtableElement.setAttribute("baseid", "BASEID");
-AirtableElement.setAttribute("tablename", "TABLENAME");
-AirtableElement.init();</code></pre>
+    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");AirtableElement.setAttribute("apikey", "APIKEY");AirtableElement.setAttribute("baseid", "BASEID");AirtableElement.setAttribute("tablename", "TABLENAME");AirtableElement.init();</code></pre>
 
     
 
@@ -416,9 +412,7 @@ Starts polling the external API
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");
-var myAirtable = AirtableElement.getService();
-myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
+    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");var myAirtable = AirtableElement.getService();myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
 
     
 
@@ -563,9 +557,7 @@ myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.executeAfterInit( function () {
-    // your API code
-})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.executeAfterInit( function () {    // your API code})</code></pre>
 
     
 
@@ -680,8 +672,7 @@ myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (myAirtable.isActive() == true)
-  // do something if Airtable service is active</code></pre>
+    <pre class="prettyprint"><code>if (myAirtable.isActive() == true)  // do something if Airtable service is active</code></pre>
 
     
 
@@ -796,13 +787,7 @@ myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>let tagsInfo = myAirtable.getTagsInfo(); 
-console.log(tagsInfo); // display all tags information
-
-// display message tag info
-let messageTagType = tagsInfo["message"].type;
-let messageTagValue = tagsInfo["message"].value;
-console.log("message has value of ", messageTagValue, "that is of type ", messageTagType);</code></pre>
+    <pre class="prettyprint"><code>let tagsInfo = myAirtable.getTagsInfo(); console.log(tagsInfo); // display all tags information// display message tag infolet messageTagType = tagsInfo["message"].type;let messageTagValue = tagsInfo["message"].value;console.log("message has value of ", messageTagValue, "that is of type ", messageTagType);</code></pre>
 
     
 
@@ -992,19 +977,7 @@ console.log("message has value of ", messageTagValue, "that is of type ", messag
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// set a string type Value of a Tag and display
-myAirtable.setTagValue("message", "hello there", function () {
-   let messageValue = myAirtable.getTagValue("message");
-   console.log("message: ", messageValue); // display the updated value
-})
-// set value of a boolean Tag
-myAirtable.setTagValue("aBoolean", true);
-
-// set value of an integer Tag
-myAirtable.setTagValue("anInteger", 10);
-
-// set value of a double Tag
-myAirtable.setTagValue("aDouble", 5.2);</code></pre>
+    <pre class="prettyprint"><code>// set a string type Value of a Tag and displaymyAirtable.setTagValue("message", "hello there", function () {   let messageValue = myAirtable.getTagValue("message");   console.log("message: ", messageValue); // display the updated value})// set value of a boolean TagmyAirtable.setTagValue("aBoolean", true);// set value of an integer TagmyAirtable.setTagValue("anInteger", 10);// set value of a double TagmyAirtable.setTagValue("aDouble", 5.2);</code></pre>
 
     
 
@@ -1169,8 +1142,7 @@ myAirtable.setTagValue("aDouble", 5.2);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>let value = myAirtable.getTagValue("message");
-console.log("message: ", value); </code></pre>
+    <pre class="prettyprint"><code>let value = myAirtable.getTagValue("message");console.log("message: ", value); </code></pre>
 
     
 
@@ -1337,10 +1309,7 @@ console.log("message: ", value); </code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.deleteTag("message", function () {
-    let tagsInfo = myAirtable.getTagsInfo();
-    console.log("tagsInfo: ", tagsInfo); // tagsInfo will no longer contain the tag that was deleted
-})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.deleteTag("message", function () {    let tagsInfo = myAirtable.getTagsInfo();    console.log("tagsInfo: ", tagsInfo); // tagsInfo will no longer contain the tag that was deleted})</code></pre>
 
     
 
@@ -1530,11 +1499,7 @@ console.log("message: ", value); </code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.createTag("aBoolean", false, function () {
-   let aBoolean = myAirtable.getTagValue("aBoolean");
-   if (aBoolean == false)
-      console.log ("aBoolean is false");
-})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.createTag("aBoolean", false, function () {   let aBoolean = myAirtable.getTagValue("aBoolean");   if (aBoolean == false)      console.log ("aBoolean is false");})</code></pre>
 
     
 
