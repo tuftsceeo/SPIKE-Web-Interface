@@ -1,0 +1,47 @@
+<!--
+    Project Name: SPIKE Prime Web Interface
+    File name: servicedock_usingPython.html
+    Author: Emma Bethel
+    Last update: 8/21/20
+    Description: drive robot forward a user-specified distance using MicroPython
+    LICENSE: MIT
+    (C) Tufts Center for Engineering Education and Outreach (CEEO)
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="controls">
+            <label for="dist-box">Distance (wheel rotations):</label>
+            <input id="dist-box">
+            <button onclick="goCurrentDistance()">Go!</button>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+
+        function goCurrentDistance() {
+            // getting distance from textbox input, or setting it to zero if input is invalid
+            distance = document.getElementById("dist-box").value
+            if(isNaN(distance))
+                distance = 0
+            console.log(distance)
+            
+            // writing micropython program to hub slot 0 using specified distance
+            mySPIKE.writeProgram("drive distance", "from spike import MotorPair \n"
+                                                    + "driveTrain = MotorPair('A', 'B') \n"
+                                                    + "driveTrain.move(" + distance + ", 'rotations', 0)", 
+                                 0, function() { mySPIKE.executeProgram(0) })
+        }
+    </script>
+</html>

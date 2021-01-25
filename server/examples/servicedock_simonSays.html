@@ -1,0 +1,131 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_simonSays.html
+    Author: Emma Bethel
+    Last Update: 1/19/21
+    Purpose: play a simon says game w/ user based on hub gestures/orientation
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+            #message {
+                font-size: 50px;
+            }
+        </style>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="controls">
+            <button onclick = startGame()>Start</button>
+            <div id="message"><br></div>
+            <div id="score">Score: 0</div>
+        </div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+        var messageDisplay = document.getElementById("message");
+        var score = 0;
+
+        // workaround for wait_for_new_orientation giving starting orientation of hub the first time it is called
+        mySPIKE.executeAfterInit(function() {
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation( function() { console.log("Ready to go!")})
+        })
+
+        // resets score to zero and begins a new game
+        function startGame() {
+            updateScore(0)
+            messageDisplay.innerHTML = "Simon Says..."
+
+            setTimeout(function() { startNewRound(0) }, 1000);
+        }
+
+        // picks a command and time for new round, shows command to user, and gives them roundTime amount of miliseconds to follow given command
+        function startNewRound(roundNum) {
+            var command = getNewCommand()
+            var roundTime = calculateRoundTime(roundNum)
+
+            document.getElementById("message").innerText = command
+            switch(command) {
+                case "Tap!":
+                    checkGesture("tapped", roundTime)
+                    break
+                case "Shake!":
+                    checkGesture("shaken", roundTime)
+                    break
+                case "Flip Left!":
+                    checkOrientation("leftside", roundTime)
+                    break
+                case "Flip Right!":
+                    checkOrientation("rightside", roundTime)
+                    break
+            }
+        }
+
+        // waits for player to tap or shake hub, records move made and time taken for further processing
+        function checkGesture(targetGesture, roundTime){
+            var startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
+                processMove(newGesture, targetGesture, Date.now() - startTime, roundTime) 
+            })
+        }
+
+        // waits for player to turn hub (for flip commands), records move made and time taken for further processing
+        function checkOrientation(targetOrientation, roundTime) {
+            var startTime = Date.now();
+            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
+                processMove(newOrientation, targetOrientation, Date.now() - startTime, roundTime) 
+            })
+        }
+
+
+        // uses move made, target move, time spent making the move, and maximum round time to discern whether user has won or lost round, and either continues or ends game accordingly
+        function processMove(newVal, targetVal, timeSpent, roundTime) {
+            // checking if correct move was made
+            if(newVal == targetVal) {
+                // checking if move was made in appropriate time
+                if(timeSpent <= roundTime) {
+                    updateScore(score + 1)
+                    messageDisplay.innerText = "Simon Says..."
+                    setTimeout(function() { startNewRound(score) }, 1000)
+                } else {
+                    messageDisplay.innerText = "Too Slow!"
+                    setTimeout(gameOver, 2000);
+                }
+            } else {
+                messageDisplay.innerText = "Wrong Move!"
+                setTimeout(gameOver, 2000);
+            }
+        }
+
+        // notifies user of game ending
+        function gameOver() {
+            messageDisplay.innerText = "Game Over!"
+        }
+    
+        // calculates time for next round based om how many rounds have already occured (such that difficulty decreases as the game goes on)
+        function calculateRoundTime(roundNum) {
+            return Math.max(5000 - roundNum * 100, 1000);
+        }
+
+        // randomly chooses and returns a new command
+        function getNewCommand() {
+            var commands = ["Tap!", "Shake!", "Flip Left!", "Flip Right!"]
+            return commands[Math.floor(Math.random() * 4)]
+        }
+
+        // sets score to given newScore and updates onscreen display to match
+        function updateScore(newScore) {
+            score = newScore
+            document.getElementById("score").innerText = "Score: " + score
+        }
+    </script>
+</html>

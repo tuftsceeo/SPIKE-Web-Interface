@@ -1,0 +1,38 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_sensorDisplay.html
+    Author: Emma Bethel
+    Last Update: 1/19/21
+    Purpose: periodically check & display distance sensor output from web interface
+-->
+<html>
+
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+
+    <body>
+        <div id="servicedock" style="float:left;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="text-box">Distance: unknown</div>
+    </body>
+    <script>
+        var mySPIKE = document.getElementById("service_spike").getService()
+        var textBox = document.getElementById("text-box")
+
+        mySPIKE.executeAfterInit(updateDist)
+
+        function updateDist() {
+            var sensor = mySPIKE.DistanceSensor("A")
+
+            //updating onscreen text with current distance
+            textBox.innerText = "Distance: " + sensor.get_distance_cm()
+
+            //setting up for next update if SPIKE is still connected
+            if(mySpike.isActive())
+                setTimeout(updateDist, 2000)
+        }
+    </script>
+
+</html>
