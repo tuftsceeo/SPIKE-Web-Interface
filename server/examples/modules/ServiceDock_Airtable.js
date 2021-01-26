@@ -433,7 +433,7 @@ function Service_Airtable() {
       return currentData;
     }
 
-    /** Update Value of a tag on Airtable by tag Name. If the tag does not exist, create a new tag and assign given properties.
+    /** Update Value of a tag on Airtable by tag Name.
      * <br>
      * The data type of the Tag is the Javascript data type of the new Value. 
      * @public

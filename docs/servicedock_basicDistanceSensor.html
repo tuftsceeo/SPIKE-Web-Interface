@@ -1,0 +1,81 @@
+<html>
+    <!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_beepSlider.html
+Author: Jeremy Jung
+Last update: 8/11/20
+Description: control the beeping frequency of SPIKE Prime with a slider
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+
+    <head>
+        <script src = "./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:right;">
+            <!-- this style must be kept for normal visualization-->
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="demobox">
+            <div>
+                DISTANCE output:
+                <h1 id="distanceReading">
+                    distance_sensor output will show here
+                </h1>
+            </div>
+            <div>
+                COLOR output:
+                <h1 id="colorReading">
+                    color_sensor output will show here
+                </h1>
+            </div>
+            <div>
+                FORCE output:
+                <h1 id="forceReading">
+                    force_sensor output will show here
+                </h1>
+            </div>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var mySPIKE = document.getElementById("service_spike").getService();
+
+        /* DOM references */
+        var distanceReading = document.getElementById("distanceReading");
+        var colorReading = document.getElementById("colorReading");
+        var forceReading = document.getElementById("forceReading");
+
+        mySPIKE.executeAfterInit( function () {
+
+            console.log("SPIKE Service is initialized!");
+
+            var distance_sensor = new mySPIKE.DistanceSensor("A"); // get the DistanceSensor connected to port A
+            var color_sensor = new mySPIKE.ColorSensor("B"); // get the ColorSensor connected to port B
+            var force_sensor = new mySPIKE.ForceSensor("C"); // get the ForceSensor connected to port C
+
+            mySPIKE.executeWithStream( function () {
+
+                /* code inside executeWithStream's callback will continuously run as long as SPIKE Service is active */
+
+                var distanceInCM = distance_sensor.get_distance_cm();
+                distanceReading.innerHTML = distanceInCM + " cm";
+
+                var color = color_sensor.get_color();
+                colorReading.innerHTML = color;
+
+                var force = force_sensor.get_force_newton();
+                forceReading = force + "newtons";
+
+            });
+        });
+
+    </script>
+
+</html>

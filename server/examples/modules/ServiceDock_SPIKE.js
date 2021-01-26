@@ -1523,7 +1523,7 @@ function Service_SPIKE() {
          * @returns {functions} functions from PrimeHub.motion_sensor
          * @example
          * var hub = mySPIKE.PrimeHub();
-         * var motion_sensor = hub.motion_sensor();
+         * var motion_sensor = hub.motion_sensor;
          * // do something with motion_sensor
          */
         var motion_sensor = {};
@@ -1561,7 +1561,7 @@ function Service_SPIKE() {
          * 
          * @param  {function(string)} callback - A callback of which argument is name of the gesture
          * @example
-         * mySPIKE.wait_for_new_gesture( function ( newGesture ) {
+         * motion_sensor.wait_for_new_gesture( function ( newGesture ) {
          *      if ( newGesture == 'tapped') {
          *             console.log("SPIKE was tapped")
          *      }
@@ -1586,7 +1586,7 @@ function Service_SPIKE() {
          * 
          * @param  {function(string)} callback - A callback whose signature is name of the orientation
          * @example
-         * mySPIKE.wait_for_new_orientation( function ( newOrientation ) {
+         * motion_sensor.wait_for_new_orientation( function ( newOrientation ) {
          *        if (newOrientation == "up") {
          *              console.log("orientation is up");
          *        }
@@ -1811,7 +1811,7 @@ function Service_SPIKE() {
          * @param {function} callback Params: "stalled" or "done"
          * @ignore
          * @example
-         * mySPIKE.run_to_position(180, 100, function() {
+         * motor.run_to_position(180, 100, function() {
          *      console.log("motor finished moving");
          * })
          */
@@ -1867,7 +1867,7 @@ function Service_SPIKE() {
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
          * @example
-         * mySPIKE.run_for_seconds(10, 100, function() {
+         * motor.run_for_seconds(10, 100, function() {
          *      console.log("motor just ran for 10 seconds");
          * })
          */
@@ -1885,7 +1885,7 @@ function Service_SPIKE() {
          * @param {integer} degrees 
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
-         * mySPIKE.run_for_degrees(720, 100, function () {
+         * motor.run_for_degrees(720, 100, function () {
          *      console.log("motor just ran for 720 degrees");
          * })
          */
