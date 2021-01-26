@@ -98,21 +98,7 @@ var serviceSPIKE = buttonServiceSPIKE.getService();
     // code in this scope will be executed after SPIKE Service is initialized
 });
 </code></pre>
-<p>Notice that a function was passed in as a paramter to <code>executeAfterInit()</code>. How does this become a callback function? What even is a callback function?</p>
-<h2>Callback Functions</h2>
-<p>In the Javascript SPIKE library and its other ServiceDock counterparts, functions involving waiting for a certain event to happen often take a &quot;callback&quot; function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking.</p>
-<p>Right now, we are figuring out a way to run SPIKE Service code after detecting that the user clicked <code>&lt;service-spike&gt;</code>, which can happen at any point in time after the web page loads.</p>
-<p>If we were to want to print the message &quot;SPIKE Service is initialized!&quot; to the console after the user clicks <code>&lt;service-spike&gt;</code>, we would need to do:</p>
-<pre class="prettyprint source lang-html"><code>&lt;script>
-    var buttonServiceSPIKE = document.getElementById(&quot;service_spike&quot;);
-    var serviceSPIKE = buttonServiceSPIKE.getService();
-
-    serviceSPIKE.executeAfterInit( function () {
-        console.log(&quot;SPIKE Service is initialized!&quot;);
-    });
-&lt;/script>
-</code></pre>
-<p>Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (<code>console.log</code>), I still had to wrap it in an inline function instead of using console.log as the callback directly (ie <code>executeAfterInit(console.log(&quot;SPIKE Service is initialized!&quot;))</code>. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function <code>foo(callback)</code> and wanted to pass in the function <code>bar()</code> as callback, we would say <code>foo(bar)</code> rather than <code>foo(bar())</code>. A consequence of this is that we couldn't use <code>bar</code> directly if it needed any parameters, and would instead have to say <code>foo(function() { bar(parameter) })</code>.</p>
+<p>Notice that a function was passed in as a paramter to <code>executeAfterInit()</code>.</p>
 <h2>SPIKE Service Motor object</h2>
 <p>Next, you have to start the Motor in the callback function of <code>executeAfterInit()</code>. The Motor object can be declared be referring to <code>serviceSPIKE</code> and getting a Motor connected to port A:</p>
 <pre class="prettyprint source lang-javascript"><code>var motor = new serviceSPIKE.Motor(&quot;A&quot;);
