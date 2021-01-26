@@ -39,6 +39,9 @@
     "tutorialAirtableService": {
         "title": "Airtable Service",
         "children": {
+            "exampleAirtableConnectToPage": {
+                "title": "Setting Up and Receiving Values"
+            },
             "exampleAirtableService": {
                 "title": "Tufts EN1-Simple Robotics Airtable Example"
             }
