@@ -289,7 +289,7 @@ function Service_Airtable() {
       Name_field: {value: Value_field, type: dataTYPE }
     };
     */
-    let currentData= {}; // contains real-time information of the tags in the cloud
+    let currentData= {}; // contains real-time information of the entries in the cloud
 
     let recordIDNameMap = {}; // map Name fields to its record ID
 
@@ -306,9 +306,9 @@ function Service_Airtable() {
     var table = undefined;
 
     var funcAtInit = undefined; // function to call after init
-    var funcAfterChangeTagValue = []; // callback function and tag name pairs to call after setTagValue [[tagName, callback]...]
-    var funcAfterCreateTag = [];
-    var funcAfterDeleteTag = []; 
+    var funcAfterChangeEntryValue = []; // callback function and entry name pairs to call after setEntryValue [[entryName, callback]...]
+    var funcAfterCreateEntry = [];
+    var funcAfterDeleteEntry = []; 
 
     //////////////////////////////////////////
     //                                      //
@@ -324,7 +324,7 @@ function Service_Airtable() {
      * @param {string} APIKey API Key
      * @param {string} BaseID Base ID for Table in which data is stored
      * @param {string} TableName Table Name of Base
-     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS. Default value is 1000 ms.
+     * @param {integer} pollIntervalInput interval at which to get entries from the cloud in MILISECONDS. Default value is 1000 ms.
      * @returns {boolean} True if service was successsfully initialized, false otherwise
      * @example
      * var AirtableElement = document.getElementById("service_airtable");
@@ -417,131 +417,174 @@ function Service_Airtable() {
         return serviceActive;
     }
 
-    /** Get all tags on the cloud.
+    /** Get all entries on the cloud.
      * @public
-     * @returns {object} all tags on the cloud, an object with Name fields as keys and Value fields as values
+     * @returns {object} all entries on the cloud, an object with Name fields as keys and Value fields as values
      * @example
-     * let tagsInfo = myAirtable.getTagsInfo(); 
-     * console.log(tagsInfo); // display all tags information
+     * let entriesInfo = myAirtable.getEntriesInfo(); 
+     * console.log(entriesInfo); // display all entries information
      * 
-     * // display message tag info
-     * let messageTagType = tagsInfo["message"].type;
-     * let messageTagValue = tagsInfo["message"].value;
-     * console.log("message has value of ", messageTagValue, "that is of type ", messageTagType);
+     * // display message entry info
+     * let messageEntryType = entriesInfo["message"].type;
+     * let messageEntryValue = entriesInfo["message"].value;
+     * console.log("message has value of ", messageEntryValue, "that is of type ", messageEntryType);
      */
-    function getTagsInfo () {
+    function getEntriesInfo () {
       return currentData;
     }
 
-    /** Update Value of a tag on Airtable by tag Name.
+    /** Update Value of a entry on Airtable by entry Name. If the entry does not exist, create a new entry and assign given properties.
      * <br>
-     * The data type of the Tag is the Javascript data type of the new Value. 
+     * NotStrict property indicates that the data type of the Value supplied will be implicitly converted. For example, allowing for setting an INT entry's value with a string, "123" or a STRING entry's value with * a number. This method exists for convenience but please avoid using it extensively as it can lead to unpredictable outcomes.
      * @public
-     * @param {string} name Name of tag
-     * @param {string} value new Value to update tag to
-     * @param {function} callback function to run after new tag value or new tag creation
+     * @param {any} name  Name of entry 
+     * @param {any} value  new Value to update entry to. 
+     * @param {any} callback  function to run after new entry value or new entry creation 
      * @example
-     * // set a string type Value of a Tag and display
-     * myAirtable.setTagValue("message", "hello there", function () {
-     *    let messageValue = myAirtable.getTagValue("message");
-     *    console.log("message: ", messageValue); // display the updated value
-     * })
-     * // set value of a boolean Tag
-     * myAirtable.setTagValue("aBoolean", true);
-     * 
-     * // set value of an integer Tag
-     * myAirtable.setTagValue("anInteger", 10);
-     * 
-     * // set value of a double Tag
-     * myAirtable.setTagValue("aDouble", 5.2);
-     */
-    async function setTagValue(name, value, callback) {
-
-      setTagValueStrict(name, value, callback);
-
-    }
-
-    /** Update Value of a tag on Airtable by tag Name.
-     * <br>
-     * NotStrict property indicates that the data type of the Value supplied will be implicitly converted. For example, allowing for setting an INT tag's value with a string, "123" or a STRING tag's value with * a number. This method exists for convenience but please avoid using it extensively as it can lead to unpredictable outcomes.
-     * @public
-     * @param {any} name  Name of tag 
-     * @param {any} value  new Value to update tag to. 
-     * @param {any} callback  function to run after new tag value or new tag creation 
-     * @example
-     * // set a string type Value of a Tag and display
-     * myAirtable.setTagValueNotStrict("message", 123, function () {
-     *    let messageValue = myAirtable.getTagValue("message");
+     * // set a string type Value of a Entry and display
+     * myAirtable.setEntryValueNotStrict("message", 123, function () {
+     *    let messageValue = myAirtable.getEntryValue("message");
      *    console.log("message: ", messageValue); // display the updated value, which will be 123. 
      * })
-     * // set value of a boolean Tag
-     * myAirtable.setTagValueNotStrict("aBoolean", true);
+     * // set value of a boolean Entry
+     * myAirtable.setEntryValueNotStrict("aBoolean", true);
      *
-     * // set value of an integer Tag
-     * myAirtable.setTagValueNotStrict("anInteger", 10);
-     * myAirtable.setTagValueNotStrict("anInteger", "10");
+     * // set value of an integer Entry
+     * myAirtable.setEntryValueNotStrict("anInteger", 10);
+     * myAirtable.setEntryValueNotStrict("anInteger", "10");
      * 
-     * // set value of a double Tag
-     * myAirtable.setTagValueNotStrict("aDouble", 5.2);
-     * myAirtable.setTagValueNotStrict("aDouble", "5.2");
+     * // set value of a double Entry
+     * myAirtable.setEntryValueNotStrict("aDouble", 5.2);
+     * myAirtable.setEntryValueNotStrict("aDouble", "5.2");
      */
-    async function setTagValueNotStrict(name, value, callback) {
+    async function setEntryValueNotStrict(name, value, callback) {
       if (currentData[name] == undefined) {
-        /* no tags exist in the database with the given name */
+        /* no entries exist in the database with the given name */
 
-        throw new Error("Tag with given name does not exist in the database. Please supply a Name of a Tag that exists on Airtable.")
+        // throw new Error("Entry with given name does not exist in the database. Please supply a Name of a Entry that exists on Airtable.")
+        createEntry(name, value, callback);
       }
       else {
-        /* the tag exists in the database */
+        /* the entry exists in the database */
 
 
         // append callback function
         // if (callback != undefined) {
 
-        //   let index = getEmptyIndex(funcAfterChangeTagValue);
+        //   let index = getEmptyIndex(funcAfterChangeEntryValue);
 
         //   if (index === -1)
-        //     funcAfterChangeTagValue.push([name, callback])
+        //     funcAfterChangeEntryValue.push([name, callback])
         //   else
-        //     funcAfterChangeTagValue[index] = [name, callback]
+        //     funcAfterChangeEntryValue[index] = [name, callback]
         // }
         setTimeout(callback, 1500);
 
-        updateValue(name, value); // update tag in database
+        updateValue(name, value); // update entry in database
+      }
+    }
+
+    /** Update Value of a entry on Airtable by entry Name. If the entry does not exist, create a new entry and assign given properties.
+     * <br>
+     * The value of the Entry is not implicitly converted. E.g. setting a string Entry's value with a number will no longer work
+     * @public
+     * @param {string} name  Name of entry
+     * @param {any} value  new Value to update entry to
+     * @param {any} callback  function to run after new entry value or new entry creation
+     * // set a string type Value of a Entry and display
+     * myAirtable.setEntryValueNotStrict("message", 123, function () {
+     *    let messageValue = myAirtable.getEntryValue("message");
+     *    console.log("message: ", messageValue); // display the updated value, which will be 123.
+     * })
+     * // set value of a boolean Entry
+     * myAirtable.setEntryValueNotStrict("aBoolean", true);
+     *
+     * // set value of an integer Entry
+     * myAirtable.setEntryValueNotStrict("anInteger", 10);
+     *
+     * // set value of a double Entry
+     * myAirtable.setEntryValueNotStrict("aDouble", 5.2);
+     */
+    async function setEntryValueStrict(name, value, callback) {
+      if (currentData[name] == undefined) {
+        /* no entries exist in the database with the given name */
+
+        // throw new Error("Entry with given name does not exist in the database. Please supply a Name of a Entry that exists on Airtable.");
+        createEntry(name, value, callback);
+      }
+      else {
+        /* the entry exists in the database */
+
+        let dataType = getValueTypeStrict(value);
+
+        if (dataType === "INT" && typeof value === "string")
+          throw new TypeError("A new Value of string data type was given, but the string does not at least contain one chracter that is not a number. E.g. '123'. Please supply a string that contains at least one character that is not a number, or use the less strict alternative method, setEntryValueNotStrict(). NOTE: getEntryValue() of a Entry set to '123' with " +
+            "setEntryValueNotStrict() will still return a javascript number type");
+
+        let expectedDataType = currentData[name].type;
+        console.log("%cTuftsCEEO ", "color: #3ba336;", dataType, " vs ", expectedDataType);
+        if (dataType === expectedDataType) {
+          /* the data type of given value is the same as one stored */
+
+          // append callback function
+          // if (callback != undefined) {
+          //   let index = getEmptyIndex(funcAfterChangeEntryValue);
+          //   if (index === -1)
+          //     funcAfterChangeEntryValue.push([name, callback])
+          //   else
+          //     funcAfterChangeEntryValue[index] = [name, callback]
+          // }
+          setTimeout(callback, 1500);
+
+          updateValue(name, value); // update entry in database
+        }
+        else {
+          // expected a STRING but got an INT
+          if (dataType === "INT" && expectedDataType === "STRING") {
+            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type STRING but got an INT. This could happen if a string value you supplied is entirely of a number. E.g. '123'. " +
+              "Please supply a string that contains at least one character that is not a number, or setuse the less strict alternative method, setEntryValueNotStrict(). NOTE: getEntryValue() of a Entry set to '123' with " +
+              "setEntryValueNotStrict() will still return a javascript number type");
+          }
+          else if (dataType === "STRING" && expectedDataType === "INT") {
+            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type INT but got a STRING. Please supply a number.");
+          }
+
+          throw new TypeError("Could not update value of entry on Airtable. The given value is not of the data type defined for the entry in the database");
+        }
       }
     }
 
 
-    /** Get the Value field associated with a tag by its Name
+    /** Get the Value field associated with a entry by its Name
     * @public
-    * @param {string} name Name of tag
+    * @param {string} name Name of entry
     * @returns {any} the Value field in any JS data type. data type conversion is implicit. 
     * @example
-    * let value = myAirtable.getTagValue("message");
+    * let value = myAirtable.getEntryValue("message");
     * console.log("message: ", value); 
     */
-    function getTagValue(name) {
+    function getEntryValue(name) {
       return currentData[name].value;
     }
 
-    /** Delete tag from the Airtable database given its Name field. 
+    /** Delete entry from the Airtable database given its Name field. 
      * @public
-     * @param {any} name the Name of tag to delete
-     * @param {any} callback callback function to run after tag deletion
+     * @param {any} name the Name of entry to delete
+     * @param {any} callback callback function to run after entry deletion
      * @example
-     * myAirtable.deleteTag("message", function () {
-     *     let tagsInfo = myAirtable.getTagsInfo();
-     *     console.log("tagsInfo: ", tagsInfo); // tagsInfo will no longer contain the tag that was deleted
+     * myAirtable.deleteEntry("message", function () {
+     *     let entriesInfo = myAirtable.getEntriesInfo();
+     *     console.log("entriesInfo: ", entriesInfo); // entriesInfo will no longer contain the entry that was deleted
      * })
      */
-    const deleteTag = async (tagName, callback) => {
+    const deleteEntry = async (entryName, callback) => {
         try {
 
-          // delete all tags in Airtable database with given tagName for Name
-          let ids = getAllRecordsIDsForName(tagName);
+          // delete all entries in Airtable database with given entryName for Name
+          let ids = getAllRecordsIDsForName(entryName);
 
           if (ids.length == 0)
-            throw new Error("Could not delete tag with name, " + tagName.toString()+ ", as it does not exist");
+            throw new Error("Could not delete entry with name, " + entryName.toString()+ ", as it does not exist");
 
           for (let i = 0; i < ids.length; i++) {
             let id = ids[i];
@@ -550,11 +593,11 @@ function Service_Airtable() {
 
           // append callback function
           // if (callback != undefined) {
-            // let index = getEmptyIndex(funcAfterDeleteTag);
+            // let index = getEmptyIndex(funcAfterDeleteEntry);
             // if (index === -1)
-              // funcAfterDeleteTag.push([tagName, callback])
+              // funcAfterDeleteEntry.push([entryName, callback])
             // else
-              // funcAfterDeleteTag[index] = [tagName, callback]
+              // funcAfterDeleteEntry[index] = [entryName, callback]
           // }
           setTimeout( callback, 2000);
 
@@ -563,40 +606,40 @@ function Service_Airtable() {
         }
     };
 
-    /** Create a new tag given its Name field and Value field. If a tag with given name already exists, the method will throw an Error.
+    /** Create a new entry given its Name field and Value field. If a entry with given name already exists, the method will throw an Error.
      * @public
-     * @param {string} name name of tag to create
-     * @param {any} value value to give tag (can be of any JS data type)
-     * @param {function} callback function to run after tag creation
+     * @param {string} name name of entry to create
+     * @param {any} value value to give entry (can be of any JS data type)
+     * @param {function} callback function to run after entry creation
      * @example
-     * myAirtable.createTag("aBoolean", false, function () {
-     *    let aBoolean = myAirtable.getTagValue("aBoolean");
+     * myAirtable.createEntry("aBoolean", false, function () {
+     *    let aBoolean = myAirtable.getEntryValue("aBoolean");
      *    if (aBoolean == false)
      *       console.log ("aBoolean is false");
      * })
      * 
      */
-    const createTag = async (tagName, tagValue, callback) => {
+    const createEntry = async (entryName, entryValue, callback) => {
       try {
 
-        if (currentData[tagName] == undefined) {
-          /* tag with the given name does not yet exist */
+        if (currentData[entryName] == undefined) {
+          /* entry with the given name does not yet exist */
 
-          let convertedValue = convertToString(tagValue);
-          createName({ Name: tagName, Value: convertedValue }); // create Tag in database
+          let convertedValue = convertToString(entryValue);
+          createName({ Name: entryName, Value: convertedValue }); // create Entry in database
 
           // append callback function
           // if (callback != undefined) {
-          //   let index = getEmptyIndex(funcAfterCreateTag);
+          //   let index = getEmptyIndex(funcAfterCreateEntry);
           //   if (index === -1)
-          //     funcAfterCreateTag.push([tagName, callback])
+          //     funcAfterCreateEntry.push([entryName, callback])
           //   else
-          //     funcAfterCreateTag[index] = [tagName, callback]
+          //     funcAfterCreateEntry[index] = [entryName, callback]
           // }
           setTimeout(callback, 1500);
         }
         else {
-          throw new Error("A tag with the name, " + tagName.toString() +  ", already exists");
+          throw new Error("A entry with the name, " + entryName.toString() +  ", already exists");
         }
       }
       catch (err) {
@@ -622,17 +665,17 @@ function Service_Airtable() {
       if (currentData[name].value == convertedValue) {
         /* value to update to is the same as value already in currentData */
 
-        // execute funcAfterChangeTagValue since value won't change
-        for (let j = 0; j < funcAfterChangeTagValue.length; j++) {
-          if (funcAfterChangeTagValue[j] !== undefined) {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", funcAfterChangeTagValue)
-            let changedTag = name;
-            let expectedTag = funcAfterChangeTagValue[j][0];
+        // execute funcAfterChangeEntryValue since value won't change
+        for (let j = 0; j < funcAfterChangeEntryValue.length; j++) {
+          if (funcAfterChangeEntryValue[j] !== undefined) {
+            console.log("%cTuftsCEEO ", "color: #3ba336;", funcAfterChangeEntryValue)
+            let changedEntry = name;
+            let expectedEntry = funcAfterChangeEntryValue[j][0];
 
-            if (expectedTag === changedTag) {
-              funcAfterChangeTagValue[j][1]();
-              funcAfterChangeTagValue[j] = undefined;
-              // console.log("After execution, funcAfterChangeTagValue: ", funcAfterChangeTagValue);
+            if (expectedEntry === changedEntry) {
+              funcAfterChangeEntryValue[j][1]();
+              funcAfterChangeEntryValue[j] = undefined;
+              // console.log("After execution, funcAfterChangeEntryValue: ", funcAfterChangeEntryValue);
             }
           }
         }
@@ -673,58 +716,58 @@ function Service_Airtable() {
             // if the object is defined and not boolean false
             if (records) {
 
-              let changedTags = [];
-              let createdTags = [];
-              let deletedTags = [];
+              let changedEntries = [];
+              let createdEntries = [];
+              let deletedEntries = [];
 
-              // get tags from the database
-              let newTags = {};
+              // get entries from the database
+              let newEntries = {};
               for (var key in records) {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
                 if (name != undefined) {
-                  newTags[name] = convertToDataType(value);
+                  newEntries[name] = convertToDataType(value);
                 }
               }
 
               // populate recordIDNameMap
               populateRecordIDNameMap(records);
 
-              // look for discrepancies between newTags and currentData
+              // look for discrepancies between newEntries and currentData
 
               let changeExists = false;
-              // go through newTags and check if all tags in records exists correspondingly to currentData
-              for (var key in newTags) {
+              // go through newEntries and check if all entries in records exists correspondingly to currentData
+              for (var key in newEntries) {
                 if (key != undefined) {
-                  if (currentData[key] !== undefined && newTags[key] !== undefined) {
+                  if (currentData[key] !== undefined && newEntries[key] !== undefined) {
                     /*  values are defined for the key */
-                    if (currentData[key].value !== newTags[key].value) {
+                    if (currentData[key].value !== newEntries[key].value) {
                       /* values are different */
                       // console.log("Different values detected in: ", key);
-                      changedTags.push(key);
+                      changedEntries.push(key);
                       changeExists = true;
                     }
                       
                   }
                   else {
-                    /* a tag was created in records and does not yet show in currentData*/
-                    // console.log("A tag was created: ", key);
-                    // console.log("newTags: ", newTags);
+                    /* a entry was created in records and does not yet show in currentData*/
+                    // console.log("A entry was created: ", key);
+                    // console.log("newEntries: ", newEntries);
                     // console.log("currentData: ", currentData);
-                    createdTags.push(key);
-                    // console.log(createdTags);
+                    createdEntries.push(key);
+                    // console.log(createdEntries);
                     changeExists = true;
                   }
                 }
               }
 
-              // go through currentData and check if all tags in newTags exists correspondingly to records
+              // go through currentData and check if all entries in newEntries exists correspondingly to records
               for (let key in currentData) {
                 if (key != undefined) {
-                  if (currentData[key] === undefined || newTags[key] === undefined) {
-                    /* a tag was destroyed in newTags and does not yet show in currentData*/
-                    // console.log("A tag was destroyed: ", key);
-                    deletedTags.push(key);
+                  if (currentData[key] === undefined || newEntries[key] === undefined) {
+                    /* a entry was destroyed in newEntries and does not yet show in currentData*/
+                    // console.log("A entry was destroyed: ", key);
+                    deletedEntries.push(key);
                     changeExists = true;
                   }
                 }
@@ -738,41 +781,41 @@ function Service_Airtable() {
 
                 /* execute any needed callback functions */
 
-                for (let i = 0; i < changedTags.length; i++ ) {
-                  for (let j = 0 ; j < funcAfterChangeTagValue.length; j++) {
-                    if (funcAfterChangeTagValue[j] !== undefined) {
-                      let changedTag = changedTags[i];
-                      let expectedTag = funcAfterChangeTagValue[j][0];
-                      if (expectedTag === changedTag) {
-                        funcAfterChangeTagValue[j][1]();
-                        funcAfterChangeTagValue[j] = undefined;
+                for (let i = 0; i < changedEntries.length; i++ ) {
+                  for (let j = 0 ; j < funcAfterChangeEntryValue.length; j++) {
+                    if (funcAfterChangeEntryValue[j] !== undefined) {
+                      let changedEntry = changedEntries[i];
+                      let expectedEntry = funcAfterChangeEntryValue[j][0];
+                      if (expectedEntry === changedEntry) {
+                        funcAfterChangeEntryValue[j][1]();
+                        funcAfterChangeEntryValue[j] = undefined;
                       }
                     }
                   }
                 }
                 
-                for (let i = 0; i < createdTags.length; i++) {
-                  for (let j = 0; j < funcAfterCreateTag.length; j++) {
-                    if (funcAfterCreateTag[j] !== undefined) {
-                      let createdTag = createdTags[i];
-                      let expectedTag = funcAfterCreateTag[j][0];
-                      // console.log(expectedTag, " vs ", createdTag);
-                      if (expectedTag === createdTag) {
-                        funcAfterCreateTag[j][1]();
-                        funcAfterCreateTag[j] = undefined;
+                for (let i = 0; i < createdEntries.length; i++) {
+                  for (let j = 0; j < funcAfterCreateEntry.length; j++) {
+                    if (funcAfterCreateEntry[j] !== undefined) {
+                      let createdEntry = createdEntries[i];
+                      let expectedEntry = funcAfterCreateEntry[j][0];
+                      // console.log(expectedEntry, " vs ", createdEntry);
+                      if (expectedEntry === createdEntry) {
+                        funcAfterCreateEntry[j][1]();
+                        funcAfterCreateEntry[j] = undefined;
                       }
                     }
                   }
                 }
 
-                for (let i = 0; i < deletedTags.length; i++) {
-                  for (let j = 0; j < funcAfterDeleteTag.length; j++) {
-                    if (funcAfterDeleteTag[j] !== undefined) {
-                      let deletedTag = deletedTags[i];
-                      let expectedTag = funcAfterDeleteTag[j][0];
-                      if (expectedTag === deletedTag) {
-                        funcAfterDeleteTag[j][1]();
-                        funcAfterDeleteTag[j] = undefined;
+                for (let i = 0; i < deletedEntries.length; i++) {
+                  for (let j = 0; j < funcAfterDeleteEntry.length; j++) {
+                    if (funcAfterDeleteEntry[j] !== undefined) {
+                      let deletedEntry = deletedEntries[i];
+                      let expectedEntry = funcAfterDeleteEntry[j][0];
+                      if (expectedEntry === deletedEntry) {
+                        funcAfterDeleteEntry[j][1]();
+                        funcAfterDeleteEntry[j] = undefined;
                       }
                     }
                   }
@@ -787,61 +830,6 @@ function Service_Airtable() {
         }, 2000);
 
       });
-    }
-    /** Update Value of a tag on Airtable by tag Name. If the tag does not exist, create a new tag and assign given properties.
-    * <br>
-    * The value of the Tag is not implicitly converted. E.g. setting a string Tag's value with a number will no longer work
-    * @priavte
-    * @param {any} name  Name of tag
-    * @param {any} value  new Value to update tag to
-    * @param {any} callback  function to run after new tag value or new tag creation
-    */
-    async function setTagValueStrict(name, value, callback) {
-      if (currentData[name] == undefined) {
-        /* no tags exist in the database with the given name */
-
-        throw new Error("Tag with given name does not exist in the database. Please supply a Name of a Tag that exists on Airtable.")
-      }
-      else {
-        /* the tag exists in the database */
-
-        let dataType = getValueTypeStrict(value);
-
-        if (dataType === "INT" && typeof value === "string")
-          throw new TypeError("A new Value of string data type was given, but the string does not at least contain one chracter that is not a number. E.g. '123'. Please supply a string that contains at least one character that is not a number, or use the less strict alternative method, setTagValueNotStrict(). NOTE: getTagValue() of a Tag set to '123' with " +
-          "setTagValueNotStrict() will still return a javascript number type");
-
-        let expectedDataType = currentData[name].type;
-        console.log("%cTuftsCEEO ", "color: #3ba336;", dataType, " vs ", expectedDataType);
-        if (dataType === expectedDataType) {
-          /* the data type of given value is the same as one stored */
-
-          // append callback function
-          // if (callback != undefined) {
-          //   let index = getEmptyIndex(funcAfterChangeTagValue);
-          //   if (index === -1)
-          //     funcAfterChangeTagValue.push([name, callback])
-          //   else
-          //     funcAfterChangeTagValue[index] = [name, callback]
-          // }
-          setTimeout(callback, 1500);
-
-          updateValue(name, value); // update tag in database
-        }
-        else {
-          // expected a STRING but got an INT
-          if (dataType === "INT" && expectedDataType === "STRING") {
-            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type STRING but got an INT. This could happen if a string value you supplied is entirely of a number. E.g. '123'. " +
-            "Please supply a string that contains at least one character that is not a number, or setuse the less strict alternative method, setTagValueNotStrict(). NOTE: getTagValue() of a Tag set to '123' with " +
-            "setTagValueNotStrict() will still return a javascript number type");
-          }
-          else if (dataType === "STRING" && expectedDataType === "INT") {
-            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type INT but got a STRING. Please supply a number.");
-          }
-          
-          throw new TypeError("Could not update value of tag on Airtable. The given value is not of the data type defined for the tag in the database");
-        }
-      }
     }
 
     /** Update the record(row) with given fields
@@ -1032,12 +1020,12 @@ function Service_Airtable() {
         var recordID = records[key].id;
 
         if (recordIDNameMap[name] !== undefined) {
-          /* a record of a tag with the name already exists in recordIDNameMap */
+          /* a record of a entry with the name already exists in recordIDNameMap */
 
           recordIDNameMap[name].push(recordID);
         }
         else {
-          /* recordIDNameMap does not contain a tag with the name */
+          /* recordIDNameMap does not contain a entry with the name */
 
           recordIDNameMap[name] = []; // make new array
           recordIDNameMap[name].push(recordID);
@@ -1096,8 +1084,8 @@ function Service_Airtable() {
     /** Helper function for getting data types in a format
     * 
     * @private
-    * @param {any} new_value the variable containing the new value of a tag
-    * @returns {any} data type of tag
+    * @param {any} new_value the variable containing the new value of a entry
+    * @returns {any} data type of entry
     */
     function getValueType(new_value) {
       //if the value is not a number
@@ -1125,7 +1113,7 @@ function Service_Airtable() {
     /**
     * @private
     * @param {any} new_value 
-    * @returns {string} data type of tag 
+    * @returns {string} data type of entry 
     */
     function getValueTypeStrict(new_value) {
       //if the value is a boolean
@@ -1179,18 +1167,12 @@ function Service_Airtable() {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
-        updateValue: updateValue,
-        getRecords: getRecords,
-        getTagValue: getTagValue,
-        setTagValueNotStrict: setTagValueNotStrict,
-        getNames: getNames,
-        getTagsInfo: getTagsInfo,
-        convertToString, convertToString,
-        deleteTag: deleteTag,
-        createTag: createTag,
-        getRecordById: getRecordById,
-        minifyRecord: minifyRecord,
-        setTagValue: setTagValue
+        setEntryValueNotStrict: setEntryValueNotStrict,
+        setEntryValueStrict: setEntryValueStrict,
+        getEntriesInfo: getEntriesInfo,
+        getEntryValue: getEntryValue,
+        createEntry: createEntry,
+        deleteEntry: deleteEntry
     }
 }
 
