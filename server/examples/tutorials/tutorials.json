@@ -11,6 +11,9 @@
             "exampleSpikeServiceTwoMotors": {
                 "title": "Basic - Controlling Multiple Motors"
             },
+            "exampleSpikeServiceSensors": {
+                "title": "Basic - Using the Sensors"
+            },
             "exampleSpikeServicePython": {
                 "title": "Intermediate - Integrating MicroPython"
             },
@@ -38,9 +41,6 @@
         "children": {
             "exampleAirtableConnectToPage": {
                 "title": "Setting Up and Receiving Values"
-            },
-            "exampleAirtableService": {
-                "title": "Tufts EN1-Simple Robotics Airtable Example"
             }
         }
     }

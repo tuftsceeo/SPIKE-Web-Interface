@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Using ServiceDock | Tutorial: Using ServiceDock</title>
+    <title>Tutorial: Basic - Using the Sensors | Tutorial: Basic - Using the Sensors</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Using ServiceDock</a>
+            <a class = "currentPage">Tutorial: Basic - Using the Sensors</a>
         
         
     </div>
@@ -55,96 +55,203 @@
     <header>
         
 
-        <h2>Using ServiceDock</h2>
+        <h2>Basic - Using the Sensors</h2>
     </header>
 
     
         <article class="readme">
-            <h2>Example</h2>
-<p><img src="servicedockDemo.gif" alt="Demonstration"></p>
-<h2>Developing with ServiceDock</h2>
-<p>The following code creates the ServiceDock interface you see on the top left corner of the example above. This is all you need to use ServiceDock! Be sure to include this HTML with your preferred Services to get started.</p>
-<pre class="prettyprint source lang-html"><code>&lt;html>
-    &lt;head>
+            <h2>Using Sensors in SPIKE Prime</h2>
+<p>In this example, we will display readings from the DistanceSensor, ColorSensor, ForceSensor on the web page.</p>
+<p>We will retrieve the distance in centimeters from the DistanceSensor with <code>get_distance_cm()</code>, the detected color from the ColorSensor with <code>get_color()</code>, and the force in newtons with <code>get_force_newton()</code>. Bear in mind these are not the only pieces of information that can be retrieved from these sensors.</p>
+<h2>Starter Code</h2>
+<p>The following is the starter code. Inside the div 'demobox', the readings from the sensors will be displayed by editing the innerHTML property of the <code>&lt;h1&gt;</code> tags.</p>
+<p>We already declared the references to these DOM elements and wrote the basic starter functions for the SPIKE Service, which are declaring <code>serviceSPIKE</code> and writing <code>executeWithStream()</code> inside <code>&lt;script&gt;</code>.</p>
+<pre class="prettyprint source lang-html"><code>    &lt;head>
         &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
             type=&quot;text/javascript&quot;>&lt;/script>
     &lt;/head>
-    &lt;body>
-        &lt;!-- this style must be kept for normal rendering-->
-        &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
-            &lt;!-- include the Services to use -->
-            &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
-            &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;div>
+                DISTANCE output:
+                &lt;h1 id=&quot;distanceReading&quot;>
+                    distance_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                COLOR output:
+                &lt;h1 id=&quot;colorReading&quot;>
+                    color_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                FORCE output:
+                &lt;h1 id=&quot;forceReading&quot;>
+                    force_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
         &lt;/div>
     &lt;/body>
     &lt;script>
-        // Use ServiceDock here!
+        /* SPIKE Service code*/
+        var serviceSPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+
+        /* DOM references */
+        var distanceReading = document.getElementById(&quot;distanceReading&quot;);
+        var colorReading = document.getElementById(&quot;colorReading&quot;);
+        var forceReading = document.getElementById(&quot;forceReading&quot;);
+
+        serviceSPIKE.executeAfterInit( function () {
+
+            console.log(&quot;SPIKE Service is initialized!&quot;);
+        })
+
     &lt;/script>
+</code></pre>
+<h2>Declaring the Sensor objects</h2>
+<p>When we declare the Sensors, much like the Motor object, we will refer to the SPIKE Service object, <code>serviceSPIKE</code>. For example, to declare the <code>DistanceSensor</code> connected to port A, you do</p>
+<pre class="prettyprint source lang-javascript"><code>var distance_sensor = new serviceSPIKE.DistanceSensor(&quot;A&quot;);
+</code></pre>
+<p>The declaration of other types of Sensors are very similar.</p>
+<pre class="prettyprint source lang-javascript"><code>var color_sensor = new serviceSPIKE.ColorSensor(&quot;B&quot;); 
+var force_sensor = new serviceSPIKE.ForceSensor(&quot;C&quot;);
+</code></pre>
+<h2>Getting the Sensor readings</h2>
+<p>The API for getting the Sensor readings in SPIKE Service is similar to how it's done with micropython. Each of these intuitive functions get information from their respective sensors.</p>
+<pre class="prettyprint source lang-javascript"><code>var distanceInCM = distance_sensor.get_distance_cm();
+var color = color_sensor.get_color();
+var force = force_sensor.get_force_newton();
+</code></pre>
+<p>Remember when we declared the DOM elements for displaying the sensor readings? We will now use those references to show <code>distanceInCM</code>, <code>color</code>, and <code>force</code> on the webpage by editing their <code>innerHTML</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+colorReading.innerHTML = color;
+forceReading.innerHTML = force + &quot; newtons&quot;;
+</code></pre>
+<p>If we piece together what we wrote so far, we should get a <code>&lt;script&gt;</code> that looks like this. Are we done?</p>
+<pre class="prettyprint source lang-html"><code>&lt;script>
+    /* SPIKE Service code*/
+    var serviceSPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+
+    /* DOM references */
+    var distanceReading = document.getElementById(&quot;distanceReading&quot;);
+    var colorReading = document.getElementById(&quot;colorReading&quot;);
+    var forceReading = document.getElementById(&quot;forceReading&quot;);
+
+    serviceSPIKE.executeAfterInit( function () {
+
+        console.log(&quot;SPIKE Service is initialized!&quot;);
+        
+        var distance_sensor = new serviceSPIKE.DistanceSensor(&quot;A&quot;); // get the DistanceSensor connected to port A
+        var color_sensor = new serviceSPIKE.ColorSensor(&quot;B&quot;); // get the ColorSensor connected to port B
+        var force_sensor = new serviceSPIKE.ForceSensor(&quot;C&quot;); // get the ForceSensor connected to port C
+        
+        // get sensor readings
+        var distanceInCM = distance_sensor.get_distance_cm();
+        var color = color_sensor.get_color();
+        var force = force_sensor.get_force_newton();
+        
+        // display sensor readings
+        distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+        colorReading.innerHTML = color;
+        forceReading.innerHTML = force + &quot; newtons&quot;;
+    });
+&lt;/script>
+</code></pre>
+<p>NO! Unfortunately if you end with this, your web page will only display the very first set of readings from the Sensors, but it will no longer display the subsequent readings after that. What we need is a way to execute code that display the readings as the SPIKE Prime sends its sensor data stream. Hence, we use <code>executeWithStream</code>. <code>executeWithStream</code>, like <code>executeAfterInit</code> takes a callback function that it runs continuously as long as SPIKE Service is activated! Also note that you do not necessarily need to use <code>executeWithStream</code>. You can use Javascript's built-in function <code>setInterval</code> that runs a piece of code every user-defined amount of time. But we won't get into that right now.</p>
+<p>We want to display the values with SPIKE Prime's data stream, so move the code that gets the sensor readings and displays them inside the callback function of <code>executeWithStream</code></p>
+<pre class="prettyprint source lang-javascript"><code>// execute alongside SPIKE's data stream
+serviceSPIKE.executeWithStream( function () {
+    
+    /* code inside executeWithStream's callback will continuously run as long as SPIKE Service is active */
+    
+    // get sensor readings
+    var distanceInCM = distance_sensor.get_distance_cm();
+    var color = color_sensor.get_color();
+    var force = force_sensor.get_force_newton();
+
+    
+    // display sensor readings
+    distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+    colorReading.innerHTML = color;
+    forceReading.innerHTML = force + &quot; newtons&quot;;
+});
+</code></pre>
+<p>We don't want to include the declarations of the Sensor objects inside the callback function of <code>executeWithStream</code> because we can declare them once and interact with them in the stream.</p>
+<h2>Final HTML</h2>
+<p>Combine everything so far, and you should end with this! Try out the example by connecting your DistanceSensor to port A, the ColorSensor to port B, and the ForceSensor to port C.</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+
+    &lt;head>
+        &lt;script src = &quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;div>
+                DISTANCE output:
+                &lt;h1 id=&quot;distanceReading&quot;>
+                    distance_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                COLOR output:
+                &lt;h1 id=&quot;colorReading&quot;>
+                    color_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                FORCE output:
+                &lt;h1 id=&quot;forceReading&quot;>
+                    force_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code*/
+        var serviceSPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+
+        /* DOM references */
+        var distanceReading = document.getElementById(&quot;distanceReading&quot;);
+        var colorReading = document.getElementById(&quot;colorReading&quot;);
+        var forceReading = document.getElementById(&quot;forceReading&quot;);
+
+        serviceSPIKE.executeAfterInit( function () {
+
+            console.log(&quot;SPIKE Service is initialized!&quot;);
+            
+            var distance_sensor = new serviceSPIKE.DistanceSensor(&quot;A&quot;); // get the DistanceSensor connected to port A
+            var color_sensor = new serviceSPIKE.ColorSensor(&quot;B&quot;); // get the ColorSensor connected to port B
+            var force_sensor = new serviceSPIKE.ForceSensor(&quot;C&quot;); // get the ForceSensor connected to port C
+
+            // execute alongside SPIKE's data stream
+            serviceSPIKE.executeWithStream( function () {
+                
+                /* code inside executeWithStream's callback will continuously run as long as SPIKE Service is active */
+                
+                // get sensor readings
+                var distanceInCM = distance_sensor.get_distance_cm();
+                var color = color_sensor.get_color();
+                var force = force_sensor.get_force_newton();
+
+                
+                // display sensor readings
+                distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+                colorReading.innerHTML = color;
+                forceReading.innerHTML = force + &quot; newtons&quot;;
+            });
+        });
+    &lt;/script>
+
 &lt;/html>
 </code></pre>
-<h2>Using Services</h2>
-<p>To use the Services in your web page, you will need to get its object from its corresponding ServiceDock HTML element. For example, <code> &lt;service-spike id = &quot;service_spike&quot;&gt;&lt;/service-spike&gt;</code> is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, mySPIKE, you will need to do:</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;script>
-    var SPIKEService = document.getElementbyId(&quot;service_spike&quot;);
-    var mySPIKE = SPIKEService.getService(); // your Service object
-    mySPIKE.executeAfterInit( function () {
-        // do something with SPIKE Service
-    })
-&lt;/script>
-</code></pre>
-<p>Getting the Service object for other types of Services is the same! If you want to get the System Link cloud Service object, all you have to do is:</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;script>
-    var SystemLinkService = document.getElementbyId(&quot;service_systemlink&quot;);
-    var mySL = SystemLinkService.getService(); // your Service object
-    mySL.executeAfterInit( function() {
-        // do something with SystemLink Cloud Service
-    })
-&lt;/script>
-</code></pre>
-<p>Service are not initialized automatically when the web page loads, so it is important to ensure that your code for your Services only run after they have been activated. Use <code> executeAfterInit(callback)</code>. The argument is a callback function, a fundamental way in Javascript for ensuring flow of execution. A callback function means that it will not execute until its parent function, <code>executeAfterInit</code>, has finished. For example:</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;script>
-    var SPIKEService = document.getElementbyId(&quot;service_spike&quot;);
-    var mySPIKE = SPIKEService.getService(); // your Service object
-    mySPIKE.executeAfterInit( function () {
-        // do something with SPIKE Service
-    })
-&lt;/script>
-</code></pre>
-<h2>Activating Services</h2>
-<p>By default, a Service object is only initialized when the user clicks the ServiceDock button. However, there are exceptions with <em>some</em> Services if you as the developer do not need the users' input. For example, if you wish to automatically activate the SystemLink Cloud Service with your own API key (and not the visitors'), you can do one of two things:</p>
-<p>(1) Provide the API credentials with Javascript.</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;script>
-    var SystemLinkService = document.getElementbyId(&quot;service_systemlink&quot;);
-    SystemLinkService.setAttribute(&quot;apikey&quot;, &quot;your API key&quot;); // provide predetermined API credentials
-    SystemLinkService.init(); // automatically initialize Service
-    var mySL = SystemLinkService.getService(); // your Service object
-    
-    // do something with SystemLink Cloud Service
-&lt;/script>
-</code></pre>
-<p>(2) Provide the API credentials in HTML</p>
-<pre class="prettyprint source lang-HTML"><code>&lt;html>
-    &lt;head>
-        &lt;script src = &quot;./modules/ServiceDock.js&quot;>&lt;/script>
-    &lt;/head>
-    &lt;body>
-        &lt;!-- this style must be kept for normal rendering-->
-        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
-            &lt;!-- put predetermined API key in HTML attribute -->
-            &lt;service-systemlink id=&quot;service_systemlink&quot; apikey = &quot;your API key&quot;>&lt;service-systemlink>
-        &lt;/div>
-    &lt;/body>
-    &lt;script>
-        var SystemLinkService = document.getElementbyId(&quot;service_systemlink&quot;);
-        SystemLinkService.init(); // automatically initialize Service
-        var mySL = SystemLinkService.getService(); // your Service object
-        
-        // do something with SystemLink Cloud Service
-    &lt;/script>
-&lt;html>
-</code></pre>
-<h2>Security</h2>
-<p>ServiceDock is a frontend framework, thus all of ServiceDock and your source code can be viewed when published. Therefore, it is not recommended that you provide your own API credentials in your web pages.</p>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_basicSensors.html"></iframe>
         </article>
     
 </section>

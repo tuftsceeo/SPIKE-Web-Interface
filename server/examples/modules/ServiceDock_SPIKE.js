@@ -3117,11 +3117,16 @@ function Service_SPIKE() {
 
 
         } catch (e) {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", "Cannot read port:", e);
-            if (funcAfterError != undefined) {
-                funcAfterError(e);
+            if (e.message.indexOf("close") > -1) {
+                await port.close;
             }
-            return false;
+            else {
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "Cannot read port:", e);
+                if (funcAfterError != undefined) {
+                    funcAfterError(e);
+                }
+                return false;
+            }
         }
     }
 
@@ -3429,7 +3434,7 @@ function Service_SPIKE() {
                 let device_value = { "device": "none", "data": {} }; // value to go in ports associated with the port letter keys
 
                 try {
-                    var letter = index_to_port[key]
+                    var letter = index_to_port[key];
 
                     // get SMALL MOTOR information
                     if (data_stream[key][0] == 48) {
@@ -3554,7 +3559,10 @@ function Service_SPIKE() {
                         device_value.device = "color";
 
                         // convert Ccolor to lower case because in the SPIKE APP the color is lower case
-                        Ccolor = Ccolor.toLowerCase();
+                        if (Ccolor !== undefined)
+                            Ccolor = Ccolor.toLowerCase();
+                        else
+                            Ccolor = "null";
                         device_value.data = { "reflected": Creflected, "color": Ccolor, "RGB": rgb_array };
 
                         // execute wait_until_color callback when color matches its argument
@@ -3574,7 +3582,6 @@ function Service_SPIKE() {
 
                             lastDetectedColor = Ccolor;
                         }
-
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
@@ -3613,7 +3620,9 @@ function Service_SPIKE() {
                     var pos = [posi_x, posi_y, posi_z];
                     hub["pos"] = pos;
 
-                } catch (e) { } //ignore errors
+                } catch (e) {
+                    console.log(e);
+                 } //ignore errors
             }
         }
     }
