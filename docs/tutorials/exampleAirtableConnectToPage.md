@@ -1,7 +1,9 @@
 ## Initializing Your Airtable
-Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. You probably want to store these in variables so you know which is which and can easily edit them if needed later.
+Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. But where do we put them?
 
-As explained in the "Using ServiceDock" tutorial, ServiceDock allows for communication between your webpage and various "services" such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. Then, you can link it to your existing table with `init(APIKey, BaseID, TableName, pollIntervalInput)` (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). All of that put together would look like this:
+As explained in the "Using ServiceDock" tutorial, ServiceDock allows for communication between your webpage and various "services" such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE.
+
+Once you have that, there are two ways of linking the Service_Airtable to your existing table. One is to do it all inline, using the function `init(APIKey, BaseID, TableName, pollIntervalInput)` (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:
 
 ```HTML
 <html>
@@ -12,8 +14,6 @@ As explained in the "Using ServiceDock" tutorial, ServiceDock allows for communi
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
         </div>
-        <label for="speed_slider">Motor Speed (-100 to 100): </label>
-        <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
         var myTable = document.getElementById("service_airtable").getService();
@@ -27,14 +27,53 @@ As explained in the "Using ServiceDock" tutorial, ServiceDock allows for communi
 </html>
 ```
 
+Alternatively, you can set the API Key, Base ID, and Table Name individually as attributes of the `service_airtable` HTML object. This works the same as any HTML attribute, such as `onclick` or `id`; you can do this either in HTML, e.g.
+```html
+    <service-airtable id = "service_airtable" apikey = "your_API_key" baseid = "your_base_ID" tableName = "your_table_name"></service-airtable>
+```
+or JavaScript
+```javascript
+var airtableElement = document.getElementById("service_airtable")
+// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
+airtableElement.setAttribute("apikey", "your_API_key")
+airtableElement.setAttribute("baseid", "your_base_ID")
+airtableElement.setAttribute("tablename", "your_table_name")
+```
+Once these are set, we would then call `init()` (with no parameters) **on the HTML element** (NOT on the Service_Airtable object), eg
+```javascript
+var airtableElement = document.getElementById("service_airtable")
+// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
+airtableElement.setAttribute("apikey", "your_API_key")
+airtableElement.setAttribute("baseid", "your_base_ID")
+airtableElement.setAttribute("tablename", "your_table_name")
+airtableElement.init()
+```
+
+The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the `<service-airtable>` HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If the circle is red, you can click on the icon and manually enter an API Key, Base ID, and Table Name, then click the icon a second time to initialize the table.
+
 ## Sending Values
-So, we have now sucessfully linked our webpage to an Airtable. But how do we use it? Typically, when controlling a SPIKE remotely, we would have two webpages: the remote one, which sends values to the table based on user input, and the local page, which would run on the computer connected to the SPIKE and pull those values down from Airtable for use in a SPIKE Prime program. Let's start with the remote page.
+So, we have now successfully linked our webpage to an Airtable. But how do we use it? Typically, when controlling a SPIKE remotely, we would have two webpages: the remote one, which sends values to the table based on user input, and the local page, which would run on the computer connected to the SPIKE and pull those values down from Airtable for use in a SPIKE Prime program. Let's start with the remote page.
 
-Suppose we want to build a robot with a motor that can be controlled **remotely** with a slider. On our remote page, then, we'd want to have a slider that sends its value into Airtable every time said value is changed. We can accomplish this using an HTML "range" input and the `setTagValue(name, value, callback)` function of Service_Airtable, where `name` is the name of the Airtable entry you want to change and `value` is the slider value you want to send (you can also add a callback function to run after the value is sent, but we won't be using that for now). 
+Suppose we want to build a robot with a motor that can be controlled **remotely** with a slider. On our remote page, then, we'd want to have a slider that sends its value into Airtable every time said value is changed. We can accomplish this using an HTML "range" input and either the `setEntryValueStrict(name, value, callback)` or function `setEntryValueNotStrict(name, value, callback)` of Service_Airtable, where `name` is the name of the Airtable entry you want to change and `value` is the slider value you want to send (you can also add a callback function to run after the value is sent, but we won't be using that for now). 
 
-Notably, `setTagValue` will throw an error if you attempt to change a tag that doesn't exist in your table, so we might want to add some code for ensuring the existence of the tags we plan on using in the `executeAfterInit` function of our table. This can be accomplished with the `Service_Airtable`'s `getTagsInfo()` function, which returns an object with a field corresponding to each row in the table. For example, if our table had a row called "speed", `myTable.getTagsInfo()["speed"]` would return an object containing the name "speed" and the current value corresponding to "speed" in the table. If "speed" didn't exist, that line would return an undefined value, allowing us to use `myTable.getTagsInfo()["tag_name"] == undefined` to check if a tag called "tag_name" exists in the table, and either create or update an existing tag accordingly.
+But hold on, which one do we use? Why is one "strict" and the other "not strict"? In order to answer that, we're unfortunately going to have to go on a little bit of a tangent.
 
-Our final code would look like this:
+## Strict vs Not Strict (Data Types)
+In many coding languages, such as Java and C++, variables have types corresponding to what sort of data they hold, such as an integer, character, or string of text. JavaScript does not explicitly have these types- when creating a variable, you do not have to specify what type of data it is meant to hold, or even stick to the type of its initial value throughout the program. A JavaScript program will compute `0 == "0"` as `true`, regardless of one being an integer and the other a string.
+
+However, in certain contexts, types are still an important thing to keep in mind. As previously mentioned, JavaScript considers number zero on its own equivalent to a string containing the number zero using the `==` operator (though not the `===` one). But with the `+` operator, those two zeroes will behave differently; JavaScript would compute `1 + 0` as `1`, but `1 + "0"` as `"10"`. If you were trying to, say, make a calculator in JavaScript, you'd therefore have to be mindful of which data type the program was receiving user input as, and convert it into integers accordingly.
+
+The difference between `setEntryValueStrict` and `setEntryValueNotStrict` is the adherence to these types. If we were to run
+```javascript
+myTable.setEntryValueStrict("speed", "10")
+myTable.setEntryValueStrict("speed", 20)
+```
+the second line would throw an error, because we tried to put an integer into an entry that had previously held a string. But if we had instead used `setEntryValueNotStrict`, Service_Airtable would've performed its own conversion and run smoothly.
+
+This might seem automatically preferable; why bother dealing with conversions on our end if we can just use non-strict mode and ignore types altogether? But think back to that calculator example; in that case, it might be nice to know for sure the type of the data we were receiving. Like the + operator, many Service_SPIKE functions, such as setting motor speeds, expect to receive numbers, and will throw errors if they get strings instead. In general, playing it too loosely with types can lead to unexpected behavior, and strict mode can help us keep things consistent.
+
+## The Final Product
+Putting all of this together, our final code would look like this:
 
 ```html
 <html>
@@ -49,30 +88,20 @@ Our final code would look like this:
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
-        var myTable = document.getElementById("service_airtable").getService();
+        var airtableElement = document.getElementById("service_airtable")
         // your API key, base ID, and table name go here
-        var apiKey = "your_API_key";
-        var baseID = "your_base_ID";
-        var tableName = "your_table_name";
+        airtableElement.setAttribute("apikey", "your_API_key")
+        airtableElement.setAttribute("baseid", "your_base_ID")
+        airtableElement.setAttribute("tablename", "your_table_name")
+        airtableElement.init()
 
-        myTable.init(apiKey, baseID, tableName)
-
-        myTable.executeAfterInit(function() {
-            if(myTable.getTagsInfo()["motor_speed"] == undefined)
-                myTable.createTag("motor_speed", 0)
-            else
-                myTable.setTagValue("motor_speed", 0)
-        })
+        var myTable = airtableElement.getService();
 
         function sendMotorSpeed(speed) {
-            myTable.setTagValue("motor_speed", parseInt(speed))
+            myTable.setEntryValueStrict("motor_speed", parseInt(speed)) 
+            // here, speed is actually coming in as a string, which would be a problem when trying to send it into a motor, hence the use of the built-in JavaScript function "parseInt" to convert it into an integer
         }
     </script>
 </html>
 ```
-Copy-and-pasting this into your own code and plugging in your own baseID, apiKey, and tableName should yield a webpage with a slider that, when moved, changes the value under "motor_speed" in your airtable. In the next tutorial, we'll look at what *do* with that value.
-
-## Additional Note: Types
-You may have noticed my use of `parseInt(speed)` instead of just `speed` when sending the slider value into Airtable. In many coding languages, such as Java and C, variables have types corresponding to what sort of data they hold, such as an integer, character, or string of text. JavaScript does not explicitly have these types- when creating a variable, you do not have to specify what type of data it is meant to hold, or even stick to the type of its initial value throughout the program. Service_Airtable, however, *does* recognize these differences, and will throw errors if you attempt to, say, set a string of text as the value of a tag that originally held an integer. In this code, `speed` on its own would actually be received as a string *containing* the integer from the slider, hence my use of `parseInt()` (a built-in JavaScript function) to essentially convert that string into an integer. 
-
-`Service_Airtable` also happens to have a function called `setTagValueNotStrict(name, value, callback)` that would do this conversion for us, which probably would've been fine for our purposes in this particular program, but can lead to unpredictable outcomes in other cases. Regardless, types are a good thing to be aware of, especially when trying to debug issues with using values from Airtable.
+Copy-and-pasting this into your own code and plugging in your own baseID, apiKey, and tableName should yield a webpage with a slider that, when moved, changes the value under "motor_speed" in your Airtable. In the next tutorial, we'll look at what *do* with that value.
