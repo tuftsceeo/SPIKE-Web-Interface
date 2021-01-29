@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Connecting to Airtable | Tutorial: Connecting to Airtable</title>
+    <title>Tutorial: Receiving and Using Values From Airtable | Tutorial: Receiving and Using Values From Airtable</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Connecting to Airtable</a>
+            <a class = "currentPage">Tutorial: Receiving and Using Values From Airtable</a>
         
         
     </div>
@@ -55,58 +55,102 @@
     <header>
         
 
-        <h2>Connecting to Airtable</h2>
+        <h2>Receiving and Using Values From Airtable</h2>
     </header>
 
     
         <article class="readme">
-            <h2>Initializing Your Airtable</h2>
-<p>Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. But where do we put them?</p>
-<p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. Once you have that, there are three ways of linking the Service_Airtable to your existing table.</p>
-<h2>Method 1: Inline</h2>
-<p>One is to do it all inline, using the function <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
+            <p>Continuing with the slider-controlled motor example, we now have the remote page down. But what about the local one? The two main steps we need to accomplish here are 1) getting the speed out of Airtable, and 2) sending that speed to the SPIKE Prime. Let's start with step 1.</p>
+<h2>Listening for Change</h2>
+<p>Assuming we have everything set up correctly, with creation and initialization of a Service_Airtable object identical to that of the remote page, getting a value out of Airtable is trivial; all we have to do is call <code>getEntryValue(name)</code> on the Service_Airtable object and use the value returned however we please. But how do we know when to check?</p>
+<p>As developers, <em>we</em> know that the speed in the table is updated whenever the slider on the remote page is moved. But how does the local page know that? And even if it did, how would it be at all aware of when some user halfway across the world happened to click that slider? On the local end, we <em>don't</em> know when a change will occur, so we have to write a function to regularly check for one.</p>
+<p>A common first instinct for this problem, especially for someone accustomed to writing MicroPython SPIKE Prime programs, might be to just put <code>getEntryValue</code> call in a while loop and call it a day. Unfortunately, this is likely to run <em>too</em> often and cause the webpage to crash with the overload of commands. Instead, we want to set up our checks to happen at regular intervals, which can be accomplished with JavaScript timing functions.</p>
+<p>In this tutorial, we're going to use <code>setTimeout(function, milliseconds)</code>, which schedules a given function to run a given number of milliseconds after the setTimeout line runs. We could also just as easily use <code>setInterval(function, milliseconds)</code>, which schedules periodic calls of a given function, as explained <a href="https://www.w3schools.com/js/js_timing.asp">here</a>; my use of <code>getTimeout</code> instead is mostly an aesthetic choice.</p>
+<p>Knowing that, the code becomes fairly simple; we get the current speed from Airtable, and, if it is different than the speed from the last check, update our speed display on the page (and/or the speed of a connected SPIKE motor, but we aren't tackling that part yet). Then, at the end of that checking function, we schedule the next check for one second later, and so on into infinity (or until we close the page).</p>
+<p>In code, that process would look something like this:</p>
+<pre class="prettyprint source lang-javascript"><code>myTable.executeAfterInit(function() {
+    // start the periodic checks and updates
+    checkAndUpdate(0)
+})
+
+// checks airtable for new motor speed, updates page display accordingly, and sets up next check if program is still active
+function checkAndUpdate(pastSpeed) {
+    var currentSpeed = myTable.getEntryValue(&quot;motor_speed&quot;)
+    // if speed has been changed since last check, update page display
+    if(currentSpeed != pastSpeed)
+    updateSpeed(currentSpeed)
+
+    // check again in one second
+    setTimeout(function() { checkAndUpdate(currentSpeed) }, 1000)
+}
+
+// changes speed displayed on page to given newSpeed
+function updateSpeed(newSpeed) {
+    document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed;
+}
+</code></pre>
+<h2>Adding In the SPIKE</h2>
+<p>Now that we have the speed, all we have to do is send it to a motor! Assuming some familiarity with JavaScript-based SPIKE Prime control, adding this in should be fairly trivial (if not, feel free to check out <a href="https://tuftsceeo.github.io/SPIKE-Web-Interface/tutorial-exampleSpikeServiceBasicMotor.html">this tutorial</a>, where we connect to and start a SPIKE motor). After adding in and initialize a Service_SPIKE, we just have to add a few lines to <code>updateSpeed</code> to send the new speed to the attached SPIKE motor. The final code will look something like this:</p>
 <pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
         &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+        &lt;style>
+            #speed_display {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        &lt;/style>
     &lt;/head>
     &lt;body>
          &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
             &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
+        &lt;div id = &quot;speed_display&quot;>Speed: unknown&lt;/div>
     &lt;/body>
     &lt;script>
-        var myTable = document.getElementById(&quot;service_airtable&quot;).getService();
-        // your API key, base ID, and table name go here
-        var apiKey = &quot;your_API_key&quot;;
-        var baseID = &quot;your_base_ID&quot;;
-        var tableName = &quot;your_table_name&quot;;
+        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
+        airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
+        airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
+        airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
+        airtableElement.init()
 
-        myTable.init(apiKey, baseID, tableName)
+        var myTable = airtableElement.getService()
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+
+        myTable.executeAfterInit(function() {
+            // start the periodic checks and updates
+            checkAndUpdate(0)
+        })
+
+        // checks airtable for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
+        function checkAndUpdate(pastSpeed) {
+            var currentSpeed = myTable.getEntryValue(&quot;motor_speed&quot;)
+            // if speed has been changed since last check, update page display
+            if(currentSpeed != pastSpeed)
+                updateSpeed(currentSpeed)
+
+            // check again in one second
+            setTimeout(function() { checkAndUpdate(currentSpeed) }, 1000)
+        }
+
+        // changes speed displayed on page and speed of SPIKE motor to given newSpeed
+        function updateSpeed(newSpeed) {
+            document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed
+
+            // run motor if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor(&quot;A&quot;).start(newSpeed)
+        }
     &lt;/script>
 &lt;/html>
 </code></pre>
-<h2>Method 2: HTML Attributes</h2>
-<p>Alternatively, you can set the API Key, Base ID, and Table Name individually as attributes of the <code>service_airtable</code> HTML object. This works the same as any HTML attribute, such as <code>onclick</code> or <code>id</code>; you can do this either in HTML, e.g.</p>
-<pre class="prettyprint source lang-html"><code>    &lt;service-airtable id = &quot;service_airtable&quot; apikey = &quot;your_API_key&quot; baseid = &quot;your_base_ID&quot; tableName = &quot;your_table_name&quot;>&lt;/service-airtable>
-</code></pre>
-<p>or JavaScript</p>
-<pre class="prettyprint source lang-javascript"><code>var airtableElement = document.getElementById(&quot;service_airtable&quot;)
-// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
-airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
-airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
-airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
-</code></pre>
-<p>Once these are set, we would then call <code>init()</code> (with no parameters) <strong>on the HTML element</strong> (NOT on the Service_Airtable object), eg</p>
-<pre class="prettyprint source lang-javascript"><code>var airtableElement = document.getElementById(&quot;service_airtable&quot;)
-// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
-airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
-airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
-airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
-airtableElement.init()
-</code></pre>
-<h2>Method 3: On the Page</h2>
-<p>The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-airtable&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If the circle is red, you can click on the icon and manually enter an API Key, Base ID, and Table Name, then click the icon a second time to initialize the table.</p>
-<p>Regardless of which way you choose, the end result is the same: you have now connected your local webpage to a cloud-based table via a Service_Airtable object, which you can  use to send and receive data.</p>
+<p>And we're done! Both the remote and local page are on display below; feel free to plug in a SPIKE and test them out!</p>
+<iframe id="remote-example-result" width="100%" height="500" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
+<iframe id="local-example-result" width="100%" height="500" frameborder="0" src="servicedock_airtableSimpleLocal.html"></iframe>
         </article>
     
 </section>

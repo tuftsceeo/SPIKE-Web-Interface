@@ -40,7 +40,13 @@
         "title": "Airtable Service",
         "children": {
             "exampleAirtableConnectToPage": {
-                "title": "Setting Up and Sending Values"
+                "title": "Connecting to Airtable"
+            },
+            "exampleAirtableSendValues": {
+                "title": "Sending Values Into Airtable"
+            },
+            "exampleAirtableReceiveValues": {
+                "title": "Receiving and Using Values From Airtable"
             }
         }
     }

@@ -1,0 +1,49 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_airtableSimpleRemote.html
+    Author: Emma Bethel
+    Last Update: 1/27/21
+    Purpose: send user-inputted value (via slider) into Airtable
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+         <div id = "servicedock" style = "float:right;">
+            <service-airtable id = "service_airtable"></service-airtable>
+        </div>
+        <div id = "controls">
+            <label for="speed_slider">Motor Speed (-100 to 100): </label>
+            <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
+        </div>
+    </body>
+    <script>
+        var airtableElement = document.getElementById("service_airtable")
+
+        var apiKey = "keyLWOtjr0x7d8s3l";
+        var baseID = "appxDMGNaul3krfkq";
+        var tableName = "example_table";
+
+        airtableElement.setAttribute("apikey", apiKey)
+        airtableElement.setAttribute("baseid",baseID)
+        airtableElement.setAttribute("tablename", tableName)
+
+        airtableElement.init()
+
+        var myTable = airtableElement.getService()
+
+        myTable.executeAfterInit(function() { sendMotorSpeed(0)} )
+
+        function sendMotorSpeed(speed) {
+            myTable.setEntryValueStrict("motor_speed", parseInt(speed))
+        }
+    </script>
+</html>

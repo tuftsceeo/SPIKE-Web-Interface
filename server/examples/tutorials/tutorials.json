@@ -44,6 +44,9 @@
             },
             "exampleAirtableSendValues": {
                 "title": "Sending Values Into Airtable"
+            },
+            "exampleAirtableReceiveValues": {
+                "title": "Receiving and Using Values From Airtable"
             }
         }
     }
