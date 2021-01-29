@@ -31,6 +31,15 @@
     "tutorialSystemLinkService": {
         "title": "SystemLink Cloud Service",
         "children": {
+            "exampleSystemLinkConnect": {
+                "title": "Connecting to System Link"
+            },
+            "exampleSystemLinkSendValues": {
+                "title": "Sending Values"
+            },
+            "exampleSystemLinkReceiveValues": {
+                "title": "Receiving and Using Values"
+            },
             "exampleSystemLinkServiceGeneral": {
                 "title": "General SystemLink Interface Example"
             }
@@ -43,10 +52,10 @@
                 "title": "Connecting to Airtable"
             },
             "exampleAirtableSendValues": {
-                "title": "Sending Values Into Airtable"
+                "title": "Sending Values"
             },
             "exampleAirtableReceiveValues": {
-                "title": "Receiving and Using Values From Airtable"
+                "title": "Receiving and Using Values"
             }
         }
     }

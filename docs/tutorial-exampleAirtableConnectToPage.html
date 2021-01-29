@@ -64,7 +64,7 @@
 <p>Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. But where do we put them?</p>
 <p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. There are essentially three ways of linking the Service_Airtable to your existing table.</p>
 <h2>Method 1: Inline</h2>
-<p>One is to do it all inline, using the function Service_Airtable function <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
+<p>One is to do it all inline, using the Service_Airtable function <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
 <pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
         &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
@@ -75,7 +75,7 @@
         &lt;/div>
     &lt;/body>
     &lt;script>
-        var myTable = document.getElementById(&quot;service_airtable&quot;).getService();
+        var myTable =  document.getElementById(&quot;service_airtable&quot;).getService();
         // your API key, base ID, and table name go here
         var apiKey = &quot;your_API_key&quot;;
         var baseID = &quot;your_base_ID&quot;;
@@ -97,7 +97,7 @@ airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
 airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
 </code></pre>
 <h2>Method 3: On the Page</h2>
-<p>The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-airtable&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If you click on the icon while the circle is red, the page will prompt you for an API Key, Base ID, and Table Name.</p>
+<p>The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-airtable&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If you click on the icon while the circle is red, the page will prompt you for an API Key, Base ID, and Table Name, which you can manually input in order to connect.</p>
 <h2>Initialiing the HTML Object</h2>
 <p>Once your values are set, you have to initialize the HTML <code>service-airtable</code> element (which is, again, different from the Service_Airtable object accessed by calling <code>getService()</code> on said HTML element) with either the <code>init()</code> function, e.g.</p>
 <pre class="prettyprint source lang-javascript"><code>var airtableElement = document.getElementById(&quot;service_airtable&quot;)
@@ -107,7 +107,7 @@ airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
 airtableElement.init()
 </code></pre>
 <p>or, if using method 3, by clicking the Airtable icon a second time.</p>
-<p>Regardless of which way you choose, the end result is the same: you have now connected your local webpage to a cloud-based table via a Service_Airtable object, which you can  use to send and receive data.</p>
+<p>Regardless of which way you choose, the end result is the same: you have now connected your local webpage to a cloud-based table via a Service_Airtable object, which you can then use to send and receive data (more on that in the next few tutorials).</p>
         </article>
     
 </section>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Sending Values | Tutorial: Sending Values</title>
+    <title>Tutorial: Connecting to System Link | Tutorial: Connecting to System Link</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Sending Values</a>
+            <a class = "currentPage">Tutorial: Connecting to System Link</a>
         
         
     </div>
@@ -55,58 +55,54 @@
     <header>
         
 
-        <h2>Sending Values</h2>
+        <h2>Connecting to System Link</h2>
     </header>
 
     
         <article class="readme">
-            <p>So, we have now successfully linked our webpage to an Airtable. But how do we use it? Typically, when controlling a SPIKE remotely, we would have two webpages: the remote one, which sends values to the table based on user input, and the local page, which would run on the computer connected to the SPIKE and pull those values down from Airtable for use in a SPIKE Prime program. Let's start with the remote page.</p>
-<p>Suppose we want to build a robot with a motor that can be controlled <strong>remotely</strong> with a slider. On our remote page, then, we'd want to have a slider that sends its value into Airtable every time said value is changed. We can accomplish this using an HTML &quot;range&quot; input and either the <code>setEntryValueStrict(name, value, callback)</code> or function <code>setEntryValueNotStrict(name, value, callback)</code> of Service_Airtable, where <code>name</code> is the name of the Airtable entry you want to change and <code>value</code> is the slider value you want to send (you can also add a callback function to run after the value is sent, but we won't be using that for now).</p>
-<p>But hold on, which one do we use? Why is one &quot;strict&quot; and the other &quot;not strict&quot;? In order to answer that, we're going to have to go on a little bit of a tangent.</p>
-<h2>Strict vs Not Strict (Data Types)</h2>
-<p>In many coding languages, such as Java and C++, variables have types corresponding to what sort of data they hold, such as an integer, character, or string of text. JavaScript does not explicitly have these types- when creating a variable, you do not have to specify what type of data it is meant to hold, or even stick to the type of its initial value throughout the program. A JavaScript program will compute <code>0 == &quot;0&quot;</code> as <code>true</code>, regardless of one being an integer and the other a string.</p>
-<p>However, in certain contexts, types are still an important thing to keep in mind. As previously mentioned, JavaScript considers number zero on its own equivalent to a string containing the number zero using the <code>==</code> operator (though not the <code>===</code> one). But with the <code>+</code> operator, those two zeroes will behave differently; JavaScript would compute <code>1 + 0</code> as <code>1</code>, but <code>1 + &quot;0&quot;</code> as <code>&quot;10&quot;</code>. If you were trying to, say, make a calculator in JavaScript, you'd therefore have to be mindful of which data type the program was receiving user input as, and convert it into integers accordingly.</p>
-<p>The difference between <code>setEntryValueStrict</code> and <code>setEntryValueNotStrict</code> is the adherence to these types. If we were to run</p>
-<pre class="prettyprint source lang-javascript"><code>myTable.setEntryValueStrict(&quot;speed&quot;, &quot;10&quot;)
-myTable.setEntryValueStrict(&quot;speed&quot;, 20)
-</code></pre>
-<p>the second line would throw an error, because we tried to put an integer into an entry that had previously held a string. But if we had instead used <code>setEntryValueNotStrict</code>, Service_Airtable would've performed its own conversion and run smoothly.</p>
-<p>This might seem automatically preferable; why bother dealing with conversions on our end if we can just use non-strict mode and ignore types altogether? But think back to that calculator example; in that case, it might be nice to know for sure the type of the data we were receiving. Like the + operator, many Service_SPIKE functions, such as setting motor speeds, expect to receive numbers, and will throw errors if they get strings instead. In general, playing it too loosely with types can lead to unexpected behavior, and strict mode can help us keep things consistent.</p>
-<h2>The Final Product</h2>
-<p>We now have enough information to complete the remote page, which would look something like this:</p>
-<pre class="prettyprint source lang-html"><code>&lt;html>
+            <h2>Initializing Service_SystemLink</h2>
+<p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. SystemLink is one such service, and you can set up and access a Service_SystemLink object in much the same way as a Service_SPIKE. There are essentially three ways of linking the Service_SystemLink to your existing database (if you happen to have experience using Service_Airtable, these are going to look very familiar).</p>
+<h2>Method 1: Inline</h2>
+<p>One is to do it all inline, using the Service_SystemLink function <code>init(APIKey, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
-        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SystemLink.js&quot;>&lt;/script>
     &lt;/head>
     &lt;body>
          &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
-            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+            &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
         &lt;/div>
-        &lt;label for=&quot;speed_slider&quot;>Motor Speed (-100 to 100): &lt;/label>
-        &lt;input type=&quot;range&quot; id=&quot;speed_slider&quot; onchange=&quot;sendMotorSpeed(this.value)&quot; min=&quot;-100&quot; max=&quot;100&quot;>
     &lt;/body>
     &lt;script>
-        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
-        // your API key, base ID, and table name go here
-        airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
-        airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
-        airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
-        airtableElement.init()
+        var mySystemLink = document.getElementById(&quot;service_systemlink&quot;).getService();
+        // your API key goes here
+        var apiKey = &quot;your_API_key&quot;;  
 
-        var myTable = airtableElement.getService();
-
-        // ensuring speed starts at zero
-        myTable.executeAfterInit(function() { sendMotorSpeed(0)} )
-
-        function sendMotorSpeed(speed) {
-            myTable.setEntryValueStrict(&quot;motor_speed&quot;, parseInt(speed)) 
-            // here, speed is actually coming in as a string, which would be a problem when trying to send it into a motor, hence the use of the built-in JavaScript function &quot;parseInt&quot; to convert it into an integer
-        }
+        mySystemLink.init(apiKey)
     &lt;/script>
 &lt;/html>
 </code></pre>
-<p>The example below is that same remote page, but with the Airtable uninitialized. If you input your own API Key, Base ID, and Table Name by clicking the Airtable icon, you should be able to see the motor_speed value change in your own table with each move of the slider.</p>
-<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
+<h2>Method 2: HTML Attributes</h2>
+<p>Alternatively, you can set the API Key as attribute of the <code>service-systemlink</code> HTML object. This works the same as any HTML attribute, such as <code>onclick</code> or <code>id</code>; you can do it either in HTML, e.g.</p>
+<pre class="prettyprint source lang-html"><code>    &lt;service-systemlink id = &quot;service_systemlink&quot; apikey = &quot;your_API_key&quot;>&lt;/service-systemlink>
+</code></pre>
+<p>or JavaScript</p>
+<pre class="prettyprint source lang-javascript"><code>var systemlinkElement = document.getElementById(&quot;service_systemlink&quot;)
+// note that we are setting an attribute of the HTML element, and not the Service_SystemJink object itself (which we would access by calling .getService() on systemLinkElement)
+systemLinkElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
+</code></pre>
+<h2>Method 3: On the Page</h2>
+<p>The third and final way to initialize your Service_SystemLink is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-systemlink&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the System Link has been initialized. If you click on the icon while the circle is red, the page will prompt you for an API Key which you can manually input in order to connect.</p>
+<h2>Initialiing the HTML Object</h2>
+<p>Once your values are set, you have to initialize the HTML <code>service-systemlink</code> element (which is, again, different from the Service_SystemlLink object accessed by calling <code>getService()</code> on said HTML element) with either the <code>init()</code> function, e.g.</p>
+<pre class="prettyprint source lang-javascript"><code>var systemLinkElement = document.getElementById(&quot;service_systemlink&quot;)
+
+// code for setting API Key goes here
+
+systemLinkElement.init()
+</code></pre>
+<p>or, if using method 3, by clicking the System Link icon a second time.</p>
+<p>Regardless of which way you choose, the end result is the same: you have now connected your local webpage to the cloud via a Service_SystemLink object, which you can then use to send and receive data (more on that in the next few tutorials).</p>
         </article>
     
 </section>

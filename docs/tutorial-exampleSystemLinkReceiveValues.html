@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Sending Values | Tutorial: Sending Values</title>
+    <title>Tutorial: Receiving and Using Values | Tutorial: Receiving and Using Values</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Sending Values</a>
+            <a class = "currentPage">Tutorial: Receiving and Using Values</a>
         
         
     </div>
@@ -55,58 +55,121 @@
     <header>
         
 
-        <h2>Sending Values</h2>
+        <h2>Receiving and Using Values</h2>
     </header>
 
     
         <article class="readme">
-            <p>So, we have now successfully linked our webpage to an Airtable. But how do we use it? Typically, when controlling a SPIKE remotely, we would have two webpages: the remote one, which sends values to the table based on user input, and the local page, which would run on the computer connected to the SPIKE and pull those values down from Airtable for use in a SPIKE Prime program. Let's start with the remote page.</p>
-<p>Suppose we want to build a robot with a motor that can be controlled <strong>remotely</strong> with a slider. On our remote page, then, we'd want to have a slider that sends its value into Airtable every time said value is changed. We can accomplish this using an HTML &quot;range&quot; input and either the <code>setEntryValueStrict(name, value, callback)</code> or function <code>setEntryValueNotStrict(name, value, callback)</code> of Service_Airtable, where <code>name</code> is the name of the Airtable entry you want to change and <code>value</code> is the slider value you want to send (you can also add a callback function to run after the value is sent, but we won't be using that for now).</p>
-<p>But hold on, which one do we use? Why is one &quot;strict&quot; and the other &quot;not strict&quot;? In order to answer that, we're going to have to go on a little bit of a tangent.</p>
-<h2>Strict vs Not Strict (Data Types)</h2>
-<p>In many coding languages, such as Java and C++, variables have types corresponding to what sort of data they hold, such as an integer, character, or string of text. JavaScript does not explicitly have these types- when creating a variable, you do not have to specify what type of data it is meant to hold, or even stick to the type of its initial value throughout the program. A JavaScript program will compute <code>0 == &quot;0&quot;</code> as <code>true</code>, regardless of one being an integer and the other a string.</p>
-<p>However, in certain contexts, types are still an important thing to keep in mind. As previously mentioned, JavaScript considers number zero on its own equivalent to a string containing the number zero using the <code>==</code> operator (though not the <code>===</code> one). But with the <code>+</code> operator, those two zeroes will behave differently; JavaScript would compute <code>1 + 0</code> as <code>1</code>, but <code>1 + &quot;0&quot;</code> as <code>&quot;10&quot;</code>. If you were trying to, say, make a calculator in JavaScript, you'd therefore have to be mindful of which data type the program was receiving user input as, and convert it into integers accordingly.</p>
-<p>The difference between <code>setEntryValueStrict</code> and <code>setEntryValueNotStrict</code> is the adherence to these types. If we were to run</p>
-<pre class="prettyprint source lang-javascript"><code>myTable.setEntryValueStrict(&quot;speed&quot;, &quot;10&quot;)
-myTable.setEntryValueStrict(&quot;speed&quot;, 20)
+            <h2>The Local Page</h2>
+<p>Continuing with the slider-controlled motor example, we now have the remote page down. But what about the local one? The two main steps we need to accomplish here are 1) getting the speed out of SystemLink, and 2) sending that speed to the SPIKE Prime. Let's start with step 1.</p>
+<h2>Listening for Change</h2>
+<p>Assuming we have everything set up correctly, with creation and initialization of a Service_SystemLink object identical to that of the remote page, getting a value out of SystemLink is fairly trivial; all we have to do is call <code>getTagValue(name)</code> on the Service_SystemLink object and use the value returned however we please. But how do we know when to check?</p>
+<p>As developers, <em>we</em> know that the speed in the cloud is updated whenever the slider on the remote page is moved. But how does the local page know that? And even if it did, how would it be at all aware of when some user halfway across the world happened to click that slider? On the local end, we <em>don't</em> know when a change will occur, so we have to write a function to regularly check for one.</p>
+<p>A common first instinct for this problem, especially for someone accustomed to writing MicroPython SPIKE Prime programs, might be to just put the <code>getTagValue</code> call in a while loop and call it a day. Unfortunately, this is likely to run <em>too</em> often and cause the webpage to crash with the overload of commands. Instead, we want to set up our checks to happen at regular intervals, which can be accomplished with JavaScript timing functions.</p>
+<p>In this tutorial, we're going to use <code>setTimeout(function, milliseconds)</code>, which schedules a given function to run a given number of milliseconds after the setTimeout line runs. We could also just as easily use <code>setInterval(function, milliseconds)</code>, which schedules periodic calls of a given function, as explained <a href="https://www.w3schools.com/js/js_timing.asp">here</a>; my use of <code>getTimeout</code> instead is mostly an aesthetic choice.</p>
+<p>Knowing that, the code becomes fairly simple; we get the current speed from SystemLink, and, if it is different than the speed from the last check, update our speed display on the page (and/or the speed of a connected SPIKE motor, but we aren't tackling that part yet). Then, at the end of that checking function, we schedule the next check for one second later, and so on into infinity (or until we close the page).</p>
+<p>In code, that process would look something like this:</p>
+<pre class="prettyprint source lang-javascript"><code>mySystemLink.executeAfterInit(function() {
+    // start the periodic checks and updates
+    checkAndUpdate(0)
+})
+
+// checks SystemLink for new motor speed, updates page display accordingly, and sets up next check if program is still active
+function checkAndUpdate(pastSpeed) {
+    var currentSpeed = mySystemLink.getTagValue(&quot;motor_speed&quot;)
+    // if speed has been changed since last check, update page display
+    if(currentSpeed != pastSpeed)
+    updateSpeed(currentSpeed)
+
+    // check again in one second
+    setTimeout(function() { checkAndUpdate(currentSpeed) }, 1000)
+}
+
+// changes speed displayed on page to given newSpeed
+function updateSpeed(newSpeed) {
+    document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed;
+}
 </code></pre>
-<p>the second line would throw an error, because we tried to put an integer into an entry that had previously held a string. But if we had instead used <code>setEntryValueNotStrict</code>, Service_Airtable would've performed its own conversion and run smoothly.</p>
-<p>This might seem automatically preferable; why bother dealing with conversions on our end if we can just use non-strict mode and ignore types altogether? But think back to that calculator example; in that case, it might be nice to know for sure the type of the data we were receiving. Like the + operator, many Service_SPIKE functions, such as setting motor speeds, expect to receive numbers, and will throw errors if they get strings instead. In general, playing it too loosely with types can lead to unexpected behavior, and strict mode can help us keep things consistent.</p>
-<h2>The Final Product</h2>
-<p>We now have enough information to complete the remote page, which would look something like this:</p>
-<pre class="prettyprint source lang-html"><code>&lt;html>
+<h2>An Edge Case</h2>
+<p>Suppose a user connects a local page to System Link before a remote page is ever connected. Since a value for motor_speed has never been set, the <code>getTagValue</code> will throw an error, which will halt our regular cloud checks such that even if a remote page is later connected, the local page will not receive any values. Before starting those periodic checks, we therefore have to make sure the motor_speed entry exists in order to prevent the page from trying to get a nonexistent value.</p>
+<p>The Service_SystemLink function <code>getTagsInfo()</code> returns an object with a field representing each System Link tag. You can access one such tag by putting its name in brackets, such that, if motor-speed exists in System Link, the line <code>myTable.getTagsInfo()[&quot;motor-speed&quot;]</code> will return an object containing the name &quot;motor-speed&quot; and its current value. If the motor-speed entry is not in the cloud, it will return <code>undefined</code>.</p>
+<p>Knowing that, we can write a function very similar to <code>checkAndUpdate</code> that checks if motor-speed exists and, if so, starts the periodic calls of <code>checkAndUpdate</code>. If not, it can schedule itself to check again in one second, and continue doing so until a motor-speed entry is found. In code, that would look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>function startChecking() {
+    if(mySystemLink.getTagsInfo()[&quot;motor_speed&quot;] != undefined)
+        checkAndUpdate(null)
+    else
+        setTimeout(startChecking, 1000)
+}
+</code></pre>
+<h2>Adding In the SPIKE</h2>
+<p>Now that we have the speed, all we have to do is send it to a motor! Assuming some familiarity with JavaScript-based SPIKE Prime control, adding this in should be fairly trivial (if not, feel free to check out <a href="https://tuftsceeo.github.io/SPIKE-Web-Interface/tutorial-exampleSpikeServiceBasicMotor.html">this tutorial</a>, where we connect to and start a SPIKE motor). After adding in and initialize a Service_SPIKE, we just have to add a few lines to <code>updateSpeed</code> to send the new speed to the attached SPIKE motor. The final code will look something like this:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
-        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SystemLink.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+        &lt;style>
+            #speed_display {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        &lt;/style>
     &lt;/head>
     &lt;body>
          &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
-            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+            &lt;service-systemlink id = &quot;service_SystemLink&quot;>&lt;/service-systemlink>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
-        &lt;label for=&quot;speed_slider&quot;>Motor Speed (-100 to 100): &lt;/label>
-        &lt;input type=&quot;range&quot; id=&quot;speed_slider&quot; onchange=&quot;sendMotorSpeed(this.value)&quot; min=&quot;-100&quot; max=&quot;100&quot;>
+        &lt;div id = &quot;speed_display&quot;>Speed: unknown&lt;/div>
     &lt;/body>
     &lt;script>
-        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
-        // your API key, base ID, and table name go here
-        airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
-        airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
-        airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
-        airtableElement.init()
+        var systemLinkElement = document.getElementById(&quot;service_SystemLink&quot;)
+        systemLinkElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
+        systemLinkElement.init()
 
-        var myTable = airtableElement.getService();
+        var mySystemLink = systemLinkElement.getService()
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
 
-        // ensuring speed starts at zero
-        myTable.executeAfterInit(function() { sendMotorSpeed(0)} )
 
-        function sendMotorSpeed(speed) {
-            myTable.setEntryValueStrict(&quot;motor_speed&quot;, parseInt(speed)) 
-            // here, speed is actually coming in as a string, which would be a problem when trying to send it into a motor, hence the use of the built-in JavaScript function &quot;parseInt&quot; to convert it into an integer
+        mySystemLink.executeAfterInit(function() {
+            // start the periodic checks and updates
+            startChecking()
+        })
+
+        function startChecking() {
+            if(mySystemLink.getTagsInfo()[&quot;motor_speed&quot;] != undefined)
+                checkAndUpdate(null)
+            else
+                setTimeout(startChecking, 1000)
+        }
+
+        // checks SystemLink for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
+        function checkAndUpdate(pastSpeed) {
+            var currentSpeed = mySystemLink.getTagValue(&quot;motor_speed&quot;)
+            // if speed has been changed since last check, update page display
+            if(currentSpeed != pastSpeed)
+                updateSpeed(currentSpeed)
+
+            // check again in one second
+            setTimeout(function() { checkAndUpdate(currentSpeed) }, 1000)
+        }
+
+        // changes speed displayed on page and speed of SPIKE motor to given newSpeed
+        function updateSpeed(newSpeed) {
+            document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed
+
+            // run motor if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor(&quot;A&quot;).start(newSpeed)
         }
     &lt;/script>
 &lt;/html>
 </code></pre>
-<p>The example below is that same remote page, but with the Airtable uninitialized. If you input your own API Key, Base ID, and Table Name by clicking the Airtable icon, you should be able to see the motor_speed value change in your own table with each move of the slider.</p>
-<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
+<p>And we're done! Both the remote and local page are on display below; feel free to plug in a SPIKE and test them out (note that the SystemLink service is uninitialized in these displays, so you're going to have to click the SystemLink icon and input your own API Key each page for it to work).</p>
+<p><strong>Remote:</strong></p>
+<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_systemLinkSimpleRemote.html"></iframe>
+<p><strong>Local:</strong></p>
+<iframe id="local-example-result" width="100%" height="450" frameborder="0" src="servicedock_systemLinkSimpleLocal.html"></iframe>
         </article>
     
 </section>

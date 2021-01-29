@@ -1,15 +1,13 @@
 <!--
     Project: SPIKE Prime Web Interface
-    File: servicedock_airtableSimpleLocal.html
+    File: servicedock_systemLinkSimpleLocal.html
     Author: Emma Bethel
     Last Update: 1/29/21
-    History:
-        created by Emma on 1/28/21
-    Purpose: run SPIKE motor based on value stored in airtable
+    Purpose: run SPIKE motor based on value stored in System Link
 -->
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
         <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
         <style>
             #speed_display {
@@ -21,34 +19,34 @@
     </head>
     <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
          <div id = "servicedock" style = "float:right;">
-            <service-airtable id = "service_airtable"></service-airtable>
+            <service-systemlink id = "service_SystemLink"></service-systemlink>
             <service-spike id="service_spike"></service-spike>
         </div>
         <div id = "speed_display">Speed: unknown</div>
     </body>
     <script>
-        var airtableElement = document.getElementById("service_airtable")
+        var systemLinkElement = document.getElementById("service_SystemLink")
 
-        var myTable = airtableElement.getService()
+        var mySystemLink = systemLinkElement.getService()
         var mySPIKE = document.getElementById("service_spike").getService()
 
 
-        myTable.executeAfterInit(function() {
+        mySystemLink.executeAfterInit(function() {
             // start the periodic checks and updates
             startChecking()
         })
 
-        // starts periodic updates of and checks of motor speed if value exists in table (if not, tries again in 1 second)
+        // starts periodic updates of and checks of motor speed if value exists in cloud (if not, tries again in 1 second)
         function startChecking() {
-            if(myTable.getEntriesInfo()["motor_speed"] != undefined)
+            if(mySystemLink.getTagsInfo()["motor_speed"] != undefined)
                 checkAndUpdate(null)
             else
                 setTimeout(startChecking, 1000)
         }
 
-        // checks airtable for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
+        // checks SystemLink for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
         function checkAndUpdate(pastSpeed) {
-            var currentSpeed = myTable.getEntryValue("motor_speed")
+            var currentSpeed = mySystemLink.getTagValue("motor_speed")
             // if speed has been changed since last check, update page display
             if(currentSpeed != pastSpeed)
                 updateSpeed(currentSpeed)
@@ -60,7 +58,7 @@
         // changes speed displayed on page and speed of SPIKE motor to given newSpeed
         function updateSpeed(newSpeed) {
             document.getElementById("speed_display").innerText = "Speed: " + newSpeed
-            
+
             // run motor if SPIKE is connected
             if(mySPIKE.isActive())
                 mySPIKE.Motor("A").start(newSpeed)

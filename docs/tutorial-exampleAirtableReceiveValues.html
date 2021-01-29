@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Receiving and Using Values From Airtable | Tutorial: Receiving and Using Values From Airtable</title>
+    <title>Tutorial: Receiving and Using Values | Tutorial: Receiving and Using Values</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Receiving and Using Values From Airtable</a>
+            <a class = "currentPage">Tutorial: Receiving and Using Values</a>
         
         
     </div>
@@ -55,22 +55,23 @@
     <header>
         
 
-        <h2>Receiving and Using Values From Airtable</h2>
+        <h2>Receiving and Using Values</h2>
     </header>
 
     
         <article class="readme">
-            <p>Continuing with the slider-controlled motor example, we now have the remote page down. But what about the local one? The two main steps we need to accomplish here are 1) getting the speed out of Airtable, and 2) sending that speed to the SPIKE Prime. Let's start with step 1.</p>
+            <h2>The Local Page</h2>
+<p>Continuing with the slider-controlled motor example, we now have the remote page down. But what about the local one? The two main steps we need to accomplish here are 1) getting the speed out of Airtable, and 2) sending that speed to the SPIKE Prime. Let's start with step 1.</p>
 <h2>Listening for Change</h2>
 <p>Assuming we have everything set up correctly, with creation and initialization of a Service_Airtable object identical to that of the remote page, getting a value out of Airtable is trivial; all we have to do is call <code>getEntryValue(name)</code> on the Service_Airtable object and use the value returned however we please. But how do we know when to check?</p>
 <p>As developers, <em>we</em> know that the speed in the table is updated whenever the slider on the remote page is moved. But how does the local page know that? And even if it did, how would it be at all aware of when some user halfway across the world happened to click that slider? On the local end, we <em>don't</em> know when a change will occur, so we have to write a function to regularly check for one.</p>
-<p>A common first instinct for this problem, especially for someone accustomed to writing MicroPython SPIKE Prime programs, might be to just put <code>getEntryValue</code> call in a while loop and call it a day. Unfortunately, this is likely to run <em>too</em> often and cause the webpage to crash with the overload of commands. Instead, we want to set up our checks to happen at regular intervals, which can be accomplished with JavaScript timing functions.</p>
+<p>A common first instinct for this problem, especially for someone accustomed to writing MicroPython SPIKE Prime programs, might be to just put the <code>getEntryValue</code> call in a while loop and call it a day. Unfortunately, this is likely to run <em>too</em> often and cause the webpage to crash with the overload of commands. Instead, we want to set up our checks to happen at regular intervals, which can be accomplished with JavaScript timing functions.</p>
 <p>In this tutorial, we're going to use <code>setTimeout(function, milliseconds)</code>, which schedules a given function to run a given number of milliseconds after the setTimeout line runs. We could also just as easily use <code>setInterval(function, milliseconds)</code>, which schedules periodic calls of a given function, as explained <a href="https://www.w3schools.com/js/js_timing.asp">here</a>; my use of <code>getTimeout</code> instead is mostly an aesthetic choice.</p>
 <p>Knowing that, the code becomes fairly simple; we get the current speed from Airtable, and, if it is different than the speed from the last check, update our speed display on the page (and/or the speed of a connected SPIKE motor, but we aren't tackling that part yet). Then, at the end of that checking function, we schedule the next check for one second later, and so on into infinity (or until we close the page).</p>
 <p>In code, that process would look something like this:</p>
 <pre class="prettyprint source lang-javascript"><code>myTable.executeAfterInit(function() {
     // start the periodic checks and updates
-    checkAndUpdate(0)
+    checkAndUpdate(null)
 })
 
 // checks airtable for new motor speed, updates page display accordingly, and sets up next check if program is still active
@@ -87,6 +88,17 @@ function checkAndUpdate(pastSpeed) {
 // changes speed displayed on page to given newSpeed
 function updateSpeed(newSpeed) {
     document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed;
+}
+</code></pre>
+<h2>An Edge Case</h2>
+<p>Suppose a user connects a local page to the Airtable before a remote page is ever connected. Since a value for motor_speed has never been set, the <code>getEntryValue</code> will throw an error, which will halt our regular checking of the table such that even if a remote page is later connected, the local page will not receive any values. Before starting those periodic checks, we therefore have to make sure the motor_speed entry exists in order to prevent the page from trying to get a nonexistent value.</p>
+<p>The Service_Airtable function <code>getEntriesInfo()</code> returns an object with a field representing each entry in the table. You can access one such entry by putting its name in brackets, such that, if motor-speed exists in the table, the line <code>myTable.getEntriesInfo()[&quot;motor-speed&quot;]</code> will return an object containing the name &quot;motor-speed&quot; and its current value. If the motor-speed entry is not in the table, it will return <code>undefined</code>.</p>
+<p>Knowing that, we can write a function very similar to <code>checkAndUpdate</code> that checks if motor-speed exists and, if so, starts the periodic calls of <code>checkAndUpdate</code>. If not, it can schedule itself to check again in one second, and continue doing so until a motor-speed entry is found. In code, that would look like this:</p>
+<pre class="prettyprint source lang-javascript"><code>function startChecking() {
+    if(myTable.getEntriesInfo()[&quot;motor_speed&quot;] != undefined)
+        checkAndUpdate(null)
+    else
+        setTimeout(startChecking, 1000)
 }
 </code></pre>
 <h2>Adding In the SPIKE</h2>
@@ -123,8 +135,16 @@ function updateSpeed(newSpeed) {
 
         myTable.executeAfterInit(function() {
             // start the periodic checks and updates
-            checkAndUpdate(0)
+            startChecking()
         })
+
+        // starts periodic updates of and checks of motor speed if value exists in table (if not, tries again in 1 second)
+        function startChecking() {
+            if(myTable.getEntriesInfo()[&quot;motor_speed&quot;] != undefined)
+                checkAndUpdate(null)
+            else
+                setTimeout(startChecking, 1000)
+        }
 
         // checks airtable for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
         function checkAndUpdate(pastSpeed) {
@@ -140,7 +160,7 @@ function updateSpeed(newSpeed) {
         // changes speed displayed on page and speed of SPIKE motor to given newSpeed
         function updateSpeed(newSpeed) {
             document.getElementById(&quot;speed_display&quot;).innerText = &quot;Speed: &quot; + newSpeed
-
+            
             // run motor if SPIKE is connected
             if(mySPIKE.isActive())
                 mySPIKE.Motor(&quot;A&quot;).start(newSpeed)
@@ -149,9 +169,9 @@ function updateSpeed(newSpeed) {
 &lt;/html>
 </code></pre>
 <p>And we're done! Both the remote and local page are on display below; feel free to plug in a SPIKE and test them out (note that the Airtable service is uninitialized in these displays, so you're going to have to click the airtable icon and input your own API Key, Base ID, and Table Name on each page for it to work).</p>
-<p>Remote:</p>
+<p><strong>Remote:</strong></p>
 <iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
-Local:
+<p><strong>Local:</strong></p>
 <iframe id="local-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleLocal.html"></iframe>
         </article>
     
