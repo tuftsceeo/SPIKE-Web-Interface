@@ -969,8 +969,8 @@ function Service_SystemLink() {
     return {
         init: init,
         getTagsInfo: getTagsInfo,
-        setTagValue: setTagValue,
         setTagValueNotStrict: setTagValueNotStrict,
+        setTagValueStrict: setTagValueStrict,
         getTagValue: getTagValue,
         executeAfterInit: executeAfterInit,
         setAPIKey: setAPIKey,
