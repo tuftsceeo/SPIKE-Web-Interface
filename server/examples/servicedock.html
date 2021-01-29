@@ -30,28 +30,50 @@ LICENSE: MIT
         </div>
     </body>
     <script>
-        /* testing micropyUtils */
-        var mySPIKE = document.getElementById("service_spike").getService();
-        var userDefinedGlobalVariable = "okay";
-        var objectGlobalVariable = { "test": 0 };
+        var some = 1;
 
-        mySPIKE.executeAfterInit(doSomething);
-        async function doSomething() {
-            var objectVariable = {"test": 0};
-            var integerVariable = 2;
-            var doubleVariable = 3.1;
-            var stringDoubleQuotesVariable = "heya"
-            var stringSingleQuotesVariable = 'heya'
-            mySPIKE.micropython(slotid = 10, `
-from spike import Motor
-# Initialize the motor
-motor = Motor('C')
-# Rotate clockwise for time defined in Airtable at 75% speed
-motor.run_for_seconds(integerVariable, 75)
-`);
+        const anObject = () => {
+            var something = some;
+
+            function printSomething() {
+                console.log("anObject1: ", something);
+            }
+
+            return {
+                printSomething: printSomething
+            }
         }
-        // micropyUtils.init(); // this needs to be run after global variable declarations but before hoisted functions
-        </script>
+
+        function anObject2() {
+            var something = some;
+
+            function printSomething () {
+                console.log("anObject2: ", something);
+            }
+
+            return {
+                printSomething: printSomething
+            }
+        }
+
+        function changeSome() {
+            some++;
+        }
+        
+        changeSome();
+
+        var object1 = anObject();
+        var object2 = new anObject2();
+
+        object1.printSomething();
+        object2.printSomething();
+
+        changeSome();
+
+        object1.printSomething();
+        object2.printSomething();
+        
+    </script>
 </html>
 <script>
 

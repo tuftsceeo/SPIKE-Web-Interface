@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Home | Home</title>
+    <title>Tutorial: Intermediate - Automatically Getting Connected Modules | Tutorial: Intermediate - Automatically Getting Connected Modules</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -25,6 +25,8 @@
     </div>
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
+        
+            <a class = "currentPage">Tutorial: Intermediate - Automatically Getting Connected Modules</a>
         
         
     </div>
@@ -49,50 +51,164 @@
 <div class="main" id="main">
     
 
+<section>
+    <header>
+        
 
-
-    
-
-
-
-
-
-
-
-
+        <h2>Intermediate - Automatically Getting Connected Modules</h2>
+    </header>
 
     
+        <article class="readme">
+            <h2>Using Sensors to Move SPIKE Prime</h2>
+<p>In this example, we will link a ForceSensor to a Motor. The percentage of force we retrieve from the ForceSensor will be used as the speed with which to run the Motor. Previously, we had predetermined ports to which the Sensors and Motors are connected to, but this time we will work with a scenario when we do NOT know which ports the users will use.</p>
+<h2>Starter code</h2>
+<p>We start with some HTML that will show the percentage of force on the ForceSensor and the speed of the Motor.</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
 
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;div>
+                FORCE output:
+                &lt;h1 id=&quot;forceReading&quot;>
+                    force_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                MOTOR speed:
+                &lt;h1 id = &quot;speedReading&quot;>
+                    motor_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code*/
+        var serviceSPIKE = document.getElementById(&quot;service_spike&quot;).getService();
 
-    <section>
-        <article class="readme"><h1>ServiceDock for SPIKE Prime</h1>
-<h2>Overview</h2>
-<p>ServiceDock is a Javascript framework that allows incorporation of LEGO SPIKE Prime and third party services in interactive web pages. Have various web services at the tip of your fingertips and speed up your prototyping process with ServiceDock's intuitive visual interface and API.</p>
-<p>Users can interact with your dynamic webpage by clicking on the ServiceDock icons to activate various Services.</p>
-<p><img src="servicedockDemo.gif" alt="Demonstration"></p>
-<p>*Geolocation icon attributed to Freepik</p>
-<h2>Framework</h2>
-<p>To use ServiceDock, you will need to import the framework from a CDN as shown.</p>
-<pre class="prettyprint source lang-html"><code>&lt;head>
-    &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
-        type=&quot;text/javascript&quot;>&lt;/script>
-    &lt;!-- ServiceDock -->
-    &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
-        &lt;!-- SystemLink Cloud Service -->
-        &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;!-- SPIKE Service -->
-        &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
-        &lt;!-- Etc. -->
-    &lt;/div>
-&lt;/head>
+        /* DOM references */
+        var forceReading = document.getElementById(&quot;forceReading&quot;);
+        var speedReading = document.getElementById(&quot;speedReading&quot;);
+
+        serviceSPIKE.executeAfterInit( function () {
+
+            console.log(&quot;SPIKE Service is initialized!&quot;);
+
+        });
+    &lt;/script>
 </code></pre>
-<p>Please refer to the documentation and the tutorials to get started with using ServiceDock!</p>
-<h2>Development</h2>
-<p>ServiceDock is still a work in progress. If you encounter any difficulties, bugs, or questions, please submit an issue at our <a href="https://github.com/tuftsceeo/SPIKE-Web-Interface">Github!</a></p></article>
-    </section>
+<h2>Getting connected devices</h2>
+<p>The way to get objects connected to a Motor is by using the <code>getMotors()</code> method. You may also use <code>getMotorPorts()</code> and declare a Motor object yourself, but here we will use <code>getMotors()</code> to skip that step. Likewise with ForceSensors, we can use the <code>getForceSensors()</code> method.</p>
+<pre class="prettyprint source lang-javascript"><code>serviceSPIKE.executeAfterInit( function () {
 
+    console.log(&quot;SPIKE Service is initialized!&quot;);
 
+    var motorObjects = serviceSPIKE.getMotors();
+    var forceSensorObjects = serviceSPIKE.getForceSensors();
+})
+</code></pre>
+<p><code>motorObjects</code> and <code>forceSensorObjects</code> are arrays of connected Motor and ForceSensor objects, respectively. The array is alphabetically ordered by ports, and we will only get the most alphabetically earliest available port.</p>
+<pre class="prettyprint source lang-javascript"><code>serviceSPIKE.executeAfterInit( function () {
 
+    console.log(&quot;SPIKE Service is initialized!&quot;);
+
+    var motorObjects = serviceSPIKE.getMotors();
+    var forceSensorObjects = serviceSPIKE.getForceSensors(); 
+
+    var force_sensor = forceSensorObjects[0];
+    var motor = motorObjects[0];
+})
+</code></pre>
+<h2>Set speed of Motor</h2>
+<p>We want to continuously map ForceSensor's percentage force to Motor's speed, so we use <code>setInterval()</code>. To get the ForceSensor's force percentage, we used <code>get_force_percentage()</code>. Not only will we use this value to set the Motor's speed, we will also display this value with the Motor's speed, which can be retrieved with <code>get_speed()</code>. We did not use an <code>else</code> statement with the SPIKE Service activity check because we want to allow the user to reconnect their SPIKE Prime and still use the web page without refreshing it.</p>
+<pre class="prettyprint source lang-javascript"><code> var intervalSPIKE = setInterval (function () {
+
+    if (serviceSPIKE.isActive() === true) {
+
+        var force = force_sensor.get_force_percentage();
+        
+        motor.start(force);
+        var speed = motor.get_speed();
+        
+        forceReading.innerHTML = force + &quot; %&quot;;
+        speedReading.innerHTML = speed;
+    }
+}, 200);
+</code></pre>
+<h2>Final code</h2>
+<p>Here is the final code you should end up with!</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;div>
+                FORCE output:
+                &lt;h1 id=&quot;forceReading&quot;>
+                    force_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+            &lt;div>
+                MOTOR speed:
+                &lt;h1 id = &quot;speedReading&quot;>
+                    motor_sensor output will show here
+                &lt;/h1>
+            &lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code*/
+        var serviceSPIKE = document.getElementById(&quot;service_spike&quot;).getService();
+
+        /* DOM references */
+        var forceReading = document.getElementById(&quot;forceReading&quot;);
+        var speedReading = document.getElementById(&quot;speedReading&quot;);
+
+        serviceSPIKE.executeAfterInit(function () {
+
+            console.log(&quot;SPIKE Service is initialized!&quot;);
+
+            var forceSensorObjects = serviceSPIKE.getForceSensors(); // get all ForceSensors connected to SPIKE Prime
+            var motorObjects = serviceSPIKE.getMotors(); // get all Motors connected to SPIKE Prime
+
+            // pick devices connected to the port earliest in the alphabet
+            var force_sensor = forceSensorObjects[0];
+            var motor = motorObjects[0];
+
+            var intervalSPIKE = setInterval (function () {
+
+                if (serviceSPIKE.isActive() === true) {
+                    // display force sensor output
+                    var force = force_sensor.get_force_percentage();
+                    
+                    motor.start(force); // run motor at speed given by the force_sensor's percentage output
+                    var speed = motor.get_speed();
+                    
+                    // display readings
+                    forceReading.innerHTML = force + &quot; %&quot;;
+                    speedReading.innerHTML = speed;
+                }
+            }, 200);
+        });
+    &lt;/script>
+
+&lt;/html>
+</code></pre>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_forceToMotor.html"></iframe>
+        </article>
+    
+</section>
 
 
 
@@ -107,13 +223,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'package:undefined_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>

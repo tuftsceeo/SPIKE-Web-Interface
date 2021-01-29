@@ -1,26 +1,6 @@
 ## Simon Says
 In this tutorial, we're going to use the SPIKE Prime hub to play a simple game of Simon Says, where we give commands on a webpage that the user then has an ever-decreasing amount of time to follow. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.
 
-## Callback Functions
-In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a "callback" function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. For example, if we wanted to print the message "done!" to the console after spinning a motor 360 degrees at half speed, the following code
-```javascript
-mySPIKE.Motor('A').run_for_degrees(360, 50)
-console.log("done!")
-```
-wouldn't actually work as intended; since `run_for_degrees` is non-blocking, "done!" would print right after the motor started running, instead of waiting until 360 degrees was reached. Luckily, if we look at the definition of `run_for_degrees` in the `Service_SPIKE.Motor` documentation, we see that it can actually take a callback function as an optional third parameter. Therefore, we can amend our code to
-```javascript
-mySPIKE.Motor('A').run_for_degrees(360, 50, function() { console.log("done!") })
-```
-Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (`console.log`), I still had to wrap it in an inline function instead of using console.log as the callback directly (ie `run_for_degrees(360, 50, console.log("done!"))`. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function `foo(callback)` and wanted to pass in the function `bar()` as callback, we would say `foo(bar)` rather than `foo(bar())`. A consequence of this is that we couldn't use `bar` directly if it needed any parameters, and would instead have to say `foo(function() { bar(parameter) })`.
-
-## Timeouts
-Another helpful tool for timing events in JavaScript programs is `setTimeout(function, milliseconds)`. This is a built-in JavaScript function that sets up `function` to run after `milliseconds` milliseconds have elapsed. Notably, `setTimeout` is also non-blocking; the program
-```javascript
-setTimeout(function() { console.log("hello") }, 1000)
-console.log("world")
-```
-would print "world" first, followed by "hello" a second later. Still, it can be a useful tool for, say, showing a message on the screen for a certain amount of time, adding delays between various phases of a program. Our use of `setTimeout` in this particular program won't get any more complicated than that, but a more in-depth tutorial on JavaScript timing events can be found [here](https://www.w3schools.com/js/js_timing.asp).
-
 ## The Game
 In any round of this game, the three major steps are: 1. choose and display a desired move, as well as a time that move must be completed in, 2. read in the move made by the user and how long that move took, and 3. check that move/time combination against the desired move/time, and either end the game or begin another round. 
 

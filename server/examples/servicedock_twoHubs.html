@@ -1,0 +1,62 @@
+<html>
+
+    <head>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+
+    <body>
+        <div id="servicedock" style="float:right;">
+            <service-spike id="service_spike1"></service-spike>
+            <div style="margin: 5px;">serviceSPIKE1</div>
+            <service-spike id="service_spike2"></service-spike>
+            <div style="margin: 5px;">serviceSPIKE2</div>
+        </div>
+        <div id="demobox">
+            <h1 id="message">
+                When will either DistanceSensor be farther than 10 cm away from their surfaces?
+            </h1>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code */
+
+        var serviceSPIKE1 = document.getElementById("service_spike1").getService();
+        var serviceSPIKE2 = document.getElementById("service_spike2").getService();
+
+        /* DOM references */
+        var message = document.getElementById("message");
+
+        serviceSPIKE1.executeAfterInit(function () {
+
+            console.log("SPIKE Service 1 is initialized!");
+
+            var distanceSensorObjects = serviceSPIKE1.getDistanceSensors();
+
+            var serviceSPIKE1Distance = distanceSensorObjects[0];
+
+            serviceSPIKE1Distance.wait_for_distance_farther_than(10, 'cm', function () {
+
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 1 is farther than 10 cm from its facing surface */
+
+                message.innerHTML = "serviceSPIKE1's DistanceSensor is 10 cm away from their facing surface!"
+            })
+        });
+
+        serviceSPIKE2.executeAfterInit(function () {
+
+            console.log("SPIKE Service 2 is initialized!");
+
+            var distanceSensorObjects = serviceSPIKE2.getDistanceSensors();
+
+            var servicesSPIKE2Distance = distanceSensorObjects[0];
+
+            servicesSPIKE2Distance.wait_for_distance_farther_than(10, 'cm', function () {
+
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 2 is farther than 10 cm from its facing surface */
+
+                message.innerHTML = "servicesSPIKE2's DistanceSensor is 10 cm away from their facing surface!"
+            })
+        });
+    </script>
+
+</html>

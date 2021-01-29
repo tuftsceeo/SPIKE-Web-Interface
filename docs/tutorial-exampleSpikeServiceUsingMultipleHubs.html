@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Home | Home</title>
+    <title>Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes | Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -25,6 +25,8 @@
     </div>
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
+        
+            <a class = "currentPage">Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes</a>
         
         
     </div>
@@ -49,50 +51,136 @@
 <div class="main" id="main">
     
 
+<section>
+    <header>
+        
 
-
-    
-
-
-
-
-
-
-
-
+        <h2>Advanced - Connecting and Using Multiple SPIKE Primes</h2>
+    </header>
 
     
+        <article class="readme">
+            <h2>Pong with two SPIKE Primes</h2>
+<p>In this example we will use two DistanceSensors, each connected to separate SPIKE Primes, and determine when either one detects a surface 10 cm away from. You will be able to connect your DistanceSensors to any port of your choosing.</p>
+<h2>Multiple SPIKE Services</h2>
+<p>The SPIKE Services are scalable. First, we will need to add two <code>&lt;service-spike&gt;</code> elements to the DOM as such</p>
+<pre class="prettyprint source lang-html"><code>&lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
 
+    &lt;!-- SPIKE Service 1 &lt;service-spike> -->
+    &lt;service-spike id = &quot;service_spike1&quot;>&lt;/service-spike>
+    &lt;div style = &quot;margin: 5px;&quot;>serviceSPIKE1&lt;/div>
 
-    <section>
-        <article class="readme"><h1>ServiceDock for SPIKE Prime</h1>
-<h2>Overview</h2>
-<p>ServiceDock is a Javascript framework that allows incorporation of LEGO SPIKE Prime and third party services in interactive web pages. Have various web services at the tip of your fingertips and speed up your prototyping process with ServiceDock's intuitive visual interface and API.</p>
-<p>Users can interact with your dynamic webpage by clicking on the ServiceDock icons to activate various Services.</p>
-<p><img src="servicedockDemo.gif" alt="Demonstration"></p>
-<p>*Geolocation icon attributed to Freepik</p>
-<h2>Framework</h2>
-<p>To use ServiceDock, you will need to import the framework from a CDN as shown.</p>
-<pre class="prettyprint source lang-html"><code>&lt;head>
-    &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
-        type=&quot;text/javascript&quot;>&lt;/script>
-    &lt;!-- ServiceDock -->
-    &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
-        &lt;!-- SystemLink Cloud Service -->
-        &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;!-- SPIKE Service -->
-        &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
-        &lt;!-- Etc. -->
-    &lt;/div>
-&lt;/head>
+    &lt;!-- SPIKE Service 2 &lt;service-spike> -->
+    &lt;service-spike id=&quot;service_spike2&quot;>&lt;/service-spike>
+    &lt;div style = &quot;margin: 5px;&quot; >serviceSPIKE2&lt;/div>
+
+&lt;/div>
 </code></pre>
-<p>Please refer to the documentation and the tutorials to get started with using ServiceDock!</p>
-<h2>Development</h2>
-<p>ServiceDock is still a work in progress. If you encounter any difficulties, bugs, or questions, please submit an issue at our <a href="https://github.com/tuftsceeo/SPIKE-Web-Interface">Github!</a></p></article>
-    </section>
+<p>We will also add the HTML that displays the message of whether serviceSPIKE1 or serviceSPIKE2's DistanceSensor gets an output of more than 10 cm.</p>
+<pre class="prettyprint source lang-html"><code>&lt;div id=&quot;demobox&quot;>
+    &lt;h1 id = &quot;message&quot;>
+        When will either DistanceSensor be farther than 10 cm away from their surfaces?
+    &lt;/h1>
+&lt;/div>
+</code></pre>
+<p>Second, as usual, we will declare the SPIKE Service objects and begin with their <code>executeAfterInit()</code> methods.</p>
+<pre class="prettyprint source lang-javascript"><code>/* get two SPIKE Services */
+const serviceSPIKE1 = document.getElementById(&quot;service_spike1&quot;).getService();
+const serviceSPIKE2 = document.getElementById(&quot;service_spike2&quot;).getService();
 
+/* DOM references */
+var message = document.getElementById(&quot;message&quot;);
 
+serviceSPIKE1.executeAfterInit(function () {
+    console.log(&quot;serviceSPIKE1 was initialized! &quot;);
 
+    var distanceSensorObjects = serviceSPIKE1.getDistanceSensors();
+    var serviceSPIKE1Distance = distanceSensorObjects[0];
+})
+serviceSPIKE2.executeAfterInit(async function () {
+    console.log(&quot;serviceSPIKE2 was initialized! &quot;);
+
+    var distanceSensorObjects = serviceSPIKE2.getDistanceSensors();
+    var servicesSPIKE2Distance = distanceSensorObjects[0];
+})
+</code></pre>
+<p>That's all you need to use two SPIKE Services! If you were to use three, you would do what you would have done for one SPIKE Service thrice. Don't forget to assign them unique names, such as <code>serviceSPIKE1</code> and <code>serviceSPIKE2</code>.</p>
+<h2>Finding when DistanceSensor reaches above 10 cm of output</h2>
+<p>We will again use Javascript's asynchronous callbacks to execute code when either DistanceSensor reaches its threshold. With <code>wait_for_distance_farther_than({distance}, {unit}, {callback function} )</code>, we can specify in which condition to run the callback function. We will display to the webpage when a DistanceSensor goes over its target distance.</p>
+<p>Here is the callback function for serviceSPIKE1's DistanceSensor.</p>
+<pre class="prettyprint source lang-javascript"><code>serviceSPIKE1Distance.wait_for_distance_farther_than(10, 'cm', function () {
+                
+    message.innerHTML = &quot;serviceSPIKE1's DistanceSensor is 10 cm away from their facing surface!&quot;
+});
+</code></pre>
+<h2>Final Code</h2>
+<p>Do the same for serviceSPIKE2's DistanceSensor, and you should get this result!</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike1&quot;>&lt;/service-spike>
+            &lt;div style=&quot;margin: 5px;&quot;>serviceSPIKE1&lt;/div>
+            &lt;service-spike id=&quot;service_spike2&quot;>&lt;/service-spike>
+            &lt;div style=&quot;margin: 5px;&quot;>serviceSPIKE2&lt;/div>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;h1 id = &quot;message&quot;>
+                When will either DistanceSensor be farther than 10 cm away from their surfaces?
+            &lt;/h1>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code */
+
+        var serviceSPIKE1 = document.getElementById(&quot;service_spike1&quot;).getService();
+        var serviceSPIKE2 = document.getElementById(&quot;service_spike2&quot;).getService();
+
+        /* DOM references */
+        var message = document.getElementById(&quot;message&quot;);
+
+        serviceSPIKE1.executeAfterInit(function () {
+
+            console.log(&quot;SPIKE Service 1 is initialized!&quot;);
+
+            var distanceSensorObjects = serviceSPIKE1.getDistanceSensors();
+
+            var serviceSPIKE1Distance = distanceSensorObjects[0];
+
+            serviceSPIKE1Distance.wait_for_distance_farther_than(10, 'cm', function () {
+                
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 1 is farther than 10 cm from its facing surface */
+                
+                message.innerHTML = &quot;serviceSPIKE1's DistanceSensor is 10 cm away from their facing surface!&quot;
+            })
+        });
+
+        serviceSPIKE2.executeAfterInit( function () {
+
+            console.log(&quot;SPIKE Service 2 is initialized!&quot;);
+
+            var distanceSensorObjects = serviceSPIKE2.getDistanceSensors();
+
+            var servicesSPIKE2Distance = distanceSensorObjects[0];
+
+            servicesSPIKE2Distance.wait_for_distance_farther_than(10, 'cm', function () {
+
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 2 is farther than 10 cm from its facing surface */
+                
+                message.innerHTML = &quot;servicesSPIKE2's DistanceSensor is 10 cm away from their facing surface!&quot;
+            })
+        });
+    &lt;/script>
+
+&lt;/html>
+</code></pre>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_twoHubs.html"></iframe>
+        </article>
+    
+</section>
 
 
 
@@ -107,13 +195,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'package:undefined_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>
