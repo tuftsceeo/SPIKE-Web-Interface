@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+    </head>
+    <body>
+         <div id = "servicedock" style = "float:right;">
+            <service-systemlink id = "service_systemlink"></service-systemlink>
+        </div>
+        <label for="speed_slider">Motor Speed (-100 to 100): </label>
+        <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
+    </body>
+    <script>
+        var systemLinkElement = document.getElementById("service_SystemLink")
+        // your API key goes here
+        systemLinkElement.setAttribute("apikey", "your_API_key")
+        systemLinkElement.init()
+
+        var mySystemLink = systemLinkElement.getService();
+
+        // ensuring speed starts at zero
+        mySystemLink.executeAfterInit(function() { sendMotorSpeed(0)} )
+
+        function sendMotorSpeed(speed) {
+            mySystemLink.setTagValueStrict("motor_speed", parseInt(speed)) 
+        }
+    </script>
+</html>
