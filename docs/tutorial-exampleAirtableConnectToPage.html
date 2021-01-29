@@ -62,9 +62,9 @@
         <article class="readme">
             <h2>Initializing Your Airtable</h2>
 <p>Assuming you have successfully set up a table on your Airtable account, you should now have a Base ID, API Key, and Table Name. But where do we put them?</p>
-<p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. Once you have that, there are three ways of linking the Service_Airtable to your existing table.</p>
+<p>As explained in the &quot;Using ServiceDock&quot; tutorial, ServiceDock allows for communication between your webpage and various &quot;services&quot; such as the SPIKE Prime. Airtable is one such service, and you can set up and access a Service_Airtable object in much the same way as a Service_SPIKE. There are essentially three ways of linking the Service_Airtable to your existing table.</p>
 <h2>Method 1: Inline</h2>
-<p>One is to do it all inline, using the function <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
+<p>One is to do it all inline, using the function Service_Airtable function <code>init(APIKey, BaseID, TableName, pollIntervalInput)</code> (pollIntervalOutput is how often, in milliseconds, the webpage will pull tags down from the cloud, with a default value of 1000). With that method, your code would look like this:</p>
 <pre class="prettyprint source lang-HTML"><code>&lt;html>
     &lt;head>
         &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
@@ -86,7 +86,7 @@
 &lt;/html>
 </code></pre>
 <h2>Method 2: HTML Attributes</h2>
-<p>Alternatively, you can set the API Key, Base ID, and Table Name individually as attributes of the <code>service_airtable</code> HTML object. This works the same as any HTML attribute, such as <code>onclick</code> or <code>id</code>; you can do this either in HTML, e.g.</p>
+<p>Alternatively, you can set the API Key, Base ID, and Table Name individually as attributes of the <code>service-airtable</code> HTML object. This works the same as any HTML attribute, such as <code>onclick</code> or <code>id</code>; you can do it either in HTML, e.g.</p>
 <pre class="prettyprint source lang-html"><code>    &lt;service-airtable id = &quot;service_airtable&quot; apikey = &quot;your_API_key&quot; baseid = &quot;your_base_ID&quot; tableName = &quot;your_table_name&quot;>&lt;/service-airtable>
 </code></pre>
 <p>or JavaScript</p>
@@ -96,16 +96,17 @@ airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
 airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
 airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
 </code></pre>
-<p>Once these are set, we would then call <code>init()</code> (with no parameters) <strong>on the HTML element</strong> (NOT on the Service_Airtable object), eg</p>
+<h2>Method 3: On the Page</h2>
+<p>The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-airtable&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If you click on the icon while the circle is red, the page will prompt you for an API Key, Base ID, and Table Name.</p>
+<h2>Initialiing the HTML Object</h2>
+<p>Once your values are set, you have to initialize the HTML <code>service-airtable</code> element (which is, again, different from the Service_Airtable object accessed by calling <code>getService()</code> on said HTML element) with either the <code>init()</code> function, e.g.</p>
 <pre class="prettyprint source lang-javascript"><code>var airtableElement = document.getElementById(&quot;service_airtable&quot;)
-// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
-airtableElement.setAttribute(&quot;apikey&quot;, &quot;your_API_key&quot;)
-airtableElement.setAttribute(&quot;baseid&quot;, &quot;your_base_ID&quot;)
-airtableElement.setAttribute(&quot;tablename&quot;, &quot;your_table_name&quot;)
+
+// code for setting key/id/name goes here
+
 airtableElement.init()
 </code></pre>
-<h2>Method 3: On the Page</h2>
-<p>The third and final way to initialize your Service_Airtable is done on the webpage itself rather than in code. As with the SPIKE Service, the <code>&lt;service-airtable&gt;</code> HTML tag puts a square icon on the page, with a red or green circle indicating whether or not the table has been initialized. If the circle is red, you can click on the icon and manually enter an API Key, Base ID, and Table Name, then click the icon a second time to initialize the table.</p>
+<p>or, if using method 3, by clicking the Airtable icon a second time.</p>
 <p>Regardless of which way you choose, the end result is the same: you have now connected your local webpage to a cloud-based table via a Service_Airtable object, which you can  use to send and receive data.</p>
         </article>
     

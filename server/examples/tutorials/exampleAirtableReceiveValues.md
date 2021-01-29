@@ -97,8 +97,9 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
     </script>
 </html>
 ```
-And we're done! Both the remote and local page are on display below; feel free to plug in a SPIKE and test them out!
+And we're done! Both the remote and local page are on display below; feel free to plug in a SPIKE and test them out (note that the Airtable service is uninitialized in these displays, so you're going to have to click the airtable icon and input your own API Key, Base ID, and Table Name on each page for it to work).
 
-<iframe id="remote-example-result" width="100%" height="500" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
-
-<iframe id="local-example-result" width="100%" height="500" frameborder="0" src="servicedock_airtableSimpleLocal.html"></iframe>
+Remote:
+<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>
+Local:
+<iframe id="local-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleLocal.html"></iframe>

@@ -53,4 +53,6 @@ We now have enough information to complete the remote page, which would look som
     </script>
 </html>
 ```
-Copy-and-pasting this into your own code and plugging in your own baseID, apiKey, and tableName should yield a webpage with a slider that, when moved, changes the value under "motor_speed" in your Airtable. In the next tutorial, we'll look at what *do* with that value.
+
+The example below is that same remote page, but with the Airtable uninitialized. If you input your own API Key, Base ID, and Table Name by clicking the Airtable icon, you should be able to see the motor_speed value change in your own table with each move of the slider.
+<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableSimpleRemote.html"></iframe>

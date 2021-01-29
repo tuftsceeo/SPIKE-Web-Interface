@@ -28,16 +28,6 @@
     <script>
         var airtableElement = document.getElementById("service_airtable")
 
-        var apiKey = "keyLWOtjr0x7d8s3l";
-        var baseID = "appxDMGNaul3krfkq";
-        var tableName = "example_table";
-
-        airtableElement.setAttribute("apikey", apiKey)
-        airtableElement.setAttribute("baseid",baseID)
-        airtableElement.setAttribute("tablename", tableName)
-
-        airtableElement.init()
-
         var myTable = airtableElement.getService()
 
         myTable.executeAfterInit(function() { sendMotorSpeed(0)} )
