@@ -303,7 +303,7 @@ function Service_SystemLink() {
 
     /** Change the current value of a tag on SystemLink cloud. 
      * 
-     * @public
+     * @private
      * @param {string} name name of tag to update
      * @param {any} value new value's data type must match the Tag's data type.
      * @param {function} callback function to execute after tag is updated
@@ -364,6 +364,42 @@ function Service_SystemLink() {
             }
         });
     }
+
+    /** Change the current value of a tag on SystemLink cloud with strict data types. There will be no implicit data type conversions. E.g. Updating tags of INT type will only work with javascript number.
+     * 
+     * @public
+     * @param {any} name name of tag to update
+     * @param {any} value value to update tag to
+     * @param {any} callback function to execute after tag is updated
+    * @example
+     * // set a string type Value of a Tag and display
+     * mySL.setTagValueStrict("message", "hello there", function () {
+     *    let messageValue = mySL.getTagValue("message");
+     *    console.log("message: ", messageValue); // display the updated value
+     * })
+     * // set value of a boolean Tag
+     * mySL.setTagValueStrict("aBoolean", true);
+     *
+     * // set value of an integer Tag
+     * mySL.setTagValueStrict("anInteger", 10);
+     *
+     * // set value of a double Tag
+     * mySL.setTagValueStrict("aDouble", 5.2);
+     */
+    function setTagValueStrict(tagName, newValue, callback) {
+        // changes the value of a tag on the cloud
+        changeValue(tagName, newValue, true, function (valueChanged) {
+            if (valueChanged) {
+                // wait for changed value to be retrieved
+                setTimeout(function () {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }, 1000)
+            }
+        });
+    }
+
 
     /** Get the current value of a tag on SystemLink cloud
      * 
@@ -463,27 +499,6 @@ function Service_SystemLink() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
-
-    /** Change the current value of a tag on SystemLink cloud with strict data types. There will be no implicit data type conversions. E.g. Updating tags of INT type will only work with javascript number.
-     * 
-     * @private
-     * @param {any} name name of tag to update
-     * @param {any} value value to update tag to
-     * @param {any} callback function to execute after tag is updated
-     */
-    function setTagValueStrict(tagName, newValue, callback) {
-        // changes the value of a tag on the cloud
-        changeValue(tagName, newValue, true, function (valueChanged) {
-            if (valueChanged) {
-                // wait for changed value to be retrieved
-                setTimeout(function () {
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                }, 1000)
-            }
-        });
-    }
 
     /** sleep function
      * 

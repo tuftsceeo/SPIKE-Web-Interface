@@ -371,6 +371,20 @@ function Service_SystemLink() {
      * @param {any} name name of tag to update
      * @param {any} value value to update tag to
      * @param {any} callback function to execute after tag is updated
+    * @example
+     * // set a string type Value of a Tag and display
+     * mySL.setTagValueStrict("message", "hello there", function () {
+     *    let messageValue = mySL.getTagValue("message");
+     *    console.log("message: ", messageValue); // display the updated value
+     * })
+     * // set value of a boolean Tag
+     * mySL.setTagValueStrict("aBoolean", true);
+     *
+     * // set value of an integer Tag
+     * mySL.setTagValueStrict("anInteger", 10);
+     *
+     * // set value of a double Tag
+     * mySL.setTagValueStrict("aDouble", 5.2);
      */
     function setTagValueStrict(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
