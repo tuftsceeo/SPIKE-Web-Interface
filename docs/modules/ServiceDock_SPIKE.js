@@ -421,6 +421,9 @@ function Service_SPIKE() {
             await sleep(1000);
 
             triggerCurrentState();
+            getFirmwareInfo( function (version) {
+                console.log("%cTuftsCEEO ", "color: #3ba336;", "This SPIKE Prime is using Hub OS ", version);
+            });
             serviceActive = true;
 
             await sleep(2000); // wait for service to init
@@ -963,46 +966,51 @@ function Service_SPIKE() {
     /**  Get all motor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} All connected Motor objects
+     * @returns {array} All connected Motor objects
      * @example
-     * var motors = await mySPIKE.getMotors();
+     * var motors = mySPIKE.getMotors();
      * 
-     * // get Motor object connected to Port A
-     * var myMotor = motors["A"]
+     * if (motors.length > 0) {
      * 
-     * // run motor for 10 seconds at 100 speed
-     * myMotor.run_for_seconds(10,100);
+     *      var myMotor = motors[0]; // get motor connected to most alphabetically early port
+     * 
+     *      // run motor for 10 seconds at 100 speed
+     *      myMotor.run_for_seconds(10,100);
+     * }
      */
     function getMotors() {
         var portsInfo = ports;
-        var motors = {};
+        var motors = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                motors[key] = new Motor(key);
+                motors.push(new Motor(key));
             }
         }
         return motors;
     }
 
-    /**  Get all distance sensor objects currently connected to SPIKE
+    /** Get all distance sensor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {object} All connected DistanceSensor objects
+     * @returns {array} All connected DistanceSensor objects
      * @example
-     * var distanceSensors = await mySPIKE.getDistanceSensors();
+     * var distanceSensors = mySPIKE.getDistanceSensors();
      * 
-     * // get DistanceSensor object connected to Port A
-     * var mySensor = distanceSensors["A"];
+     * if (distanceSensors.length > 0) {
+     *
+     *      var myDistanceSensor = distanceSensors[0]; // get DistanceSensor connected to most alphabetically early port
      * 
-     * // get distance in centimeters
-     * console.log("distance in CM: ", mySensor.get_distance_cm())
+     *      // get distance in centimeters
+     *      var distance = myDistanceSensor.get_distance_cm();
+     *      console.log("distance in CM: ", distance);
+     * }
      */
     function getDistanceSensors() {
         var portsInfo = ports;
-        var distanceSensors = {};
+        var distanceSensors = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "ultrasonic") {
-                distanceSensors[key] = new DistanceSensor(key);
+                distanceSensors.push(new DistanceSensor(key));
             }
         }
         return distanceSensors;
@@ -1013,15 +1021,23 @@ function Service_SPIKE() {
      * @public
      * @returns {object} All connected ColorSensor objects
      * @example
-     * var colorSensors = await mySPIKE.getColorSensors();
-     * var mySensor = colorSensors["A"];
+     * var colorSensors = mySPIKE.getColorSensors();
+     *
+     * if (colorSensors.length > 0) {
+     *
+     *      var color_sensor = colorSensors[0]; // get ColorSensor connected to most alphabetically early port
+     *
+     *      // get detected color
+     *      var color = color_sensor.get_color();
+     *      console.log("detected color: ", color);
+     * }
      */
     function getColorSensors() {
         var portsInfo = ports;
-        var colorSensors = {};
+        var colorSensors = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "color") {
-                colorSensors[key] = new ColorSensor(key);
+                colorSensors.push( new ColorSensor(key));
             }
         }
         return colorSensors;
@@ -1034,20 +1050,23 @@ function Service_SPIKE() {
      * @example
      * var forceSensors = mySPIKE.getForceSensors();
      *
-     * // get ForceSensor object connected to port A
-     * var mySensor = forceSensors["A"];
+     * if (forceSensors.length > 0) {
      *
-     * // when ForceSensor is pressed, indicate button state on console
-     * mySensor.wait_until_pressed( function() {
-     *      console.log("ForceSensor at port A was pressed");
-     * })
+     *      var force_sensor = forceSensors[0]; // get ForceSensor connected to most alphabetically early port
+     *
+     *      // when ForceSensor is pressed, indicate button state on console
+     *      force_sensor.wait_until_pressed( function() {
+     *           console.log("ForceSensor at port A was pressed");
+     *      })
+     * }
+     * 
      */
     function getForceSensors() {
         var portsInfo = ports;
-        var forceSensors = {};
+        var forceSensors = [];
         for (var key in portsInfo) {
             if (portsInfo[key].device == "force") {
-                forceSensors[key] = new ForceSensor(key);
+                forceSensors.push( new ForceSensor(key));
             }
         }
         return forceSensors;
@@ -2075,13 +2094,17 @@ function Service_SPIKE() {
      * // Initialize the DistanceSensor
      * var distance_sensor = new mySPIKE.DistanceSensor("A");
      */
-    DistanceSensor = function (port) {
-
-        var distanceSensor = ports[port] // get the distance sensor info by port
+    var  DistanceSensor = function (port) {
+        var distanceSensor = ports[port]; // get the distance sensor info by port
 
         // check if device is a distance sensor
         if (distanceSensor.device != "ultrasonic") {
-            throw new Error("No Distance Sensor detected at port " + port);
+            console.error("Ports Info: ", ports);
+            throw new Error("No DistanceSensor detected at port " + port);
+        }
+
+        function test() {
+            return ports[port];
         }
 
         /** Retrieves the measured distance in centimeters.
@@ -3087,18 +3110,33 @@ function Service_SPIKE() {
             }
             catch (er) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", er);
+
                 // check if system requires baudRate syntax
                 if (er.message.indexOf("baudrate") > -1) {
                     console.log("%cTuftsCEEO ", "color: #3ba336;", "baudRate needs to be baudrate");
                     await port.open({ baudrate: 115200 });
                 }
+
                 // check if error is due to unsuccessful closing of previous port
                 else if (er.message.indexOf("close") > -1) {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
                     await port.close();
-                } else {
+                }
+
+                // check if error in port.open was because it was already open
+                else if (er.message.indexOf("open") > -1) {
+                    console.log("Here");
+                    try {
+                        await port.close();
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
+                }
+
+                else {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
@@ -3182,7 +3220,7 @@ function Service_SPIKE() {
 
             // update hub information using lastUJSONRPC
             if (parseTest["m"] == 0) {
-                updateHubPortsInfo();
+                await updateHubPortsInfo();
             }
             PrimeHubEventHandler();
 
@@ -3591,6 +3629,8 @@ function Service_SPIKE() {
                         device_value.data = {};
                         ports[letter] = device_value;
                     }
+
+                    ports.time = Date.now();
 
                     //parse hub information
                     var gyro_x = data_stream[6][0];

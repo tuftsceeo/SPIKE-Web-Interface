@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Making a Game (Simon Says) | Tutorial: Making a Game (Simon Says)</title>
+    <title>Tutorial: Advanced - Using Hub Gestures and Orientations | Tutorial: Advanced - Using Hub Gestures and Orientations</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Making a Game (Simon Says)</a>
+            <a class = "currentPage">Tutorial: Advanced - Using Hub Gestures and Orientations</a>
         
         
     </div>
@@ -55,28 +55,13 @@
     <header>
         
 
-        <h2>Making a Game (Simon Says)</h2>
+        <h2>Advanced - Using Hub Gestures and Orientations</h2>
     </header>
 
     
         <article class="readme">
             <h2>Simon Says</h2>
 <p>In this tutorial, we're going to use the SPIKE Prime hub to play a simple game of Simon Says, where we give commands on a webpage that the user then has an ever-decreasing amount of time to follow. In doing so, we can get a feel for the general structure of sensor reading, especially as it relates to timing and how we can make functions run as synchronously as they would in MicroPython.</p>
-<h2>Callback Functions</h2>
-<p>In the JavaScript SPIKE library, functions involving waiting for a certain event to happen often take a &quot;callback&quot; function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. For example, if we wanted to print the message &quot;done!&quot; to the console after spinning a motor 360 degrees at half speed, the following code</p>
-<pre class="prettyprint source lang-javascript"><code>mySPIKE.Motor('A').run_for_degrees(360, 50)
-console.log(&quot;done!&quot;)
-</code></pre>
-<p>wouldn't actually work as intended; since <code>run_for_degrees</code> is non-blocking, &quot;done!&quot; would print right after the motor started running, instead of waiting until 360 degrees was reached. Luckily, if we look at the definition of <code>run_for_degrees</code> in the <code>Service_SPIKE.Motor</code> documentation, we see that it can actually take a callback function as an optional third parameter. Therefore, we can amend our code to</p>
-<pre class="prettyprint source lang-javascript"><code>mySPIKE.Motor('A').run_for_degrees(360, 50, function() { console.log(&quot;done!&quot;) })
-</code></pre>
-<p>Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (<code>console.log</code>), I still had to wrap it in an inline function instead of using console.log as the callback directly (ie <code>run_for_degrees(360, 50, console.log(&quot;done!&quot;))</code>. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function <code>foo(callback)</code> and wanted to pass in the function <code>bar()</code> as callback, we would say <code>foo(bar)</code> rather than <code>foo(bar())</code>. A consequence of this is that we couldn't use <code>bar</code> directly if it needed any parameters, and would instead have to say <code>foo(function() { bar(parameter) })</code>.</p>
-<h2>Timeouts</h2>
-<p>Another helpful tool for timing events in JavaScript programs is <code>setTimeout(function, milliseconds)</code>. This is a built-in JavaScript function that sets up <code>function</code> to run after <code>milliseconds</code> milliseconds have elapsed. Notably, <code>setTimeout</code> is also non-blocking; the program</p>
-<pre class="prettyprint source lang-javascript"><code>setTimeout(function() { console.log(&quot;hello&quot;) }, 1000)
-console.log(&quot;world&quot;)
-</code></pre>
-<p>would print &quot;world&quot; first, followed by &quot;hello&quot; a second later. Still, it can be a useful tool for, say, showing a message on the screen for a certain amount of time, adding delays between various phases of a program. Our use of <code>setTimeout</code> in this particular program won't get any more complicated than that, but a more in-depth tutorial on JavaScript timing events can be found <a href="https://www.w3schools.com/js/js_timing.asp">here</a>.</p>
 <h2>The Game</h2>
 <p>In any round of this game, the three major steps are: 1. choose and display a desired move, as well as a time that move must be completed in, 2. read in the move made by the user and how long that move took, and 3. check that move/time combination against the desired move/time, and either end the game or begin another round.</p>
 <p>Step 1 could be done in many ways, and is fairly independent of the SPIKE Prime. In this example, we're going to hold the four possible commands in an array, and then use the command stored at a random index of that array for each round. For time, we're going to start at 5000 milliseconds, and subtract 100 ms for each successful round played until we reach a minimum time of 1000 ms. Those two functions would look like this:</p>

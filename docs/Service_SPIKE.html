@@ -152,7 +152,13 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// assuming you declared &lt;service-spike> with the id, "service_spike"var mySPIKE = document.getElemenyById("service_spike").getService();mySPIKE.executeAfterInit(async function() {    // write code here})mySPIKE.init();</code></pre>
+    <pre class="prettyprint"><code>// assuming you declared &lt;service-spike> with the id, "service_spike"
+var mySPIKE = document.getElemenyById("service_spike").getService();
+mySPIKE.executeAfterInit(async function() {
+    // write code here
+})
+
+mySPIKE.init();</code></pre>
 
     
 
@@ -372,7 +378,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line450">line 450</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line453">line 453</a></code>
             </div>
             
         </h4>
@@ -499,7 +505,11 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySPIKE.executeAfterInit( function () {    var motor = mySPIKE.Motor("A");    var speed = motor.get_speed();    // do something with speed})</code></pre>
+    <pre class="prettyprint"><code>mySPIKE.executeAfterInit( function () {
+    var motor = mySPIKE.Motor("A");
+    var speed = motor.get_speed();
+    // do something with speed
+})</code></pre>
 
     
 
@@ -517,7 +527,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line483">line 483</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line486">line 486</a></code>
             </div>
             
         </h4>
@@ -643,7 +653,11 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motor = new mySPIKE.Motor('A')mySPIKE.executeWithStream( async function() {     var speed = await motor.get_speed();     // do something with motor speed})</code></pre>
+    <pre class="prettyprint"><code>var motor = new mySPIKE.Motor('A')
+mySPIKE.executeWithStream( async function() {
+     var speed = await motor.get_speed();
+     // do something with motor speed
+})</code></pre>
 
     
 
@@ -661,7 +675,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line554">line 554</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line557">line 557</a></code>
             </div>
             
         </h4>
@@ -756,7 +770,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line646">line 646</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line649">line 649</a></code>
             </div>
             
         </h4>
@@ -861,7 +875,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line716">line 716</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line719">line 719</a></code>
             </div>
             
         </h4>
@@ -958,7 +972,9 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (mySPIKE.isActive()) {     // do something}</code></pre>
+    <pre class="prettyprint"><code>if (mySPIKE.isActive()) {
+     // do something
+}</code></pre>
 
     
 
@@ -976,7 +992,7 @@
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line728">line 728</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line731">line 731</a></code>
             </div>
             
         </h4>
@@ -1090,7 +1106,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line741">line 741</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line744">line 744</a></code>
             </div>
             
         </h4>
@@ -1187,7 +1203,10 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var gesture = await mySPIKE.getHubGesture();if (gesture == "shaken") {     console.log("SPIKE is being shaked");}</code></pre>
+    <pre class="prettyprint"><code>var gesture = await mySPIKE.getHubGesture();
+if (gesture == "shaken") {
+     console.log("SPIKE is being shaked");
+}</code></pre>
 
     
 
@@ -1205,7 +1224,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line754">line 754</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line757">line 757</a></code>
             </div>
             
         </h4>
@@ -1302,7 +1321,10 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var orientation = await mySPIKE.getHubOrientation();if (orientation == "front") {     console.log("SPIKE is facing up");}</code></pre>
+    <pre class="prettyprint"><code>var orientation = await mySPIKE.getHubOrientation();
+if (orientation == "front") {
+     console.log("SPIKE is facing up");
+}</code></pre>
 
     
 
@@ -1320,7 +1342,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line821">line 821</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line824">line 824</a></code>
             </div>
             
         </h4>
@@ -1420,7 +1442,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motorPorts = mySPIKE.getMotorPorts();// get the alphabetically earliest port connected to a motorvar randomPort = motorPorts[0];// get Motor object connected to the portvar mySensor = new Motor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var motorPorts = mySPIKE.getMotorPorts();
+
+// get the alphabetically earliest port connected to a motor
+var randomPort = motorPorts[0];
+
+// get Motor object connected to the port
+var mySensor = new Motor(randomPort);</code></pre>
 
     
 
@@ -1438,7 +1466,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line846">line 846</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line849">line 849</a></code>
             </div>
             
         </h4>
@@ -1538,7 +1566,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var smallMotorPorts = mySPIKE.getSmallMotorPorts();// get the alphabetically earliest port connected to a small motorvar randomPort = smallMotorPorts[0];// get Motor object connected to the portvar mySensor = new Motor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var smallMotorPorts = mySPIKE.getSmallMotorPorts();
+
+// get the alphabetically earliest port connected to a small motor
+var randomPort = smallMotorPorts[0];
+
+// get Motor object connected to the port
+var mySensor = new Motor(randomPort);</code></pre>
 
     
 
@@ -1556,7 +1590,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line871">line 871</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line874">line 874</a></code>
             </div>
             
         </h4>
@@ -1656,7 +1690,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var bigMotorPorts = mySPIKE.getBigMotorPorts();// get the alphabetically earliest port connected to a big motorvar randomPort = bigMotorPorts[0];// get Motor object connected to the portvar mySensor = new Motor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var bigMotorPorts = mySPIKE.getBigMotorPorts();
+
+// get the alphabetically earliest port connected to a big motor
+var randomPort = bigMotorPorts[0];
+
+// get Motor object connected to the port
+var mySensor = new Motor(randomPort);</code></pre>
 
     
 
@@ -1674,7 +1714,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line894">line 894</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line897">line 897</a></code>
             </div>
             
         </h4>
@@ -1774,7 +1814,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var distanceSensorPorts = mySPIKE.getDistancePorts();// get the alphabetically earliest port connected to a DistanceSensorvar randomPort = distanceSensorPorts[0];// get DistanceSensor object connected to the portvar mySensor = new DistanceSensor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var distanceSensorPorts = mySPIKE.getDistancePorts();
+
+// get the alphabetically earliest port connected to a DistanceSensor
+var randomPort = distanceSensorPorts[0];
+
+// get DistanceSensor object connected to the port
+var mySensor = new DistanceSensor(randomPort);</code></pre>
 
     
 
@@ -1792,7 +1838,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line921">line 921</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line924">line 924</a></code>
             </div>
             
         </h4>
@@ -1892,7 +1938,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var colorSensorPorts = mySPIKE.getColorPorts();// get the alphabetically earliest port connected to a ColorSensorvar randomPort = colorSensorPorts[0];// get ColorSensor object connected to the portvar mySensor = new ColorSensor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var colorSensorPorts = mySPIKE.getColorPorts();
+
+// get the alphabetically earliest port connected to a ColorSensor
+var randomPort = colorSensorPorts[0];
+
+// get ColorSensor object connected to the port
+var mySensor = new ColorSensor(randomPort);</code></pre>
 
     
 
@@ -1910,7 +1962,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line948">line 948</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line951">line 951</a></code>
             </div>
             
         </h4>
@@ -2010,7 +2062,13 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var forceSensorPorts = mySPIKE.getForcePorts();// get the alphabetically earliest port connected to a ForceSensorvar randomPort = forceSensorPorts[0];// get ForceSensor object connected to the portvar mySensor = new ForceSensor(randomPort);</code></pre>
+    <pre class="prettyprint"><code>var forceSensorPorts = mySPIKE.getForcePorts();
+
+// get the alphabetically earliest port connected to a ForceSensor
+var randomPort = forceSensorPorts[0];
+
+// get ForceSensor object connected to the port
+var mySensor = new ForceSensor(randomPort);</code></pre>
 
     
 
@@ -2023,12 +2081,12 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h4 class="name" id="~getMotors">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getMotors<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span>
+                <span class="type-signature"><span class="icon green">inner</span> </span>getMotors<span class="signature">()</span><span class="type-signature"> &rarr; {array}</span>
                 
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line976">line 976</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line981">line 981</a></code>
             </div>
             
         </h4>
@@ -2070,7 +2128,7 @@ console.log(&quot;SPIKE is tapped&quot;);
 
 
 
-<span class="param-type">object</span>
+<span class="param-type">array</span>
 
 
 
@@ -2125,7 +2183,15 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motors = await mySPIKE.getMotors();// get Motor object connected to Port Avar myMotor = motors["A"]// run motor for 10 seconds at 100 speedmyMotor.run_for_seconds(10,100);</code></pre>
+    <pre class="prettyprint"><code>var motors = mySPIKE.getMotors();
+
+if (motors.length > 0) {
+
+     var myMotor = motors[0]; // get motor connected to most alphabetically early port
+
+     // run motor for 10 seconds at 100 speed
+     myMotor.run_for_seconds(10,100);
+}</code></pre>
 
     
 
@@ -2138,12 +2204,12 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h4 class="name" id="~getDistanceSensors">
             
-                <span class="type-signature"><span class="icon green">inner</span> </span>getDistanceSensors<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span>
+                <span class="type-signature"><span class="icon green">inner</span> </span>getDistanceSensors<span class="signature">()</span><span class="type-signature"> &rarr; {array}</span>
                 
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1000">line 1000</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1008">line 1008</a></code>
             </div>
             
         </h4>
@@ -2185,7 +2251,7 @@ console.log(&quot;SPIKE is tapped&quot;);
 
 
 
-<span class="param-type">object</span>
+<span class="param-type">array</span>
 
 
 
@@ -2240,7 +2306,16 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var distanceSensors = await mySPIKE.getDistanceSensors();// get DistanceSensor object connected to Port Avar mySensor = distanceSensors["A"];// get distance in centimetersconsole.log("distance in CM: ", mySensor.get_distance_cm())</code></pre>
+    <pre class="prettyprint"><code>var distanceSensors = mySPIKE.getDistanceSensors();
+
+if (distanceSensors.length > 0) {
+
+     var myDistanceSensor = distanceSensors[0]; // get DistanceSensor connected to most alphabetically early port
+
+     // get distance in centimeters
+     var distance = myDistanceSensor.get_distance_cm();
+     console.log("distance in CM: ", distance);
+}</code></pre>
 
     
 
@@ -2258,7 +2333,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1019">line 1019</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1035">line 1035</a></code>
             </div>
             
         </h4>
@@ -2355,7 +2430,16 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var colorSensors = await mySPIKE.getColorSensors();var mySensor = colorSensors["A"];</code></pre>
+    <pre class="prettyprint"><code>var colorSensors = mySPIKE.getColorSensors();
+
+if (colorSensors.length > 0) {
+
+     var color_sensor = colorSensors[0]; // get ColorSensor connected to most alphabetically early port
+
+     // get detected color
+     var color = color_sensor.get_color();
+     console.log("detected color: ", color);
+}</code></pre>
 
     
 
@@ -2373,7 +2457,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1045">line 1045</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1064">line 1064</a></code>
             </div>
             
         </h4>
@@ -2470,7 +2554,17 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var forceSensors = mySPIKE.getForceSensors();// get ForceSensor object connected to port Avar mySensor = forceSensors["A"];// when ForceSensor is pressed, indicate button state on consolemySensor.wait_until_pressed( function() {     console.log("ForceSensor at port A was pressed");})</code></pre>
+    <pre class="prettyprint"><code>var forceSensors = mySPIKE.getForceSensors();
+
+if (forceSensors.length > 0) {
+
+     var force_sensor = forceSensors[0]; // get ForceSensor connected to most alphabetically early port
+
+     // when ForceSensor is pressed, indicate button state on console
+     force_sensor.wait_until_pressed( function() {
+          console.log("ForceSensor at port A was pressed");
+     })
+}</code></pre>
 
     
 
@@ -2488,7 +2582,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1059">line 1059</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1078">line 1078</a></code>
             </div>
             
         </h4>
@@ -2577,7 +2671,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1157">line 1157</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1176">line 1176</a></code>
             </div>
             
         </h4>
@@ -2785,7 +2879,7 @@ console.log(&quot;SPIKE is tapped&quot;);
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line1212">line 1212</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line1231">line 1231</a></code>
             </div>
             
         </h4>
@@ -2911,7 +3005,8 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// execute program in slot 1 of SPIKE Prime hubmySPIKE.executeProgram(1);</code></pre>
+    <pre class="prettyprint"><code>// execute program in slot 1 of SPIKE Prime hub
+mySPIKE.executeProgram(1);</code></pre>
 
     
 

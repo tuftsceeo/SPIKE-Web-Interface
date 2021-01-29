@@ -55,6 +55,25 @@ serviceSPIKE.executeAfterInit( function () {
 
 Notice that a function was passed in as a paramter to `executeAfterInit()`. 
 
+## Callback Functions
+In the Javascript SPIKE library and its other ServiceDock counterparts, functions involving waiting for a certain event to happen often take a "callback" function, which runs once that condition is reached. This is essentially a workaround for the fact that, unlike in MicroPython, most of the functions we use here are non-blocking. 
+
+Right now, we are figuring out a way to run SPIKE Service code after detecting that the user clicked `<service-spike>`, which can happen at any point in time after the web page loads. 
+
+If we were to want to print the message "SPIKE Service is initialized!" to the console after the user clicks `<service-spike>`, we would need to do:
+```html
+<script>
+    var buttonServiceSPIKE = document.getElementById("service_spike");
+    var serviceSPIKE = buttonServiceSPIKE.getService();
+
+    serviceSPIKE.executeAfterInit( function () {
+        console.log("SPIKE Service is initialized!");
+    });
+</script>
+```
+
+Another thing to note, for those unfamiliar: you might notice how, even though all the callback function does is call another function (`console.log`), I still had to wrap it in an inline function instead of using console.log as the callback directly (ie `executeAfterInit(console.log("SPIKE Service is initialized!"))`. This is a quirk of the language- if passing in a function as a parameter of another function, you have to use its name without parentheses, or else it will be called at the same time as the function taking the parameter. For example, if we had a function `foo(callback)` and wanted to pass in the function `bar()` as callback, we would say `foo(bar)` rather than `foo(bar())`. A consequence of this is that we couldn't use `bar` directly if it needed any parameters, and would instead have to say `foo(function() { bar(parameter) })`.
+
 ## SPIKE Service Motor object
 Next, you have to start the Motor in the callback function of `executeAfterInit()`. The Motor object can be declared be referring to `serviceSPIKE` and getting a Motor connected to port A:
 ```javascript

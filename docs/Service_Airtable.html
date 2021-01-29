@@ -155,7 +155,11 @@ that are &quot;Name&quot; and &quot;Value&quot;, each of a single line text type
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");AirtableElement.setAttribute("apikey", "APIKEY");AirtableElement.setAttribute("baseid", "BASEID");AirtableElement.setAttribute("tablename", "TABLENAME");AirtableElement.init();</code></pre>
+    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");
+AirtableElement.setAttribute("apikey", "APIKEY");
+AirtableElement.setAttribute("baseid", "BASEID");
+AirtableElement.setAttribute("tablename", "TABLENAME");
+AirtableElement.init();</code></pre>
 
     
 
@@ -412,7 +416,9 @@ Starts polling the external API
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");var myAirtable = AirtableElement.getService();myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
+    <pre class="prettyprint"><code>var AirtableElement = document.getElementById("service_airtable");
+var myAirtable = AirtableElement.getService();
+myAirtable.init("APIKEY", "BASEID", "TABLENAME")</code></pre>
 
     
 
@@ -557,7 +563,9 @@ Starts polling the external API
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.executeAfterInit( function () {    // your API code})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.executeAfterInit( function () {
+    // your API code
+})</code></pre>
 
     
 
@@ -672,7 +680,8 @@ Starts polling the external API
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (myAirtable.isActive() == true)  // do something if Airtable service is active</code></pre>
+    <pre class="prettyprint"><code>if (myAirtable.isActive() == true)
+  // do something if Airtable service is active</code></pre>
 
     
 
@@ -787,7 +796,13 @@ Starts polling the external API
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>let entriesInfo = myAirtable.getEntriesInfo(); console.log(entriesInfo); // display all entries information// display message entry infolet messageEntryType = entriesInfo["message"].type;let messageEntryValue = entriesInfo["message"].value;console.log("message has value of ", messageEntryValue, "that is of type ", messageEntryType);</code></pre>
+    <pre class="prettyprint"><code>let entriesInfo = myAirtable.getEntriesInfo(); 
+console.log(entriesInfo); // display all entries information
+
+// display message entry info
+let messageEntryType = entriesInfo["message"].type;
+let messageEntryValue = entriesInfo["message"].value;
+console.log("message has value of ", messageEntryValue, "that is of type ", messageEntryType);</code></pre>
 
     
 
@@ -979,7 +994,21 @@ NotStrict property indicates that the data type of the Value supplied will be im
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// set a string type Value of a Entry and displaymyAirtable.setEntryValueNotStrict("message", 123, function () {   let messageValue = myAirtable.getEntryValue("message");   console.log("message: ", messageValue); // display the updated value, which will be 123. })// set value of a boolean EntrymyAirtable.setEntryValueNotStrict("aBoolean", true);// set value of an integer EntrymyAirtable.setEntryValueNotStrict("anInteger", 10);myAirtable.setEntryValueNotStrict("anInteger", "10");// set value of a double EntrymyAirtable.setEntryValueNotStrict("aDouble", 5.2);myAirtable.setEntryValueNotStrict("aDouble", "5.2");</code></pre>
+    <pre class="prettyprint"><code>// set a string type Value of a Entry and display
+myAirtable.setEntryValueNotStrict("message", 123, function () {
+   let messageValue = myAirtable.getEntryValue("message");
+   console.log("message: ", messageValue); // display the updated value, which will be 123. 
+})
+// set value of a boolean Entry
+myAirtable.setEntryValueNotStrict("aBoolean", true);
+
+// set value of an integer Entry
+myAirtable.setEntryValueNotStrict("anInteger", 10);
+myAirtable.setEntryValueNotStrict("anInteger", "10");
+
+// set value of a double Entry
+myAirtable.setEntryValueNotStrict("aDouble", 5.2);
+myAirtable.setEntryValueNotStrict("aDouble", "5.2");</code></pre>
 
     
 
@@ -1342,7 +1371,8 @@ myAirtable.setEntryValueNotStrict(&quot;aDouble&quot;, 5.2);</p></td>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>let value = myAirtable.getEntryValue("message");console.log("message: ", value); </code></pre>
+    <pre class="prettyprint"><code>let value = myAirtable.getEntryValue("message");
+console.log("message: ", value); </code></pre>
 
     
 
@@ -1509,7 +1539,10 @@ myAirtable.setEntryValueNotStrict(&quot;aDouble&quot;, 5.2);</p></td>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.deleteEntry("message", function () {    let entriesInfo = myAirtable.getEntriesInfo();    console.log("entriesInfo: ", entriesInfo); // entriesInfo will no longer contain the entry that was deleted})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.deleteEntry("message", function () {
+    let entriesInfo = myAirtable.getEntriesInfo();
+    console.log("entriesInfo: ", entriesInfo); // entriesInfo will no longer contain the entry that was deleted
+})</code></pre>
 
     
 
@@ -1699,7 +1732,11 @@ myAirtable.setEntryValueNotStrict(&quot;aDouble&quot;, 5.2);</p></td>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>myAirtable.createEntry("aBoolean", false, function () {   let aBoolean = myAirtable.getEntryValue("aBoolean");   if (aBoolean == false)      console.log ("aBoolean is false");})</code></pre>
+    <pre class="prettyprint"><code>myAirtable.createEntry("aBoolean", false, function () {
+   let aBoolean = myAirtable.getEntryValue("aBoolean");
+   if (aBoolean == false)
+      console.log ("aBoolean is false");
+})</code></pre>
 
     
 

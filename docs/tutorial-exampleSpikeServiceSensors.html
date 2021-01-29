@@ -70,7 +70,7 @@
         &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js&quot;
             type=&quot;text/javascript&quot;>&lt;/script>
     &lt;/head>
-    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+    &lt;body>
         &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
             &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
@@ -119,7 +119,8 @@
 <pre class="prettyprint source lang-javascript"><code>var color_sensor = new serviceSPIKE.ColorSensor(&quot;B&quot;); 
 var force_sensor = new serviceSPIKE.ForceSensor(&quot;C&quot;);
 </code></pre>
-<h2>Getting the Sensor readings</h2>
+<p>When no sensors are detected at the specified ports during these declarations, ServiceDock will throw an error that you will have to catch, or else it may cause unexpected connectivity issues. However, for the sake for simplicity we will not try/catch at the moment. See LINK TO GETMOTORPORTS EXAMPLE to get automatically get ports a certain module is connected to.</p>
+<h2>Getting and displaying the Sensor readings</h2>
 <p>The API for getting the Sensor readings in SPIKE Service is similar to how it's done with micropython. Each of these intuitive functions get information from their respective sensors.</p>
 <pre class="prettyprint source lang-javascript"><code>var distanceInCM = distance_sensor.get_distance_cm();
 var color = color_sensor.get_color();
@@ -160,12 +161,8 @@ forceReading.innerHTML = force + &quot; newtons&quot;;
     });
 &lt;/script>
 </code></pre>
-<p>NO! Unfortunately if you end with this, your web page will only display the very first set of readings from the Sensors, but it will no longer display the subsequent readings after that. What we need is a way to execute code that display the readings as the SPIKE Prime sends its sensor data stream. Hence, we use <code>executeWithStream</code>. <code>executeWithStream</code>, like <code>executeAfterInit</code> takes a callback function that it runs continuously as long as SPIKE Service is activated! Also note that you do not necessarily need to use <code>executeWithStream</code>. You can use Javascript's built-in function <code>setInterval</code> that runs a piece of code every user-defined amount of time. But we won't get into that right now.</p>
-<p>We want to display the values with SPIKE Prime's data stream, so move the code that gets the sensor readings and displays them inside the callback function of <code>executeWithStream</code></p>
-<pre class="prettyprint source lang-javascript"><code>// execute alongside SPIKE's data stream
-serviceSPIKE.executeWithStream( function () {
-    
-    /* code inside executeWithStream's callback will continuously run as long as SPIKE Service is active */
+<p>NO! Unfortunately if you end with this, your web page will only display the very first set of readings from the Sensors, but it will no longer display the subsequent readings after that. What we need is a way to execute code that display the readings continuously. Hence, we use Javascript's function <code>setInterval</code>. <code>setInterval</code> takes a function for its first parameter and a duration of time in miliseconds in its second parameter. It will run the given function EVERY certain amount of miliseconds. Although this may vary by your technology, we will execute the function every 200 miliseconds.</p>
+<pre class="prettyprint source lang-javascript"><code>var intervalSPIKE = setInterval( function () {
     
     // get sensor readings
     var distanceInCM = distance_sensor.get_distance_cm();
@@ -177,18 +174,39 @@ serviceSPIKE.executeWithStream( function () {
     distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
     colorReading.innerHTML = color;
     forceReading.innerHTML = force + &quot; newtons&quot;;
-});
+}, 200);
 </code></pre>
-<p>We don't want to include the declarations of the Sensor objects inside the callback function of <code>executeWithStream</code> because we can declare them once and interact with them in the stream.</p>
+<p>This function will run every 200 miliseconds, even after your SPIKE Service gets deactivated. If you were to leave your computer idle for a few hours, it would overheat! We will add an if statement that checks if SPIKE Service is active with <code>isActive()</code>. We will display the sensor outputs only when SPIKE Service is active. When the SPIKE Prime disconnects from ServiceDock, we will clear the interval we set, so nothing needlessly runs every 200 miliseconds. However, if you were to want to allow reconnection of SPIKE Prime in the same web page without refreshing the page, you can remove the <code>else</code> statement of <code>if(spikeService.isActive() === true)</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>var intervalSPIKE = setInterval( function () {
+
+    if (spikeService.isActive() === true) {
+
+        /* SPIKE Service is active */
+
+        // get sensor readings
+        var distanceInCM = distance_sensor.get_distance_cm();
+        var color = color_sensor.get_color();
+        var force = force_sensor.get_force_newton();
+
+
+        // display sensor readings
+        distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+        colorReading.innerHTML = color;
+        forceReading.innerHTML = force + &quot; newtons&quot;;
+    }
+    else {
+        clearInterval(intervalSPIKE);
+    }
+}, 200);
+</code></pre>
 <h2>Final HTML</h2>
 <p>Combine everything so far, and you should end with this! Try out the example by connecting your DistanceSensor to port A, the ColorSensor to port B, and the ForceSensor to port C.</p>
 <pre class="prettyprint source lang-html"><code>&lt;html>
-
     &lt;head>
-        &lt;script src = &quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+        &lt;script src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
     &lt;/head>
 
-    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+    &lt;body>
         &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
             &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
@@ -222,33 +240,41 @@ serviceSPIKE.executeWithStream( function () {
         var colorReading = document.getElementById(&quot;colorReading&quot;);
         var forceReading = document.getElementById(&quot;forceReading&quot;);
 
-        serviceSPIKE.executeAfterInit( function () {
+        serviceSPIKE.executeAfterInit(function () {
 
             console.log(&quot;SPIKE Service is initialized!&quot;);
-            
+
             var distance_sensor = new serviceSPIKE.DistanceSensor(&quot;A&quot;); // get the DistanceSensor connected to port A
             var color_sensor = new serviceSPIKE.ColorSensor(&quot;B&quot;); // get the ColorSensor connected to port B
             var force_sensor = new serviceSPIKE.ForceSensor(&quot;C&quot;); // get the ForceSensor connected to port C
 
-            // execute alongside SPIKE's data stream
-            serviceSPIKE.executeWithStream( function () {
-                
-                /* code inside executeWithStream's callback will continuously run as long as SPIKE Service is active */
-                
-                // get sensor readings
-                var distanceInCM = distance_sensor.get_distance_cm();
-                var color = color_sensor.get_color();
-                var force = force_sensor.get_force_newton();
+            // execute this function every 200 miliseconds
+            var intervalSPIKE = setInterval(function () {
 
-                
-                // display sensor readings
-                distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
-                colorReading.innerHTML = color;
-                forceReading.innerHTML = force + &quot; newtons&quot;;
-            });
+                if (serviceSPIKE.isActive() === true) {
+
+                    /* SPIKE Service is active */
+
+                    // get sensor readings
+                    var distanceInCM = distance_sensor.get_distance_cm();
+                    var color = color_sensor.get_color();
+                    var force = force_sensor.get_force_newton();
+
+
+                    // display sensor readings
+                    distanceReading.innerHTML = distanceInCM + &quot; cm&quot;;
+                    colorReading.innerHTML = color;
+                    forceReading.innerHTML = force + &quot; newtons&quot;;
+                }
+                else {
+
+                    /* SPIKE Service is inactive */
+
+                    clearInterval(intervalSPIKE); // clear the setInterval (function will no longer run every 200 seconds)
+                }
+            }, 200);
         });
     &lt;/script>
-
 &lt;/html>
 </code></pre>
 <iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_basicSensors.html"></iframe>

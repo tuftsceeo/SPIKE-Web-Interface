@@ -125,6 +125,33 @@ function collides(obj1, obj2) {
          obj1.y + obj1.height > obj2.y;
 }
 
+// get the SPIKE_Service object linked to its service dock element
+const mySPIKE1 = document.getElementById("Service_SPIKE1").getService();
+const mySPIKE2 = document.getElementById("Service_SPIKE2").getService();
+
+var leftPlayermotor;
+var rightPlayermotor;
+
+mySPIKE1.executeAfterInit(function () {
+  mySPIKE1.PrimeHub().light_matrix.write("1");
+  var motorPorts = mySPIKE1.getMotors();
+  leftPlayermotor = motorPorts[0];
+})
+mySPIKE2.executeAfterInit(async function () {
+  mySPIKE2.PrimeHub().light_matrix.write("2");
+  var motorPorts = mySPIKE2.getMotors();
+  rightPlayermotor = motorPorts[0];
+})
+// sync motor speed with respective Pong paddles
+async function main() {
+  if (mySPIKE1.isActive()) {
+    leftPaddle.dy = leftPlayermotor.get_speed();
+  }
+  if (mySPIKE2.isActive()) {
+    rightPaddle.dy = rightPlayermotor.get_speed();
+  }
+}
+
 // game loop
 async function loop() {
   requestAnimationFrame(loop);
@@ -213,34 +240,6 @@ async function loop() {
     context.fillRect(canvas.width / 2 - grid / 2, i, grid, grid);
   }
 }
-
-  // get the SPIKE_Service object linked to its service dock element
-  const mySPIKE1 = document.getElementById("Service_SPIKE1").getService();
-  const mySPIKE2 = document.getElementById("Service_SPIKE2").getService();
-
-  var leftPlayermotor;
-  var rightPlayermotor;
-
-  mySPIKE1.executeAfterInit( async function () {
-    mySPIKE1.PrimeHub().light_matrix.write("1");
-    var motorPorts = await mySPIKE1.getMotorPorts();
-    leftPlayermotor = new mySPIKE1.Motor(motorPorts[0]);
-  })
-  mySPIKE2.executeAfterInit(async function () {
-    mySPIKE2.PrimeHub().light_matrix.write("2");
-    var motorPorts = await mySPIKE2.getMotorPorts();
-    rightPlayermotor = new mySPIKE2.Motor(motorPorts[0]);
-  })
-
-  // sync motor speed with respective Pong paddles
-  async function main() {
-    if (mySPIKE1.isActive()) {
-      leftPaddle.dy = leftPlayermotor.get_speed();
-    }
-    if (mySPIKE2.isActive()) {
-      rightPaddle.dy = rightPlayermotor.get_speed();
-    }
-  }
 // start the game
 requestAnimationFrame(loop);
 
