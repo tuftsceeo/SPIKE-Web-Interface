@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: Airtable Service | Tutorial: Airtable Service</title>
+    <title>Tutorial: Checking for Multiple Values | Tutorial: Checking for Multiple Values</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: Airtable Service</a>
+            <a class = "currentPage">Tutorial: Checking for Multiple Values</a>
         
         
     </div>
@@ -54,74 +54,172 @@
 <section>
     <header>
         
-        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
-        <ul>
-            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableConnectToPage.html">Connecting to Airtable</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableSendValues.html">Sending Values</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableReceiveValues.html">Receiving and Using Values</a></li>
-        
-            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableMultipleValues.html">Checking for Multiple Values</a></li>
-        </ul>
-        
 
-        <h2>Airtable Service</h2>
+        <h2>Checking for Multiple Values</h2>
     </header>
 
     
         <article class="readme">
-            <h2>Airtable Cloud Service</h2>
-<p>Airtable is a cloud based storage and collaboration service that features a neat UI to serve users with an interactive way to modify their databases. Airtable Service will work for a specific format of the database, as shown below.</p>
-<h2>Setting up Airtable</h2>
-<p>Please go to the website below and create an account.
-https://airtable.com/ (Links to an external site.)</p>
-<p>Airtable lets you create a 'base', which holds all of your 'tables'. 'Tables' are like spreadsheets that you can update from anywhere, and they can hold all sorts of values, like numbers, strings, and dates!</p>
-<p>Inside a table, there are 'fields'. Each 'field' has a datatype assigned to it, so numbers can only go in number fields and so on...</p>
-<h3>Creating an Account</h3>
-<p>When you create an account at Airtable, you are granted a certain amount of &quot;space&quot; and the ability to create tables through their webbased visual interface. You are also given an access token unique to you that you can use to create external access (read and write) from python scripts to your Airtable data.</p>
-<p>To get started: go to Airtable and create an account.</p>
-<p>https://airtable.com/signup</p>
-<h3>Creating a Base</h3>
-<p>Then create your first &quot;base&quot; (short for &quot;database&quot;) which by default will have a blank table.</p>
-<p>Suggestion:</p>
-<ul>
-<li>choose &quot;Start from Scratch&quot;</li>
-<li>name it something relevant, like &quot;EN1Robotics&quot;</li>
-</ul>
-<p><img src="./creatingABase.png" alt="baseCreation"></p>
-<h3>Setting Up Your Table</h3>
-<p>After creating the base, you should see your empty table.
-<img src="./settingUpYourTable1.png" alt="table1"></p>
-<p>A) Name your table anything. This name will later be used to access your database with Airtable Service. In this picture, it has been named, &quot;finalProject&quot;.</p>
-<p><img src="./settingUpYourTable2.jpg" alt="table2"></p>
-<p>B) Rename the &quot;Notes&quot; column to be &quot;Value&quot;. Fields under &quot;Name&quot; are keys to your information, where the information you wish to find will be located under the &quot;Value&quot; column. This is very important as Airtable Service looks for &quot;Name&quot; and &quot;Value&quot; to create Key/Value pairs of information.</p>
-<p><img src="./settingUpYourTable3.png" alt="table3"></p>
-<p>C) Where you can change your column name to &quot;Value&quot;, change the field type of the column to be &quot;Single line text&quot;.</p>
-<p><img src="./settingUpYourTable4.png" alt="table4"></p>
-<p>D) Delete columns that are not &quot;Name&quot; and &quot;Value&quot;, such as &quot;Attachments&quot; and &quot;Status&quot;.</p>
-<p><img src="./settingUpYourTable5.png" alt="table5"></p>
-<p>E)  You should end with a workspace that looks like the following, with only &quot;Name&quot; and &quot;Value&quot; columns. (Note: the background color may differ)</p>
-<p><img src="./settingUpYourTable6.png" alt="table6"></p>
-<h3>Using your Table</h3>
-<p>In your table, each &quot;Tag&quot;, one single piece of Key&amp;Value information, is represented by a row of &quot;Name&quot; and &quot;Value&quot; fields. The &quot;Name&quot; is the Tag's identifer, and the &quot;Value&quot; is the information associated with the Tag. In Airtable, all &quot;Value&quot; entries will be in strings, but Airtable Service will implicitly convert your &quot;Value&quot; fields to data types that you give them.</p>
-<h3>Getting your API Key</h3>
-<p>Airtable uses token-based authentication. You need to, from your Airtable account, set up an API Key that will be used by your code for gaining access to your data.</p>
-<p><img src="./gettingYourAPIKey1.png" alt="apikey1"></p>
-<p>From your account page (https://airtable.com/account (Links to an external site.)) you should generate a key:</p>
-<p><img src="./gettingYourAPIKey2.png" alt="apikey2"></p>
-<p>This API Key is your &quot;password&quot; for accessing your data. It looks like this:</p>
-<p><img src="./gettingYourAPIKey3.jpg" alt="apikey3"></p>
-<p><strong>Note: The key in the image is no longer in use.</strong></p>
-<h3>Getting your Base ID</h3>
-<p>The base ID is needed in order for external applications to access the content in the base you created.</p>
-<p>A) Go to https://airtable.com/api
-B) Select the base you created</p>
-<p><img src="./baseid1.png" alt="baseid1"></p>
-<p>C) Save your Base ID somewhere you can remember!
-<img src="./baseid2.png" alt="baseid1"></p>
-<h3>Where do these go?</h3>
-<p>Now that you have your (1) API Key, (2) Base ID, and (3) Table Name (what you named your table, e.g. &quot;finalproject&quot;), you will need to supply this to the Airtable Service to interact with your table with Javascript. See other documentation for detail. Have fun!</p>
+            <h2>Keeping Track of Multiple Values</h2>
+<p>Description coming soon</p>
+<h1>Remote</h1>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        &lt;/style>
+    &lt;/head>
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+         &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
+            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+        &lt;/div>
+        &lt;div id = &quot;controls&quot;>
+            &lt;label for=&quot;left_speed_slider&quot;>Left Speed (0 to 100): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;left_speed_slider&quot; onchange=&quot;sendSliderVal('left_speed', this.value)&quot; min=&quot;0&quot; max=&quot;100&quot;>
+            &lt;br>
+            &lt;label for=&quot;right_speed_slider&quot;>Right Speed (0 to 100): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;right_speed_slider&quot; onchange=&quot;sendSliderVal('right_speed', this.value)&quot; min=&quot;0&quot; max=&quot;100&quot;>
+            &lt;br>
+            &lt;label for=&quot;right_speed_slider&quot;>Angle (-90 to 90): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;right_speed_slider&quot; onchange=&quot;sendSliderVal('shooter_angle', this.value)&quot; min=&quot;-90&quot; max=&quot;90&quot;>
+            &lt;br>&lt;br>
+            &lt;button onclick=&quot;shoot()&quot;>Fire!&lt;/button>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
+        var myTable = airtableElement.getService()
+
+        myTable.executeAfterInit(function() { 
+            // set up table with default values
+            sendSliderVal(&quot;left_speed&quot;, 0)
+            sendSliderVal(&quot;right_speed&quot;, 0)
+            sendSliderVal(&quot;shooter_angle&quot;, 0)
+            sendSliderVal(&quot;shoot_mode&quot;, &quot;wait&quot;)
+        })
+
+        function shoot() {
+            myTable.setEntryValueStrict(&quot;shoot_mode&quot;, &quot;shoot&quot;)
+        }
+
+        function sendSliderVal(entryName, val) {
+            myTable.setEntryValueStrict(entryName, parseInt(val))
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<h1>Local</h1>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+        &lt;style>
+            #displays {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+                background-color:rgb(0,255,133)
+            }
+        &lt;/style>
+    &lt;/head>
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+         &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
+            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id = &quot;displays&quot;>
+            &lt;div id = &quot;angle_display&quot;>angle: unknown&lt;/div>
+            &lt;div id = &quot;left_speed_display&quot;>left speed: unknown&lt;/div>
+            &lt;div id = &quot;right_speed_display&quot;>right speed: unknown&lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
+        var myTable = airtableElement.getService()
+
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        var motorSpeeds = {
+            left: null,
+            right: null,
+        }
+
+        myTable.executeAfterInit(function() {
+            // start the periodic checks and updates
+           checkTable({})
+        })
+
+
+        // checks current table values against those of last check and controls motors and page displays accordingly
+        function checkTable(pastTable) {
+            var  currentTable = myTable.getEntriesInfo()
+
+            checkEntry(&quot;shooter_angle&quot;, currentTable, pastTable, updateAngle)
+            checkEntry(&quot;left_speed&quot;, currentTable, pastTable, function(newSpeed) { updateSpeed(&quot;left&quot;, newSpeed) } )
+            checkEntry(&quot;right_speed&quot;, currentTable, pastTable, function(newSpeed) { updateSpeed(&quot;right&quot;, newSpeed) })
+
+            if(currentTable[&quot;shoot_mode&quot;] != undefined && currentTable[&quot;shoot_mode&quot;].value == &quot;shoot&quot;)
+                shoot()
+
+            // check again in one second
+            setTimeout(function() { checkTable(currentTable) }, 1000)
+        }
+
+        // runs action if value of entry called name is different in pastTable than currentTable
+        function checkEntry(name, currentTable, pastTable, action) {
+            if(currentTable[name] != undefined && (pastTable[name] == undefined || currentTable[name].value != pastTable[name].value)) {
+                action(currentTable[name].value)
+                console.log(&quot;running action for &quot; + name)
+            }
+        }
+
+        // runs shooting motors at specified speeds
+        function shoot() {
+            // change display div color to indicate shooting mode
+            document.getElementById(&quot;displays&quot;).style.backgroundColor = &quot;rgb(163,255,143)&quot;
+
+            // if spike is connected, run shooter motors w/ specified speeds
+            if(mySPIKE.isActive()) {
+                mySPIKE.Motor(&quot;A&quot;).run_for_seconds(2, motorSpeeds.left)
+                mySPIKE.Motor(&quot;B&quot;).run_for_seconds(2, -motorSpeeds.right)
+            }
+
+            // revert div color back once shooting is done
+            setTimeout(function() { document.getElementById(&quot;displays&quot;).style.backgroundColor = &quot;rgb(0,255,133)&quot; }, 2000)
+
+            myTable.setEntryValueStrict(&quot;shoot_mode&quot;, &quot;wait&quot;)
+        }
+
+        /* updates stored speed value and screen display for specified side (a)
+         * NOTE: assumes side is &quot;left&quot; or &quot;right&quot;
+         */
+        function updateSpeed(side, newSpeed) {
+            if(side == &quot;left&quot;)
+                motorSpeeds.left = newSpeed
+            else if(side == &quot;right&quot;)
+                motorSpeeds.right = newSpeed
+
+            document.getElementById(side + &quot;_speed_display&quot;).innerText = side + &quot; speed: &quot; + newSpeed
+        }
+
+        // changes angle displayed on page and repositions angle motor to given newAngle
+        function updateAngle(newAngle) {
+            document.getElementById(&quot;angle_display&quot;).innerText = &quot;angle: &quot; + newAngle
+            
+            // run motor to new position if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor(&quot;C&quot;).run_to_degrees_counted(newAngle)
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableShooterRemote.html"></iframe>
+<iframe id="local-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableShooterLocal.html"></iframe>
         </article>
     
 </section>

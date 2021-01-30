@@ -1,0 +1,110 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_airtableShooterLocal.html
+    Author: Emma Bethel
+    Last Update: 1/29/21
+    Purpose: run a shooter with a left and right shooting speed as well as an angle position based on Airtable input
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #displays {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+                background-color:rgb(0,255,133)
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+         <div id = "servicedock" style = "float:right;">
+            <service-airtable id = "service_airtable"></service-airtable>
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "displays">
+            <div id = "angle_display">angle: unknown</div>
+            <div id = "left_speed_display">left speed: unknown</div>
+            <div id = "right_speed_display">right speed: unknown</div>
+        </div>
+    </body>
+    <script>
+        var airtableElement = document.getElementById("service_airtable")
+        var myTable = airtableElement.getService()
+
+        var mySPIKE = document.getElementById("service_spike").getService()
+
+        var motorSpeeds = {
+            left: null,
+            right: null,
+        }
+
+        myTable.executeAfterInit(function() {
+            // start the periodic checks and updates
+           checkTable({})
+        })
+
+
+        // checks current table values against those of last check and controls motors and page displays accordingly
+        function checkTable(pastTable) {
+            var  currentTable = myTable.getEntriesInfo()
+
+            checkEntry("shooter_angle", currentTable, pastTable, updateAngle)
+            checkEntry("left_speed", currentTable, pastTable, function(newSpeed) { updateSpeed("left", newSpeed) } )
+            checkEntry("right_speed", currentTable, pastTable, function(newSpeed) { updateSpeed("right", newSpeed) })
+
+            if(currentTable["shoot_mode"] != undefined && currentTable["shoot_mode"].value == "shoot")
+                shoot()
+
+            // check again in one second
+            setTimeout(function() { checkTable(currentTable) }, 1000)
+        }
+
+        // runs action if value of entry called name is different in pastTable than currentTable
+        function checkEntry(name, currentTable, pastTable, action) {
+            if(currentTable[name] != undefined && (pastTable[name] == undefined || currentTable[name].value != pastTable[name].value)) {
+                action(currentTable[name].value)
+                console.log("running action for " + name)
+            }
+        }
+
+        // runs shooting motors at specified speeds
+        function shoot() {
+            // change display div color to indicate shooting mode
+            document.getElementById("displays").style.backgroundColor = "rgb(163,255,143)"
+
+            // if spike is connected, run shooter motors w/ specified speeds
+            if(mySPIKE.isActive()) {
+                mySPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
+                mySPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
+            }
+
+            // revert div color back once shooting is done
+            setTimeout(function() { document.getElementById("displays").style.backgroundColor = "rgb(0,255,133)" }, 2000)
+
+            myTable.setEntryValueStrict("shoot_mode", "wait")
+        }
+
+        /* updates stored speed value and screen display for specified side (a)
+         * NOTE: assumes side is "left" or "right"
+         */
+        function updateSpeed(side, newSpeed) {
+            if(side == "left")
+                motorSpeeds.left = newSpeed
+            else if(side == "right")
+                motorSpeeds.right = newSpeed
+
+            document.getElementById(side + "_speed_display").innerText = side + " speed: " + newSpeed
+        }
+
+        // changes angle displayed on page and repositions angle motor to given newAngle
+        function updateAngle(newAngle) {
+            document.getElementById("angle_display").innerText = "angle: " + newAngle
+            
+            // run motor to new position if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor("C").run_to_degrees_counted(newAngle)
+        }
+    </script>
+</html>

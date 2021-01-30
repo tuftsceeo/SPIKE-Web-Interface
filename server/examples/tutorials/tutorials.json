@@ -56,6 +56,9 @@
             },
             "exampleAirtableReceiveValues": {
                 "title": "Receiving and Using Values"
+            },
+            "exampleAirtableMultipleValues": {
+                "title": "Checking for Multiple Values"
             }
         }
     }

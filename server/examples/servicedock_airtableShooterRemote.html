@@ -1,0 +1,56 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_airtableShooterRemote.html
+    Author: Emma Bethel
+    Last Update: 1/29/21
+    Purpose: sends values into Airtable for use in controlling a SPIKE Prime shooter
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+         <div id = "servicedock" style = "float:right;">
+            <service-airtable id = "service_airtable"></service-airtable>
+        </div>
+        <div id = "controls">
+            <label for="left_speed_slider">Left Speed (0 to 100): </label>
+            <input type="range" id="left_speed_slider" onchange="sendSliderVal('left_speed', this.value)" min="0" max="100">
+            <br>
+            <label for="right_speed_slider">Right Speed (0 to 100): </label>
+            <input type="range" id="right_speed_slider" onchange="sendSliderVal('right_speed', this.value)" min="0" max="100">
+            <br>
+            <label for="right_speed_slider">Angle (-90 to 90): </label>
+            <input type="range" id="right_speed_slider" onchange="sendSliderVal('shooter_angle', this.value)" min="-90" max="90">
+            <br><br>
+            <button onclick="shoot()">Fire!</button>
+        </div>
+    </body>
+    <script>
+        var airtableElement = document.getElementById("service_airtable")
+        var myTable = airtableElement.getService()
+
+        myTable.executeAfterInit(function() { 
+            // set up table with default values
+            sendSliderVal("left_speed", 0)
+            sendSliderVal("right_speed", 0)
+            sendSliderVal("shooter_angle", 0)
+            sendSliderVal("shoot_mode", "wait")
+        })
+
+        function shoot() {
+            myTable.setEntryValueStrict("shoot_mode", "shoot")
+        }
+
+        function sendSliderVal(entryName, val) {
+            myTable.setEntryValueStrict(entryName, parseInt(val))
+        }
+    </script>
+</html>
