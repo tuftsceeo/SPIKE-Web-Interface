@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+    </head>
+    <body>
+         <div id = "servicedock" style = "float:right;">
+            <!--<service-airtable id = "service_airtable" apikey="keyLWOtjr0x7d8s3l" baseid="appxDMGNaul3krfkq" tablename="example_table"></service-airtable>-->
+            <service-airtable id = "service_airtable"></service-airtable>
+        </div>
+        <label for="speed_slider">Motor Speed (-100 to 100): </label>
+        <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
+    </body>
+    <script>
+        var airtableElement = document.getElementById("service_airtable")
+        
+        var apiKey = "keyLWOtjr0x7d8s3l";
+        var baseID = "appxDMGNaul3krfkq";
+        var tableName = "example_table";
+
+        airtableElement.setAttribute("apikey", apiKey)
+        airtableElement.setAttribute("baseid",baseID)
+        airtableElement.setAttribute("tablename", tableName)
+
+        airtableElement.init()
+
+        var myTable = airtableElement.getService()
+
+        //myTable.init(apiKey, baseID, tableName)
+
+        function sendMotorSpeed(speed) {
+            myTable.setEntryValueStrict("motor_speed", parseInt(speed))
+        }
+    </script>
+</html>

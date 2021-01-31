@@ -5,32 +5,41 @@
     "tutorialSpikeService": {
         "title": "SPIKE Service",
         "children":{
-            "tutorialSpikeServiceHub": {
-                "title": "Intro to SPIKE Service"
-            },
             "exampleSpikeServiceBasicMotor": {
                 "title": "Basic - Start Single Motor"
             },
             "exampleSpikeServiceTwoMotors": {
-                "title": "Controlling Multiple Motors"
+                "title": "Basic - Controlling Multiple Motors"
+            },
+            "exampleSpikeServiceSensors": {
+                "title": "Basic - Using the Sensors"
+            },
+            "exampleSpikeServiceForceToMotor": {
+                "title": "Intermediate - Automatically Getting Connected Modules"
             },
             "exampleSpikeServicePython": {
-                "title": "Integrating MicroPython"
-            },
-            "exampleSpikeServiceBeep": {
-                "title": "Beeping Pitch Example"
-            },
-            "exampleSpikeServiceMotor": {
-                "title": "Slider-Controlled Motor Example"
+                "title": "Intermediate - Integrating MicroPython"
             },
             "exampleSpikeServiceSimonSays": {
-                "title": "Making a Game (Simon Says)"
+                "title": "Advanced - Using Hub Gestures and Orientations"
+            },
+            "exampleSpikeServiceUsingMultipleHubs": {
+                "title": "Advanced - Connecting and Using Multiple SPIKE Primes"
             }
         }
     },
     "tutorialSystemLinkService": {
         "title": "SystemLink Cloud Service",
         "children": {
+            "exampleSystemLinkConnect": {
+                "title": "Connecting to SystemLink"
+            },
+            "exampleSystemLinkSendValues": {
+                "title": "Sending Values"
+            },
+            "exampleSystemLinkReceiveValues": {
+                "title": "Receiving and Using Values"
+            },
             "exampleSystemLinkServiceGeneral": {
                 "title": "General SystemLink Interface Example"
             }
@@ -39,8 +48,17 @@
     "tutorialAirtableService": {
         "title": "Airtable Service",
         "children": {
-            "exampleAirtableService": {
-                "title": "Tufts EN1-Simple Robotics Airtable Example"
+            "exampleAirtableConnectToPage": {
+                "title": "Connecting to Airtable"
+            },
+            "exampleAirtableSendValues": {
+                "title": "Sending Values"
+            },
+            "exampleAirtableReceiveValues": {
+                "title": "Receiving and Using Values"
+            },
+            "exampleAirtableMultipleValues": {
+                "title": "Checking for Multiple Values"
             }
         }
     }

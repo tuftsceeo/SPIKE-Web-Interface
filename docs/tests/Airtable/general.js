@@ -12,63 +12,63 @@ var testSetIntTagValueWithStringThatIsNumber_AT = document.getElementById("testS
 var testSetStringTagValueWithStringThatIsNumber_AT = document.getElementById("testSetStringTagValueWithStringThatIsNumber_AT");
 
 testGetTagsInfo.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST getTagsInfo() AIRTABLE #####");
-    let tagsInfo = Airtable.getTagsInfo();
-    console.log("tagsInfo: ", tagsInfo);
-    console.log("##### ENDING TEST getTagsInfo() AIRTABLE #####");
+    console.log("##### BEGINNING TEST getEntriesInfo() AIRTABLE #####");
+    let entriesInfo = Airtable.getEntriesInfo();
+    console.log("entriesInfo: ", entriesInfo);
+    console.log("##### ENDING TEST getEntriesInfo() AIRTABLE #####");
 })
 
 testSetTagValue.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() AIRTABLE #####");
     console.log("Setting the value of 'command' to 'testing string input' ");
-    Airtable.setTagValue("command", "default", function () {
-        console.log("command value: ", Airtable.getTagValue("command"));
-        Airtable.setTagValue("command", "testing string input", function () {
-            console.log("new command value: ", Airtable.getTagValue("command"));
-            console.log("##### ENDING TEST setTagValue() AIRTABLE #####");
+    Airtable.setEntryValueNotStrict("command", "default", function () {
+        console.log("command value: ", Airtable.getEntryValue("command"));
+        Airtable.setEntryValueNotStrict("command", "testing string input", function () {
+            console.log("new command value: ", Airtable.getEntryValue("command"));
+            console.log("##### ENDING TEST.setEntryValueNotStrict() AIRTABLE #####");
         })
     })
 })
 
 testSetTagValueNonString.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() of non string in AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() of non string in AIRTABLE #####");
     console.log("Setting the value of 'command' to 123 ")
-    Airtable.setTagValue("command", 123, function () {
-        let tagsInfo = Airtable.getTagsInfo();
-        console.log("tagsInfo: ", tagsInfo);
-        console.log("##### ENDING TEST setTagValue() of non string in AIRTABLE #####");
+    Airtable.setEntryValueNotStrict("command", 123, function () {
+        let entriesInfo = Airtable.getEntriesInfo();
+        console.log("entriesInfo: ", entriesInfo);
+        console.log("##### ENDING TEST.setEntryValueNotStrict() of non string in AIRTABLE #####");
     })
 })
 
 testGetTagValue.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST getTagValue() AIRTABLE #####");
+    console.log("##### BEGINNING TEST getEntryValue() AIRTABLE #####");
     console.log("Getting value of 'command' tag ")
-    let value = Airtable.getTagValue("command");
+    let value = Airtable.getEntryValue("command");
 
     console.log("value: ", value);
 
-    console.log("##### ENDING TEST getTagValue() AIRTABLE #####");
+    console.log("##### ENDING TEST getEntryValue() AIRTABLE #####");
 })
 
 testCreateTag.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST createTag() AIRTABLE #####");
+    console.log("##### BEGINNING TEST createEntry() AIRTABLE #####");
     console.log("Creating tag called 'newTag' ")
     // create a tag called "newTag"
-    Airtable.createTag("newTag", "new value", function () {
-        let tagsInfo = Airtable.getTagsInfo();
-        console.log("tagsInfo: ", tagsInfo);
-        console.log("##### ENDING TEST createTag() AIRTABLE #####");
+    Airtable.createEntry("newTag", "new value", function () {
+        let entriesInfo = Airtable.getEntriesInfo();
+        console.log("entriesInfo: ", entriesInfo);
+        console.log("##### ENDING TEST createEntry() AIRTABLE #####");
     })
 
 })
 
 testDeleteTag.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST deleteTag() AIRTABLE #####");
+    console.log("##### BEGINNING TEST deleteEntry() AIRTABLE #####");
     console.log("Deleting tag called 'newTag' ")
-    Airtable.deleteTag("newTag", function () {
-        let tagsInfo = Airtable.getTagsInfo();
-        console.log("tagsInfo:", tagsInfo);
-        console.log("##### ENDING TEST deleteTag() AIRTABLE #####");
+    Airtable.deleteEntry("newTag", function () {
+        let entriesInfo = Airtable.getEntriesInfo();
+        console.log("entriesInfo:", entriesInfo);
+        console.log("##### ENDING TEST deleteEntry() AIRTABLE #####");
     })
 })
 
@@ -79,64 +79,64 @@ testIsActive.addEventListener("click", function () {
 })
 
 testSetTagValueNoCB_AT.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() without callback AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() without callback AIRTABLE #####");
 
-    Airtable.setTagValue("message", 100);
+    Airtable.setEntryValueNotStrict("message", 100);
 
-    console.log("##### ENDING TEST setTagValue() without callback AIRTABLE #####");
+    console.log("##### ENDING TEST.setEntryValueNotStrict() without callback AIRTABLE #####");
 })
 
 testSetStringTagValueWithNumber_AT.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() of string tag with number AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() of string tag with number AIRTABLE #####");
     
-    Airtable.setTagValue("message", "default", function () {
-        console.log("message value: ", Airtable.getTagValue("message"));
+    Airtable.setEntryValueNotStrict("message", "default", function () {
+        console.log("message value: ", Airtable.getEntryValue("message"));
         console.log("changing value");
-        Airtable.setTagValue("message", 123, function () {
-            console.log("new message value: ", Airtable.getTagValue("message"));
-            console.log("##### ENDING TEST setTagValue() of string tag with number AIRTABLE #####");
+        Airtable.setEntryValueNotStrict("message", 123, function () {
+            console.log("new message value: ", Airtable.getEntryValue("message"));
+            console.log("##### ENDING TEST.setEntryValueNotStrict() of string tag with number AIRTABLE #####");
         })
     });
 
 })
 
 testSetStringTagValueWithBoolean_AT.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() of string tag with boolean AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() of string tag with boolean AIRTABLE #####");
 
-    Airtable.setTagValue("message", "default", function () {
-        console.log("message value: ", Airtable.getTagValue("message"));
+    Airtable.setEntryValueNotStrict("message", "default", function () {
+        console.log("message value: ", Airtable.getEntryValue("message"));
         console.log("changing value");
-        Airtable.setTagValue("message", true, function () {
-            console.log("new message value: ", Airtable.getTagValue("message"));
-            console.log("##### ENDING TEST setTagValue() of string tag with boolean AIRTABLE #####");
+        Airtable.setEntryValueNotStrict("message", true, function () {
+            console.log("new message value: ", Airtable.getEntryValue("message"));
+            console.log("##### ENDING TEST.setEntryValueNotStrict() of string tag with boolean AIRTABLE #####");
         })
     });
 
 })
 
 testSetIntTagValueWithStringThatIsNumber_AT.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() of integer tag with string that is a number AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() of integer tag with string that is a number AIRTABLE #####");
 
-    Airtable.setTagValue("integer", 1234, function () {
-        console.log("integer value: ", Airtable.getTagValue("integer"));
+    Airtable.setEntryValueNotStrict("integer", 1234, function () {
+        console.log("integer value: ", Airtable.getEntryValue("integer"));
         console.log("changing value");
-        Airtable.setTagValue("integer", "123", function () {
-            console.log("new integer value: ", Airtable.getTagValue("integer"));
-            console.log("##### ENDING TEST setTagValue() of integer tag with string that is a number AIRTABLE #####");
+        Airtable.setEntryValueNotStrict("integer", "123", function () {
+            console.log("new integer value: ", Airtable.getEntryValue("integer"));
+            console.log("##### ENDING TEST.setEntryValueNotStrict() of integer tag with string that is a number AIRTABLE #####");
         })
     });
 
 })
 
 testSetStringTagValueWithStringThatIsNumber_AT.addEventListener("click", function () {
-    console.log("##### BEGINNING TEST setTagValue() of string tag with string that is a number AIRTABLE #####");
+    console.log("##### BEGINNING TEST.setEntryValueNotStrict() of string tag with string that is a number AIRTABLE #####");
 
-    Airtable.setTagValue("message", "default", function () {
-        console.log("message value: ", Airtable.getTagValue("message"));
+    Airtable.setEntryValueNotStrict("message", "default", function () {
+        console.log("message value: ", Airtable.getEntryValue("message"));
         console.log("changing value");
-        Airtable.setTagValue("message", "123", function () {
-            console.log("new message value: ", Airtable.getTagValue("message"));
-            console.log("##### ENDING TEST setTagValue() of string tag with string that is a number AIRTABLE #####");
+        Airtable.setEntryValueNotStrict("message", "123", function () {
+            console.log("new message value: ", Airtable.getEntryValue("message"));
+            console.log("##### ENDING TEST.setEntryValueNotStrict() of string tag with string that is a number AIRTABLE #####");
         })
     });
 

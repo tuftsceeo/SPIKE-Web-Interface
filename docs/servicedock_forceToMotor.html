@@ -1,0 +1,75 @@
+<html>
+    <!-- 
+Project Name: SPIKE Prime Web Interface
+File name: servicedock_beepSlider.html
+Author: Jeremy Jung
+Last update: 8/11/20
+Description: control the beeping frequency of SPIKE Prime with a slider
+Credits/inspirations:
+History: 
+    Created by Jeremy on 8/4/20
+LICENSE: MIT
+(C) Tufts Center for Engineering Education and Outreach (CEEO)
+Note:
+-->
+
+    <head>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
+    </head>
+
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+        <div id="servicedock" style="float:right;">
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id="demobox">
+            <div>
+                FORCE output:
+                <h1 id="forceReading">
+                    force_sensor output will show here
+                </h1>
+            </div>
+            <div>
+                MOTOR speed:
+                <h1 id = "speedReading">
+                    motor_sensor output will show here
+                </h1>
+            </div>
+        </div>
+    </body>
+    <script>
+        /* SPIKE Service code*/
+        var serviceSPIKE = document.getElementById("service_spike").getService();
+
+        /* DOM references */
+        var forceReading = document.getElementById("forceReading");
+        var speedReading = document.getElementById("speedReading");
+
+        serviceSPIKE.executeAfterInit(function () {
+
+            console.log("SPIKE Service is initialized!");
+
+            var forceSensorObjects = serviceSPIKE.getForceSensors(); // get all ForceSensors connected to SPIKE Prime
+            var motorObjects = serviceSPIKE.getMotors(); // get all Motors connected to SPIKE Prime
+
+            // pick devices connected to the port earliest in the alphabet
+            var force_sensor = forceSensorObjects[0];
+            var motor = motorObjects[0];
+
+            var intervalSPIKE = setInterval (function () {
+
+                if (serviceSPIKE.isActive() === true) {
+                    // display force sensor output
+                    var force = force_sensor.get_force_percentage();
+                    
+                    motor.start(force); // run motor at speed given by the force_sensor's percentage output
+                    var speed = motor.get_speed();
+                    
+                    // display readings
+                    forceReading.innerHTML = force + " %";
+                    speedReading.innerHTML = speed;
+                }
+            }, 200);
+        });
+    </script>
+
+</html>

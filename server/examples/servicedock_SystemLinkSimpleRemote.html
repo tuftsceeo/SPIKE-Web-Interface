@@ -1,0 +1,46 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_systemLinkSimpleRemote.html
+    Author: Emma Bethel
+    Last Update: 1/29/21
+    History:
+        created by Emma on 1/28/21
+    Purpose: send user-inputted value (via slider) into System Link
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+         <div id = "servicedock" style = "float:right;">
+            <service-systemlink id = "service_systemlink"></service-systemlink>
+        </div>
+        <div id = "controls">
+            <label for="speed_slider">Motor Speed (-100 to 100): </label>
+            <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
+        </div>
+    </body>
+    <script>
+        var systemLinkElement = document.getElementById("service_systemlink")
+        var mySystemLink = systemLinkElement.getService()
+
+        // ensuring motor speed tag exists
+        mySystemLink.executeAfterInit(function() { 
+            mySystemLink.createTag("motor_speed", 0)
+        })
+
+        /* sets value of motor_speed tag to given speed
+         * NOTE: assumes motor_speed tag exists
+         */
+        function sendMotorSpeed(speed) {
+            mySystemLink.setTagValueStrict("motor_speed", parseInt(speed)) 
+        }
+    </script>
+</html>

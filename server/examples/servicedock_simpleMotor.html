@@ -28,9 +28,15 @@ Note:
         var mySPIKE = document.getElementById("service_spike").getService()
 
         mySPIKE.executeAfterInit(function () {
-            var motor = new mySPIKE.Motor("A")
+            console.log("SPIKE Service is initialized!");
+            try {
+                var motor = new mySPIKE.Motor("A")
 
-            motor.start(100)
+                motor.start(100);
+            }
+            catch (e) {
+                console.error(e);
+            }
         })
 
     </script>

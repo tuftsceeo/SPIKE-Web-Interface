@@ -1,14 +1,40 @@
+## General SystemLink Service Interface
+This is an interface that can set tag values and create tags on your SystemLink Cloud database. The source code and an interactive example are below. 
+
 ```html
 <html>
-    <!-- Include ServiceDock -->
+
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script>
-    </head>
-    <body>
-        <div id="servicedock" style="float:left;">
-            <!-- Include systemlink service-->
+        <script src = "./modules/ServiceDock_SystemLink.js"></script>
+            <!-- include the Services to use -->
             <service-systemlink id="service_systemlink"></service-systemlink>
         </div>
+        <style>
+            input {
+                width: 100px;
+                height: 20px;
+            }
+        
+            #interface {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                left: 15%;
+                top: 100px;
+                background-color: #4CE0D2;
+                height: 400px;
+                width: 500px;
+                border: solid;
+            }
+        
+            .action {
+                margin: 5%;
+                position: relative;
+                justify-content: center;
+            }
+        </style>
+    </head>
+    <body>
         <div id = "interface">
             <div class = "action">
                 <h3>
@@ -113,7 +139,7 @@
             changeTagValue.value = ""; // reset input field
             
             // change Tag's value
-            mySL.setTagValue(key, newValue, function() {
+            mySL.setTagValueNotStrict(key, newValue, function() {
                 displayCurrentValue();
             })
         })

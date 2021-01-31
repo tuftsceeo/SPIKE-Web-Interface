@@ -1,0 +1,67 @@
+<!--
+    Project: SPIKE Prime Web Interface
+    File: servicedock_systemLinkSimpleLocal.html
+    Author: Emma Bethel
+    Last Update: 1/29/21
+    Purpose: run SPIKE motor based on value stored in System Link
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <style>
+            #speed_display {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        </style>
+    </head>
+    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+         <div id = "servicedock" style = "float:right;">
+            <service-systemlink id = "service_SystemLink"></service-systemlink>
+            <service-spike id="service_spike"></service-spike>
+        </div>
+        <div id = "speed_display">Speed: unknown</div>
+    </body>
+    <script>
+        var systemLinkElement = document.getElementById("service_SystemLink")
+
+        var mySystemLink = systemLinkElement.getService()
+        var mySPIKE = document.getElementById("service_spike").getService()
+
+
+        mySystemLink.executeAfterInit(function() {
+            // start the periodic checks and updates
+            startChecking()
+        })
+
+        // starts periodic updates of and checks of motor speed if value exists in cloud (if not, tries again in 1 second)
+        function startChecking() {
+            if(mySystemLink.getTagsInfo()["motor_speed"] != undefined)
+                checkAndUpdate(null)
+            else
+                setTimeout(startChecking, 1000)
+        }
+
+        // checks SystemLink for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
+        function checkAndUpdate(pastSpeed) {
+            var currentSpeed = mySystemLink.getTagValue("motor_speed")
+            // if speed has been changed since last check, update page display
+            if(currentSpeed != pastSpeed)
+                updateSpeed(currentSpeed)
+
+            // check again in one second
+            setTimeout(function() { checkAndUpdate(currentSpeed) }, 1000)
+        }
+
+        // changes speed displayed on page and speed of SPIKE motor to given newSpeed
+        function updateSpeed(newSpeed) {
+            document.getElementById("speed_display").innerText = "Speed: " + newSpeed
+
+            // run motor if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor("A").start(newSpeed)
+        }
+    </script>
+</html>

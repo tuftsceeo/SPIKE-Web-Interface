@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes | Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="width: 200px; height: 60px">
+        
+            <img src="./img/CEEO_Innovations_Logo_White.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Home</a></h1>
+        
+            <a class = "currentPage">Tutorial: Advanced - Connecting and Using Multiple SPIKE Primes</a>
+        
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+        <ol class="lnb-tab">
+            <li id="api-tab">
+                <a href="#"><h4>API</h4></a>
+            </li>
+            <li id="examples-tab">
+                <a href="#"><h4>Tutorials</h4></a>
+            </li>
+        </ol>
+    
+    <div class="lnb-examples hidden"><h3>Tutorials</h3><ul><li><a href="tutorial-tutorialAirtableService.html">Airtable Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialAirtableService_sub"></div></li><li><a href="tutorial-tutorialServiceDock.html">Using ServiceDock</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialServiceDock_sub"></div></li><li><a href="tutorial-tutorialSpikeService.html">SPIKE Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialSpikeService_sub"></div></li><li><a href="tutorial-tutorialSystemLinkService.html">SystemLink Cloud Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialSystemLinkService_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Service_SystemLink.html">Service_SystemLink</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SystemLink_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SystemLink.html#~init">init</a></li><li><a href="Service_SystemLink.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SystemLink.html#~getTagsInfo">getTagsInfo</a></li><li><a href="Service_SystemLink.html#~setTagValueNotStrict">setTagValueNotStrict</a></li><li><a href="Service_SystemLink.html#~setTagValueStrict">setTagValueStrict</a></li><li><a href="Service_SystemLink.html#~getTagValue">getTagValue</a></li><li><a href="Service_SystemLink.html#~isActive">isActive</a></li><li><a href="Service_SystemLink.html#~createTag">createTag</a></li><li><a href="Service_SystemLink.html#~deleteTag">deleteTag</a></li></ul></div></li><li><a href="Service_Airtable.html">Service_Airtable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_Airtable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_Airtable.html#~init">init</a></li><li><a href="Service_Airtable.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_Airtable.html#~isActive">isActive</a></li><li><a href="Service_Airtable.html#~getEntriesInfo">getEntriesInfo</a></li><li><a href="Service_Airtable.html#~setEntryValueNotStrict">setEntryValueNotStrict</a></li><li><a href="Service_Airtable.html#~setEntryValueStrict">setEntryValueStrict</a></li><li><a href="Service_Airtable.html#~getEntryValue">getEntryValue</a></li><li><a href="Service_Airtable.html#~deleteEntry">deleteEntry</a></li><li><a href="Service_Airtable.html#~createEntry">createEntry</a></li></ul></div></li><li><a href="Service_SPIKE.html">Service_SPIKE</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.html#~init">init</a></li><li><a href="Service_SPIKE.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SPIKE.html#~executeWithStream">executeWithStream</a></li><li><a href="Service_SPIKE.html#~rebootHub">rebootHub</a></li><li><a href="Service_SPIKE.html#~getHubName">getHubName</a></li><li><a href="Service_SPIKE.html#~isActive">isActive</a></li><li><a href="Service_SPIKE.html#~getHubEvent">getHubEvent</a></li><li><a href="Service_SPIKE.html#~getHubGesture">getHubGesture</a></li><li><a href="Service_SPIKE.html#~getHubOrientation">getHubOrientation</a></li><li><a href="Service_SPIKE.html#~getMotorPorts">getMotorPorts</a></li><li><a href="Service_SPIKE.html#~getSmallMotorPorts">getSmallMotorPorts</a></li><li><a href="Service_SPIKE.html#~getBigMotorPorts">getBigMotorPorts</a></li><li><a href="Service_SPIKE.html#~getUltrasonicPorts">getUltrasonicPorts</a></li><li><a href="Service_SPIKE.html#~getColorPorts">getColorPorts</a></li><li><a href="Service_SPIKE.html#~getForcePorts">getForcePorts</a></li><li><a href="Service_SPIKE.html#~getMotors">getMotors</a></li><li><a href="Service_SPIKE.html#~getDistanceSensors">getDistanceSensors</a></li><li><a href="Service_SPIKE.html#~getColorSensors">getColorSensors</a></li><li><a href="Service_SPIKE.html#~getForceSensors">getForceSensors</a></li><li><a href="Service_SPIKE.html#~stopCurrentProgram">stopCurrentProgram</a></li><li><a href="Service_SPIKE.html#~writeProgram">writeProgram</a></li><li><a href="Service_SPIKE.html#~executeProgram">executeProgram</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="Service_SPIKE.PrimeHub.html">Service_SPIKE.PrimeHub</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub_sub"></div></li><li><a href="PrimeHub.left_button.html">PrimeHub.left_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.left_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.left_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="PrimeHub.left_button.html#.wait_until_released">wait_until_released</a></li><li><a href="PrimeHub.left_button.html#.was_pressed">was_pressed</a></li><li><a href="PrimeHub.left_button.html#.is_pressed">is_pressed</a></li></ul></div></li><li><a href="PrimeHub.right_button.html">PrimeHub.right_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.right_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.right_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="PrimeHub.right_button.html#.wait_until_released">wait_until_released</a></li><li><a href="PrimeHub.right_button.html#.was_pressed">was_pressed</a></li><li><a href="PrimeHub.right_button.html#.is_pressed">is_pressed</a></li></ul></div></li><li><a href="PrimeHub.status_light.html">PrimeHub.status_light</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.status_light_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.status_light.html#.on">on</a></li><li><a href="PrimeHub.status_light.html#.off">off</a></li></ul></div></li><li><a href="PrimeHub.light_matrix.html">PrimeHub.light_matrix</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.light_matrix_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.light_matrix.html#.set_pixel">set_pixel</a></li><li><a href="PrimeHub.light_matrix.html#.write">write</a></li><li><a href="PrimeHub.light_matrix.html#.off">off</a></li></ul></div></li><li><a href="PrimeHub.speaker.html">PrimeHub.speaker</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.speaker_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.speaker.html#.beep">beep</a></li><li><a href="PrimeHub.speaker.html#.start_beep">start_beep</a></li><li><a href="PrimeHub.speaker.html#.stop">stop</a></li><li><a href="PrimeHub.speaker.html#.get_volume">get_volume</a></li><li><a href="PrimeHub.speaker.html#.set_volume">set_volume</a></li></ul></div></li><li><a href="PrimeHub.motion_sensor.html">PrimeHub.motion_sensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.motion_sensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.motion_sensor.html#.was_gesture">was_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.wait_for_new_gesture">wait_for_new_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.wait_for_new_orientation">wait_for_new_orientation</a></li><li><a href="PrimeHub.motion_sensor.html#.get_yaw_angle">get_yaw_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_pitch_angle">get_pitch_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_roll_angle">get_roll_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_yaw_acceleration">get_yaw_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_pitch_acceleration">get_pitch_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_roll_acceleration">get_roll_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_gesture">get_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.get_orientation">get_orientation</a></li></ul></div></li><li><a href="Service_SPIKE.Motor.html">Service_SPIKE.Motor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.Motor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.Motor.html#~get_speed">get_speed</a></li><li><a href="Service_SPIKE.Motor.html#~get_position">get_position</a></li><li><a href="Service_SPIKE.Motor.html#~get_degrees_counted">get_degrees_counted</a></li><li><a href="Service_SPIKE.Motor.html#~get_power">get_power</a></li><li><a href="Service_SPIKE.Motor.html#~get_default_speed">get_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~set_default_speed">set_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~set_stall_detection">set_stall_detection</a></li><li><a href="Service_SPIKE.Motor.html#~run_to_degrees_counted">run_to_degrees_counted</a></li><li><a href="Service_SPIKE.Motor.html#~start_at_power">start_at_power</a></li><li><a href="Service_SPIKE.Motor.html#~start">start</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_seconds">run_for_seconds</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_degrees">run_for_degrees</a></li><li><a href="Service_SPIKE.Motor.html#~stop">stop</a></li></ul></div></li><li><a href="Service_SPIKE.ColorSensor.html">Service_SPIKE.ColorSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ColorSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ColorSensor.html#~get_color">get_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_reflected_light">get_reflected_light</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_red">get_red</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_green">get_green</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_blue">get_blue</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_until_color">wait_until_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_for_new_color">wait_for_new_color</a></li></ul></div></li><li><a href="Service_SPIKE.DistanceSensor.html">Service_SPIKE.DistanceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.DistanceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_cm">get_distance_cm</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_inches">get_distance_inches</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_percentage">get_distance_percentage</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_farther_than">wait_for_distance_farther_than</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_closer_than">wait_for_distance_closer_than</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~light_up">light_up</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~light_up_all">light_up_all</a></li></ul></div></li><li><a href="Service_SPIKE.ForceSensor.html">Service_SPIKE.ForceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ForceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ForceSensor.html#~is_pressed">is_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~get_force_newton">get_force_newton</a></li><li><a href="Service_SPIKE.ForceSensor.html#~get_force_percentage">get_force_percentage</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_pressed">wait_until_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_released">wait_until_released</a></li></ul></div></li><li><a href="Service_SPIKE.MotorPair.html">Service_SPIKE.MotorPair</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.MotorPair_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.MotorPair.html#~set_motor_rotation">set_motor_rotation</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank">start_tank</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank_at_power">start_tank_at_power</a></li><li><a href="Service_SPIKE.MotorPair.html#~stop">stop</a></li></ul></div></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+<section>
+    <header>
+        
+
+        <h2>Advanced - Connecting and Using Multiple SPIKE Primes</h2>
+    </header>
+
+    
+        <article class="readme">
+            <h2>Pong with two SPIKE Primes</h2>
+<p>In this example we will use two DistanceSensors, each connected to separate SPIKE Primes, and determine when either one detects a surface 10 cm away from. You will be able to connect your DistanceSensors to any port of your choosing.</p>
+<h2>Multiple SPIKE Services</h2>
+<p>The SPIKE Services are scalable. First, we will need to add two <code>&lt;service-spike&gt;</code> elements to the DOM as such</p>
+<pre class="prettyprint source lang-html"><code>&lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+
+    &lt;!-- SPIKE Service 1 &lt;service-spike> -->
+    &lt;service-spike id = &quot;service_spike1&quot;>&lt;/service-spike>
+    &lt;div style = &quot;margin: 5px;&quot;>serviceSPIKE1&lt;/div>
+
+    &lt;!-- SPIKE Service 2 &lt;service-spike> -->
+    &lt;service-spike id=&quot;service_spike2&quot;>&lt;/service-spike>
+    &lt;div style = &quot;margin: 5px;&quot; >serviceSPIKE2&lt;/div>
+
+&lt;/div>
+</code></pre>
+<p>We will also add the HTML that displays the message of whether serviceSPIKE1 or serviceSPIKE2's DistanceSensor gets an output of more than 10 cm.</p>
+<pre class="prettyprint source lang-html"><code>&lt;div id=&quot;demobox&quot;>
+    &lt;h1 id = &quot;message&quot;>
+        When will either DistanceSensor be farther than 10 cm away from their surfaces?
+    &lt;/h1>
+&lt;/div>
+</code></pre>
+<p>Second, as usual, we will declare the SPIKE Service objects and begin with their <code>executeAfterInit()</code> methods.</p>
+<pre class="prettyprint source lang-javascript"><code>/* get two SPIKE Services */
+const serviceSPIKE1 = document.getElementById(&quot;service_spike1&quot;).getService();
+const serviceSPIKE2 = document.getElementById(&quot;service_spike2&quot;).getService();
+
+/* DOM references */
+var message = document.getElementById(&quot;message&quot;);
+
+serviceSPIKE1.executeAfterInit(function () {
+    console.log(&quot;serviceSPIKE1 was initialized! &quot;);
+
+    var distanceSensorObjects = serviceSPIKE1.getDistanceSensors();
+    var serviceSPIKE1Distance = distanceSensorObjects[0];
+})
+serviceSPIKE2.executeAfterInit(async function () {
+    console.log(&quot;serviceSPIKE2 was initialized! &quot;);
+
+    var distanceSensorObjects = serviceSPIKE2.getDistanceSensors();
+    var servicesSPIKE2Distance = distanceSensorObjects[0];
+})
+</code></pre>
+<p>That's all you need to use two SPIKE Services! If you were to use three, you would do what you would have done for one SPIKE Service thrice. Don't forget to assign them unique names, such as <code>serviceSPIKE1</code> and <code>serviceSPIKE2</code>.</p>
+<h2>Finding when DistanceSensor reaches above 10 cm of output</h2>
+<p>We will again use Javascript's asynchronous callbacks to execute code when either DistanceSensor reaches its threshold. With <code>wait_for_distance_farther_than({distance}, {unit}, {callback function} )</code>, we can specify in which condition to run the callback function. We will display to the webpage when a DistanceSensor goes over its target distance.</p>
+<p>Here is the callback function for serviceSPIKE1's DistanceSensor.</p>
+<pre class="prettyprint source lang-javascript"><code>serviceSPIKE1Distance.wait_for_distance_farther_than(10, 'cm', function () {
+                
+    message.innerHTML = &quot;serviceSPIKE1's DistanceSensor is 10 cm away from their facing surface!&quot;
+});
+</code></pre>
+<h2>Final Code</h2>
+<p>Do the same for serviceSPIKE2's DistanceSensor, and you should get this result!</p>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+    &lt;/head>
+
+    &lt;body>
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:right;&quot;>
+            &lt;service-spike id=&quot;service_spike1&quot;>&lt;/service-spike>
+            &lt;div style=&quot;margin: 5px;&quot;>serviceSPIKE1&lt;/div>
+            &lt;service-spike id=&quot;service_spike2&quot;>&lt;/service-spike>
+            &lt;div style=&quot;margin: 5px;&quot;>serviceSPIKE2&lt;/div>
+        &lt;/div>
+        &lt;div id=&quot;demobox&quot;>
+            &lt;h1 id = &quot;message&quot;>
+                When will either DistanceSensor be farther than 10 cm away from their surfaces?
+            &lt;/h1>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        /* SPIKE Service code */
+
+        var serviceSPIKE1 = document.getElementById(&quot;service_spike1&quot;).getService();
+        var serviceSPIKE2 = document.getElementById(&quot;service_spike2&quot;).getService();
+
+        /* DOM references */
+        var message = document.getElementById(&quot;message&quot;);
+
+        serviceSPIKE1.executeAfterInit(function () {
+
+            console.log(&quot;SPIKE Service 1 is initialized!&quot;);
+
+            var distanceSensorObjects = serviceSPIKE1.getDistanceSensors();
+
+            var serviceSPIKE1Distance = distanceSensorObjects[0];
+
+            serviceSPIKE1Distance.wait_for_distance_farther_than(10, 'cm', function () {
+                
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 1 is farther than 10 cm from its facing surface */
+                
+                message.innerHTML = &quot;serviceSPIKE1's DistanceSensor is 10 cm away from their facing surface!&quot;
+            })
+        });
+
+        serviceSPIKE2.executeAfterInit( function () {
+
+            console.log(&quot;SPIKE Service 2 is initialized!&quot;);
+
+            var distanceSensorObjects = serviceSPIKE2.getDistanceSensors();
+
+            var servicesSPIKE2Distance = distanceSensorObjects[0];
+
+            servicesSPIKE2Distance.wait_for_distance_farther_than(10, 'cm', function () {
+
+                /* this function will be executed after the DistanceSensor connected to SPIKE Service 2 is farther than 10 cm from its facing surface */
+                
+                message.innerHTML = &quot;servicesSPIKE2's DistanceSensor is 10 cm away from their facing surface!&quot;
+            })
+        });
+    &lt;/script>
+
+&lt;/html>
+</code></pre>
+<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_twoHubs.html"></iframe>
+        </article>
+    
+</section>
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="./img/CEEO_Innovations_Logo_White.png" style="height= "30px" width = "100px" ">
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        showLnbExamples();
+    </script>
+
+</body>
+</html>

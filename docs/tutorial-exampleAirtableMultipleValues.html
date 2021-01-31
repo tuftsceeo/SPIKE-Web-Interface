@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Checking for Multiple Values | Tutorial: Checking for Multiple Values</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="width: 200px; height: 60px">
+        
+            <img src="./img/CEEO_Innovations_Logo_White.png" width="100%" height="100%">
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Home</a></h1>
+        
+            <a class = "currentPage">Tutorial: Checking for Multiple Values</a>
+        
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+        <ol class="lnb-tab">
+            <li id="api-tab">
+                <a href="#"><h4>API</h4></a>
+            </li>
+            <li id="examples-tab">
+                <a href="#"><h4>Tutorials</h4></a>
+            </li>
+        </ol>
+    
+    <div class="lnb-examples hidden"><h3>Tutorials</h3><ul><li><a href="tutorial-tutorialAirtableService.html">Airtable Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialAirtableService_sub"></div></li><li><a href="tutorial-tutorialServiceDock.html">Using ServiceDock</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialServiceDock_sub"></div></li><li><a href="tutorial-tutorialSpikeService.html">SPIKE Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialSpikeService_sub"></div></li><li><a href="tutorial-tutorialSystemLinkService.html">SystemLink Cloud Service</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tutorialSystemLinkService_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Service_SystemLink.html">Service_SystemLink</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SystemLink_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SystemLink.html#~init">init</a></li><li><a href="Service_SystemLink.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SystemLink.html#~getTagsInfo">getTagsInfo</a></li><li><a href="Service_SystemLink.html#~setTagValueNotStrict">setTagValueNotStrict</a></li><li><a href="Service_SystemLink.html#~setTagValueStrict">setTagValueStrict</a></li><li><a href="Service_SystemLink.html#~getTagValue">getTagValue</a></li><li><a href="Service_SystemLink.html#~isActive">isActive</a></li><li><a href="Service_SystemLink.html#~createTag">createTag</a></li><li><a href="Service_SystemLink.html#~deleteTag">deleteTag</a></li></ul></div></li><li><a href="Service_Airtable.html">Service_Airtable</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_Airtable_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_Airtable.html#~init">init</a></li><li><a href="Service_Airtable.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_Airtable.html#~isActive">isActive</a></li><li><a href="Service_Airtable.html#~getEntriesInfo">getEntriesInfo</a></li><li><a href="Service_Airtable.html#~setEntryValueNotStrict">setEntryValueNotStrict</a></li><li><a href="Service_Airtable.html#~setEntryValueStrict">setEntryValueStrict</a></li><li><a href="Service_Airtable.html#~getEntryValue">getEntryValue</a></li><li><a href="Service_Airtable.html#~deleteEntry">deleteEntry</a></li><li><a href="Service_Airtable.html#~createEntry">createEntry</a></li></ul></div></li><li><a href="Service_SPIKE.html">Service_SPIKE</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.html#~init">init</a></li><li><a href="Service_SPIKE.html#~executeAfterInit">executeAfterInit</a></li><li><a href="Service_SPIKE.html#~executeWithStream">executeWithStream</a></li><li><a href="Service_SPIKE.html#~rebootHub">rebootHub</a></li><li><a href="Service_SPIKE.html#~getHubName">getHubName</a></li><li><a href="Service_SPIKE.html#~isActive">isActive</a></li><li><a href="Service_SPIKE.html#~getHubEvent">getHubEvent</a></li><li><a href="Service_SPIKE.html#~getHubGesture">getHubGesture</a></li><li><a href="Service_SPIKE.html#~getHubOrientation">getHubOrientation</a></li><li><a href="Service_SPIKE.html#~getMotorPorts">getMotorPorts</a></li><li><a href="Service_SPIKE.html#~getSmallMotorPorts">getSmallMotorPorts</a></li><li><a href="Service_SPIKE.html#~getBigMotorPorts">getBigMotorPorts</a></li><li><a href="Service_SPIKE.html#~getUltrasonicPorts">getUltrasonicPorts</a></li><li><a href="Service_SPIKE.html#~getColorPorts">getColorPorts</a></li><li><a href="Service_SPIKE.html#~getForcePorts">getForcePorts</a></li><li><a href="Service_SPIKE.html#~getMotors">getMotors</a></li><li><a href="Service_SPIKE.html#~getDistanceSensors">getDistanceSensors</a></li><li><a href="Service_SPIKE.html#~getColorSensors">getColorSensors</a></li><li><a href="Service_SPIKE.html#~getForceSensors">getForceSensors</a></li><li><a href="Service_SPIKE.html#~stopCurrentProgram">stopCurrentProgram</a></li><li><a href="Service_SPIKE.html#~writeProgram">writeProgram</a></li><li><a href="Service_SPIKE.html#~executeProgram">executeProgram</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Namespaces</h3><ul><li><a href="Service_SPIKE.PrimeHub.html">Service_SPIKE.PrimeHub</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.PrimeHub_sub"></div></li><li><a href="PrimeHub.left_button.html">PrimeHub.left_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.left_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.left_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="PrimeHub.left_button.html#.wait_until_released">wait_until_released</a></li><li><a href="PrimeHub.left_button.html#.was_pressed">was_pressed</a></li><li><a href="PrimeHub.left_button.html#.is_pressed">is_pressed</a></li></ul></div></li><li><a href="PrimeHub.right_button.html">PrimeHub.right_button</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.right_button_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.right_button.html#.wait_until_pressed">wait_until_pressed</a></li><li><a href="PrimeHub.right_button.html#.wait_until_released">wait_until_released</a></li><li><a href="PrimeHub.right_button.html#.was_pressed">was_pressed</a></li><li><a href="PrimeHub.right_button.html#.is_pressed">is_pressed</a></li></ul></div></li><li><a href="PrimeHub.status_light.html">PrimeHub.status_light</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.status_light_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.status_light.html#.on">on</a></li><li><a href="PrimeHub.status_light.html#.off">off</a></li></ul></div></li><li><a href="PrimeHub.light_matrix.html">PrimeHub.light_matrix</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.light_matrix_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.light_matrix.html#.set_pixel">set_pixel</a></li><li><a href="PrimeHub.light_matrix.html#.write">write</a></li><li><a href="PrimeHub.light_matrix.html#.off">off</a></li></ul></div></li><li><a href="PrimeHub.speaker.html">PrimeHub.speaker</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.speaker_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.speaker.html#.beep">beep</a></li><li><a href="PrimeHub.speaker.html#.start_beep">start_beep</a></li><li><a href="PrimeHub.speaker.html#.stop">stop</a></li><li><a href="PrimeHub.speaker.html#.get_volume">get_volume</a></li><li><a href="PrimeHub.speaker.html#.set_volume">set_volume</a></li></ul></div></li><li><a href="PrimeHub.motion_sensor.html">PrimeHub.motion_sensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="PrimeHub.motion_sensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="PrimeHub.motion_sensor.html#.was_gesture">was_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.wait_for_new_gesture">wait_for_new_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.wait_for_new_orientation">wait_for_new_orientation</a></li><li><a href="PrimeHub.motion_sensor.html#.get_yaw_angle">get_yaw_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_pitch_angle">get_pitch_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_roll_angle">get_roll_angle</a></li><li><a href="PrimeHub.motion_sensor.html#.get_yaw_acceleration">get_yaw_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_pitch_acceleration">get_pitch_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_roll_acceleration">get_roll_acceleration</a></li><li><a href="PrimeHub.motion_sensor.html#.get_gesture">get_gesture</a></li><li><a href="PrimeHub.motion_sensor.html#.get_orientation">get_orientation</a></li></ul></div></li><li><a href="Service_SPIKE.Motor.html">Service_SPIKE.Motor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.Motor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.Motor.html#~get_speed">get_speed</a></li><li><a href="Service_SPIKE.Motor.html#~get_position">get_position</a></li><li><a href="Service_SPIKE.Motor.html#~get_degrees_counted">get_degrees_counted</a></li><li><a href="Service_SPIKE.Motor.html#~get_power">get_power</a></li><li><a href="Service_SPIKE.Motor.html#~get_default_speed">get_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~set_default_speed">set_default_speed</a></li><li><a href="Service_SPIKE.Motor.html#~set_stall_detection">set_stall_detection</a></li><li><a href="Service_SPIKE.Motor.html#~run_to_degrees_counted">run_to_degrees_counted</a></li><li><a href="Service_SPIKE.Motor.html#~start_at_power">start_at_power</a></li><li><a href="Service_SPIKE.Motor.html#~start">start</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_seconds">run_for_seconds</a></li><li><a href="Service_SPIKE.Motor.html#~run_for_degrees">run_for_degrees</a></li><li><a href="Service_SPIKE.Motor.html#~stop">stop</a></li></ul></div></li><li><a href="Service_SPIKE.ColorSensor.html">Service_SPIKE.ColorSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ColorSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ColorSensor.html#~get_color">get_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_reflected_light">get_reflected_light</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_red">get_red</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_green">get_green</a></li><li><a href="Service_SPIKE.ColorSensor.html#~get_blue">get_blue</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_until_color">wait_until_color</a></li><li><a href="Service_SPIKE.ColorSensor.html#~wait_for_new_color">wait_for_new_color</a></li></ul></div></li><li><a href="Service_SPIKE.DistanceSensor.html">Service_SPIKE.DistanceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.DistanceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_cm">get_distance_cm</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_inches">get_distance_inches</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~get_distance_percentage">get_distance_percentage</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_farther_than">wait_for_distance_farther_than</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~wait_for_distance_closer_than">wait_for_distance_closer_than</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~light_up">light_up</a></li><li><a href="Service_SPIKE.DistanceSensor.html#~light_up_all">light_up_all</a></li></ul></div></li><li><a href="Service_SPIKE.ForceSensor.html">Service_SPIKE.ForceSensor</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.ForceSensor_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.ForceSensor.html#~is_pressed">is_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~get_force_newton">get_force_newton</a></li><li><a href="Service_SPIKE.ForceSensor.html#~get_force_percentage">get_force_percentage</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_pressed">wait_until_pressed</a></li><li><a href="Service_SPIKE.ForceSensor.html#~wait_until_released">wait_until_released</a></li></ul></div></li><li><a href="Service_SPIKE.MotorPair.html">Service_SPIKE.MotorPair</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Service_SPIKE.MotorPair_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="Service_SPIKE.MotorPair.html#~set_motor_rotation">set_motor_rotation</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank">start_tank</a></li><li><a href="Service_SPIKE.MotorPair.html#~start_tank_at_power">start_tank_at_power</a></li><li><a href="Service_SPIKE.MotorPair.html#~stop">stop</a></li></ul></div></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+<section>
+    <header>
+        
+
+        <h2>Checking for Multiple Values</h2>
+    </header>
+
+    
+        <article class="readme">
+            <h2>Keeping Track of Multiple Values</h2>
+<p>Description coming soon</p>
+<h1>Remote</h1>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;style>
+            #controls {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+            }
+        &lt;/style>
+    &lt;/head>
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+         &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
+            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+        &lt;/div>
+        &lt;div id = &quot;controls&quot;>
+            &lt;label for=&quot;left_speed_slider&quot;>Left Speed (0 to 100): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;left_speed_slider&quot; onchange=&quot;sendSliderVal('left_speed', this.value)&quot; min=&quot;0&quot; max=&quot;100&quot;>
+            &lt;br>
+            &lt;label for=&quot;right_speed_slider&quot;>Right Speed (0 to 100): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;right_speed_slider&quot; onchange=&quot;sendSliderVal('right_speed', this.value)&quot; min=&quot;0&quot; max=&quot;100&quot;>
+            &lt;br>
+            &lt;label for=&quot;right_speed_slider&quot;>Angle (-90 to 90): &lt;/label>
+            &lt;input type=&quot;range&quot; id=&quot;right_speed_slider&quot; onchange=&quot;sendSliderVal('shooter_angle', this.value)&quot; min=&quot;-90&quot; max=&quot;90&quot;>
+            &lt;br>&lt;br>
+            &lt;button onclick=&quot;shoot()&quot;>Fire!&lt;/button>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
+        var myTable = airtableElement.getService()
+
+        myTable.executeAfterInit(function() { 
+            // set up table with default values
+            sendSliderVal(&quot;left_speed&quot;, 0)
+            sendSliderVal(&quot;right_speed&quot;, 0)
+            sendSliderVal(&quot;shooter_angle&quot;, 0)
+            sendSliderVal(&quot;shoot_mode&quot;, &quot;wait&quot;)
+        })
+
+        function shoot() {
+            myTable.setEntryValueStrict(&quot;shoot_mode&quot;, &quot;shoot&quot;)
+        }
+
+        function sendSliderVal(entryName, val) {
+            myTable.setEntryValueStrict(entryName, parseInt(val))
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<h1>Local</h1>
+<pre class="prettyprint source lang-html"><code>&lt;html>
+    &lt;head>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_Airtable.js&quot;>&lt;/script>
+        &lt;script type=&quot;text/javascript&quot; src=&quot;./modules/ServiceDock_SPIKE.js&quot;>&lt;/script>
+        &lt;style>
+            #displays {
+                text-align: center;
+                font-size: 30px;
+                padding: 100px;
+                background-color:rgb(0,255,133)
+            }
+        &lt;/style>
+    &lt;/head>
+    &lt;body style=&quot;background-image: url('./modules/views/CEEOInnovationsbackground.png');&quot;>
+         &lt;div id = &quot;servicedock&quot; style = &quot;float:right;&quot;>
+            &lt;service-airtable id = &quot;service_airtable&quot;>&lt;/service-airtable>
+            &lt;service-spike id=&quot;service_spike&quot;>&lt;/service-spike>
+        &lt;/div>
+        &lt;div id = &quot;displays&quot;>
+            &lt;div id = &quot;angle_display&quot;>angle: unknown&lt;/div>
+            &lt;div id = &quot;left_speed_display&quot;>left speed: unknown&lt;/div>
+            &lt;div id = &quot;right_speed_display&quot;>right speed: unknown&lt;/div>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var airtableElement = document.getElementById(&quot;service_airtable&quot;)
+        var myTable = airtableElement.getService()
+
+        var mySPIKE = document.getElementById(&quot;service_spike&quot;).getService()
+
+        var motorSpeeds = {
+            left: null,
+            right: null,
+        }
+
+        myTable.executeAfterInit(function() {
+            // start the periodic checks and updates
+           checkTable({})
+        })
+
+
+        // checks current table values against those of last check and controls motors and page displays accordingly
+        function checkTable(pastTable) {
+            var  currentTable = myTable.getEntriesInfo()
+
+            checkEntry(&quot;shooter_angle&quot;, currentTable, pastTable, updateAngle)
+            checkEntry(&quot;left_speed&quot;, currentTable, pastTable, function(newSpeed) { updateSpeed(&quot;left&quot;, newSpeed) } )
+            checkEntry(&quot;right_speed&quot;, currentTable, pastTable, function(newSpeed) { updateSpeed(&quot;right&quot;, newSpeed) })
+
+            if(currentTable[&quot;shoot_mode&quot;] != undefined && currentTable[&quot;shoot_mode&quot;].value == &quot;shoot&quot;)
+                shoot()
+
+            // check again in one second
+            setTimeout(function() { checkTable(currentTable) }, 1000)
+        }
+
+        // runs action if value of entry called name is different in pastTable than currentTable
+        function checkEntry(name, currentTable, pastTable, action) {
+            if(currentTable[name] != undefined && (pastTable[name] == undefined || currentTable[name].value != pastTable[name].value)) {
+                action(currentTable[name].value)
+                console.log(&quot;running action for &quot; + name)
+            }
+        }
+
+        // runs shooting motors at specified speeds
+        function shoot() {
+            // change display div color to indicate shooting mode
+            document.getElementById(&quot;displays&quot;).style.backgroundColor = &quot;rgb(163,255,143)&quot;
+
+            // if spike is connected, run shooter motors w/ specified speeds
+            if(mySPIKE.isActive()) {
+                mySPIKE.Motor(&quot;A&quot;).run_for_seconds(2, motorSpeeds.left)
+                mySPIKE.Motor(&quot;B&quot;).run_for_seconds(2, -motorSpeeds.right)
+            }
+
+            // revert div color back once shooting is done
+            setTimeout(function() { document.getElementById(&quot;displays&quot;).style.backgroundColor = &quot;rgb(0,255,133)&quot; }, 2000)
+
+            myTable.setEntryValueStrict(&quot;shoot_mode&quot;, &quot;wait&quot;)
+        }
+
+        /* updates stored speed value and screen display for specified side (a)
+         * NOTE: assumes side is &quot;left&quot; or &quot;right&quot;
+         */
+        function updateSpeed(side, newSpeed) {
+            if(side == &quot;left&quot;)
+                motorSpeeds.left = newSpeed
+            else if(side == &quot;right&quot;)
+                motorSpeeds.right = newSpeed
+
+            document.getElementById(side + &quot;_speed_display&quot;).innerText = side + &quot; speed: &quot; + newSpeed
+        }
+
+        // changes angle displayed on page and repositions angle motor to given newAngle
+        function updateAngle(newAngle) {
+            document.getElementById(&quot;angle_display&quot;).innerText = &quot;angle: &quot; + newAngle
+            
+            // run motor to new position if SPIKE is connected
+            if(mySPIKE.isActive())
+                mySPIKE.Motor(&quot;C&quot;).run_to_degrees_counted(newAngle)
+        }
+    &lt;/script>
+&lt;/html>
+</code></pre>
+<iframe id="remote-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableShooterRemote.html"></iframe>
+<iframe id="local-example-result" width="100%" height="450" frameborder="0" src="servicedock_airtableShooterLocal.html"></iframe>
+        </article>
+    
+</section>
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="./img/CEEO_Innovations_Logo_White.png" style="height= "30px" width = "100px" ">
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        showLnbExamples();
+    </script>
+
+</body>
+</html>
