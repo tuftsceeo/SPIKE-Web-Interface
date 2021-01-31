@@ -29,10 +29,14 @@ Note:
 
         mySPIKE.executeAfterInit(function () {
             console.log("SPIKE Service is initialized!");
-            
-            var motor = new mySPIKE.Motor("A")
+            try {
+                var motor = new mySPIKE.Motor("A")
 
-            motor.start(100)
+                motor.start(100)
+            }
+            catch (e) {
+                console.error(e);
+            }
         })
 
     </script>

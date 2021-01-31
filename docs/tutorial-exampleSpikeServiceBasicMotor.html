@@ -117,7 +117,14 @@ var serviceSPIKE = buttonServiceSPIKE.getService();
 <p>Next, you have to start the Motor in the callback function of <code>executeAfterInit()</code>. The Motor object can be declared be referring to <code>serviceSPIKE</code> and getting a Motor connected to port A:</p>
 <pre class="prettyprint source lang-javascript"><code>var motor = new serviceSPIKE.Motor(&quot;A&quot;);
 </code></pre>
-<p>Note that if no Motor is detected at port A when you declare this Motor object, ServiceDock will throw an error, so it is very important to declare these in the callback function of <code>executeAfterInit()</code>.</p>
+<p>Note that if no Motor is detected at port A when you declare this Motor object, ServiceDock will throw an error, so it is very important to declare these in the callback function of <code>executeAfterInit()</code>. The error should also be caught unless you are absolutely sure the correct port will be used to connect to the Motor. We catch errors as such</p>
+<pre class="prettyprint source lang-javascript"><code>try {
+    var motor = new serviceSPIKE.Motor(&quot;A&quot;);
+}
+catch(e) {
+    console.error(e); // possibly no Motor was detected at port A
+}
+</code></pre>
 <p>To start <code>motor</code> with speed of 100, all you need to do is the following, much like micropython.</p>
 <pre class="prettyprint source lang-javascript"><code>motor.start(100);
 </code></pre>
@@ -127,7 +134,12 @@ var serviceSPIKE = buttonServiceSPIKE.getService();
     console.log(&quot;SPIKE Service is initialized!&quot;);
 
     // declare Motor object at port &quot;A&quot;
-    var motor = new serviceSPIKE.Motor(&quot;A&quot;)
+    try {
+        var motor = new serviceSPIKE.Motor(&quot;A&quot;);
+    }
+    catch(e) {
+        console.error(e); // possibly no Motor was detected at port A
+    }
 
     // start Motor at speed 100
     motor.start(100)
@@ -155,10 +167,14 @@ var serviceSPIKE = buttonServiceSPIKE.getService();
             /* all code inside the callback function of executeAfterInit will run only after SPIKE Service is initialized */
 
             console.log(&quot;SPIKE Service is initialized!&quot;);
+            try {
+                var motor = new serviceSPIKE.Motor(&quot;A&quot;); // get the Motor object connected to port A
 
-            var motor = new serviceSPIKE.Motor(&quot;A&quot;); // get the Motor object connected to port A
-
-            motor.start(100); // start the Motor at speed 100
+                motor.start(100); // start the Motor at speed 100
+            }
+            catch (e) {
+                console.error(e); // possibly no Motor was detected at port A
+            }
         })
 
     &lt;/script>

@@ -131,7 +131,7 @@ Here is the final code you should end up with!
         serviceSPIKE.executeAfterInit(function () {
 
             console.log("SPIKE Service is initialized!");
-
+        
             var forceSensorObjects = serviceSPIKE.getForceSensors(); // get all ForceSensors connected to SPIKE Prime
             var motorObjects = serviceSPIKE.getMotors(); // get all Motors connected to SPIKE Prime
 
@@ -142,6 +142,7 @@ Here is the final code you should end up with!
             var intervalSPIKE = setInterval (function () {
 
                 if (serviceSPIKE.isActive() === true) {
+                    
                     // display force sensor output
                     var force = force_sensor.get_force_percentage();
                     

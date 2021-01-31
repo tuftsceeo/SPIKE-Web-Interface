@@ -79,7 +79,15 @@ Next, you have to start the Motor in the callback function of `executeAfterInit(
 ```javascript
 var motor = new serviceSPIKE.Motor("A");
 ```
-Note that if no Motor is detected at port A when you declare this Motor object, ServiceDock will throw an error, so it is very important to declare these in the callback function of `executeAfterInit()`. 
+Note that if no Motor is detected at port A when you declare this Motor object, ServiceDock will throw an error, so it is very important to declare these in the callback function of `executeAfterInit()`. The error should also be caught unless you are absolutely sure the correct port will be used to connect to the Motor. We catch errors as such
+```javascript
+try {
+    var motor = new serviceSPIKE.Motor("A");
+}
+catch(e) {
+    console.error(e); // possibly no Motor was detected at port A
+}
+```
 
 To start `motor` with speed of 100, all you need to do is the following, much like micropython.
 ```javascript
@@ -94,12 +102,18 @@ serviceSPIKE.executeAfterInit( function () {
     console.log("SPIKE Service is initialized!");
 
     // declare Motor object at port "A"
-    var motor = new serviceSPIKE.Motor("A")
+    try {
+        var motor = new serviceSPIKE.Motor("A");
+    }
+    catch(e) {
+        console.error(e); // possibly no Motor was detected at port A
+    }
 
     // start Motor at speed 100
     motor.start(100)
 })
 ```
+
 
 ## Running the Example
 Now save the HTML and run the web page again. Connect a Motor to port "A". Click the SPIKE Service button, and see your motor run. The final HTML is below.
@@ -125,10 +139,14 @@ Now save the HTML and run the web page again. Connect a Motor to port "A". Click
             /* all code inside the callback function of executeAfterInit will run only after SPIKE Service is initialized */
 
             console.log("SPIKE Service is initialized!");
+            try {
+                var motor = new serviceSPIKE.Motor("A"); // get the Motor object connected to port A
 
-            var motor = new serviceSPIKE.Motor("A"); // get the Motor object connected to port A
-
-            motor.start(100); // start the Motor at speed 100
+                motor.start(100); // start the Motor at speed 100
+            }
+            catch (e) {
+                console.error(e); // possibly no Motor was detected at port A
+            }
         })
 
     </script>
