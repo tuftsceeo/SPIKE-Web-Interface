@@ -32,7 +32,7 @@
         "title": "SystemLink Cloud Service",
         "children": {
             "exampleSystemLinkConnect": {
-                "title": "Connecting to System Link"
+                "title": "Connecting to SystemLink"
             },
             "exampleSystemLinkSendValues": {
                 "title": "Sending Values"

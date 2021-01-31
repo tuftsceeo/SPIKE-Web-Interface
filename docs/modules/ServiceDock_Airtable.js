@@ -183,7 +183,7 @@ class serviceairtable extends HTMLElement {
 
 
     set apikey(val) {
-        console.log(val);
+        // console.log(val);
         if (val) {
             this.setAttribute("apikey", val);
         }
@@ -193,7 +193,7 @@ class serviceairtable extends HTMLElement {
     }
 
     set baseid(val) {
-        console.log(val);
+        // console.log(val);
         if (val) {
             this.setAttribute("baseid", val);
         }
@@ -203,7 +203,7 @@ class serviceairtable extends HTMLElement {
     }
 
     set tablename(val) {
-        console.log(val);
+        // console.log(val);
         if (val) {
             this.setAttribute("tablename", val);
         }
@@ -944,7 +944,7 @@ function Service_Airtable() {
           return false
         }
         else {
-          console.log("%cTuftsCEEO ", "color: #3ba336;", stringInput.slice(0, stringInput.length - 1))
+          // console.log("%cTuftsCEEO ", "color: #3ba336;", stringInput.slice(0, stringInput.length - 1))
           return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
         }
       }

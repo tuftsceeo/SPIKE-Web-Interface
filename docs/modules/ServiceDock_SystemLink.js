@@ -136,7 +136,7 @@ class servicesystemlink extends HTMLElement {
     }
 
     set apikey(val) {
-        console.log("%cTuftsCEEO ", "color: #3ba336;", val);
+        // console.log("%cTuftsCEEO ", "color: #3ba336;", val);
         if ( val ) {
             this.setAttribute("apikey", val);
         }
@@ -146,6 +146,7 @@ class servicesystemlink extends HTMLElement {
     }
 
     attributeChangedCallback (name, oldValue, newValue) {
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "new value of apikey: ", newValue);
         this.APIKey = newValue;
     }
 
@@ -697,7 +698,7 @@ function Service_SystemLink() {
 
                     expectedValueType = tagsInfo[tagPath].type;
                     inputValueType = getValueTypeStrict(newValue);
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", expectedValueType, " vs ", inputValueType);
+                    // console.log("%cTuftsCEEO ", "color: #3ba336;", expectedValueType, " vs ", inputValueType);
                     if (inputValueType !== expectedValueType) {
                         console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on SystemLink Cloud. The given value is not of the data type defined for the tag in the database");
                         throw new Error("Could not update value of tag on SystemLink Cloud.The given value is not of the data type defined for the tag in the database");
