@@ -82,7 +82,7 @@ class servicespike extends HTMLElement {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
                 if ('serial' in navigator) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating SPIKE Service");
                     var initSuccessful = await this.service.init();
                     if (initSuccessful) {
                         active = true;
@@ -404,8 +404,6 @@ function Service_SPIKE() {
      */
     async function init() {
 
-        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.product is ", navigator.product);
-        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.appName is ", navigator.appName);
         // reinit variables in the case of hardware disconnection and Service reactivation
         reader = undefined;
         writer = undefined;
@@ -2102,7 +2100,7 @@ function Service_SPIKE() {
             console.error("Ports Info: ", ports);
             throw new Error("No DistanceSensor detected at port " + port);
         }
-        
+
         /** Retrieves the measured distance in centimeters.
          * @returns {number} [0 to 200]
          * @todo find the short_range handling ujsonrpc script
@@ -2867,6 +2865,7 @@ function Service_SPIKE() {
                 if (funcAfterError != undefined) {
                     funcAfterError("5 seconds have passed without response... Please reboot the hub and try again.")
                 }
+                console.error("%cTuftsCEEO ", "color: #3ba336;", "5 seconds have passed without response... Please reboot the hub and try again.");
             }
         }, 5000)
 
@@ -3114,7 +3113,7 @@ function Service_SPIKE() {
                 await port.open({ baudRate: 115200 });
             }
             catch (er) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", er);
+                console.error("%cTuftsCEEO ", "color: #3ba336;", er);
 
                 // check if system requires baudRate syntax
                 if (er.message.indexOf("baudrate") > -1) {
@@ -3127,17 +3126,20 @@ function Service_SPIKE() {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
+                    console.error("%cTuftsCEEO ", "color: #3ba336;", "Please check if you have any other window or app currently connected to your SPIKE Prime.");
+
                     await port.close();
                 }
 
                 // check if error in port.open was because it was already open
+                /* "failed to open serial port" */
                 else if (er.message.indexOf("open") > -1) {
-                    console.log("Here");
                     try {
                         await port.close();
                     }
                     catch (err) {
-                        console.log(err);
+                        console.error("%cTuftsCEEO ", "color: #3ba336;", err);
+                        console.error("%cTuftsCEEO ", "color: #3ba336;", "Please check if you have any other window or app currently connected to your SPIKE Prime.");
                     }
                 }
 
@@ -3145,6 +3147,7 @@ function Service_SPIKE() {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
+                    console.error("%cTuftsCEEO ", "color: #3ba336;", "If error persists, refresh this environment");
                 }
                 await port.close();
             }
@@ -3301,7 +3304,18 @@ function Service_SPIKE() {
 
                 /* Case 1: lastUJSONRPC is a valid, complete, and standard UJSONRPC packet */
                 if (lastUJSONRPC[0] == "{" && lastUJSONRPC[lastUJSONRPC.length - 1] == "}") {
-                    await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
+
+                    let arrayLeftCurly = lastUJSONRPC.match(/{/g);
+                    let arrayRightCurly = lastUJSONRPC.match(/}/g);
+                    if (arrayLeftCurly.length === arrayRightCurly.length) {
+                        /* Case 1A: complete packet*/
+                        
+                        await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
+                    }
+                    else {
+                        /* Case 1B: {"i": 1234, "r": {} */
+                        jsonline = lastUJSONRPC;    
+                    }
                 }
                 /* Case 3: lastUJSONRPC is a micropy print result */
                 else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1 && 
@@ -3918,7 +3932,7 @@ function Service_SPIKE() {
                             stringVersion = stringVersion + version[index];
                         }
                     }
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "firmware version: ", stringVersion);
+                    // console.log("%cTuftsCEEO ", "color: #3ba336;", "firmware version: ", stringVersion);
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
