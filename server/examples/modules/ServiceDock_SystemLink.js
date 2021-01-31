@@ -335,6 +335,7 @@ function Service_SystemLink() {
      * @param {any} tagName 
      * @param {any} newValue 
      * @param {any} callback 
+     * @example
      * // set a string type Value of a Tag and display
      * mySL.setTagValueNotStrict("message", 123, function () {
      *    let messageValue = mySL.getTagValue("message");

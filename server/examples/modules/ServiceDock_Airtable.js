@@ -491,6 +491,7 @@ function Service_Airtable() {
      * @param {string} name  Name of entry
      * @param {any} value  new Value to update entry to
      * @param {any} callback  function to run after new entry value or new entry creation
+     * @example
      * // set a string type Value of a Entry and display
      * myAirtable.setEntryValueNotStrict("message", 123, function () {
      *    let messageValue = myAirtable.getEntryValue("message");
