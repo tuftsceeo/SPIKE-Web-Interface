@@ -111,7 +111,7 @@
             
                 <h3>Example</h3>
                 
-    <pre class="prettyprint"><code>var hub = mySPIKE.PrimeHub();
+    <pre class="prettyprint"><code>var hub = serviceSPIKE.PrimeHub();
 var right_button = hub.right_button;
 // do something with right_button</code></pre>
 
@@ -275,7 +275,7 @@ var right_button = hub.right_button;
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+    <pre class="prettyprint"><code>var hub = new serviceSPIKE.PrimeHub();
 var right_button = hub.right_button;
 right_button.wait_until_pressed ( function () {
     console.log("right_button was pressed");
@@ -423,7 +423,7 @@ right_button.wait_until_pressed ( function () {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+    <pre class="prettyprint"><code>var hub = new serviceSPIKE.PrimeHub();
 var right_button = hub.right_button;
 right_button.wait_until_released ( function () {
     console.log("right_button was released");
@@ -544,7 +544,7 @@ right_button.wait_until_released ( function () {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var hub = new mySPIKE.PrimeHub();
+    <pre class="prettyprint"><code>var hub = new serviceSPIKE.PrimeHub();
 if ( hub.right_button.was_pressed() ) {
     console.log("right_button was pressed");
 }</code></pre>

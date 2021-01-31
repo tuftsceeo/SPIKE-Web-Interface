@@ -447,7 +447,7 @@ function Service_SystemLink() {
      * @param {function} callback optional callback
      * @example
      * mySL.createTag("message", "hi", function () {
-     *      mySL.setTagValue("message", "bye"); // change the value of 'message' from "hi" to "bye"
+     *      mySL.setTagValueStrict("message", "bye"); // change the value of 'message' from "hi" to "bye"
      * })
      */
     function createTag(tagName, tagValue, callback) {

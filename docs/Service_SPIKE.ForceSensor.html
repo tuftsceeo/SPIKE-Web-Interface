@@ -113,7 +113,7 @@
                 <h3>Example</h3>
                 
     <pre class="prettyprint"><code>// Initialize the ForceSensor
-var force = new mySPIKE.ForceSensor("E")</code></pre>
+var force_sensor = new serviceSPIKE.ForceSensor("E")</code></pre>
 
             
         
@@ -244,6 +244,13 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
 
 
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>if (force_sensor.is_pressed() === true) {
+     console.log("force sensor is pressed");
+}</code></pre>
+
+    
 
 </dd>
 
@@ -259,7 +266,7 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2295">line 2295</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line2297">line 2297</a></code>
             </div>
             
         </h4>
@@ -354,6 +361,11 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
 
 
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var newtons = force_sensor.get_force_newtons();</code></pre>
+
+    
 
 </dd>
 
@@ -369,7 +381,7 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2306">line 2306</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line2309">line 2309</a></code>
             </div>
             
         </h4>
@@ -417,7 +429,8 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
 
 
 
-- <p>percentage [0 to 100]</p>
+- <p>percentage [0 to 100]
+var percentage = force_sensor.get_force_percentage();</p>
 
 
 
@@ -479,7 +492,7 @@ var force = new mySPIKE.ForceSensor("E")</code></pre>
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2321">line 2321</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line2327">line 2327</a></code>
             </div>
             
         </h4>
@@ -604,6 +617,13 @@ The function is executed in updateHubPortsInfo()'s Force Sensor part</p>
 
 
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>force_sensor.wait_until_pressed( function () {
+     console.log("force sensor is pressed!");
+})</code></pre>
+
+    
 
 </dd>
 
@@ -619,7 +639,7 @@ The function is executed in updateHubPortsInfo()'s Force Sensor part</p>
             
             <div class="container-source members">
                 <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2329">line 2329</a></code>
+                <code><a href="ServiceDock_SPIKE.js.html#line2339">line 2339</a></code>
             </div>
             
         </h4>
@@ -742,6 +762,13 @@ The function is executed in updateHubPortsInfo()'s Force Sensor part</p>
     
 </dl>
 
+
+    
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>force_sensor.wait_until_released ( function () {
+     console.log("force sensor is released!");
+})</code></pre>
 
     
 

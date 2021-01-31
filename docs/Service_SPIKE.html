@@ -153,12 +153,12 @@
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>// assuming you declared &lt;service-spike> with the id, "service_spike"
-var mySPIKE = document.getElemenyById("service_spike").getService();
-mySPIKE.executeAfterInit(async function() {
+var serviceSPIKE = document.getElemenyById("service_spike").getService();
+serviceSPIKE.executeAfterInit(async function() {
     // write code here
 })
 
-mySPIKE.init();</code></pre>
+serviceSPIKE.init();</code></pre>
 
     
 
@@ -505,8 +505,8 @@ mySPIKE.init();</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySPIKE.executeAfterInit( function () {
-    var motor = mySPIKE.Motor("A");
+    <pre class="prettyprint"><code>serviceSPIKE.executeAfterInit( function () {
+    var motor = serviceSPIKE.Motor("A");
     var speed = motor.get_speed();
     // do something with speed
 })</code></pre>
@@ -653,8 +653,8 @@ mySPIKE.init();</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motor = new mySPIKE.Motor('A')
-mySPIKE.executeWithStream( async function() {
+    <pre class="prettyprint"><code>var motor = new serviceSPIKE.Motor('A')
+serviceSPIKE.executeWithStream( async function() {
      var speed = await motor.get_speed();
      // do something with motor speed
 })</code></pre>
@@ -752,7 +752,7 @@ mySPIKE.executeWithStream( async function() {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySPIKE.rebootHub();</code></pre>
+    <pre class="prettyprint"><code>serviceSPIKE.rebootHub();</code></pre>
 
     
 
@@ -972,7 +972,7 @@ mySPIKE.executeWithStream( async function() {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (mySPIKE.isActive()) {
+    <pre class="prettyprint"><code>if (serviceSPIKE.isActive()) {
      // do something
 }</code></pre>
 
@@ -1041,7 +1041,7 @@ mySPIKE.executeWithStream( async function() {
 
 
 - <p>['tapped','doubletapped']
-var event = await mySPIKE.getHubEvent();
+var event = await serviceSPIKE.getHubEvent();
 if (event == &quot;tapped&quot; ) {
 console.log(&quot;SPIKE is tapped&quot;);
 }</p>
@@ -1203,7 +1203,7 @@ console.log(&quot;SPIKE is tapped&quot;);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var gesture = await mySPIKE.getHubGesture();
+    <pre class="prettyprint"><code>var gesture = await serviceSPIKE.getHubGesture();
 if (gesture == "shaken") {
      console.log("SPIKE is being shaked");
 }</code></pre>
@@ -1321,7 +1321,7 @@ if (gesture == "shaken") {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var orientation = await mySPIKE.getHubOrientation();
+    <pre class="prettyprint"><code>var orientation = await serviceSPIKE.getHubOrientation();
 if (orientation == "front") {
      console.log("SPIKE is facing up");
 }</code></pre>
@@ -1442,7 +1442,7 @@ if (orientation == "front") {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motorPorts = mySPIKE.getMotorPorts();
+    <pre class="prettyprint"><code>var motorPorts = serviceSPIKE.getMotorPorts();
 
 // get the alphabetically earliest port connected to a motor
 var randomPort = motorPorts[0];
@@ -1566,7 +1566,7 @@ var mySensor = new Motor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var smallMotorPorts = mySPIKE.getSmallMotorPorts();
+    <pre class="prettyprint"><code>var smallMotorPorts = serviceSPIKE.getSmallMotorPorts();
 
 // get the alphabetically earliest port connected to a small motor
 var randomPort = smallMotorPorts[0];
@@ -1690,7 +1690,7 @@ var mySensor = new Motor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var bigMotorPorts = mySPIKE.getBigMotorPorts();
+    <pre class="prettyprint"><code>var bigMotorPorts = serviceSPIKE.getBigMotorPorts();
 
 // get the alphabetically earliest port connected to a big motor
 var randomPort = bigMotorPorts[0];
@@ -1814,7 +1814,7 @@ var mySensor = new Motor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var distanceSensorPorts = mySPIKE.getDistancePorts();
+    <pre class="prettyprint"><code>var distanceSensorPorts = serviceSPIKE.getDistancePorts();
 
 // get the alphabetically earliest port connected to a DistanceSensor
 var randomPort = distanceSensorPorts[0];
@@ -1938,7 +1938,7 @@ var mySensor = new DistanceSensor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var colorSensorPorts = mySPIKE.getColorPorts();
+    <pre class="prettyprint"><code>var colorSensorPorts = serviceSPIKE.getColorPorts();
 
 // get the alphabetically earliest port connected to a ColorSensor
 var randomPort = colorSensorPorts[0];
@@ -2062,7 +2062,7 @@ var mySensor = new ColorSensor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var forceSensorPorts = mySPIKE.getForcePorts();
+    <pre class="prettyprint"><code>var forceSensorPorts = serviceSPIKE.getForcePorts();
 
 // get the alphabetically earliest port connected to a ForceSensor
 var randomPort = forceSensorPorts[0];
@@ -2183,7 +2183,7 @@ var mySensor = new ForceSensor(randomPort);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var motors = mySPIKE.getMotors();
+    <pre class="prettyprint"><code>var motors = serviceSPIKE.getMotors();
 
 if (motors.length > 0) {
 
@@ -2306,7 +2306,7 @@ if (motors.length > 0) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var distanceSensors = mySPIKE.getDistanceSensors();
+    <pre class="prettyprint"><code>var distanceSensors = serviceSPIKE.getDistanceSensors();
 
 if (distanceSensors.length > 0) {
 
@@ -2430,7 +2430,7 @@ if (distanceSensors.length > 0) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var colorSensors = mySPIKE.getColorSensors();
+    <pre class="prettyprint"><code>var colorSensors = serviceSPIKE.getColorSensors();
 
 if (colorSensors.length > 0) {
 
@@ -2554,7 +2554,7 @@ if (colorSensors.length > 0) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var forceSensors = mySPIKE.getForceSensors();
+    <pre class="prettyprint"><code>var forceSensors = serviceSPIKE.getForceSensors();
 
 if (forceSensors.length > 0) {
 
@@ -3006,7 +3006,7 @@ if (forceSensors.length > 0) {
         <h5>Example</h5>
         
     <pre class="prettyprint"><code>// execute program in slot 1 of SPIKE Prime hub
-mySPIKE.executeProgram(1);</code></pre>
+serviceSPIKE.executeProgram(1);</code></pre>
 
     
 
