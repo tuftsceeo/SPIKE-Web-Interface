@@ -9,7 +9,7 @@ One is to do it all inline, using the Service_Airtable function `init(APIKey, Ba
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -36,11 +36,11 @@ Alternatively, you can set the API Key, Base ID, and Table Name individually as 
 ```
 or JavaScript
 ```javascript
-var airtableElement = document.getElementById("service_airtable")
-// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
-airtableElement.setAttribute("apikey", "your_API_key")
-airtableElement.setAttribute("baseid", "your_base_ID")
-airtableElement.setAttribute("tablename", "your_table_name")
+var serviceAirtableElement = document.getElementById("service_airtable")
+// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on serviceAirtableElement)
+serviceAirtableElement.setAttribute("apikey", "your_API_key")
+serviceAirtableElement.setAttribute("baseid", "your_base_ID")
+serviceAirtableElement.setAttribute("tablename", "your_table_name")
 ```
 
 ## Method 3: On the Page
@@ -50,11 +50,11 @@ The third and final way to initialize your Service_Airtable is done on the webpa
 Once your values are set, you have to initialize the HTML `service-airtable` element (which is, again, different from the Service_Airtable object accessed by calling `getService()` on said HTML element) with either the `init()` function, e.g.
 
 ```javascript
-var airtableElement = document.getElementById("service_airtable")
+var serviceAirtableElement = document.getElementById("service_airtable")
 
 // code for setting key/id/name goes here
 
-airtableElement.init()
+serviceAirtableElement.init()
 ```
 or, if using method 3, by clicking the Airtable icon a second time.
 

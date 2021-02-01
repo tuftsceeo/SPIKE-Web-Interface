@@ -11,8 +11,8 @@ However, in certain contexts, types are still an important thing to keep in mind
 
 The difference between `setEntryValueStrict` and `setEntryValueNotStrict` is the adherence to these types. If we were to run
 ```javascript
-myTable.setEntryValueStrict("speed", "10")
-myTable.setEntryValueStrict("speed", 20)
+serviceAirtable.setEntryValueStrict("speed", "10")
+serviceAirtable.setEntryValueStrict("speed", 20)
 ```
 the second line would throw an error, because we tried to put an integer into an entry that had previously held a string. But if we had instead used `setEntryValueNotStrict`, Service_Airtable would've performed its own conversion and run smoothly.
 
@@ -34,20 +34,20 @@ We now have enough information to complete the remote page, which would look som
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
-        var airtableElement = document.getElementById("service_airtable")
+        var serviceAirtableElement = document.getElementById("service_airtable")
         // your API key, base ID, and table name go here
-        airtableElement.setAttribute("apikey", "your_API_key")
-        airtableElement.setAttribute("baseid", "your_base_ID")
-        airtableElement.setAttribute("tablename", "your_table_name")
-        airtableElement.init()
+        serviceAirtableElement.setAttribute("apikey", "your_API_key")
+        serviceAirtableElement.setAttribute("baseid", "your_base_ID")
+        serviceAirtableElement.setAttribute("tablename", "your_table_name")
+        serviceAirtableElement.init()
 
-        var myTable = airtableElement.getService();
+        var serviceAirtable = serviceAirtableElement.getService();
 
         // ensuring speed starts at zero
-        myTable.executeAfterInit(function() { sendMotorSpeed(0)} )
+        serviceAirtable.executeAfterInit(function() { sendMotorSpeed(0)} )
 
         function sendMotorSpeed(speed) {
-            myTable.setEntryValueStrict("motor_speed", parseInt(speed)) 
+            serviceAirtable.setEntryValueStrict("motor_speed", parseInt(speed)) 
             // here, speed is actually coming in as a string, which would be a problem when trying to send it into a motor, hence the use of the built-in JavaScript function "parseInt" to convert it into an integer
         }
     </script>

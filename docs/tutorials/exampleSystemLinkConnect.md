@@ -16,11 +16,11 @@ One is to do it all inline, using the Service_SystemLink function `init(APIKey, 
         </div>
     </body>
     <script>
-        var mySystemLink = document.getElementById("service_systemlink").getService();
+        var serviceSystemLink = document.getElementById("service_systemlink").getService();
         // your API key goes here
         var apiKey = "your_API_key";  
 
-        mySystemLink.init(apiKey)
+        serviceSystemLink.init(apiKey)
     </script>
 </html>
 ```

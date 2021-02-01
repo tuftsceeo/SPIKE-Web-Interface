@@ -16,14 +16,14 @@ Knowing that, the code becomes fairly simple; we get the current speed from Airt
 In code, that process would look something like this:
 
 ```javascript
-myTable.executeAfterInit(function() {
+serviceAirtable.executeAfterInit(function() {
     // start the periodic checks and updates
     checkAndUpdate(null)
 })
 
 // checks airtable for new motor speed, updates page display accordingly, and sets up next check if program is still active
 function checkAndUpdate(pastSpeed) {
-    var currentSpeed = myTable.getEntryValue("motor_speed")
+    var currentSpeed = serviceAirtable.getEntryValue("motor_speed")
     // if speed has been changed since last check, update page display
     if(currentSpeed != pastSpeed)
     updateSpeed(currentSpeed)
@@ -41,13 +41,13 @@ function updateSpeed(newSpeed) {
 ## An Edge Case
 Suppose a user connects a local page to the Airtable before a remote page is ever connected. Since a value for motor_speed has never been set, the `getEntryValue` will throw an error, which will halt our regular checking of the table such that even if a remote page is later connected, the local page will not receive any values. Before starting those periodic checks, we therefore have to make sure the motor_speed entry exists in order to prevent the page from trying to get a nonexistent value.
 
-The Service_Airtable function `getEntriesInfo()` returns an object with a field representing each entry in the table. You can access one such entry by putting its name in brackets, such that, if motor-speed exists in the table, the line `myTable.getEntriesInfo()["motor-speed"]` will return an object containing the name "motor-speed" and its current value. If the motor-speed entry is not in the table, it will return `undefined`.
+The Service_Airtable function `getEntriesInfo()` returns an object with a field representing each entry in the table. You can access one such entry by putting its name in brackets, such that, if motor-speed exists in the table, the line `serviceAirtable.getEntriesInfo()["motor-speed"]` will return an object containing the name "motor-speed" and its current value. If the motor-speed entry is not in the table, it will return `undefined`.
 
 Knowing that, we can write a function very similar to `checkAndUpdate` that checks if motor-speed exists and, if so, starts the periodic calls of `checkAndUpdate`. If not, it can schedule itself to check again in one second, and continue doing so until a motor-speed entry is found. In code, that would look like this:
 
 ```javascript
 function startChecking() {
-    if(myTable.getEntriesInfo()["motor_speed"] != undefined)
+    if(serviceAirtable.getEntriesInfo()["motor_speed"] != undefined)
         checkAndUpdate(null)
     else
         setTimeout(startChecking, 1000)
@@ -78,24 +78,24 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
         <div id = "speed_display">Speed: unknown</div>
     </body>
     <script>
-        var airtableElement = document.getElementById("service_airtable")
-        airtableElement.setAttribute("apikey", "your_API_key")
-        airtableElement.setAttribute("baseid", "your_base_ID")
-        airtableElement.setAttribute("tablename", "your_table_name")
-        airtableElement.init()
+        var serviceAirtableElement = document.getElementById("service_airtable")
+        serviceAirtableElement.setAttribute("apikey", "your_API_key")
+        serviceAirtableElement.setAttribute("baseid", "your_base_ID")
+        serviceAirtableElement.setAttribute("tablename", "your_table_name")
+        serviceAirtableElement.init()
 
-        var myTable = airtableElement.getService()
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceAirtable = serviceAirtableElement.getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
 
-        myTable.executeAfterInit(function() {
+        serviceAirtable.executeAfterInit(function() {
             // start the periodic checks and updates
             startChecking()
         })
 
         // starts periodic updates of and checks of motor speed if value exists in table (if not, tries again in 1 second)
         function startChecking() {
-            if(myTable.getEntriesInfo()["motor_speed"] != undefined)
+            if(serviceAirtable.getEntriesInfo()["motor_speed"] != undefined)
                 checkAndUpdate(null)
             else
                 setTimeout(startChecking, 1000)
@@ -103,7 +103,7 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
 
         // checks airtable for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
         function checkAndUpdate(pastSpeed) {
-            var currentSpeed = myTable.getEntryValue("motor_speed")
+            var currentSpeed = serviceAirtable.getEntryValue("motor_speed")
             // if speed has been changed since last check, update page display
             if(currentSpeed != pastSpeed)
                 updateSpeed(currentSpeed)
@@ -117,8 +117,8 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
             document.getElementById("speed_display").innerText = "Speed: " + newSpeed
             
             // run motor if SPIKE is connected
-            if(mySPIKE.isActive())
-                mySPIKE.Motor("A").start(newSpeed)
+            if(serviceSPIKE.isActive())
+                serviceSPIKE.Motor("A").start(newSpeed)
         }
     </script>
 </html>

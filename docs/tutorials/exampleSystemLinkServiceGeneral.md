@@ -74,9 +74,9 @@ This is an interface that can set tag values and create tags on your SystemLink 
     </body>
     <script>
         //Use ServiceDock here!
-        var SystemLinkService = document.getElementById("service_systemlink");
+        var serviceSystemLinkElement = document.getElementById("service_systemlink");
 
-        var mySL = SystemLinkService.getService(); // your Service object
+        var serviceSystemLink = serviceSystemLinkElement.getService(); // your Service object
 
         var realTimeTagsInfo = {}; // real time System Link Cloud tags
 
@@ -89,18 +89,18 @@ This is an interface that can set tag values and create tags on your SystemLink 
         var createTagStatus = document.getElementById("createTagStatus");
 
         // populate <select> with all tags on the cloud and display the selected Tag's (first Tag) value
-        mySL.executeAfterInit( function() {
+        serviceSystemLink.executeAfterInit( function() {
             populateSelection();
             displayCurrentValue();
         });
         
-        SystemLinkService.init(); 
+        serviceSystemLinkElement.init(); 
         
         // append <option> of Tags to <select>
         function populateSelection() {
             existingTagsElement.innerHTML = ""; //reset <select>
             // get all tags information from Cloud
-            realTimeTagsInfo = mySL.getTagsInfo();
+            realTimeTagsInfo = serviceSystemLink.getTagsInfo();
 
             // append each to <select>
             for (var key in realTimeTagsInfo) {
@@ -121,7 +121,7 @@ This is an interface that can set tag values and create tags on your SystemLink 
             var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
 
             // get the value of the Tag
-            var value = mySL.getTagValue(key);
+            var value = serviceSystemLink.getTagValue(key);
 
             // update display
             currentValue.innerHTML = value;
@@ -139,7 +139,7 @@ This is an interface that can set tag values and create tags on your SystemLink 
             changeTagValue.value = ""; // reset input field
             
             // change Tag's value
-            mySL.setTagValueNotStrict(key, newValue, function() {
+            serviceSystemLink.setTagValueNotStrict(key, newValue, function() {
                 displayCurrentValue();
             })
         })
@@ -164,7 +164,7 @@ This is an interface that can set tag values and create tags on your SystemLink 
             createTagName.value = "";
 
             // create new Tag
-            mySL.createTag(key, newValue, function () {
+            serviceSystemLink.createTag(key, newValue, function () {
                 populateSelection();
                 displayCurrentValue();
                 createTagStatus.innerHTML = "tag was created!"

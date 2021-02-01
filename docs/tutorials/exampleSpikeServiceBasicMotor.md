@@ -26,16 +26,16 @@ The status light for your SPIKE Service should have turned from red to green. Yo
 Although what you just clicked was the `<service-spike>` element, what was initialized is the SPIKE Service object that can be obtained by running `getService()` on the `<service-spike>` element as such:
 
 ```javascript
-var buttonServiceSPIKE = document.getElementById("service_spike");
-var serviceSPIKE = buttonServiceSPIKE.getService();
+var serviceSPIKEElement = document.getElementById("service_spike");
+var serviceSPIKE = serviceSPIKEElement.getService();
 ```
 
 `serviceSPIKE` is the SPIKE Service object with which you can program with your SPIKE Prime. The SPIKE Service, `serviceSPIKE`, gets automatically initialized when the user of your webpage clicks on `<service-spike>` and connects their SPIKE Prime to Google Chrome. So far, your `<script>` should look like this
 
 ```html
 <script>
-    var buttonServiceSPIKE = document.getElementById("service_spike");
-    var serviceSPIKE = buttonServiceSPIKE.getService();
+    var serviceSPIKEElement = document.getElementById("service_spike");
+    var serviceSPIKE = serviceSPIKEElement.getService();
 </script>
 ```
 
@@ -63,8 +63,8 @@ Right now, we are figuring out a way to run SPIKE Service code after detecting t
 If we were to want to print the message "SPIKE Service is initialized!" to the console after the user clicks `<service-spike>`, we would need to do:
 ```html
 <script>
-    var buttonServiceSPIKE = document.getElementById("service_spike");
-    var serviceSPIKE = buttonServiceSPIKE.getService();
+    var serviceSPIKEElement = document.getElementById("service_spike");
+    var serviceSPIKE = serviceSPIKEElement.getService();
 
     serviceSPIKE.executeAfterInit( function () {
         console.log("SPIKE Service is initialized!");
@@ -130,8 +130,8 @@ Now save the HTML and run the web page again. Connect a Motor to port "A". Click
         </div>
     </body>
     <script>
-        var buttonServiceSPIKE = document.getElementById("service_spike"); // get <service-spike>
-        var serviceSPIKE = buttonServiceSPIKE.getService(); // get SPIKE Service object
+        var serviceSPIKEElement = document.getElementById("service_spike"); // get <service-spike>
+        var serviceSPIKE = serviceSPIKEElement.getService(); // get SPIKE Service object
 
         
         serviceSPIKE.executeAfterInit(function () {

@@ -5,7 +5,7 @@ Description coming soon
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;
@@ -14,7 +14,7 @@ Description coming soon
             }
         </style>
     </head>
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
         </div>
@@ -32,10 +32,10 @@ Description coming soon
         </div>
     </body>
     <script>
-        var airtableElement = document.getElementById("service_airtable")
-        var myTable = airtableElement.getService()
+        var elementServiceAirtable = document.getElementById("service_airtable")
+        var serviceAirtable = elementServiceAirtable.getService()
 
-        myTable.executeAfterInit(function() { 
+        serviceAirtable.executeAfterInit(function() { 
             // set up table with default values
             sendSliderVal("left_speed", 0)
             sendSliderVal("right_speed", 0)
@@ -44,11 +44,11 @@ Description coming soon
         })
 
         function shoot() {
-            myTable.setEntryValueStrict("shoot_mode", "shoot")
+            serviceAirtable.setEntryValueStrict("shoot_mode", "shoot")
         }
 
         function sendSliderVal(entryName, val) {
-            myTable.setEntryValueStrict(entryName, parseInt(val))
+            serviceAirtable.setEntryValueStrict(entryName, parseInt(val))
         }
     </script>
 </html>
@@ -58,8 +58,7 @@ Description coming soon
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #displays {
                 text-align: center;
@@ -69,7 +68,7 @@ Description coming soon
             }
         </style>
     </head>
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
             <service-spike id="service_spike"></service-spike>
@@ -81,17 +80,17 @@ Description coming soon
         </div>
     </body>
     <script>
-        var airtableElement = document.getElementById("service_airtable")
-        var myTable = airtableElement.getService()
+        var elementServiceAirtable = document.getElementById("service_airtable")
+        var serviceAirtable = elementServiceAirtable.getService()
 
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
         var motorSpeeds = {
             left: null,
             right: null,
         }
 
-        myTable.executeAfterInit(function() {
+        serviceAirtable.executeAfterInit(function() {
             // start the periodic checks and updates
            checkTable({})
         })
@@ -99,7 +98,7 @@ Description coming soon
 
         // checks current table values against those of last check and controls motors and page displays accordingly
         function checkTable(pastTable) {
-            var  currentTable = myTable.getEntriesInfo()
+            var  currentTable = serviceAirtable.getEntriesInfo()
 
             checkEntry("shooter_angle", currentTable, pastTable, updateAngle)
             checkEntry("left_speed", currentTable, pastTable, function(newSpeed) { updateSpeed("left", newSpeed) } )
@@ -126,15 +125,15 @@ Description coming soon
             document.getElementById("displays").style.backgroundColor = "rgb(163,255,143)"
 
             // if spike is connected, run shooter motors w/ specified speeds
-            if(mySPIKE.isActive()) {
-                mySPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
-                mySPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
+            if(serviceSPIKE.isActive()) {
+                serviceSPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
+                serviceSPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
             }
 
             // revert div color back once shooting is done
             setTimeout(function() { document.getElementById("displays").style.backgroundColor = "rgb(0,255,133)" }, 2000)
 
-            myTable.setEntryValueStrict("shoot_mode", "wait")
+            serviceAirtable.setEntryValueStrict("shoot_mode", "wait")
         }
 
         /* updates stored speed value and screen display for specified side (a)
@@ -154,8 +153,8 @@ Description coming soon
             document.getElementById("angle_display").innerText = "angle: " + newAngle
             
             // run motor to new position if SPIKE is connected
-            if(mySPIKE.isActive())
-                mySPIKE.Motor("C").run_to_degrees_counted(newAngle)
+            if(serviceSPIKE.isActive())
+                serviceSPIKE.Motor("C").run_to_degrees_counted(newAngle)
         }
     </script>
 </html>

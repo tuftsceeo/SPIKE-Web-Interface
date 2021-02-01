@@ -12,12 +12,12 @@ Unlike in the Python library, the JavaScript functions for running motors for sp
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
-        mySPIKE.executeAfterInit(function () {
+        serviceSPIKE.executeAfterInit(function () {
 
-            var fastMotor = new mySPIKE.Motor("A")
-            var slowMotor = new mySPIKE.Motor("B")
+            var fastMotor = new serviceSPIKE.Motor("A")
+            var slowMotor = new serviceSPIKE.Motor("B")
 
             fastMotor.run_for_degrees(360, 100)
             slowMotor.run_for_degrees(360, 50)
@@ -53,11 +53,11 @@ You can also use MotorPairs to control motors simultaneously, though they can ge
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
-        mySPIKE.executeAfterInit(function () {
+        serviceSPIKE.executeAfterInit(function () {
 
-            var pair = new mySPIKE.MotorPair("A", "B")
+            var pair = new serviceSPIKE.MotorPair("A", "B")
 
             pair.start(50, 50)
 

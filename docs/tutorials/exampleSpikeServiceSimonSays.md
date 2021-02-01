@@ -17,21 +17,21 @@ function getNewCommand() {
 }
 ```
 
-Steps 2 and 3 are where it gets more interesting. For step 2, we're going to use the hub's built-in motion sensor, accessed with `mySPIKE.PrimeHub().motion_sensor`, which tracks both its orientation in space and various "gestures" such as being tapped or shaken. The motion sensor has a `wait_for_new_gesture(callback)` function, which waits for a new gesture to occur and then runs a callback function with the name of the gesture ("tapped", "doubletapped", "shaken", or "freefall") as a parameter. If we use this function as our step 2, we can have our step 3 be the callback function, ensuring that it will run only after a move is made. There is also an analogous function for orientations (with each orientation corresponding to which side of the spike is facing up) called `wait_for_new_orientation(callback)`
+Steps 2 and 3 are where it gets more interesting. For step 2, we're going to use the hub's built-in motion sensor, accessed with `serviceSPIKE.PrimeHub().motion_sensor`, which tracks both its orientation in space and various "gestures" such as being tapped or shaken. The motion sensor has a `wait_for_new_gesture(callback)` function, which waits for a new gesture to occur and then runs a callback function with the name of the gesture ("tapped", "doubletapped", "shaken", or "freefall") as a parameter. If we use this function as our step 2, we can have our step 3 be the callback function, ensuring that it will run only after a move is made. There is also an analogous function for orientations (with each orientation corresponding to which side of the spike is facing up) called `wait_for_new_orientation(callback)`
 
 In code, that would look like this:
 
 ```javascript
 function checkGesture(targetGesture, roundTime){
     var startTime = Date.now(); // storing the time right before the hub starts waiting for a gesture, to be compared to the time after gesture is completed
-    mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
+    serviceSPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
         processMove(newGesture, targetGesture, Date.now() - startTime, roundTime) 
     })
 }
 
 function checkOrientation(targetOrientation, roundTime) {
     var startTime = Date.now();
-    mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
+    serviceSPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
         processMove(newOrientation, targetOrientation, Date.now() - startTime, roundTime) 
     })
 }
@@ -78,13 +78,13 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
         var messageDisplay = document.getElementById("message");
         var score = 0;
 
         // workaround for wait_for_new_orientation giving starting orientation of hub the first time it is called
-        mySPIKE.executeAfterInit(function() {
-            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation( function() { console.log("Ready to go!")})
+        serviceSPIKE.executeAfterInit(function() {
+            serviceSPIKE.PrimeHub().motion_sensor.wait_for_new_orientation( function() { console.log("Ready to go!")})
         })
 
         // resets score to zero and begins a new game
@@ -121,7 +121,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
         // waits for player to tap or shake hub, records move made and time taken for further processing
         function checkGesture(targetGesture, roundTime){
             var startTime = Date.now();
-            mySPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
+            serviceSPIKE.PrimeHub().motion_sensor.wait_for_new_gesture(function(newGesture) { 
                 processMove(newGesture, targetGesture, Date.now() - startTime, roundTime) 
             })
         }
@@ -129,7 +129,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
         // waits for player to turn hub (for flip commands), records move made and time taken for further processing
         function checkOrientation(targetOrientation, roundTime) {
             var startTime = Date.now();
-            mySPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
+            serviceSPIKE.PrimeHub().motion_sensor.wait_for_new_orientation(function(newOrientation) { 
                 processMove(newOrientation, targetOrientation, Date.now() - startTime, roundTime) 
             })
         }

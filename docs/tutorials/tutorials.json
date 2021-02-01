@@ -1,9 +1,9 @@
 {
     "tutorialServiceDock": {
-        "title": "Using ServiceDock"
+        "title": "A) Using ServiceDock"
     },
     "tutorialSpikeService": {
-        "title": "SPIKE Service",
+        "title": "B) SPIKE Service",
         "children":{
             "exampleSpikeServiceBasicMotor": {
                 "title": "Basic - Start Single Motor"
@@ -29,7 +29,7 @@
         }
     },
     "tutorialSystemLinkService": {
-        "title": "SystemLink Cloud Service",
+        "title": "D) SystemLink Cloud Service",
         "children": {
             "exampleSystemLinkConnect": {
                 "title": "Connecting to SystemLink"
@@ -46,7 +46,7 @@
         }
     },
     "tutorialAirtableService": {
-        "title": "Airtable Service",
+        "title": "C) Airtable Service",
         "children": {
             "exampleAirtableConnectToPage": {
                 "title": "Connecting to Airtable"
