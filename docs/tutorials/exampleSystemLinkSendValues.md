@@ -32,7 +32,7 @@ We now have enough information to complete the remote page, which should look so
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -42,11 +42,11 @@ We now have enough information to complete the remote page, which should look so
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
-        var systemLinkElement = document.getElementById("service_SystemLink")
-        systemLinkElement.setAttribute("apikey", "your_API_key")
-        systemLinkElement.init()
+        var elementServiceSystemLink = document.getElementById("service_SystemLink")
+        elementServiceSystemLink.setAttribute("apikey", "your_API_key")
+        elementServiceSystemLink.init()
 
-        var serviceSystemLink = systemLinkElement.getService()
+        var serviceSystemLink = elementServiceSystemLink.getService()
 
         // creating motor_speed tag
         serviceSystemLink.executeAfterInit(function() { serviceSystemLink.createTag("motor_speed", 0) })

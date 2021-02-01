@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: exampleSystemLinkServiceGeneral | Tutorial: exampleSystemLinkServiceGeneral</title>
+    <title>Tutorial: SPIKE Service | Tutorial: SPIKE Service</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: exampleSystemLinkServiceGeneral</a>
+            <a class = "currentPage">Tutorial: SPIKE Service</a>
         
         
     </div>
@@ -54,214 +54,51 @@
 <section>
     <header>
         
+        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
+        <ul>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBasicMotor.html">Basic - Start Single Motor</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceTwoMotors.html">Basic - Controlling Multiple Motors</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSensors.html">Basic - Using the Sensors</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceForceToMotor.html">Intermediate - Automatically Getting Connected Modules</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServicePython.html">Intermediate - Integrating MicroPython</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSimonSays.html">Advanced - Using Hub Gestures and Orientations</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceUsingMultipleHubs.html">Advanced - Connecting and Using Multiple SPIKE Primes</a></li>
+        </ul>
+        
 
-        <h2>exampleSystemLinkServiceGeneral</h2>
+        <h2>SPIKE Service</h2>
     </header>
 
     
         <article class="readme">
-            <h2>General SystemLink Service Interface</h2>
-<p>This is an interface that can set tag values and create tags on your SystemLink Cloud database. The source code and an interactive example are below.</p>
-<pre class="prettyprint source lang-html"><code>&lt;html>
-
-    &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js&quot;>&lt;/script>
-        &lt;div id = &quot;servicedock&quot; style = &quot;float: left&quot;>
-            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;/div>
-        &lt;style>
-            input {
-                width: 100px;
-                height: 20px;
-            }
-        
-            #interface {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                left: 15%;
-                top: 100px;
-                background-color: #4CE0D2;
-                height: 400px;
-                width: 500px;
-                border: solid;
-            }
-        
-            .action {
-                margin: 5%;
-                position: relative;
-                justify-content: center;
-            }
-        &lt;/style>
-    &lt;/head>
-    &lt;body>
-        &lt;div id = &quot;interface&quot;>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Change existing tags
-                &lt;/h3>
-                &lt;div id=&quot;changeTag&quot;>
-                    &lt;select id=&quot;existingTags&quot;>
-                    
-                    &lt;/select>
-                    &lt;input id=&quot;changeTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id=&quot;changeTagSubmit&quot; type=&quot;submit&quot; value=&quot;change&quot;>
-                &lt;/div>
-                &lt;div>
-                    Current value:
-                    &lt;span id=&quot;currentValue&quot;>
-                    
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Create tags
-                &lt;/h3>
-                &lt;div id=&quot;createTag&quot;>
-                    &lt;input id=&quot;createTagName&quot; type=&quot;text&quot; placeholder=&quot;Tag Name&quot;>
-                    &lt;input id=&quot;createTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id = &quot;createTagSubmit&quot; type=&quot;submit&quot; value=&quot;Create&quot;>
-                &lt;/div>
-                &lt;div>
-                    Status:
-                    &lt;span id=&quot;createTagStatus&quot;>
-                
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-        &lt;/div>
-    &lt;/body>
-    &lt;script>
-        //Use ServiceDock here!
-        var elementServiceSystemLink = document.getElementById(&quot;service_systemlink&quot;);
-
-        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
-
-        var realTimeTagsInfo = {}; // real time System Link Cloud tags
-
-        /* HTML Elements */
-        var existingTagsElement = document.getElementById(&quot;existingTags&quot;);
-        var currentValue = document.getElementById(&quot;currentValue&quot;);
-        var changeTagValue = document.getElementById(&quot;changeTagValue&quot;);
-        var createTagValue = document.getElementById(&quot;createTagValue&quot;);
-        var createTagName = document.getElementById(&quot;createTagName&quot;);
-        var createTagStatus = document.getElementById(&quot;createTagStatus&quot;);
-
-        // populate &lt;select> with all tags on the cloud and display the selected Tag's (first Tag) value
-        serviceSystemLink.executeAfterInit( function() {
-            populateSelection();
-            displayCurrentValue();
-        });
-        
-        elementServiceSystemLink.init(); 
-        
-        // append &lt;option> of Tags to &lt;select>
-        function populateSelection() {
-            existingTagsElement.innerHTML = &quot;&quot;; //reset &lt;select>
-            // get all tags information from Cloud
-            realTimeTagsInfo = serviceSystemLink.getTagsInfo();
-
-            // append each to &lt;select>
-            for (var key in realTimeTagsInfo) {
-                var optionElement = document.createElement(&quot;option&quot;);
-                optionElement.innerHTML = key;
-                existingTagsElement.appendChild(optionElement);
-            }
-        }
-
-        // when another &lt;option> is selected
-        existingTagsElement.addEventListener(&quot;change&quot;, function() {
-            displayCurrentValue();
-        })
-
-        // display the value of the currently &quot;selected&quot; Tag option
-        function displayCurrentValue() {
-            // get the name of currently selected Tag
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value of the Tag
-            var value = serviceSystemLink.getTagValue(key);
-
-            // update display
-            currentValue.innerHTML = value;
-        }
-
-        // button to change Tag's value was clicked
-        var changeTagButton = document.getElementById(&quot;changeTagSubmit&quot;);
-        changeTagButton.addEventListener(&quot;click&quot;, function () {
-            // get the name of Tag to change
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value to change Tag to
-            var newValue = changeTagValue.value;
-            
-            changeTagValue.value = &quot;&quot;; // reset input field
-            
-            // change Tag's value
-            serviceSystemLink.setTagValueNotStrict(key, newValue, function() {
-                displayCurrentValue();
-            })
-        })
-
-        var createTagButton = document.getElementById(&quot;createTagSubmit&quot;);
-        createTagButton.addEventListener(&quot;click&quot;, function() {
-
-            createTagStatus.innerHTML = &quot;creating tag&quot;
-
-            // get the name of Tag to create
-            var nameInput = createTagName.value;
-            var key = nameInput;
-
-            // get the value to create the Tag with
-            var newValue = createTagValue.value;
-
-            // convert the value's type based on input
-            var convertedValue = convertValue(newValue);
-
-            // reset input fields
-            createTagValue.value = &quot;&quot;; 
-            createTagName.value = &quot;&quot;;
-
-            // create new Tag
-            serviceSystemLink.createTag(key, newValue, function () {
-                populateSelection();
-                displayCurrentValue();
-                createTagStatus.innerHTML = &quot;tag was created!&quot;
-            })
-        })
-
-        // change value from &lt;input> to be of correct type
-        function convertValue(new_value) {
-            var convertedValue;
-            //if the value is not a number
-            if (isNaN(new_value)) {
-                //if the value is a boolean
-                if (new_value == true) {
-                    convertedValue = true;
-                } 
-                if (new_value == false) {
-                    convertedValue = false;
-                }
-                // value is a string, no change needed.
-                else {
-                    convertedValue = new_value;
-                }
-            }
-            //value is a number
-            else {
-                // value is a number, no change needed
-                convertedValue = new_value;
-            }
-
-            return convertedValue;
-        }
-    &lt;/script>
-
-&lt;/html>
-</code></pre>
-<!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_systemlink.html"></iframe>
+            <h2>SPIKE Service</h2>
+<p>ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection.</p>
+<h2>Dependencies</h2>
+<p>The webserial API is only supported on Google Chrome. <strong>Visitors that wish to connect their SPIKE Prime to your web page must ensure that the following requirements are fulfilled</strong>:</p>
+<p>To use the SPIKE™ Prime hardware, you must enable the <strong>WebSerial API</strong> in your browser. To do so, please make sure:</p>
+<ol>
+<li>You are using the <a href="https://www.google.com/chrome/">Google Chrome browser</a>.</li>
+<li>The following chrome flags are enabled on chrome://flags.
+Mac OSX user? #enable-experimental-web-platform-features</li>
+</ol>
+<p>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</p>
+<p>To enable these flags:</p>
+<ol>
+<li>In your Chrome Browser URL, visit chrome://flags</li>
+<li>Set the your required flags to &quot;Enabled&quot; via dropdown</li>
+<li>Relaunch the browser to have changes take effect</li>
+</ol>
+<p>When using SPIKE Service, make sure that your SPIKE Prime is connected (via USB or Bluetooth) to your computer and <em>you don't have any other applications or browser windows connected to your SPIKE Prime.</em></p>
+<p>#enable-experimental-web-platform-features</p>
+<p><img src="enableflag.png" alt="ExperimentalWebPlatformFeatures"></p>
+<p>#new-usb-backend</p>
+<p><img src="enableflagwindows.png" alt="NewUSBBackend"></p>
         </article>
     
 </section>

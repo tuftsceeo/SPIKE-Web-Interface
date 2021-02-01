@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: exampleSystemLinkServiceGeneral | Tutorial: exampleSystemLinkServiceGeneral</title>
+    <title>Tutorial: Using ServiceDock | Tutorial: Using ServiceDock</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: exampleSystemLinkServiceGeneral</a>
+            <a class = "currentPage">Tutorial: Using ServiceDock</a>
         
         
     </div>
@@ -55,213 +55,95 @@
     <header>
         
 
-        <h2>exampleSystemLinkServiceGeneral</h2>
+        <h2>Using ServiceDock</h2>
     </header>
 
     
         <article class="readme">
-            <h2>General SystemLink Service Interface</h2>
-<p>This is an interface that can set tag values and create tags on your SystemLink Cloud database. The source code and an interactive example are below.</p>
+            <h2>Example</h2>
+<p><img src="servicedockDemo.gif" alt="Demonstration"></p>
+<h2>Developing with ServiceDock</h2>
+<p>The following code creates the ServiceDock interface you see on the top left corner of the example above. This is all you need to use ServiceDock! Be sure to include this HTML with your preferred Services to get started.</p>
 <pre class="prettyprint source lang-html"><code>&lt;html>
-
     &lt;head>
         &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js&quot;>&lt;/script>
-        &lt;div id = &quot;servicedock&quot; style = &quot;float: left&quot;>
-            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;/div>
-        &lt;style>
-            input {
-                width: 100px;
-                height: 20px;
-            }
-        
-            #interface {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                left: 15%;
-                top: 100px;
-                background-color: #4CE0D2;
-                height: 400px;
-                width: 500px;
-                border: solid;
-            }
-        
-            .action {
-                margin: 5%;
-                position: relative;
-                justify-content: center;
-            }
-        &lt;/style>
     &lt;/head>
     &lt;body>
-        &lt;div id = &quot;interface&quot;>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Change existing tags
-                &lt;/h3>
-                &lt;div id=&quot;changeTag&quot;>
-                    &lt;select id=&quot;existingTags&quot;>
-                    
-                    &lt;/select>
-                    &lt;input id=&quot;changeTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id=&quot;changeTagSubmit&quot; type=&quot;submit&quot; value=&quot;change&quot;>
-                &lt;/div>
-                &lt;div>
-                    Current value:
-                    &lt;span id=&quot;currentValue&quot;>
-                    
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Create tags
-                &lt;/h3>
-                &lt;div id=&quot;createTag&quot;>
-                    &lt;input id=&quot;createTagName&quot; type=&quot;text&quot; placeholder=&quot;Tag Name&quot;>
-                    &lt;input id=&quot;createTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id = &quot;createTagSubmit&quot; type=&quot;submit&quot; value=&quot;Create&quot;>
-                &lt;/div>
-                &lt;div>
-                    Status:
-                    &lt;span id=&quot;createTagStatus&quot;>
-                
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
+        &lt;!-- this style must be kept for normal rendering (either left or right)-->
+        &lt;div id = &quot;servicedock&quot; style = &quot;float:left;&quot;>
+            &lt;!-- include the Services to use -->
+            &lt;service-systemlink id = &quot;service_systemlink&quot;>&lt;/service-systemlink>
+            &lt;service-spike id = &quot;service_spike&quot;>&lt;/service-spike>
         &lt;/div>
     &lt;/body>
     &lt;script>
-        //Use ServiceDock here!
-        var elementServiceSystemLink = document.getElementById(&quot;service_systemlink&quot;);
-
-        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
-
-        var realTimeTagsInfo = {}; // real time System Link Cloud tags
-
-        /* HTML Elements */
-        var existingTagsElement = document.getElementById(&quot;existingTags&quot;);
-        var currentValue = document.getElementById(&quot;currentValue&quot;);
-        var changeTagValue = document.getElementById(&quot;changeTagValue&quot;);
-        var createTagValue = document.getElementById(&quot;createTagValue&quot;);
-        var createTagName = document.getElementById(&quot;createTagName&quot;);
-        var createTagStatus = document.getElementById(&quot;createTagStatus&quot;);
-
-        // populate &lt;select> with all tags on the cloud and display the selected Tag's (first Tag) value
-        serviceSystemLink.executeAfterInit( function() {
-            populateSelection();
-            displayCurrentValue();
-        });
-        
-        elementServiceSystemLink.init(); 
-        
-        // append &lt;option> of Tags to &lt;select>
-        function populateSelection() {
-            existingTagsElement.innerHTML = &quot;&quot;; //reset &lt;select>
-            // get all tags information from Cloud
-            realTimeTagsInfo = serviceSystemLink.getTagsInfo();
-
-            // append each to &lt;select>
-            for (var key in realTimeTagsInfo) {
-                var optionElement = document.createElement(&quot;option&quot;);
-                optionElement.innerHTML = key;
-                existingTagsElement.appendChild(optionElement);
-            }
-        }
-
-        // when another &lt;option> is selected
-        existingTagsElement.addEventListener(&quot;change&quot;, function() {
-            displayCurrentValue();
-        })
-
-        // display the value of the currently &quot;selected&quot; Tag option
-        function displayCurrentValue() {
-            // get the name of currently selected Tag
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value of the Tag
-            var value = serviceSystemLink.getTagValue(key);
-
-            // update display
-            currentValue.innerHTML = value;
-        }
-
-        // button to change Tag's value was clicked
-        var changeTagButton = document.getElementById(&quot;changeTagSubmit&quot;);
-        changeTagButton.addEventListener(&quot;click&quot;, function () {
-            // get the name of Tag to change
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value to change Tag to
-            var newValue = changeTagValue.value;
-            
-            changeTagValue.value = &quot;&quot;; // reset input field
-            
-            // change Tag's value
-            serviceSystemLink.setTagValueNotStrict(key, newValue, function() {
-                displayCurrentValue();
-            })
-        })
-
-        var createTagButton = document.getElementById(&quot;createTagSubmit&quot;);
-        createTagButton.addEventListener(&quot;click&quot;, function() {
-
-            createTagStatus.innerHTML = &quot;creating tag&quot;
-
-            // get the name of Tag to create
-            var nameInput = createTagName.value;
-            var key = nameInput;
-
-            // get the value to create the Tag with
-            var newValue = createTagValue.value;
-
-            // convert the value's type based on input
-            var convertedValue = convertValue(newValue);
-
-            // reset input fields
-            createTagValue.value = &quot;&quot;; 
-            createTagName.value = &quot;&quot;;
-
-            // create new Tag
-            serviceSystemLink.createTag(key, newValue, function () {
-                populateSelection();
-                displayCurrentValue();
-                createTagStatus.innerHTML = &quot;tag was created!&quot;
-            })
-        })
-
-        // change value from &lt;input> to be of correct type
-        function convertValue(new_value) {
-            var convertedValue;
-            //if the value is not a number
-            if (isNaN(new_value)) {
-                //if the value is a boolean
-                if (new_value == true) {
-                    convertedValue = true;
-                } 
-                if (new_value == false) {
-                    convertedValue = false;
-                }
-                // value is a string, no change needed.
-                else {
-                    convertedValue = new_value;
-                }
-            }
-            //value is a number
-            else {
-                // value is a number, no change needed
-                convertedValue = new_value;
-            }
-
-            return convertedValue;
-        }
+        // Use ServiceDock here!
     &lt;/script>
-
 &lt;/html>
 </code></pre>
-<!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_systemlink.html"></iframe>
+<h2>Using Services</h2>
+<p>To use the Services in your web page, you will need to get its object from its corresponding ServiceDock HTML element. For example, <code> &lt;service-spike id = &quot;service_spike&quot;&gt;&lt;/service-spike&gt;</code> is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, serviceSPIKE, you will need to do:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;script>
+    var elementServiceSPIKE = document.getElementbyId(&quot;service_spike&quot;);
+    var serviceSPIKE = elementServiceSPIKE.getService(); // your Service object
+    serviceSPIKE.executeAfterInit( function () {
+        // do something with SPIKE Service
+    })
+&lt;/script>
+</code></pre>
+<p>Getting the Service object for other types of Services is the same! If you want to get the System Link cloud Service object, all you have to do is:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;script>
+    var elementServiceSystemLink = document.getElementbyId(&quot;service_systemlink&quot;);
+    var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
+    serviceSystemLink.executeAfterInit( function() {
+        // do something with SystemLink Cloud Service
+    })
+&lt;/script>
+</code></pre>
+<p>Service are not initialized automatically when the web page loads, so it is important to ensure that your code for your Services only run after they have been activated. Use <code> executeAfterInit(callback)</code>. The argument is a callback function, a fundamental way in Javascript for ensuring flow of execution. A callback function means that it will not execute until its parent function, <code>executeAfterInit</code>, has finished. For example:</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;script>
+    var elementServiceSPIKE = document.getElementbyId(&quot;service_spike&quot;);
+    var serviceSPIKE = elementServiceSPIKE.getService(); // your Service object
+    serviceSPIKE.executeAfterInit( function () {
+        // do something with SPIKE Service
+    })
+&lt;/script>
+</code></pre>
+<h2>Activating Services</h2>
+<p>By default, a Service object is only initialized when the user clicks the ServiceDock button. However, there are exceptions with <em>some</em> Services if you as the developer do not need the users' input. For example, if you wish to automatically activate the SystemLink Cloud Service with your own API key (and not the visitors'), you can do one of two things:</p>
+<p>(1) Provide the API credentials with Javascript.</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;script>
+    var elementServiceSystemLink = document.getElementbyId(&quot;service_systemlink&quot;);
+    elementServiceSystemLink.setAttribute(&quot;apikey&quot;, &quot;your API key&quot;); // provide predetermined API credentials
+    elementServiceSystemLink.init(); // automatically initialize Service
+    var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
+    
+    // do something with SystemLink Cloud Service
+&lt;/script>
+</code></pre>
+<p>(2) Provide the API credentials in HTML</p>
+<pre class="prettyprint source lang-HTML"><code>&lt;html>
+    &lt;head>
+        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js&quot;>&lt;/script>
+    &lt;/head>
+    &lt;body>
+        &lt;!-- this style must be kept for normal rendering-->
+        &lt;div id=&quot;servicedock&quot; style=&quot;float:left;&quot;>
+            &lt;!-- put predetermined API key in HTML attribute -->
+            &lt;service-systemlink id=&quot;service_systemlink&quot; apikey = &quot;your API key&quot;>&lt;service-systemlink>
+        &lt;/div>
+    &lt;/body>
+    &lt;script>
+        var elementServiceSystemLink = document.getElementbyId(&quot;service_systemlink&quot;);
+        elementServiceSystemLink.init(); // automatically initialize Service
+        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
+        
+        // do something with SystemLink Cloud Service
+    &lt;/script>
+&lt;html>
+</code></pre>
+<h2>Security</h2>
+<p>ServiceDock is a frontend framework, thus all of ServiceDock and your source code can be viewed when published. Therefore, it is not recommended that you provide your own API credentials in your web pages.</p>
         </article>
     
 </section>

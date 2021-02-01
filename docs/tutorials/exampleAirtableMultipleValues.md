@@ -32,8 +32,8 @@ Description coming soon
         </div>
     </body>
     <script>
-        var serviceAirtableElement = document.getElementById("service_airtable")
-        var serviceAirtable = serviceAirtableElement.getService()
+        var elementServiceAirtable = document.getElementById("service_airtable")
+        var serviceAirtable = elementServiceAirtable.getService()
 
         serviceAirtable.executeAfterInit(function() { 
             // set up table with default values
@@ -58,8 +58,7 @@ Description coming soon
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #displays {
                 text-align: center;
@@ -69,7 +68,7 @@ Description coming soon
             }
         </style>
     </head>
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
             <service-spike id="service_spike"></service-spike>
@@ -81,8 +80,8 @@ Description coming soon
         </div>
     </body>
     <script>
-        var serviceAirtableElement = document.getElementById("service_airtable")
-        var serviceAirtable = serviceAirtableElement.getService()
+        var elementServiceAirtable = document.getElementById("service_airtable")
+        var serviceAirtable = elementServiceAirtable.getService()
 
         var serviceSPIKE = document.getElementById("service_spike").getService()
 

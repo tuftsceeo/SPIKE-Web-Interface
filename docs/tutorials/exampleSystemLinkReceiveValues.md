@@ -60,8 +60,7 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #speed_display {
                 text-align: center;
@@ -78,11 +77,11 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
         <div id = "speed_display">Speed: unknown</div>
     </body>
     <script>
-        var systemLinkElement = document.getElementById("service_SystemLink")
-        systemLinkElement.setAttribute("apikey", "your_API_key")
-        systemLinkElement.init()
+        var elementServiceSystemLink = document.getElementById("service_SystemLink")
+        elementServiceSystemLink.setAttribute("apikey", "your_API_key")
+        elementServiceSystemLink.init()
 
-        var serviceSystemLink = systemLinkElement.getService()
+        var serviceSystemLink = elementServiceSystemLink.getService()
         var serviceSPIKE = document.getElementById("service_spike").getService()
 
 

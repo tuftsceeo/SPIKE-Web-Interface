@@ -24,7 +24,7 @@ We now have enough information to complete the remote page, which would look som
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -34,14 +34,14 @@ We now have enough information to complete the remote page, which would look som
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
-        var serviceAirtableElement = document.getElementById("service_airtable")
+        var elementServiceAirtable = document.getElementById("service_airtable")
         // your API key, base ID, and table name go here
-        serviceAirtableElement.setAttribute("apikey", "your_API_key")
-        serviceAirtableElement.setAttribute("baseid", "your_base_ID")
-        serviceAirtableElement.setAttribute("tablename", "your_table_name")
-        serviceAirtableElement.init()
+        elementServiceAirtable.setAttribute("apikey", "your_API_key")
+        elementServiceAirtable.setAttribute("baseid", "your_base_ID")
+        elementServiceAirtable.setAttribute("tablename", "your_table_name")
+        elementServiceAirtable.init()
 
-        var serviceAirtable = serviceAirtableElement.getService();
+        var serviceAirtable = elementServiceAirtable.getService();
 
         // ensuring speed starts at zero
         serviceAirtable.executeAfterInit(function() { sendMotorSpeed(0)} )

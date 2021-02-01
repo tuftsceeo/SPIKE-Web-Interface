@@ -4,7 +4,7 @@ Unlike in the Python library, the JavaScript functions for running motors for sp
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -45,7 +45,7 @@ You can also use MotorPairs to control motors simultaneously, though they can ge
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">

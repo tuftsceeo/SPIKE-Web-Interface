@@ -54,7 +54,7 @@ Now all we need to do is link step 1 to steps 2 and 3, which is mostly a matter 
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;

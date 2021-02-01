@@ -5,8 +5,8 @@ This is an interface that can set tag values and create tags on your SystemLink 
 <html>
 
     <head>
-        <script src = "./modules/ServiceDock_SystemLink.js"></script>
-            <!-- include the Services to use -->
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <div id = "servicedock" style = "float: left">
             <service-systemlink id="service_systemlink"></service-systemlink>
         </div>
         <style>
@@ -74,9 +74,9 @@ This is an interface that can set tag values and create tags on your SystemLink 
     </body>
     <script>
         //Use ServiceDock here!
-        var serviceSystemLinkElement = document.getElementById("service_systemlink");
+        var elementServiceSystemLink = document.getElementById("service_systemlink");
 
-        var serviceSystemLink = serviceSystemLinkElement.getService(); // your Service object
+        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
 
         var realTimeTagsInfo = {}; // real time System Link Cloud tags
 
@@ -94,7 +94,7 @@ This is an interface that can set tag values and create tags on your SystemLink 
             displayCurrentValue();
         });
         
-        serviceSystemLinkElement.init(); 
+        elementServiceSystemLink.init(); 
         
         // append <option> of Tags to <select>
         function populateSelection() {

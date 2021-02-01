@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: exampleSystemLinkServiceGeneral | Tutorial: exampleSystemLinkServiceGeneral</title>
+    <title>Tutorial: Airtable Service | Tutorial: Airtable Service</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Tutorial: exampleSystemLinkServiceGeneral</a>
+            <a class = "currentPage">Tutorial: Airtable Service</a>
         
         
     </div>
@@ -54,214 +54,74 @@
 <section>
     <header>
         
+        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
+        <ul>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableConnectToPage.html">Connecting to Airtable</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableSendValues.html">Basic - Sending Values</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableReceiveValues.html">Intermediate - Receiving and Using Values (with SPIKE Service)</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableMultipleValues.html">Advanced - Checking for Multiple Values (with SPIKE Service)</a></li>
+        </ul>
+        
 
-        <h2>exampleSystemLinkServiceGeneral</h2>
+        <h2>Airtable Service</h2>
     </header>
 
     
         <article class="readme">
-            <h2>General SystemLink Service Interface</h2>
-<p>This is an interface that can set tag values and create tags on your SystemLink Cloud database. The source code and an interactive example are below.</p>
-<pre class="prettyprint source lang-html"><code>&lt;html>
-
-    &lt;head>
-        &lt;script src=&quot;https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js&quot;>&lt;/script>
-        &lt;div id = &quot;servicedock&quot; style = &quot;float: left&quot;>
-            &lt;service-systemlink id=&quot;service_systemlink&quot;>&lt;/service-systemlink>
-        &lt;/div>
-        &lt;style>
-            input {
-                width: 100px;
-                height: 20px;
-            }
-        
-            #interface {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                left: 15%;
-                top: 100px;
-                background-color: #4CE0D2;
-                height: 400px;
-                width: 500px;
-                border: solid;
-            }
-        
-            .action {
-                margin: 5%;
-                position: relative;
-                justify-content: center;
-            }
-        &lt;/style>
-    &lt;/head>
-    &lt;body>
-        &lt;div id = &quot;interface&quot;>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Change existing tags
-                &lt;/h3>
-                &lt;div id=&quot;changeTag&quot;>
-                    &lt;select id=&quot;existingTags&quot;>
-                    
-                    &lt;/select>
-                    &lt;input id=&quot;changeTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id=&quot;changeTagSubmit&quot; type=&quot;submit&quot; value=&quot;change&quot;>
-                &lt;/div>
-                &lt;div>
-                    Current value:
-                    &lt;span id=&quot;currentValue&quot;>
-                    
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-            &lt;div class = &quot;action&quot;>
-                &lt;h3>
-                    Create tags
-                &lt;/h3>
-                &lt;div id=&quot;createTag&quot;>
-                    &lt;input id=&quot;createTagName&quot; type=&quot;text&quot; placeholder=&quot;Tag Name&quot;>
-                    &lt;input id=&quot;createTagValue&quot; type=&quot;text&quot; placeholder=&quot;Value&quot;>
-                    &lt;input id = &quot;createTagSubmit&quot; type=&quot;submit&quot; value=&quot;Create&quot;>
-                &lt;/div>
-                &lt;div>
-                    Status:
-                    &lt;span id=&quot;createTagStatus&quot;>
-                
-                    &lt;/span>
-                &lt;/div>
-            &lt;/div>
-        &lt;/div>
-    &lt;/body>
-    &lt;script>
-        //Use ServiceDock here!
-        var elementServiceSystemLink = document.getElementById(&quot;service_systemlink&quot;);
-
-        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
-
-        var realTimeTagsInfo = {}; // real time System Link Cloud tags
-
-        /* HTML Elements */
-        var existingTagsElement = document.getElementById(&quot;existingTags&quot;);
-        var currentValue = document.getElementById(&quot;currentValue&quot;);
-        var changeTagValue = document.getElementById(&quot;changeTagValue&quot;);
-        var createTagValue = document.getElementById(&quot;createTagValue&quot;);
-        var createTagName = document.getElementById(&quot;createTagName&quot;);
-        var createTagStatus = document.getElementById(&quot;createTagStatus&quot;);
-
-        // populate &lt;select> with all tags on the cloud and display the selected Tag's (first Tag) value
-        serviceSystemLink.executeAfterInit( function() {
-            populateSelection();
-            displayCurrentValue();
-        });
-        
-        elementServiceSystemLink.init(); 
-        
-        // append &lt;option> of Tags to &lt;select>
-        function populateSelection() {
-            existingTagsElement.innerHTML = &quot;&quot;; //reset &lt;select>
-            // get all tags information from Cloud
-            realTimeTagsInfo = serviceSystemLink.getTagsInfo();
-
-            // append each to &lt;select>
-            for (var key in realTimeTagsInfo) {
-                var optionElement = document.createElement(&quot;option&quot;);
-                optionElement.innerHTML = key;
-                existingTagsElement.appendChild(optionElement);
-            }
-        }
-
-        // when another &lt;option> is selected
-        existingTagsElement.addEventListener(&quot;change&quot;, function() {
-            displayCurrentValue();
-        })
-
-        // display the value of the currently &quot;selected&quot; Tag option
-        function displayCurrentValue() {
-            // get the name of currently selected Tag
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value of the Tag
-            var value = serviceSystemLink.getTagValue(key);
-
-            // update display
-            currentValue.innerHTML = value;
-        }
-
-        // button to change Tag's value was clicked
-        var changeTagButton = document.getElementById(&quot;changeTagSubmit&quot;);
-        changeTagButton.addEventListener(&quot;click&quot;, function () {
-            // get the name of Tag to change
-            var key = existingTagsElement.options[existingTagsElement.selectedIndex].text;
-
-            // get the value to change Tag to
-            var newValue = changeTagValue.value;
-            
-            changeTagValue.value = &quot;&quot;; // reset input field
-            
-            // change Tag's value
-            serviceSystemLink.setTagValueNotStrict(key, newValue, function() {
-                displayCurrentValue();
-            })
-        })
-
-        var createTagButton = document.getElementById(&quot;createTagSubmit&quot;);
-        createTagButton.addEventListener(&quot;click&quot;, function() {
-
-            createTagStatus.innerHTML = &quot;creating tag&quot;
-
-            // get the name of Tag to create
-            var nameInput = createTagName.value;
-            var key = nameInput;
-
-            // get the value to create the Tag with
-            var newValue = createTagValue.value;
-
-            // convert the value's type based on input
-            var convertedValue = convertValue(newValue);
-
-            // reset input fields
-            createTagValue.value = &quot;&quot;; 
-            createTagName.value = &quot;&quot;;
-
-            // create new Tag
-            serviceSystemLink.createTag(key, newValue, function () {
-                populateSelection();
-                displayCurrentValue();
-                createTagStatus.innerHTML = &quot;tag was created!&quot;
-            })
-        })
-
-        // change value from &lt;input> to be of correct type
-        function convertValue(new_value) {
-            var convertedValue;
-            //if the value is not a number
-            if (isNaN(new_value)) {
-                //if the value is a boolean
-                if (new_value == true) {
-                    convertedValue = true;
-                } 
-                if (new_value == false) {
-                    convertedValue = false;
-                }
-                // value is a string, no change needed.
-                else {
-                    convertedValue = new_value;
-                }
-            }
-            //value is a number
-            else {
-                // value is a number, no change needed
-                convertedValue = new_value;
-            }
-
-            return convertedValue;
-        }
-    &lt;/script>
-
-&lt;/html>
-</code></pre>
-<!-- Taken from documentation folder, which got the files from examples --->
-<iframe id="example-result" width="100%" height="800" frameborder="0" src="servicedock_systemlink.html"></iframe>
+            <h2>Airtable Cloud Service</h2>
+<p>Airtable is a cloud based storage and collaboration service that features a neat UI to serve users with an interactive way to modify their databases. Airtable Service will work for a specific format of the database, as shown below.</p>
+<h2>Setting up Airtable</h2>
+<p>Please go to the website below and create an account.
+https://airtable.com/ (Links to an external site.)</p>
+<p>Airtable lets you create a 'base', which holds all of your 'tables'. 'Tables' are like spreadsheets that you can update from anywhere, and they can hold all sorts of values, like numbers, strings, and dates!</p>
+<p>Inside a table, there are 'fields'. Each 'field' has a datatype assigned to it, so numbers can only go in number fields and so on...</p>
+<h3>Creating an Account</h3>
+<p>When you create an account at Airtable, you are granted a certain amount of &quot;space&quot; and the ability to create tables through their webbased visual interface. You are also given an access token unique to you that you can use to create external access (read and write) from python scripts to your Airtable data.</p>
+<p>To get started: go to Airtable and create an account.</p>
+<p>https://airtable.com/signup</p>
+<h3>Creating a Base</h3>
+<p>Then create your first &quot;base&quot; (short for &quot;database&quot;) which by default will have a blank table.</p>
+<p>Suggestion:</p>
+<ul>
+<li>choose &quot;Start from Scratch&quot;</li>
+<li>name it something relevant, like &quot;EN1Robotics&quot;</li>
+</ul>
+<p><img src="./creatingABase.png" alt="baseCreation"></p>
+<h3>Setting Up Your Table</h3>
+<p>After creating the base, you should see your empty table.
+<img src="./settingUpYourTable1.png" alt="table1"></p>
+<p>A) Name your table anything. This name will later be used to access your database with Airtable Service. In this picture, it has been named, &quot;finalProject&quot;.</p>
+<p><img src="./settingUpYourTable2.jpg" alt="table2"></p>
+<p>B) Rename the &quot;Notes&quot; column to be &quot;Value&quot;. Fields under &quot;Name&quot; are keys to your information, where the information you wish to find will be located under the &quot;Value&quot; column. This is very important as Airtable Service looks for &quot;Name&quot; and &quot;Value&quot; to create Key/Value pairs of information.</p>
+<p><img src="./settingUpYourTable3.png" alt="table3"></p>
+<p>C) Where you can change your column name to &quot;Value&quot;, change the field type of the column to be &quot;Single line text&quot;.</p>
+<p><img src="./settingUpYourTable4.png" alt="table4"></p>
+<p>D) Delete columns that are not &quot;Name&quot; and &quot;Value&quot;, such as &quot;Attachments&quot; and &quot;Status&quot;.</p>
+<p><img src="./settingUpYourTable5.png" alt="table5"></p>
+<p>E)  You should end with a workspace that looks like the following, with only &quot;Name&quot; and &quot;Value&quot; columns. (Note: the background color may differ)</p>
+<p><img src="./settingUpYourTable6.png" alt="table6"></p>
+<h3>Using your Table</h3>
+<p>In your table, each &quot;Tag&quot;, one single piece of Key&amp;Value information, is represented by a row of &quot;Name&quot; and &quot;Value&quot; fields. The &quot;Name&quot; is the Tag's identifer, and the &quot;Value&quot; is the information associated with the Tag. In Airtable, all &quot;Value&quot; entries will be in strings, but Airtable Service will implicitly convert your &quot;Value&quot; fields to data types that you give them.</p>
+<h3>Getting your API Key</h3>
+<p>Airtable uses token-based authentication. You need to, from your Airtable account, set up an API Key that will be used by your code for gaining access to your data.</p>
+<p><img src="./gettingYourAPIKey1.png" alt="apikey1"></p>
+<p>From your account page (https://airtable.com/account (Links to an external site.)) you should generate a key:</p>
+<p><img src="./gettingYourAPIKey2.png" alt="apikey2"></p>
+<p>This API Key is your &quot;password&quot; for accessing your data. It looks like this:</p>
+<p><img src="./gettingYourAPIKey3.jpg" alt="apikey3"></p>
+<p><strong>Note: The key in the image is no longer in use.</strong></p>
+<h3>Getting your Base ID</h3>
+<p>The base ID is needed in order for external applications to access the content in the base you created.</p>
+<p>A) Go to https://airtable.com/api
+B) Select the base you created</p>
+<p><img src="./baseid1.png" alt="baseid1"></p>
+<p>C) Save your Base ID somewhere you can remember!
+<img src="./baseid2.png" alt="baseid1"></p>
+<h3>Where do these go?</h3>
+<p>Now that you have your (1) API Key, (2) Base ID, and (3) Table Name (what you named your table, e.g. &quot;finalproject&quot;), you will need to supply this to the Airtable Service to interact with your table with Javascript. See other documentation for detail. Have fun!</p>
         </article>
     
 </section>

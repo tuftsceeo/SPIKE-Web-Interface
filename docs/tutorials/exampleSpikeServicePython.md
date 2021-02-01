@@ -4,7 +4,7 @@ For cases when a project seems better suited to MicroPython control rather than 
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -28,7 +28,7 @@ In some cases, we may not know all of the python code before beginning the progr
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;
@@ -72,7 +72,7 @@ And here would be the same program purely in JavaScript, for comparison:
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;

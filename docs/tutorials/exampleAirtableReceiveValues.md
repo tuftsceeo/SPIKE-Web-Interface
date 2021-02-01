@@ -60,8 +60,7 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #speed_display {
                 text-align: center;
@@ -78,13 +77,13 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
         <div id = "speed_display">Speed: unknown</div>
     </body>
     <script>
-        var serviceAirtableElement = document.getElementById("service_airtable")
-        serviceAirtableElement.setAttribute("apikey", "your_API_key")
-        serviceAirtableElement.setAttribute("baseid", "your_base_ID")
-        serviceAirtableElement.setAttribute("tablename", "your_table_name")
-        serviceAirtableElement.init()
+        var elementServiceAirtable = document.getElementById("service_airtable")
+        elementServiceAirtable.setAttribute("apikey", "your_API_key")
+        elementServiceAirtable.setAttribute("baseid", "your_base_ID")
+        elementServiceAirtable.setAttribute("tablename", "your_table_name")
+        elementServiceAirtable.init()
 
-        var serviceAirtable = serviceAirtableElement.getService()
+        var serviceAirtable = elementServiceAirtable.getService()
         var serviceSPIKE = document.getElementById("service_spike").getService()
 
 
