@@ -1,7 +1,101 @@
 ## Keeping Track of Multiple Values
-Description coming soon
+The previous example used only one Airtable entry (motor speed). Here, we're going to get a little more complicated with a program that keeps multiple entries at once.
 
-# Remote
+## Robot Specs
+We're going to write code for a robot that shoots projectiles at a remotely controlled speed and angle. Personally, I'm imagining a contraption with wheels on either side of the projectile which spin in opposite directions to launch said projectile into the air. However, it could also work with various configurations of arms, or any number of other designs (such is the fun of SPIKE Prime). The important part for our purposes is that there are two seperate motors controlling the left and right side of the shooter, such that the user can run one faster than the other if they want the ball to veer off at an angle. 
+
+There's also a third motor determining the angle at which the shooter points, which is also user-controlled, this time by picking a desired angle for the motor to sit at. Then, once the user has their desired speeds and angle set, all they need is a way to tell the robot to launch its projectile, which we're going to do with a shoot button. This makes four Airtable entries to keep track of in total: left speed, right speed, angle, and shooter mode.
+
+## The Remote Page
+For the first three values, we're doing pretty much the same thing as in the last example: sending values in from sliders. The code will therefore look pretty much the same, though it's a good idea to generalize the value-sending function a little (called whenever a slider is changed) so you can use the same one for all three and avoid redundant code. That would look something like this:
+
+```javascript
+function sendSliderVal(entryName, val) {
+    myTable.setEntryValueStrict(entryName, parseInt(val))
+}
+```
+
+Then, there's the shoot button. For this, we're going to essentially have the Airtable keep track of what "mode" the shooter is currently in; when the user clicks the shoot button, it will be put in shoot mode, and will stay there until the launch is complete, at which point the remote page will set it back to "wait" mode. All we need from the remote side, then, is to set the value of "shoot_mode" entry to "shoot"- we'll handle the rest on the local page.
+
+## The Local Page
+This is where the majority of the differences from the single-entry example will come in. Technically, we could do the exact same thing as that one, making the periodic checking function into one big long chain of if statements like this:
+
+```javascript
+function checkAndUpdate(pastLeftSpeed, pastRightSpeed, pastAngle, pastMode) {
+    var currentLeftSpeed = myTable.getEntryValue("left_speed")
+    var currentRightSpeed = myTable.getEntryValue("right_speed")
+    var currentAngle = myTable.getEntryValue("shooter_angle")
+    var currentMode = myTable.getEntryValue("shooter_mode")
+
+    // if speed has been changed since last check, update page display
+    if(currentLeftSpeed != pastLeftSpeed)
+        // update page/control robot accordingly
+
+    if(currentRightSpeed != pastRightSpeed)
+        // update page/control robot accordingly
+
+    if(currentAngle != pastAngle)
+        // update page/control robot accordingly
+
+    if(currentMode != pastMode)
+        // update page/control robot accordingly
+
+    // check again in one second
+    setTimeout(function() { checkAndUpdate(currentLeftSpeed, currentRightSpeed, currentAngle, currentMode) }, 1000)
+}
+```
+
+As you can probably tell, however, this function is far from ideal. There's a lot of parameters floating around (just imagine how ugly it would get for a program with even *more* cloud values), and the body is essentially one statement copy-and-pasted over and over again. Let's try to clean it up a little.
+
+## Getting an Entire Table
+In the past, we've stuck to getting  the values of individual entries one at a time from Airtable. However, the Service_Airtable object also has a function called `getEntriesInfo()` that returns an object representing each entry in the table, all nested inside one bigger object. For example if left_speed was currently 50, right_speed 75, shooter_angle 0, and shooter_mode "wait", `getEntriesInfo()` would return the following object:
+
+{   left_speed: { name: "left_speed", value: 50 },
+    right_speed: { name: "right_speed", value: 75 },
+    shooter_angle: { name: "shooter_angle", value: 0 },
+    shooter_mode: { name: "shooter_mode", value: "wait" }
+}
+
+Then, to get the left speed, all we would have to do was go `myTable.getEntriesInfo()["left_speed"].value`. This might seem confusing and unnecessary at first, especially if you aren't quite used to the syntax of JavaScript objects. But passing in this object as a parameter to `checkAndUpdate` will make it cleaner overall. Imagine if we wanted to add another cloud value, or had a program with way more variables to start with- the function could get ugly very quickly, and we'd have to be careful to add each new parameter to the recursive call at the end. With only one parameter holding all the data, our code can be more readable and easier to edit later.
+
+Now, our checking function looks something like this:
+
+```javascript
+function checkAndUpdate(pastTable) {
+    var currentTable = myTable.getEntriesInfo()
+
+    // if speed has been changed since last check, update page display
+    if(currentTable["left_speed"].value != pastLeftSpeed)
+        // update page/control robot accordingly
+
+    if(currentTable["right_speed"].value != pastRightSpeed)
+        // update page/control robot accordingly
+
+    if(currentTable["shooter_angle"].value != pastAngle)
+        // update page/control robot accordingly
+
+    if(currentTable["shooter_mode"].value != pastMode)
+        // update page/control robot accordingly
+
+    // check again in one second
+    setTimeout(function() { checkAndUpdate(currentTable) }, 1000)
+}
+```
+Better, but still redundant-looking. Let's see if we an consolidate those if statements.
+
+## Generalizing Entry Checks
+
+Essentially, for each value, all we're doing is checking the current value of an entry in Airtable against the locally stored one from the previous check, and, if the two are not equal, running some update function. Since JavaScript (unlike some other coding languages) has very easy-to-use functionality for sending functions in as parameters to other functions, this sequence could easily be turned into a function! Making that change would give us something like this:
+
+```javascript
+
+```
+
+## The Final Product
+
+And here it is!
+
+## Remote
 ```html
 <html>
     <head>
@@ -14,7 +108,7 @@ Description coming soon
             }
         </style>
     </head>
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
         </div>
@@ -25,8 +119,8 @@ Description coming soon
             <label for="right_speed_slider">Right Speed (0 to 100): </label>
             <input type="range" id="right_speed_slider" onchange="sendSliderVal('right_speed', this.value)" min="0" max="100">
             <br>
-            <label for="right_speed_slider">Angle (-90 to 90): </label>
-            <input type="range" id="right_speed_slider" onchange="sendSliderVal('shooter_angle', this.value)" min="-90" max="90">
+            <label for="right_speed_slider">Angle (-45 to 45): </label>
+            <input type="range" id="right_speed_slider" onchange="sendSliderVal('shooter_angle', this.value)" min="-45" max=45">
             <br><br>
             <button onclick="shoot()">Fire!</button>
         </div>
@@ -54,7 +148,7 @@ Description coming soon
 </html>
 ```
 
-# Local
+## Local
 ```html
 <html>
     <head>
@@ -69,7 +163,7 @@ Description coming soon
             }
         </style>
     </head>
-    <body style="background-image: url('./modules/views/CEEOInnovationsbackground.png');">
+    <body>
          <div id = "servicedock" style = "float:right;">
             <service-airtable id = "service_airtable"></service-airtable>
             <service-spike id="service_spike"></service-spike>
@@ -86,6 +180,7 @@ Description coming soon
 
         var mySPIKE = document.getElementById("service_spike").getService()
 
+        // object for storing most recent motor speeds
         var motorSpeeds = {
             left: null,
             right: null,
