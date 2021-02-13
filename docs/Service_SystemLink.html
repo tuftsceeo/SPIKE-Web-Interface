@@ -150,10 +150,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// assuming you declared &lt;service-systemlink> with the id, "service_systemlink"
-var mySL = document.getElemenyById("service_systemlink").getService();
-mySL.setAttribute("apikey", "YOUR API KEY");
-mySL.init();</code></pre>
+    <pre class="prettyprint"><code>// assuming you declared &lt;service-systemlink> with the id, "service_systemlink"var mySL = document.getElemenyById("service_systemlink").getService();mySL.setAttribute("apikey", "YOUR API KEY");mySL.init();</code></pre>
 
     
 
@@ -364,9 +361,7 @@ mySL.init();</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var SystemLinkElement = document.getElemenyById("service_systemlink");
-var mySL = SystemLinkElement.getService();
-mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval of 10 ms</code></pre>
+    <pre class="prettyprint"><code>var SystemLinkElement = document.getElemenyById("service_systemlink");var mySL = SystemLinkElement.getService();mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval of 10 ms</code></pre>
 
     
 
@@ -511,9 +506,7 @@ mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySL.executeAfterInit( function () {
-    var tagsInfo = mySL.getTagsInfo();
-})</code></pre>
+    <pre class="prettyprint"><code>mySL.executeAfterInit( function () {    var tagsInfo = mySL.getTagsInfo();})</code></pre>
 
     
 
@@ -623,9 +616,7 @@ mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var tagsInfo = mySL.getTagsInfo();
-var astringValue = tagsInfo["astring"]["value"];
-var astringType = tagsInfo["astring"]["type"];</code></pre>
+    <pre class="prettyprint"><code>var tagsInfo = mySL.getTagsInfo();var astringValue = tagsInfo["astring"]["value"];var astringType = tagsInfo["astring"]["type"];</code></pre>
 
     
 
@@ -818,21 +809,7 @@ a number. This method exists for convenience but please avoid using it extensive
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// set a string type Value of a Tag and display
-mySL.setTagValueNotStrict("message", 123, function () {
-   let messageValue = mySL.getTagValue("message");
-   console.log("message: ", messageValue); // display the updated value, which will be 123.
-})
-// set value of a boolean Tag
-mySL.setTagValueNotStrict("aBoolean", true);
-
-// set value of an integer Tag
-mySL.setTagValueNotStrict("anInteger", 10);
-mySL.setTagValueNotStrict("anInteger", "10");
-
-// set value of a double Tag
-mySL.setTagValueNotStrict("aDouble", 5.2);
-mySL.setTagValueNotStrict("aDouble", "5.2");</code></pre>
+    <pre class="prettyprint"><code>// set a string type Value of a Tag and displaymySL.setTagValueNotStrict("message", 123, function () {   let messageValue = mySL.getTagValue("message");   console.log("message: ", messageValue); // display the updated value, which will be 123.})// set value of a boolean TagmySL.setTagValueNotStrict("aBoolean", true);// set value of an integer TagmySL.setTagValueNotStrict("anInteger", 10);mySL.setTagValueNotStrict("anInteger", "10");// set value of a double TagmySL.setTagValueNotStrict("aDouble", 5.2);mySL.setTagValueNotStrict("aDouble", "5.2");</code></pre>
 
     
 
@@ -1022,19 +999,7 @@ mySL.setTagValueNotStrict("aDouble", "5.2");</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// set a string type Value of a Tag and display
-mySL.setTagValueStrict("message", "hello there", function () {
-   let messageValue = mySL.getTagValue("message");
-   console.log("message: ", messageValue); // display the updated value
-})
-// set value of a boolean Tag
-mySL.setTagValueStrict("aBoolean", true);
-
-// set value of an integer Tag
-mySL.setTagValueStrict("anInteger", 10);
-
-// set value of a double Tag
-mySL.setTagValueStrict("aDouble", 5.2);</code></pre>
+    <pre class="prettyprint"><code>// set a string type Value of a Tag and displaymySL.setTagValueStrict("message", "hello there", function () {   let messageValue = mySL.getTagValue("message");   console.log("message: ", messageValue); // display the updated value})// set value of a boolean TagmySL.setTagValueStrict("aBoolean", true);// set value of an integer TagmySL.setTagValueStrict("anInteger", 10);// set value of a double TagmySL.setTagValueStrict("aDouble", 5.2);</code></pre>
 
     
 
@@ -1199,8 +1164,7 @@ mySL.setTagValueStrict("aDouble", 5.2);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>messageValue = mySL.getTagValue("message");
-console.log("message: ", messageValue);</code></pre>
+    <pre class="prettyprint"><code>messageValue = mySL.getTagValue("message");console.log("message: ", messageValue);</code></pre>
 
     
 
@@ -1315,8 +1279,7 @@ console.log("message: ", messageValue);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (mySL.isActive() === true)
-    // do something if SystemLink Service is active</code></pre>
+    <pre class="prettyprint"><code>if (mySL.isActive() === true)    // do something if SystemLink Service is active</code></pre>
 
     
 
@@ -1506,9 +1469,7 @@ console.log("message: ", messageValue);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySL.createTag("message", "hi", function () {
-     mySL.setTagValueStrict("message", "bye"); // change the value of 'message' from "hi" to "bye"
-})</code></pre>
+    <pre class="prettyprint"><code>mySL.createTag("message", "hi", function () {     mySL.setTagValueStrict("message", "bye"); // change the value of 'message' from "hi" to "bye"})</code></pre>
 
     
 
@@ -1675,10 +1636,7 @@ console.log("message: ", messageValue);</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>mySL.deleteTag("message", function () {
-     let tagsInfo = mySL.getTagsInfo();
-     console.log("tagsInfo: ", tagsInfo); // tags information will now not contain the 'message' tag
-})</code></pre>
+    <pre class="prettyprint"><code>mySL.deleteTag("message", function () {     let tagsInfo = mySL.getTagsInfo();     console.log("tagsInfo: ", tagsInfo); // tags information will now not contain the 'message' tag})</code></pre>
 
     
 

@@ -2,7 +2,7 @@
 The previous example used only one Airtable entry (motor speed). Here, we're going to get a little more complicated with a program that keeps multiple entries at once.
 
 ## Robot Specs
-We're going to write code for a robot that shoots projectiles at a remotely controlled speed and angle. Personally, I'm imagining a contraption with wheels on either side of the projectile which spin in opposite directions to launch said projectile into the air. However, it could also work with various configurations of arms, or any number of other designs (such is the fun of SPIKE Prime). The important part for our purposes is that there are two seperate motors controlling the left and right side of the shooter, such that the user can run one faster than the other if they want the ball to veer off at an angle. 
+We're going to write code for a robot that shoots projectiles at a remotely controlled speed and angle. Personally, I'm imagining a contraption with wheels on either side of the projectile that spin in opposite directions to launch said projectile into the air. However, it could also work with various configurations of arms, or any number of other designs (such is the fun of SPIKE Prime). The important part for our purposes is that two separate motors control the left and right side of the shooter, such that the user can run one faster than the other if they want the ball to veer off at an angle. 
 
 There's also a third motor determining the angle at which the shooter points, which is also user-controlled, this time by picking a desired angle for the motor to sit at. Then, once the user has their desired speeds and angle set, all they need is a way to tell the robot to launch its projectile, which we're going to do with a shoot button. This makes four Airtable entries to keep track of in total: left speed, right speed, angle, and shooter mode.
 
@@ -21,79 +21,148 @@ Then, there's the shoot button. For this, we're going to essentially have the Ai
 This is where the majority of the differences from the single-entry example will come in. Technically, we could do the exact same thing as that one, making the periodic checking function into one big long chain of if statements like this:
 
 ```javascript
-function checkAndUpdate(pastLeftSpeed, pastRightSpeed, pastAngle, pastMode) {
-    var currentLeftSpeed = myTable.getEntryValue("left_speed")
-    var currentRightSpeed = myTable.getEntryValue("right_speed")
-    var currentAngle = myTable.getEntryValue("shooter_angle")
-    var currentMode = myTable.getEntryValue("shooter_mode")
+function checkAndUpdate(pastLeftSpeed, pastRightSpeed, pastAngle) {
+    var currentLeftSpeed, currentRightSpeed, currentAngle;
 
-    // if speed has been changed since last check, update page display
-    if(currentLeftSpeed != pastLeftSpeed)
+    if(myTable.getEntriesInfo()["left_speed"] != undefined)
+        currentLeftSpeed = myTable.getEntryValue("left_speed")
+
+    if(myTable.getEntriesInfo()["right_speed"] != undefined)
+        currentRightSpeed = myTable.getEntryValue("right_speed")
+    
+    if(myTable.getEntriesInfo()["shooter_angle"] != undefined)
+        currentAngle = myTable.getEntryValue("shooter_angle")
+
+    if(currentLeftSpeed != undefined && currentLeftSpeed != pastLeftSpeed)
         // update page/control robot accordingly
 
-    if(currentRightSpeed != pastRightSpeed)
+    if(currentRightSpeed != undefined && currentRightSpeed != pastRightSpeed)
         // update page/control robot accordingly
 
-    if(currentAngle != pastAngle)
+    if(currentAngle != undefined && currentAngle != pastAngle)
         // update page/control robot accordingly
 
-    if(currentMode != pastMode)
+    if(currentMode == "shoot")
         // update page/control robot accordingly
 
     // check again in one second
-    setTimeout(function() { checkAndUpdate(currentLeftSpeed, currentRightSpeed, currentAngle, currentMode) }, 1000)
+    setTimeout(function() { checkAndUpdate(currentLeftSpeed, currentRightSpeed, currentAngle) }, 1000)
 }
 ```
 
-As you can probably tell, however, this function is far from ideal. There's a lot of parameters floating around (just imagine how ugly it would get for a program with even *more* cloud values), and the body is essentially one statement copy-and-pasted over and over again. Let's try to clean it up a little.
+Small thing you may have noticed: in this case, I decided to do away with the separate `startChecking()` function from the single-entry example, and instead moved all the checks for whether or not an entry exists in the table into the main checking function. This is because I want updates to happen even when the user hasn't changed every cloud value yet. For example, if the user started with an empty table and then moved the angle slider, we'd want the local page to receive and drive the corresponding motor to that angle, despite left_speed, right_speed, and shooter_mode not existing in the table yet.
 
-## Getting an Entire Table
-In the past, we've stuck to getting  the values of individual entries one at a time from Airtable. However, the Service_Airtable object also has a function called `getEntriesInfo()` that returns an object representing each entry in the table, all nested inside one bigger object. For example if left_speed was currently 50, right_speed 75, shooter_angle 0, and shooter_mode "wait", `getEntriesInfo()` would return the following object:
+This function would work. But, as you can probably tell, the code is far from ideal. There's a lot of parameters floating around (just imagine how ugly it would get for a program with even *more* cloud values), and the body includes a lot of repeated code.
 
-{   left_speed: { name: "left_speed", value: 50 },
-    right_speed: { name: "right_speed", value: 75 },
-    shooter_angle: { name: "shooter_angle", value: 0 },
-    shooter_mode: { name: "shooter_mode", value: "wait" }
-}
+## Using the Entire Table
+The first possible change that jumps out to me is cleaning up all those variables. Right now, we're passing each value in individually, which is already getting a little messy, and would only get more so if we decided to add more cloud variables later on. We're already using the object returned by the `getEntriesInfo` function to make sure entries exist in the table before we get their values, but, as it turns out, we can also use it to get the values of said entries once know they exist, eg `myTable.getEntriesInfo()["left_speed"].value`. 
 
-Then, to get the left speed, all we would have to do was go `myTable.getEntriesInfo()["left_speed"].value`. This might seem confusing and unnecessary at first, especially if you aren't quite used to the syntax of JavaScript objects. But passing in this object as a parameter to `checkAndUpdate` will make it cleaner overall. Imagine if we wanted to add another cloud value, or had a program with way more variables to start with- the function could get ugly very quickly, and we'd have to be careful to add each new parameter to the recursive call at the end. With only one parameter holding all the data, our code can be more readable and easier to edit later.
-
-Now, our checking function looks something like this:
+If we get our values this way, we no longer have to worry about passing each one in separately as a parameter for the next check- we can just pass in the entire table, and check values from the current and past tables against each other. With that change, our checking function would look something like this:
 
 ```javascript
 function checkAndUpdate(pastTable) {
     var currentTable = myTable.getEntriesInfo()
 
-    // if speed has been changed since last check, update page display
-    if(currentTable["left_speed"].value != pastLeftSpeed)
+    if(currentTable["left_speed"] != undefined && pastTable["left_speed"].value != undefined 
+        && currentTable["left_speed"].value != pastTable["left_speed"].value)
         // update page/control robot accordingly
 
-    if(currentTable["right_speed"].value != pastRightSpeed)
+    if(currentTable["right_speed"] != undefined && pastTable["right_speed"].value != undefined 
+        && currentTable["right_speed"].value != pastTable["right_speed"].value)
         // update page/control robot accordingly
 
-    if(currentTable["shooter_angle"].value != pastAngle)
+    if(currentTable["shooter_angle"] != undefined && pastTable["shooter_angle"].value != undefined 
+        && currentTable["shooter_angle"].value != pastTable["shooter_angle"].value)
         // update page/control robot accordingly
 
-    if(currentTable["shooter_mode"].value != pastMode)
+    if(currentTable["shooter_mode"]!= undefined && currentTable["shooter_mode"].value == "shoot")
         // update page/control robot accordingly
 
     // check again in one second
     setTimeout(function() { checkAndUpdate(currentTable) }, 1000)
 }
 ```
-Better, but still redundant-looking. Let's see if we an consolidate those if statements.
+Better, but still redundant-looking. Let's see if we can consolidate those if statements.
 
 ## Generalizing Entry Checks
 
-Essentially, for each value, all we're doing is checking the current value of an entry in Airtable against the locally stored one from the previous check, and, if the two are not equal, running some update function. Since JavaScript (unlike some other coding languages) has very easy-to-use functionality for sending functions in as parameters to other functions, this sequence could easily be turned into a function! Making that change would give us something like this:
+Essentially, for both the speeds and angle, all we're doing is checking the current value of an entry in Airtable against the locally stored one from the previous check, and, if the two are not equal, running some update function. Since JavaScript has very easy-to-use functionality for sending functions in as parameters to other functions, this sequence could easily be turned into a function! Making that change would give us something like this:
 
 ```javascript
+function checkAndUpdate(pastTable) {
+    var currentTable = myTable.getEntriesInfo()
 
+    checkEntry("left_speed", currentTable, pastTable, /* desired update function */)
+    checkEntry("right_speed", currentTable, pastTable, /* desired update function */)
+    checkEntry("shooter_angle", currentTable, pastTable, /* desired update function */)
+
+    if(currentTable["shooter_mode"]!= undefined && currentTable["shooter_mode"].value == "shoot")
+        // update page/control robot accordingly
+
+    // check again in one second
+    setTimeout(function() { checkAndUpdate(currentTable) }, 1000)
+}
+
+// runs action if value of entry called name is different in pastTable than currentTable
+function checkEntry(name, currentTable, pastTable, action) {
+    if(currentTable[name] != undefined && (pastTable[name] == undefined || currentTable[name].value != pastTable[name].value)) {
+        action(currentTable[name].value)
+        console.log("running action for " + name)
+    }
+}
 ```
 
-## The Final Product
+That looks a lot better! You might notice we didn't use `checkEntry` on shooter_mode- in that case, we are waiting for a specific value rather than simply listening for any change, so we'd need a different function. If we had multiple instances of that functionality (if we added a stop button, perhaps? Or a reset one?), we might make some sort of `checkEntryForValue` function to consolidate all of those, but as it stands we can just leave shooter_mode's if statement `checkAndUpdate`.
 
-And here it is!
+## Controlling the Robot and Page
+
+So now, we've got our value checking. All that's left to do is control the robot and webpage! Since this is a Service_Airtable tutorial rather than a Service_SPIKE one, we're not going to go too in-depth on that here, but here are my functions for updating the speed and angle displays on the page (the latter part is unnecessary, but I personally find it helpful to be able to see the user input on the local page to make sure everything is working).
+
+```javascript
+// object for storing most recent motor speeds (for use in shooting)
+var motorSpeeds = {
+    left: null,
+    right: null,
+}
+
+/* updates stored speed value and screen display for specified side (a)
+ * NOTE: assumes side is "left" or "right"
+ */
+function updateSpeed(side, newSpeed) {
+    if(side == "left")
+        motorSpeeds.left = newSpeed
+    else if(side == "right")
+        motorSpeeds.right = newSpeed
+
+    document.getElementById(side + "_speed_display").innerText = side + " speed: " + newSpeed
+}
+
+// changes angle displayed on page and repositions angle motor to given newAngle
+function updateAngle(newAngle) {
+    document.getElementById("angle_display").innerText = "angle: " + newAngle
+            
+    // run motor to new position if SPIKE is connected
+    if(mySPIKE.isActive())
+        mySPIKE.Motor("C").run_to_degrees_counted(newAngle)
+}
+```
+
+And the shoot function:
+
+```javascript
+// runs shooting motors at specified speeds
+function shoot() {
+    // if spike is connected, run shooter motors w/ specified speeds
+    if(mySPIKE.isActive()) {
+        mySPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
+        mySPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
+    }
+
+    myTable.setEntryValueStrict("shoot_mode", "wait")
+}
+```
+
+And that's all the functions we need! You can see them all put together, as well as try it for yourself with your own shooter (or just three motors plugged into a hub) below.
 
 ## Remote
 ```html
@@ -180,7 +249,7 @@ And here it is!
 
         var mySPIKE = document.getElementById("service_spike").getService()
 
-        // object for storing most recent motor speeds
+        // object for storing most recent motor speeds (for use in shooting)
         var motorSpeeds = {
             left: null,
             right: null,
