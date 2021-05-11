@@ -4,7 +4,7 @@ For cases when a project seems better suited to MicroPython control rather than 
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -12,11 +12,11 @@ For cases when a project seems better suited to MicroPython control rather than 
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
-        mySPIKE.executeAfterInit(function () {
+        serviceSPIKE.executeAfterInit(function () {
 
-            mySPIKE.executeProgram(1)
+            serviceSPIKE.executeProgram(1)
         })
     </script>
 </html>
@@ -28,7 +28,7 @@ In some cases, we may not know all of the python code before beginning the progr
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;
@@ -47,7 +47,7 @@ In some cases, we may not know all of the python code before beginning the progr
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
 
         function goCurrentDistance() {
             // getting distance from textbox input, or setting it to zero if input is invalid
@@ -57,10 +57,10 @@ In some cases, we may not know all of the python code before beginning the progr
             
             // writing micropython program to hub slot 0 using specified distance
             // in this example, the python lines are in separate strings for readability, but this is not necessary as long as the whitespace is correct
-            mySPIKE.writeProgram("drive distance", "from spike import MotorPair \n"
+            serviceSPIKE.writeProgram("drive distance", "from spike import MotorPair \n"
                                                     + "driveTrain = MotorPair('A', 'B') \n"
                                                     + "driveTrain.move(" + distance + ", 'rotations', 0)", 
-                                 0), function() { mySPIKE.executeProgram(0) }; // note the callback function- this runs after the code is successfully uploaded to the SPIKE, and in this case tells the SPIKE to run whatever was just uploaded
+                                 0), function() { serviceSPIKE.executeProgram(0) }; // note the callback function- this runs after the code is successfully uploaded to the SPIKE, and in this case tells the SPIKE to run whatever was just uploaded
         }
     </script>
 </html>
@@ -72,7 +72,7 @@ And here would be the same program purely in JavaScript, for comparison:
 ```HTML
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
         <style>
             #controls {
                 text-align: center;
@@ -91,13 +91,13 @@ And here would be the same program purely in JavaScript, for comparison:
         </div>
     </body>
     <script>
-        var mySPIKE = document.getElementById("service_spike").getService()
+        var serviceSPIKE = document.getElementById("service_spike").getService()
         var leftWheel, rightWheel;
 
         // initializing left and right wheen variables for later use (cannot be done until SPIKE itself is initialized)
-        mySPIKE.executeAfterInit(function() {
-            leftWheel = mySPIKE.Motor('A')
-            rightWheel = mySPIKE.Motor('B')
+        serviceSPIKE.executeAfterInit(function() {
+            leftWheel = serviceSPIKE.Motor('A')
+            rightWheel = serviceSPIKE.Motor('B')
         })
 
         function goCurrentDistance() {

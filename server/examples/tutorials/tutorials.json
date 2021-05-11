@@ -1,8 +1,8 @@
 {
-    "tutorialServiceDock": {
+    "AtutorialServiceDock": {
         "title": "Using ServiceDock"
     },
-    "tutorialSpikeService": {
+    "BtutorialSpikeService": {
         "title": "SPIKE Service",
         "children":{
             "exampleSpikeServiceBasicMotor": {
@@ -28,37 +28,34 @@
             }
         }
     },
-    "tutorialSystemLinkService": {
+    "DtutorialSystemLinkService": {
         "title": "SystemLink Cloud Service",
         "children": {
             "exampleSystemLinkConnect": {
                 "title": "Connecting to SystemLink"
             },
             "exampleSystemLinkSendValues": {
-                "title": "Sending Values"
+                "title": "Basic - Sending Values"
             },
             "exampleSystemLinkReceiveValues": {
-                "title": "Receiving and Using Values"
-            },
-            "exampleSystemLinkServiceGeneral": {
-                "title": "General SystemLink Interface Example"
+                "title": "Intermediate - Receiving and Using Values (with SPIKE Service)"
             }
         }
     },
-    "tutorialAirtableService": {
+    "CtutorialAirtableService": {
         "title": "Airtable Service",
         "children": {
             "exampleAirtableConnectToPage": {
                 "title": "Connecting to Airtable"
             },
             "exampleAirtableSendValues": {
-                "title": "Sending Values"
+                "title": "Basic - Sending Values"
             },
             "exampleAirtableReceiveValues": {
-                "title": "Receiving and Using Values"
+                "title": "Intermediate - Receiving and Using Values (with SPIKE Service)"
             },
             "exampleAirtableMultipleValues": {
-                "title": "Checking for Multiple Values"
+                "title": "Advanced - Checking for Multiple Values (with SPIKE Service)"
             }
         }
     }

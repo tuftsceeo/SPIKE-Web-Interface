@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: MotorPair | Namespace: MotorPair</title>
+    <title>Tutorial: Airtable Service | Tutorial: Airtable Service</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Namespace: MotorPair</a>
+            <a class = "currentPage">Tutorial: Airtable Service</a>
         
         
     </div>
@@ -51,695 +51,80 @@
 <div class="main" id="main">
     
 
-
-
-
 <section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="Service_SPIKE.html">Service_SPIKE</a>.</span>MotorPair</h2>
+    <header>
         
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
+        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
+        <ul>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableConnectToPage.html">Connecting to Airtable</a></li>
         
-            
-                <div class="description"><p>MotorPair</p></div>
-            
-
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-                <h3>Example</h3>
-                
-    <pre class="prettyprint"><code>var pair = new serviceSPIKE.MotorPair("A", "B")</code></pre>
-
-            
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableSendValues.html">Basic - Sending Values</a></li>
         
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-                
-
-<dt>
-    
-        <h4 class="name" id="~set_motor_rotation">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>set_motor_rotation<span class="signature">(amount, unit)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2387">line 2387</a></code>
-            </div>
-            
-        </h4>
-
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableReceiveValues.html">Intermediate - Receiving and Using Values (with SPIKE Service)</a></li>
         
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the ratio of one motor rotation to the distance traveled.</p>
-<p>If there are no gears used between the motors and the wheels of the Driving Base,
-then amount is the circumference of one wheel.</p>
-<p>Calling this method does not affect the Driving Base if it is already currently running.
-It will only have an effect the next time one of the move or start methods is used.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleAirtableMultipleValues.html">Advanced - Checking for Multiple Values (with SPIKE Service)</a></li>
+        </ul>
         
 
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>amount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>unit</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>'cm','in'</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank<span class="signature">(left_speed, right_speed)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2406">line 2406</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.start_tank(100,100);</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank_at_power">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank_at_power<span class="signature">(leftPower, rightPower)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2417">line 2417</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>leftPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>rightPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
+        <h2>Airtable Service</h2>
+    </header>
+
+    
+        <article class="readme">
+            <h2>Airtable Cloud Service</h2>
+<p>Airtable is a cloud based storage and collaboration service that features a neat UI to serve users with an interactive way to modify their databases. Airtable Service will work for a specific format of the database, as shown below.</p>
+<h2>Setting up Airtable</h2>
+<p>Please go to the website below and create an account.
+https://airtable.com/ (Links to an external site.)</p>
+<p>Airtable lets you create a 'base', which holds all of your 'tables'. 'Tables' are like spreadsheets that you can update from anywhere, and they can hold all sorts of values, like numbers, strings, and dates!</p>
+<p>Inside a table, there are 'fields'. Each 'field' has a datatype assigned to it, so numbers can only go in number fields and so on...</p>
+<h3>Creating an Account</h3>
+<p>When you create an account at Airtable, you are granted a certain amount of &quot;space&quot; and the ability to create tables through their webbased visual interface. You are also given an access token unique to you that you can use to create external access (read and write) from python scripts to your Airtable data.</p>
+<p>To get started: go to Airtable and create an account.</p>
+<p>https://airtable.com/signup</p>
+<h3>Creating a Base</h3>
+<p>Then create your first &quot;base&quot; (short for &quot;database&quot;) which by default will have a blank table.</p>
+<p>Suggestion:</p>
+<ul>
+<li>choose &quot;Start from Scratch&quot;</li>
+<li>name it something relevant, like &quot;EN1Robotics&quot;</li>
+</ul>
+<p><img src="./creatingABase.png" alt="baseCreation"></p>
+<h3>Setting Up Your Table</h3>
+<p>After creating the base, you should see your empty table.
+<img src="./settingUpYourTable1.png" alt="table1"></p>
+<p>A) Name your table anything. This name will later be used to access your database with Airtable Service. In this picture, it has been named, &quot;finalProject&quot;.</p>
+<p><img src="./settingUpYourTable2.jpg" alt="table2"></p>
+<p>B) Rename the &quot;Notes&quot; column to be &quot;Value&quot;. Fields under &quot;Name&quot; are keys to your information, where the information you wish to find will be located under the &quot;Value&quot; column. This is very important as Airtable Service looks for &quot;Name&quot; and &quot;Value&quot; to create Key/Value pairs of information.</p>
+<p><img src="./settingUpYourTable3.png" alt="table3"></p>
+<p>C) Where you can change your column name to &quot;Value&quot;, change the field type of the column to be &quot;Single line text&quot;.</p>
+<p><img src="./settingUpYourTable4.png" alt="table4"></p>
+<p>D) Delete columns that are not &quot;Name&quot; and &quot;Value&quot;, such as &quot;Attachments&quot; and &quot;Status&quot;.</p>
+<p><img src="./settingUpYourTable5.png" alt="table5"></p>
+<p>E)  You should end with a workspace that looks like the following, with only &quot;Name&quot; and &quot;Value&quot; columns. (Note: the background color may differ)</p>
+<p><img src="./settingUpYourTable6.png" alt="table6"></p>
+<h3>Using your Table</h3>
+<p>In your table, each &quot;Tag&quot;, one single piece of Key&amp;Value information, is represented by a row of &quot;Name&quot; and &quot;Value&quot; fields. The &quot;Name&quot; is the Tag's identifer, and the &quot;Value&quot; is the information associated with the Tag. In Airtable, all &quot;Value&quot; entries will be in strings, but Airtable Service will implicitly convert your &quot;Value&quot; fields to data types that you give them.</p>
+<h3>Getting your API Key</h3>
+<p>Airtable uses token-based authentication. You need to, from your Airtable account, set up an API Key that will be used by your code for gaining access to your data.</p>
+<p><img src="./gettingYourAPIKey1.png" alt="apikey1"></p>
+<p>From your account page (https://airtable.com/account (Links to an external site.)) you should generate a key:</p>
+<p><img src="./gettingYourAPIKey2.png" alt="apikey2"></p>
+<p>This API Key is your &quot;password&quot; for accessing your data. It looks like this:</p>
+<p><img src="./gettingYourAPIKey3.jpg" alt="apikey3"></p>
+<p><strong>Note: The key in the image is no longer in use.</strong></p>
+<h3>Getting your Base ID</h3>
+<p>The base ID is needed in order for external applications to access the content in the base you created.</p>
+<p>A) Go to https://airtable.com/api
+B) Select the base you created</p>
+<p><img src="./baseid1.png" alt="baseid1"></p>
+<p>C) Save your Base ID somewhere you can remember!
+<img src="./baseid2.png" alt="baseid1"></p>
+<h3>Where do these go?</h3>
+<p>Now that you have your (1) API Key, (2) Base ID, and (3) Table Name (what you named your table, e.g. &quot;finalproject&quot;), you will need to supply this to the Airtable Service to interact with your table with Javascript. See other documentation for detail. Have fun!</p>
+        </article>
     
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.start_tank_at_power(10, 10);</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~stop">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>stop<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2425">line 2425</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Stops the 2 motors simultaneously, which will stop a Driving Base.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.stop();</code></pre>
-
-    
-
-</dd>
-
-            </dl>
-    
-
-    
-
-    
-</article>
-
 </section>
-
 
 
 
@@ -754,13 +139,7 @@ It will only have an effect the next time one of the move or start methods is us
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'Service_SPIKE.MotorPair_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>

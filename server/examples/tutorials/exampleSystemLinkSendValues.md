@@ -15,8 +15,8 @@ However, in certain contexts, types are still an important thing to keep in mind
 The SystemLink database itself also recognizes these types. When you create a System Link tag and send it its initial value, it recognizes the data type of that value, and will not accept values of any other type from then on. The difference between `setTagValueStrict` and `setTagValueNotStrict` is how they adhere to this rule. If we tried to run
 
 ```javascript
-mySystemLink.setTagValueStrict("speed", "10")
-mySystemLink.setTagValueStrict("speed", 20)
+serviceSystemLink.setTagValueStrict("speed", "10")
+serviceSystemLink.setTagValueStrict("speed", 20)
 ```
 
 the second line would throw an error, because we tried to put an integer into a tag that had previously held a string. But if we had instead used `setTagValueNotStrict`, Service_SystemLink would've performed its own conversion and run smoothly.
@@ -32,7 +32,7 @@ We now have enough information to complete the remote page, which should look so
 ```html
 <html>
     <head>
-        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -42,20 +42,20 @@ We now have enough information to complete the remote page, which should look so
         <input type="range" id="speed_slider" onchange="sendMotorSpeed(this.value)" min="-100" max="100">
     </body>
     <script>
-        var systemLinkElement = document.getElementById("service_SystemLink")
-        systemLinkElement.setAttribute("apikey", "your_API_key")
-        systemLinkElement.init()
+        var elementServiceSystemLink = document.getElementById("service_SystemLink")
+        elementServiceSystemLink.setAttribute("apikey", "your_API_key")
+        elementServiceSystemLink.init()
 
-        var mySystemLink = systemLinkElement.getService()
+        var serviceSystemLink = elementServiceSystemLink.getService()
 
         // creating motor_speed tag
-        mySystemLink.executeAfterInit(function() { mySystemLink.createTag("motor_speed", 0) })
+        serviceSystemLink.executeAfterInit(function() { serviceSystemLink.createTag("motor_speed", 0) })
 
         /* sets value of motor_speed tag to given speed
          * NOTE: assumes motor_speed tag exists
          */
         function sendMotorSpeed(speed) {
-            mySystemLink.setTagValueStrict("motor_speed", parseInt(speed)) 
+            serviceSystemLink.setTagValueStrict("motor_speed", parseInt(speed)) 
             // here, speed is actually coming in as a string, which would be a problem when trying to send it into a motor, hence the use of the built-in JavaScript function "parseInt" to convert it into an integer
         }
     </script>

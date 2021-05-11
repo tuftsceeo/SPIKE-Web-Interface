@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: MotorPair | Namespace: MotorPair</title>
+    <title>Tutorial: SPIKE Service | Tutorial: SPIKE Service</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Home</a></h1>
         
-            <a class = "currentPage">Namespace: MotorPair</a>
+            <a class = "currentPage">Tutorial: SPIKE Service</a>
         
         
     </div>
@@ -51,695 +51,57 @@
 <div class="main" id="main">
     
 
-
-
-
 <section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="Service_SPIKE.html">Service_SPIKE</a>.</span>MotorPair</h2>
+    <header>
         
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
+        <span style = "font-size: 25px; font-family: Helvetica; color: #00beaa; border-bottom: 2px solid powderblue;">Examples</span>
+        <ul>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceBasicMotor.html">Basic - Start Single Motor</a></li>
         
-            
-                <div class="description"><p>MotorPair</p></div>
-            
-
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-                <h3>Example</h3>
-                
-    <pre class="prettyprint"><code>var pair = new serviceSPIKE.MotorPair("A", "B")</code></pre>
-
-            
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceTwoMotors.html">Basic - Controlling Multiple Motors</a></li>
         
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-                
-
-<dt>
-    
-        <h4 class="name" id="~set_motor_rotation">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>set_motor_rotation<span class="signature">(amount, unit)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2387">line 2387</a></code>
-            </div>
-            
-        </h4>
-
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSensors.html">Basic - Using the Sensors</a></li>
         
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Sets the ratio of one motor rotation to the distance traveled.</p>
-<p>If there are no gears used between the motors and the wheels of the Driving Base,
-then amount is the circumference of one wheel.</p>
-<p>Calling this method does not affect the Driving Base if it is already currently running.
-It will only have an effect the next time one of the move or start methods is used.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceForceToMotor.html">Intermediate - Automatically Getting Connected Modules</a></li>
         
-<table class="params">
-    <thead>
-    <tr>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServicePython.html">Intermediate - Integrating MicroPython</a></li>
         
-        <th>Name</th>
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceSimonSays.html">Advanced - Using Hub Gestures and Orientations</a></li>
+        
+            <li style = "font-size: 20px;"><a href="tutorial-exampleSpikeServiceUsingMultipleHubs.html">Advanced - Connecting and Using Multiple SPIKE Primes</a></li>
+        </ul>
         
 
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>amount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>unit</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>'cm','in'</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank<span class="signature">(left_speed, right_speed)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2406">line 2406</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>left_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>right_speed</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.start_tank(100,100);</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~start_tank_at_power">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>start_tank_at_power<span class="signature">(leftPower, rightPower)</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2417">line 2417</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Starts moving the Driving Base</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>leftPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>rightPower</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">integer</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>[-100 to 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
+        <h2>SPIKE Service</h2>
+    </header>
+
+    
+        <article class="readme">
+            <h2>SPIKE Service</h2>
+<p>ServiceDock SPIKE allows you to connect your LEGO® SPIKE™ Prime to your webpage via a webserial connection.</p>
+<h2>Dependencies</h2>
+<p>The webserial API is only supported on Google Chrome. <strong>Visitors that wish to connect their SPIKE Prime to your web page must ensure that the following requirements are fulfilled</strong>:</p>
+<p>To use the SPIKE™ Prime hardware, you must enable the <strong>WebSerial API</strong> in your browser. To do so, please make sure:</p>
+<ol>
+<li>You are using the <a href="https://www.google.com/chrome/">Google Chrome browser</a>.</li>
+<li>The following chrome flags are enabled on chrome://flags.
+Mac OSX user? #enable-experimental-web-platform-features</li>
+</ol>
+<p>Windows user? #enable-experimental-web-platform-features AND #new-usb-backend</p>
+<p>To enable these flags:</p>
+<ol>
+<li>In your Chrome Browser URL, visit chrome://flags</li>
+<li>Set the your required flags to &quot;Enabled&quot; via dropdown</li>
+<li>Relaunch the browser to have changes take effect</li>
+</ol>
+<p>When using SPIKE Service, make sure that your SPIKE Prime is connected (via USB or Bluetooth) to your computer and <em>you don't have any other applications or browser windows connected to your SPIKE Prime.</em></p>
+<p>#enable-experimental-web-platform-features</p>
+<p><img src="enableflag.png" alt="ExperimentalWebPlatformFeatures"></p>
+<p>#new-usb-backend</p>
+<p><img src="enableflagwindows.png" alt="NewUSBBackend"></p>
+        </article>
     
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.start_tank_at_power(10, 10);</code></pre>
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id="~stop">
-            
-                <span class="type-signature"><span class="icon green">inner</span> </span>stop<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="ServiceDock_SPIKE.js.html">ServiceDock_SPIKE.js</a></code>,
-                <code><a href="ServiceDock_SPIKE.js.html#line2425">line 2425</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Stops the 2 motors simultaneously, which will stop a Driving Base.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>pair.stop();</code></pre>
-
-    
-
-</dd>
-
-            </dl>
-    
-
-    
-
-    
-</article>
-
 </section>
-
 
 
 
@@ -754,13 +116,7 @@ It will only have an effect the next time one of the move or start methods is us
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'Service_SPIKE.MotorPair_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>
