@@ -27,8 +27,8 @@ The following code creates the ServiceDock interface you see on the top left cor
 To use the Services in your web page, you will need to get its object from its corresponding ServiceDock HTML element. For example, ``` <service-spike id = "service_spike"></service-spike>``` is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, serviceSPIKE, you will need to do:
 ```HTML
 <script>
-    var serviceSPIKEElement = document.getElementbyId("service_spike");
-    var serviceSPIKE = serviceSPIKEElement.getService(); // your Service object
+    var elementServiceSPIKE = document.getElementbyId("service_spike");
+    var serviceSPIKE = elementServiceSPIKE.getService(); // your Service object
     serviceSPIKE.executeAfterInit( function () {
         // do something with SPIKE Service
     })
@@ -37,9 +37,9 @@ To use the Services in your web page, you will need to get its object from its c
 Getting the Service object for other types of Services is the same! If you want to get the System Link cloud Service object, all you have to do is:
 ```HTML
 <script>
-    var SystemLinkService = document.getElementbyId("service_systemlink");
-    var mySL = SystemLinkService.getService(); // your Service object
-    mySL.executeAfterInit( function() {
+    var elementServiceSystemLink = document.getElementbyId("service_systemlink");
+    var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
+    serviceSystemLink.executeAfterInit( function() {
         // do something with SystemLink Cloud Service
     })
 </script>
@@ -48,8 +48,8 @@ Getting the Service object for other types of Services is the same! If you want 
 Service are not initialized automatically when the web page loads, so it is important to ensure that your code for your Services only run after they have been activated. Use ``` executeAfterInit(callback)```. The argument is a callback function, a fundamental way in Javascript for ensuring flow of execution. A callback function means that it will not execute until its parent function, ```executeAfterInit```, has finished. For example:
 ```HTML
 <script>
-    var serviceSPIKEElement = document.getElementbyId("service_spike");
-    var serviceSPIKE = serviceSPIKEElement.getService(); // your Service object
+    var elementServiceSPIKE = document.getElementbyId("service_spike");
+    var serviceSPIKE = elementServiceSPIKE.getService(); // your Service object
     serviceSPIKE.executeAfterInit( function () {
         // do something with SPIKE Service
     })
@@ -63,10 +63,10 @@ By default, a Service object is only initialized when the user clicks the Servic
 (1) Provide the API credentials with Javascript.
 ```HTML
 <script>
-    var SystemLinkService = document.getElementbyId("service_systemlink");
-    SystemLinkService.setAttribute("apikey", "your API key"); // provide predetermined API credentials
-    SystemLinkService.init(); // automatically initialize Service
-    var mySL = SystemLinkService.getService(); // your Service object
+    var elementServiceSystemLink = document.getElementbyId("service_systemlink");
+    elementServiceSystemLink.setAttribute("apikey", "your API key"); // provide predetermined API credentials
+    elementServiceSystemLink.init(); // automatically initialize Service
+    var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
     
     // do something with SystemLink Cloud Service
 </script>
@@ -75,7 +75,7 @@ By default, a Service object is only initialized when the user clicks the Servic
 ```HTML
 <html>
     <head>
-        <script src = "./modules/ServiceDock.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <!-- this style must be kept for normal rendering-->
@@ -85,9 +85,9 @@ By default, a Service object is only initialized when the user clicks the Servic
         </div>
     </body>
     <script>
-        var SystemLinkService = document.getElementbyId("service_systemlink");
-        SystemLinkService.init(); // automatically initialize Service
-        var mySL = SystemLinkService.getService(); // your Service object
+        var elementServiceSystemLink = document.getElementbyId("service_systemlink");
+        elementServiceSystemLink.init(); // automatically initialize Service
+        var serviceSystemLink = elementServiceSystemLink.getService(); // your Service object
         
         // do something with SystemLink Cloud Service
     </script>
