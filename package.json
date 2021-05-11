@@ -25,7 +25,6 @@
     "jsdoc": "^3.6.5"
   },
   "devDependencies": {
-    "better-docs": "^2.3.0",
     "tui-jsdoc-template": "^1.2.2"
   }
 }
