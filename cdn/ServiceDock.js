@@ -80,7 +80,7 @@ class servicesystemlink extends HTMLElement {
             // check active flag so once activated, the service doesnt reinit
             if ( !this.active && this.proceed) {
                 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating SystemLink Service");
+                console.log("activating service");
                 
                 var initSuccessful = await this.service.init(this.APIKey);
                 
@@ -107,7 +107,7 @@ class servicesystemlink extends HTMLElement {
             
             // APIkey 
             if (APIKeyResult == null || APIKeyResult == "") {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no API key");
+                console.log("You inserted no API key");
                 APIKeyExists = false;
             }
             else {
@@ -136,7 +136,7 @@ class servicesystemlink extends HTMLElement {
     }
 
     set apikey(val) {
-        // console.log("%cTuftsCEEO ", "color: #3ba336;", val);
+        console.log(val);
         if ( val ) {
             this.setAttribute("apikey", val);
         }
@@ -146,7 +146,6 @@ class servicesystemlink extends HTMLElement {
     }
 
     attributeChangedCallback (name, oldValue, newValue) {
-        console.log("%cTuftsCEEO ", "color: #3ba336;", "new value of apikey: ", newValue);
         this.APIKey = newValue;
     }
 
@@ -231,12 +230,8 @@ function Service_SystemLink() {
      * 
      * @public
      * @param {string} APIKeyInput SYstemlink APIkey
-     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS. Default value is 1000 ms.
+     * @param {integer} pollIntervalInput interval at which to get tags from the cloud in MILISECONDS
      * @returns {boolean} True if service was successsfully initialized, false otherwise
-     * @example
-     * var SystemLinkElement = document.getElemenyById("service_systemlink");
-     * var mySL = SystemLinkElement.getService();
-     * mySL.init("APIKEY", 1000); // initialize SystemLink Service with a poll interval of 10 ms
      * 
      */
     async function init(APIKeyInput, pollIntervalInput) {
@@ -281,7 +276,7 @@ function Service_SystemLink() {
      * @param {function} callback function to execute after initialization
      * @example
      * mySL.executeAfterInit( function () {
-     *     var tagsInfo = mySL.getTagsInfo();
+     *     var tagsInfo = getTagsInfo();
      * })
      */
     function executeAfterInit(callback) {
@@ -302,63 +297,19 @@ function Service_SystemLink() {
         return tagsInfo;
     }
 
-    /** Change the current value of a tag on SystemLink cloud. 
+    /** Change the current value of a tag on SystemLink cloud
      * 
-     * @private
-     * @param {string} name name of tag to update
-     * @param {any} value new value's data type must match the Tag's data type.
-     * @param {function} callback function to execute after tag is updated
-     * @example
-     * // set a string type Value of a Tag and display
-     * mySL.setTagValue("message", "hello there", function () {
-     *    let messageValue = mySL.getTagValue("message");
-     *    console.log("message: ", messageValue); // display the updated value
-     * })
-     * // set value of a boolean Tag
-     * mySL.setTagValue("aBoolean", true);
-     *
-     * // set value of an integer Tag
-     * mySL.setTagValue("anInteger", 10);
-     *
-     * // set value of a double Tag
-     * mySL.setTagValue("aDouble", 5.2);
+     * @public
+     * @param {string} tagName 
+     * @param {any} newValue 
+     * @param {function} callback executes 1 second after this function is called
      */
     function setTagValue(tagName, newValue, callback) {
         // changes the value of a tag on the cloud
-        setTagValueStrict(tagName, newValue, callback);
-    }
-
-    /** Change the current value of a tag on SystemLink cloud with strict data types. Values will be implicitly converted
-     * <br>
-     * NotStrict property indicates that the data type of the Value supplied will be implicitly converted. For example, allowing for setting an INT tag's value with a string, "123" or a STRING tag's value with
-     * a number. This method exists for convenience but please avoid using it extensively as it can lead to unpredictable outcomes.
-     * @public
-     * @param {any} tagName 
-     * @param {any} newValue 
-     * @param {any} callback 
-     * @example
-     * // set a string type Value of a Tag and display
-     * mySL.setTagValueNotStrict("message", 123, function () {
-     *    let messageValue = mySL.getTagValue("message");
-     *    console.log("message: ", messageValue); // display the updated value, which will be 123.
-     * })
-     * // set value of a boolean Tag
-     * mySL.setTagValueNotStrict("aBoolean", true);
-     *
-     * // set value of an integer Tag
-     * mySL.setTagValueNotStrict("anInteger", 10);
-     * mySL.setTagValueNotStrict("anInteger", "10");
-     *
-     * // set value of a double Tag
-     * mySL.setTagValueNotStrict("aDouble", 5.2);
-     * mySL.setTagValueNotStrict("aDouble", "5.2");
-     */
-    function setTagValueNotStrict(tagName, newValue, callback) {
-        // changes the value of a tag on the cloud
-        changeValue(tagName, newValue, false, function (valueChanged) {
+        changeValue(tagName, newValue, function(valueChanged) {
             if (valueChanged) {
                 // wait for changed value to be retrieved
-                setTimeout(function () {
+                setTimeout(function() {
                     if (typeof callback === 'function') {
                         callback();
                     }
@@ -366,51 +317,12 @@ function Service_SystemLink() {
             }
         });
     }
-
-    /** Change the current value of a tag on SystemLink cloud with strict data types. There will be no implicit data type conversions. E.g. Updating tags of INT type will only work with javascript number.
-     * 
-     * @public
-     * @param {any} name name of tag to update
-     * @param {any} value value to update tag to
-     * @param {any} callback function to execute after tag is updated
-    * @example
-     * // set a string type Value of a Tag and display
-     * mySL.setTagValueStrict("message", "hello there", function () {
-     *    let messageValue = mySL.getTagValue("message");
-     *    console.log("message: ", messageValue); // display the updated value
-     * })
-     * // set value of a boolean Tag
-     * mySL.setTagValueStrict("aBoolean", true);
-     *
-     * // set value of an integer Tag
-     * mySL.setTagValueStrict("anInteger", 10);
-     *
-     * // set value of a double Tag
-     * mySL.setTagValueStrict("aDouble", 5.2);
-     */
-    function setTagValueStrict(tagName, newValue, callback) {
-        // changes the value of a tag on the cloud
-        changeValue(tagName, newValue, true, function (valueChanged) {
-            if (valueChanged) {
-                // wait for changed value to be retrieved
-                setTimeout(function () {
-                    if (typeof callback === 'function') {
-                        callback();
-                    }
-                }, 1000)
-            }
-        });
-    }
-
 
     /** Get the current value of a tag on SystemLink cloud
      * 
      * @public
      * @param {string} tagName 
      * @returns {any} current value of tag
-     * @example
-     * messageValue = mySL.getTagValue("message");
-     * console.log("message: ", messageValue);
      */
     function getTagValue(tagName) {
 
@@ -423,9 +335,6 @@ function Service_SystemLink() {
      * 
      * @public
      * @returns {boolean} whether Service was initialized or not
-     * @example
-     * if (mySL.isActive() === true)
-     *     // do something if SystemLink Service is active
      */
     function isActive() {
         return serviceActive;
@@ -440,14 +349,14 @@ function Service_SystemLink() {
         APIKey = APIKeyInput;
     }
     
-    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue. 
+    /** Create a new tag. The type of new tag is determined by the javascript data type of tagValue.
      * @public
      * @param {string} tagName name of tag to create
      * @param {any} tagValue value to assign the tag after creation
      * @param {function} callback optional callback
      * @example
      * mySL.createTag("message", "hi", function () {
-     *      mySL.setTagValueStrict("message", "bye"); // change the value of 'message' from "hi" to "bye"
+     *      mySL.setTagValue("message", "bye"); 
      * })
      */
     function createTag(tagName, tagValue, callback) {
@@ -459,7 +368,7 @@ function Service_SystemLink() {
         createNewTagHelper(tagName, valueType, function (newTagCreated) {
             
             // after tag is created, assign a value to it
-            changeValue(tagName, tagValue, false, function (newTagValueAssigned) {
+            changeValue(tagName, tagValue, function (newTagValueAssigned) {
 
                 // execute callback if successful
                 if (newTagCreated) {
@@ -481,11 +390,6 @@ function Service_SystemLink() {
      * @public
      * @param {string} tagName name of tag to delete
      * @param {function} callback optional callback
-     * @example
-     * mySL.deleteTag("message", function () {
-     *      let tagsInfo = mySL.getTagsInfo();
-     *      console.log("tagsInfo: ", tagsInfo); // tags information will now not contain the 'message' tag
-     * })
      */
     function deleteTag(tagName, callback) {
         // delete the tag on System Link cloud
@@ -501,6 +405,7 @@ function Service_SystemLink() {
     //          Private Functions           //
     //                                      //
     //////////////////////////////////////////
+
 
     /** sleep function
      * 
@@ -532,7 +437,7 @@ function Service_SystemLink() {
                     reject(new Error("Error at apikey auth:", response));
                 }
                 else {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "APIkey is valid")
+                    console.log("APIkey is valid")
                     resolve(true)
                 }
 
@@ -610,6 +515,7 @@ function Service_SystemLink() {
                 var tagsAmount = responseJSON.totalCount;
 
                 for (var i = 0; i < tagsAmount; i++) {
+
                     // parse information of the tags
 
                     try {
@@ -649,7 +555,7 @@ function Service_SystemLink() {
             }
             request.onerror = function () {
 
-                console.log("%cTuftsCEEO ", "color: #3ba336;", this.response);
+                console.log(this.response);
 
                 reject(false);
 
@@ -676,7 +582,7 @@ function Service_SystemLink() {
      * @param {any} newValue value to assign tag
      * @param {function} callback
      */
-    async function changeValue(tagPath, newValue, strict, callback) {
+    async function changeValue(tagPath, newValue, callback) {
         new Promise(async function (resolve, reject) {
 
             var URL = "https://api.systemlinkcloud.com/nitag/v2/tags/" + tagPath + "/values/current";
@@ -687,29 +593,13 @@ function Service_SystemLink() {
             var newValueStringified;
 
             // if Tag to change does not yet exist (possibly due to it being created very recently)
-            if (tagsInfo[tagPath] === undefined) {
+            if (tagsInfo[tagPath] == undefined) {
                 // refer to newValue's JS type to deduce Tag's data type
-                valueType = getValueTypeStrict(newValue);
+                valueType = getValueType(newValue);
             }
             // Tag to change exists; find the SL data type of tag from locally stored tagsInfo
             else {
-                if (strict === true) {
-                    /* strict changeValue. So no implicit data type conversions. All newValue's types need to match the tag's type */
-
-                    expectedValueType = tagsInfo[tagPath].type;
-                    inputValueType = getValueTypeStrict(newValue);
-                    // console.log("%cTuftsCEEO ", "color: #3ba336;", expectedValueType, " vs ", inputValueType);
-                    if (inputValueType !== expectedValueType) {
-                        console.error("%cTuftsCEEO ", "color: #3ba336;", "Could not update value of tag on SystemLink Cloud. The given value is not of the data type defined for the tag in the database");
-                        throw new Error("Could not update value of tag on SystemLink Cloud.The given value is not of the data type defined for the tag in the database");
-                    }
-                    else {
-                        valueType = tagsInfo[tagPath].type;
-                    }
-                }
-                else {
-                    valueType = tagsInfo[tagPath].type;
-                }
+                valueType = tagsInfo[tagPath].type;
             }
             
             newValueStringified = changeToString(newValue);
@@ -730,7 +620,7 @@ function Service_SystemLink() {
             // catch error
             request.onreadystatechange = function () {
                 if (this.readyState === XMLHttpRequest.DONE && (this.status != 200) ) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", this.status + " Error at changeValue: ", this.response)
+                    console.log(this.status + " Error at changeValue: ", this.response)
                 }
             }
 
@@ -769,14 +659,14 @@ function Service_SystemLink() {
             }
 
             request.onerror = function () {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Error at createNewTagHelper", request.response);
+                console.log("Error at createNewTagHelper", request.response);
                 reject(false);
             }
 
             // catch error
             request.onreadystatechange = function () {
                 if (this.readyState === XMLHttpRequest.DONE && (this.status != 200 && this.status != 201)) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", this.status + " Error at createNewTagHelper: ", this.response)
+                    console.log(this.status + " Error at createNewTagHelper: ", this.response)
                 }
             }
 
@@ -810,14 +700,14 @@ function Service_SystemLink() {
             }
             
             request.onerror = function () {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Error at deleteTagHelper", request.response);
+                console.log("Error at deleteTagHelper", request.response);
                 reject(false);
             }
 
             // catch error
             request.onreadystatechange = function () {
                 if (this.readyState === XMLHttpRequest.DONE && this.status != 200) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", this.status + " Error at deleteTagHelper: ", this.response)
+                    console.log(this.status + " Error at deleteTagHelper: ", this.response)
                 }
             }
 
@@ -860,7 +750,7 @@ function Service_SystemLink() {
             try {
                 request.send(requestBody);
             } catch (e) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "error sending request:", request.response);
+                console.log("error sending request:", request.response);
             }
         }
 
@@ -874,11 +764,10 @@ function Service_SystemLink() {
      * @returns {any} data type of tag
      */
     function getValueType(new_value) {
-
         //if the value is not a number
         if (isNaN(new_value)) {
             //if the value is a boolean
-            if (new_value === "true" || new_value === "false") {
+            if (new_value == "true" || new_value == "false") {
                 return "BOOLEAN";
             }
             //if the value is a string
@@ -896,31 +785,6 @@ function Service_SystemLink() {
             }
         }
     }
-
-    /**
-     * @private
-     * @param {any} new_value 
-     * @returns {string} data type of tag 
-     */
-    function getValueTypeStrict(new_value) {
-        //if the value is a boolean
-        if (typeof new_value === "boolean") {
-            return "BOOLEAN";
-        }
-        else if (typeof new_value === "string") {
-            return "STRING";
-        }
-        else if (typeof new_value === "number") {
-            if (Number.isInteger(parseFloat(new_value))) {
-                return "INT"
-            }
-            //if value is a double
-            else {
-                return "DOUBLE"
-            }
-        }
-    }
-
 
     /** stringify newValue
      * Note: for POST request
@@ -971,8 +835,7 @@ function Service_SystemLink() {
     return {
         init: init,
         getTagsInfo: getTagsInfo,
-        setTagValueNotStrict: setTagValueNotStrict,
-        setTagValueStrict: setTagValueStrict,
+        setTagValue: setTagValue,
         getTagValue: getTagValue,
         executeAfterInit: executeAfterInit,
         setAPIKey: setAPIKey,
@@ -1006,9 +869,9 @@ class serviceairtable extends HTMLElement {
         this.active = false; // whether the service was activated
         this.service = new Service_Airtable(); // instantiate a service object ( one object per button )
         this.proceed = false; // if there are credentials input
-        this.APIKey = "";
-        this.BaseID = "";
-        this.TableName = "";
+        this.APIKey;
+        this.BaseID;
+        this.TableName;
 
         // Create a shadow root
         var shadow = this.attachShadow({ mode: 'open' });
@@ -1063,23 +926,23 @@ class serviceairtable extends HTMLElement {
         this.addEventListener("click", async function () {
 
             if (!this.active) {
-              if (this.APIKey != "" && this.BaseID != "" && this.TableName != "") {
-                // check active flag so once activated, the service doesnt reinit
-
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating Airtable Service");
-
-                var initSuccessful = await this.service.init(this.APIKey, this.BaseID, this.TableName);
-
-                if (initSuccessful) {
-
-                  this.active = true;
-                  this.status.style.backgroundColor = "green";
-                }
-                
-              }
-              else {
                 this.popUpBox();
-              }
+            }
+
+            // check active flag so once activated, the service doesnt reinit
+            if (!this.active && this.proceed) {
+
+                console.log("activating service");
+
+                var initSuccessful = await this.service.init(this.APIKey);
+                var initSuccessful2 = await this.service.init(this.BaseID);
+                var initSuccessful3 = await this.service.init(this.TableName);
+
+                if (initSuccessful && initSuccessful2 && initSuccessful3) {
+                    this.active = true;
+                    this.status.style.backgroundColor = "green";
+                }
+
             }
 
         });
@@ -1108,7 +971,7 @@ class serviceairtable extends HTMLElement {
         
         // if the user did not input any field, flag nonexistant field
         if (APIKeyResult == null || APIKeyResult == "") {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no API key");
+            console.log("You inserted no API key");
             APIKeyExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -1119,7 +982,7 @@ class serviceairtable extends HTMLElement {
 
         // if the user did not input any field, flag nonexistant field
         if (BaseIDKeyResult == null || BaseIDKeyResult == "") {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no Base key");
+            console.log("You inserted no Base key");
             BaseIDKeyExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -1130,7 +993,7 @@ class serviceairtable extends HTMLElement {
 
         // if the user did not input any field, flag nonexistant field
         if (TableNameResult == null || TableNameResult == "") {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", "You inserted no Base Table Name");
+            console.log("You inserted no Base Table Name");
             TableNameExists = false;
         }
         // if user did input field, flag existing field and store data
@@ -1143,6 +1006,9 @@ class serviceairtable extends HTMLElement {
         if (APIKeyExists && BaseIDKeyExists && TableNameExists) {
             this.proceed = true;
         }
+
+        
+
     }
 
     /* allow credentials input through HTML attributes */
@@ -1166,7 +1032,7 @@ class serviceairtable extends HTMLElement {
 
 
     set apikey(val) {
-        // console.log(val);
+        console.log(val);
         if (val) {
             this.setAttribute("apikey", val);
         }
@@ -1176,7 +1042,7 @@ class serviceairtable extends HTMLElement {
     }
 
     set baseid(val) {
-        // console.log(val);
+        console.log(val);
         if (val) {
             this.setAttribute("baseid", val);
         }
@@ -1186,7 +1052,7 @@ class serviceairtable extends HTMLElement {
     }
 
     set tablename(val) {
-        // console.log(val);
+        console.log(val);
         if (val) {
             this.setAttribute("tablename", val);
         }
@@ -1199,16 +1065,14 @@ class serviceairtable extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         // console.log("changing attribute: ", name);
         if (name == "apikey") {
-          console.log("%cTuftsCEEO ", "color: #3ba336;", "new value of apikey:", newValue);
-          this.APIKey = newValue;
+            console.log("newvalue of apikey:", newValue);
+            this.APIKey = newValue;
         }
         else if (name == "baseid") {
-          console.log("%cTuftsCEEO ", "color: #3ba336;","new value of baseid:", newValue);
-          this.BaseID = newValue
+            this.BaseID = newValue
         }
         else if (name == "tablename") {
-          console.log("%cTuftsCEEO ", "color: #3ba336;","new value of tablename:", newValue);
-          this.TableName = newValue
+            this.TableName = newValue
         }
         
     }
@@ -1227,9 +1091,9 @@ class serviceairtable extends HTMLElement {
 
     // initialize the service (is not used in this class but available for use publicly)
     async init() {
-        console.log("%cTuftsCEEO ", "color: #3ba336;","apikey attribute value: ", this.APIKey);
-        console.log("%cTuftsCEEO ", "color: #3ba336;","baseid attribute value: ", this.BaseID);
-        console.log("%cTuftsCEEO ", "color: #3ba336;","tablename attribute value: ", this.TableName);
+        console.log("apikey attribute value: ", this.APIKey);
+        console.log("baseid attribute value: ", this.BaseID);
+        console.log("tablename attribute value: ", this.TableName);
         var initSuccess = await this.service.init(this.APIKey, this.BaseID, this.TableName);
         if (initSuccess) {
           this.status.style.backgroundColor = "green";
@@ -1269,10 +1133,10 @@ function Service_Airtable() {
 
     /*
     currentData = {
-      Name_field: {value: Value_field, type: dataTYPE }
+      Name_field: Value_field
     };
     */
-    let currentData= {}; // contains real-time information of the entries in the cloud
+    let currentData= {}; // contains real-time information of the tags in the cloud
 
     let recordIDNameMap = {}; // map Name fields to its record ID
 
@@ -1289,9 +1153,7 @@ function Service_Airtable() {
     var table = undefined;
 
     var funcAtInit = undefined; // function to call after init
-    var funcAfterChangeEntryValue = []; // callback function and entry name pairs to call after setEntryValue [[entryName, callback]...]
-    var funcAfterCreateEntry = [];
-    var funcAfterDeleteEntry = []; 
+    
 
     //////////////////////////////////////////
     //                                      //
@@ -1304,17 +1166,14 @@ function Service_Airtable() {
      * <em> this function needs to be executed after executeAfterInit but before all other public functions </em> 
      * 
      * @public
-     * @param {string} APIKey API Key
-     * @param {string} BaseID Base ID for Table in which data is stored
-     * @param {string} TableName Table Name of Base
-     * @param {integer} pollIntervalInput interval at which to get entries from the cloud in MILISECONDS. Default value is 1000 ms.
+     * @ignore
+     * @param {string} APIKeyInput API Key
+     * @param {string} BaseIDInput Base ID for Table in which data is stored
+     * @param {string} TableNameInput Table Name of Base
      * @returns {boolean} True if service was successsfully initialized, false otherwise
-     * @example
-     * var AirtableElement = document.getElementById("service_airtable");
-     * var myAirtable = AirtableElement.getService();
-     * myAirtable.init("APIKEY", "BASEID", "TABLENAME")
+     * 
      */
-    async function init(APIKeyInput, BaseIDInput, TableNameInput, pollIntervalInput) {
+    async function init(APIKeyInput, BaseIDInput, TableNameInput) {
 
         var credentialsValid = false;
         
@@ -1334,7 +1193,7 @@ function Service_Airtable() {
 
         }
 
-        // console.log(BaseID);
+        console.log(BaseID);
 
         const Airtable = require('airtable');
 
@@ -1347,19 +1206,15 @@ function Service_Airtable() {
             return false;
         }
 
-        // console.log(base);
+        console.log(base);
         // console.log(apiKey);
 
 
         // if the credentials are valid authorization
         if (credentialsValid) {
-          
-          if (pollIntervalInput !== undefined) {
-            pollInterval = await pollIntervalInput;
-          }
 
           beginDataStream(function () {
-            // console.log(funcAtInit)
+            console.log(funcAtInit)
             serviceActive = true;
             // call funcAtInit if defined from executeAfterInit
             if (funcAtInit !== undefined) {
@@ -1390,246 +1245,82 @@ function Service_Airtable() {
     }
 
     /** Get whether the Service was initialized or not
+    *
     * @public
     * @returns {boolean} whether Service was initialized or not
-    * @example
-    * if (myAirtable.isActive() == true)
-    *   // do something if Airtable service is active
     */
     function isActive() {
         return serviceActive;
     }
-
-    /** Get all entries on the cloud.
+    
+    /** Get all the entries only in 'Name' column, which are keys
      * @public
-     * @returns {object} all entries on the cloud, an object with Name fields as keys and Value fields as values
-     * @example
-     * let entriesInfo = myAirtable.getEntriesInfo(); 
-     * console.log(entriesInfo); // display all entries information
-     * 
-     * // display message entry info
-     * let messageEntryType = entriesInfo["message"].type;
-     * let messageEntryValue = entriesInfo["message"].value;
-     * console.log("message has value of ", messageEntryValue, "that is of type ", messageEntryType);
+     * @returns {array}
      */
-    function getEntriesInfo () {
-      return currentData;
+    function getNames() {
+      var names = [];
+
+      for (var key in currentData) {
+        names.push(key);
+      }
+
+      return names;
     }
 
-    /** Update Value of a entry on Airtable by entry Name. If the entry does not exist, create a new entry and assign given properties.
-     * <br>
-     * NotStrict property indicates that the data type of the Value supplied will be implicitly converted. For example, allowing for setting an INT entry's value with a string, "123" or a STRING entry's value with * a number. This method exists for convenience but please avoid using it extensively as it can lead to unpredictable outcomes.
+    /** Create a Name & Value pair if it doesn't exist
      * @public
-     * @param {any} name  Name of entry 
-     * @param {any} value  new Value to update entry to. 
-     * @param {any} callback  function to run after new entry value or new entry creation 
-     * @example
-     * // set a string type Value of a Entry and display
-     * myAirtable.setEntryValueNotStrict("message", 123, function () {
-     *    let messageValue = myAirtable.getEntryValue("message");
-     *    console.log("message: ", messageValue); // display the updated value, which will be 123. 
-     * })
-     * // set value of a boolean Entry
-     * myAirtable.setEntryValueNotStrict("aBoolean", true);
-     *
-     * // set value of an integer Entry
-     * myAirtable.setEntryValueNotStrict("anInteger", 10);
-     * myAirtable.setEntryValueNotStrict("anInteger", "10");
-     * 
-     * // set value of a double Entry
-     * myAirtable.setEntryValueNotStrict("aDouble", 5.2);
-     * myAirtable.setEntryValueNotStrict("aDouble", "5.2");
+     * @param {string} name 
+     * @param {string} value 
+     * @param {function} callback
      */
-    async function setEntryValueNotStrict(name, value, callback) {
+    function createNameValuePair(name, value, callback) {
+      // only create new pair if name does not yet exist
       if (currentData[name] == undefined) {
-        /* no entries exist in the database with the given name */
-
-        // throw new Error("Entry with given name does not exist in the database. Please supply a Name of a Entry that exists on Airtable.")
-        createEntry(name, value, callback);
-      }
-      else {
-        /* the entry exists in the database */
-
-
-        // append callback function
-        // if (callback != undefined) {
-
-        //   let index = getEmptyIndex(funcAfterChangeEntryValue);
-
-        //   if (index === -1)
-        //     funcAfterChangeEntryValue.push([name, callback])
-        //   else
-        //     funcAfterChangeEntryValue[index] = [name, callback]
-        // }
-        setTimeout(callback, 1500);
-
-        updateValue(name, value); // update entry in database
-      }
-    }
-
-    /** Update Value of a entry on Airtable by entry Name. If the entry does not exist, create a new entry and assign given properties.
-     * <br>
-     * The value of the Entry is not implicitly converted. E.g. setting a string Entry's value with a number will no longer work
-     * @public
-     * @param {string} name  Name of entry
-     * @param {any} value  new Value to update entry to
-     * @param {any} callback  function to run after new entry value or new entry creation
-     * @example
-     * // set a string type Value of a Entry and display
-     * myAirtable.setEntryValueNotStrict("message", 123, function () {
-     *    let messageValue = myAirtable.getEntryValue("message");
-     *    console.log("message: ", messageValue); // display the updated value, which will be 123.
-     * })
-     * // set value of a boolean Entry
-     * myAirtable.setEntryValueNotStrict("aBoolean", true);
-     *
-     * // set value of an integer Entry
-     * myAirtable.setEntryValueNotStrict("anInteger", 10);
-     *
-     * // set value of a double Entry
-     * myAirtable.setEntryValueNotStrict("aDouble", 5.2);
-     */
-    async function setEntryValueStrict(name, value, callback) {
-      if (currentData[name] == undefined) {
-        /* no entries exist in the database with the given name */
-
-        // throw new Error("Entry with given name does not exist in the database. Please supply a Name of a Entry that exists on Airtable.");
-        createEntry(name, value, callback);
-      }
-      else {
-        /* the entry exists in the database */
-
-        let dataType = getValueTypeStrict(value);
-
-        if (dataType === "INT" && typeof value === "string")
-          throw new TypeError("A new Value of string data type was given, but the string does not at least contain one chracter that is not a number. E.g. '123'. Please supply a string that contains at least one character that is not a number, or use the less strict alternative method, setEntryValueNotStrict(). NOTE: getEntryValue() of a Entry set to '123' with " +
-            "setEntryValueNotStrict() will still return a javascript number type");
-
-        let expectedDataType = currentData[name].type;
-        console.log("%cTuftsCEEO ", "color: #3ba336;", dataType, " vs ", expectedDataType);
-        if (dataType === expectedDataType) {
-          /* the data type of given value is the same as one stored */
-
-          // append callback function
-          // if (callback != undefined) {
-          //   let index = getEmptyIndex(funcAfterChangeEntryValue);
-          //   if (index === -1)
-          //     funcAfterChangeEntryValue.push([name, callback])
-          //   else
-          //     funcAfterChangeEntryValue[index] = [name, callback]
-          // }
-          setTimeout(callback, 1500);
-
-          updateValue(name, value); // update entry in database
+        createName({Name: name, Value: value});
+        if (callback != undefined ) {
+          callback();
         }
-        else {
-          // expected a STRING but got an INT
-          if (dataType === "INT" && expectedDataType === "STRING") {
-            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type STRING but got an INT. This could happen if a string value you supplied is entirely of a number. E.g. '123'. " +
-              "Please supply a string that contains at least one character that is not a number, or setuse the less strict alternative method, setEntryValueNotStrict(). NOTE: getEntryValue() of a Entry set to '123' with " +
-              "setEntryValueNotStrict() will still return a javascript number type");
-          }
-          else if (dataType === "STRING" && expectedDataType === "INT") {
-            console.error("%cTuftsCEEO ", "color: #3ba336;", "Expected a Value of type INT but got a STRING. Please supply a number.");
-          }
-
-          throw new TypeError("Could not update value of entry on Airtable. The given value is not of the data type defined for the entry in the database");
+      }
+      else {
+        if (callback != undefined) {
+          callback();
         }
       }
     }
 
-
-    /** Get the Value field associated with a entry by its Name
-    * @public
-    * @param {string} name Name of entry
-    * @returns {any} the Value field in any JS data type. data type conversion is implicit. 
-    * @example
-    * let value = myAirtable.getEntryValue("message");
-    * console.log("message: ", value); 
-    */
-    function getEntryValue(name) {
-      return currentData[name].value;
+    /** Get the Value field associated with a Name
+     * @public
+     * @param {string} name name of the Name entry
+     * @returns {any} Value associated with the given Name
+     */
+    function getValue(name) {
+        return convertToDataType(currentData[name]);
     }
 
-    /** Delete entry from the Airtable database given its Name field. 
+    /** Update the Value field associated with a Name 
      * @public
-     * @param {any} name the Name of entry to delete
-     * @param {any} callback callback function to run after entry deletion
-     * @example
-     * myAirtable.deleteEntry("message", function () {
-     *     let entriesInfo = myAirtable.getEntriesInfo();
-     *     console.log("entriesInfo: ", entriesInfo); // entriesInfo will no longer contain the entry that was deleted
-     * })
+     * @param {string} name 
+     * @param {string} newValue 
      */
-    const deleteEntry = async (entryName, callback) => {
+    function updateValue(name, newValue) {
+      var recordID = recordIDNameMap[name];
+      var convertedValue = convertToString(newValue);
+      var requestBody = { Name: name, Value: convertedValue };
+      updateRecord(recordID, requestBody);
+    }
+
+    /** Delete a record given a record ID
+     * @public
+     * @param {any} id 
+     */
+    const deleteRecord = async (id) => {
         try {
-
-          // delete all entries in Airtable database with given entryName for Name
-          let ids = getAllRecordsIDsForName(entryName);
-
-          if (ids.length == 0)
-            throw new Error("Could not delete entry with name, " + entryName.toString()+ ", as it does not exist");
-
-          for (let i = 0; i < ids.length; i++) {
-            let id = ids[i];
-            let deletedRecord = await table.destroy(id);
-          }
-
-          // append callback function
-          // if (callback != undefined) {
-            // let index = getEmptyIndex(funcAfterDeleteEntry);
-            // if (index === -1)
-              // funcAfterDeleteEntry.push([entryName, callback])
-            // else
-              // funcAfterDeleteEntry[index] = [entryName, callback]
-          // }
-          setTimeout( callback, 2000);
-
+            const deletedRecord = await table.destroy(id);
+            console.log(minifyRecord(deletedRecord));
         } catch (err) {
-          throw new Error(err);
+            console.error(err);
         }
     };
-
-    /** Create a new entry given its Name field and Value field. If a entry with given name already exists, the method will throw an Error.
-     * @public
-     * @param {string} name name of entry to create
-     * @param {any} value value to give entry (can be of any JS data type)
-     * @param {function} callback function to run after entry creation
-     * @example
-     * myAirtable.createEntry("aBoolean", false, function () {
-     *    let aBoolean = myAirtable.getEntryValue("aBoolean");
-     *    if (aBoolean == false)
-     *       console.log ("aBoolean is false");
-     * })
-     * 
-     */
-    const createEntry = async (entryName, entryValue, callback) => {
-      try {
-
-        if (currentData[entryName] == undefined) {
-          /* entry with the given name does not yet exist */
-
-          let convertedValue = convertToString(entryValue);
-          createName({ Name: entryName, Value: convertedValue }); // create Entry in database
-
-          // append callback function
-          // if (callback != undefined) {
-          //   let index = getEmptyIndex(funcAfterCreateEntry);
-          //   if (index === -1)
-          //     funcAfterCreateEntry.push([entryName, callback])
-          //   else
-          //     funcAfterCreateEntry[index] = [entryName, callback]
-          // }
-          setTimeout(callback, 1500);
-        }
-        else {
-          throw new Error("A entry with the name, " + entryName.toString() +  ", already exists");
-        }
-      }
-      catch (err) {
-        console.error(err);
-      }
-    }
 
     //////////////////////////////////////////
     //                                      //
@@ -1637,41 +1328,6 @@ function Service_Airtable() {
     //                                      //
     //////////////////////////////////////////
 
-    /** Update the Value field associated with a Name 
-    * @private
-    * @param {string} name 
-    * @param {string} newValue 
-    */
-    function updateValue(name, newValue) {
-      var recordIDs = recordIDNameMap[name];
-      var convertedValue = convertToString(newValue);
-      
-      if (currentData[name].value == convertedValue) {
-        /* value to update to is the same as value already in currentData */
-
-        // execute funcAfterChangeEntryValue since value won't change
-        for (let j = 0; j < funcAfterChangeEntryValue.length; j++) {
-          if (funcAfterChangeEntryValue[j] !== undefined) {
-            console.log("%cTuftsCEEO ", "color: #3ba336;", funcAfterChangeEntryValue)
-            let changedEntry = name;
-            let expectedEntry = funcAfterChangeEntryValue[j][0];
-
-            if (expectedEntry === changedEntry) {
-              funcAfterChangeEntryValue[j][1]();
-              funcAfterChangeEntryValue[j] = undefined;
-              // console.log("After execution, funcAfterChangeEntryValue: ", funcAfterChangeEntryValue);
-            }
-          }
-        }
-      }
-      else {
-        for (let i = 0; i < recordIDs.length; i++) {
-          let recordID = recordIDs[i];
-          var requestBody = { Name: name, Value: convertedValue };
-          updateRecord(recordID, requestBody);
-        }
-      }
-    }
 
     /** get an initial reading of the table, and then initialize global variable currentData
      * @private
@@ -1680,135 +1336,42 @@ function Service_Airtable() {
     async function beginDataStream(callback) {
       var records = await base(TableName).select().firstPage(function(err, records) {
         if (err) {
-          console.error("%cTuftsCEEO ", "color: #3ba336;", err);
+          console.log(err);
           return false;
         }
-        // initialize recordIDNameMap
-        populateRecordIDNameMap(records);
-        
+        console.log(records);
         // initialize currentData global variable
-        populateCurrentData(records);
+        for (var key in records) {
+          var name = records[key].fields.Name;
+          var value = records[key].fields.Value;
+          var recordID = records[key].id;
 
-        // console.log("currentData: ", currentData);
+          currentData[name] = value;
+          recordIDNameMap[name] = recordID;
+        }
+
+        console.log("currentData: ", currentData);
         setTimeout( function () {
-
           setInterval(async function () {
 
-            // get all records in Airtable
             var records = await base(TableName).select().firstPage();
 
             // if the object is defined and not boolean false
             if (records) {
-
-              let changedEntries = [];
-              let createdEntries = [];
-              let deletedEntries = [];
-
-              // get entries from the database
-              let newEntries = {};
+              currentData = {}; // reinitialize currentData in case some info was deleted outside
+              // initialize currentData global variable
               for (var key in records) {
                 var name = records[key].fields.Name;
                 var value = records[key].fields.Value;
+                var recordID = records[key].id;
                 if (name != undefined) {
-                  newEntries[name] = convertToDataType(value);
+                  currentData[name] = value;
+                  recordIDNameMap[name] = recordID;
                 }
               }
-
-              // populate recordIDNameMap
-              populateRecordIDNameMap(records);
-
-              // look for discrepancies between newEntries and currentData
-
-              let changeExists = false;
-              // go through newEntries and check if all entries in records exists correspondingly to currentData
-              for (var key in newEntries) {
-                if (key != undefined) {
-                  if (currentData[key] !== undefined && newEntries[key] !== undefined) {
-                    /*  values are defined for the key */
-                    if (currentData[key].value !== newEntries[key].value) {
-                      /* values are different */
-                      // console.log("Different values detected in: ", key);
-                      changedEntries.push(key);
-                      changeExists = true;
-                    }
-                      
-                  }
-                  else {
-                    /* a entry was created in records and does not yet show in currentData*/
-                    // console.log("A entry was created: ", key);
-                    // console.log("newEntries: ", newEntries);
-                    // console.log("currentData: ", currentData);
-                    createdEntries.push(key);
-                    // console.log(createdEntries);
-                    changeExists = true;
-                  }
-                }
-              }
-
-              // go through currentData and check if all entries in newEntries exists correspondingly to records
-              for (let key in currentData) {
-                if (key != undefined) {
-                  if (currentData[key] === undefined || newEntries[key] === undefined) {
-                    /* a entry was destroyed in newEntries and does not yet show in currentData*/
-                    // console.log("A entry was destroyed: ", key);
-                    deletedEntries.push(key);
-                    changeExists = true;
-                  }
-                }
-              }
-
-              // if change exists, update currentData
-              if (changeExists === true) {
-                populateCurrentData(records);
-
-                // console.log("NEW CURRENTDAAT: ", currentData);
-
-                /* execute any needed callback functions */
-
-                for (let i = 0; i < changedEntries.length; i++ ) {
-                  for (let j = 0 ; j < funcAfterChangeEntryValue.length; j++) {
-                    if (funcAfterChangeEntryValue[j] !== undefined) {
-                      let changedEntry = changedEntries[i];
-                      let expectedEntry = funcAfterChangeEntryValue[j][0];
-                      if (expectedEntry === changedEntry) {
-                        funcAfterChangeEntryValue[j][1]();
-                        funcAfterChangeEntryValue[j] = undefined;
-                      }
-                    }
-                  }
-                }
-                
-                for (let i = 0; i < createdEntries.length; i++) {
-                  for (let j = 0; j < funcAfterCreateEntry.length; j++) {
-                    if (funcAfterCreateEntry[j] !== undefined) {
-                      let createdEntry = createdEntries[i];
-                      let expectedEntry = funcAfterCreateEntry[j][0];
-                      // console.log(expectedEntry, " vs ", createdEntry);
-                      if (expectedEntry === createdEntry) {
-                        funcAfterCreateEntry[j][1]();
-                        funcAfterCreateEntry[j] = undefined;
-                      }
-                    }
-                  }
-                }
-
-                for (let i = 0; i < deletedEntries.length; i++) {
-                  for (let j = 0; j < funcAfterDeleteEntry.length; j++) {
-                    if (funcAfterDeleteEntry[j] !== undefined) {
-                      let deletedEntry = deletedEntries[i];
-                      let expectedEntry = funcAfterDeleteEntry[j][0];
-                      if (expectedEntry === deletedEntry) {
-                        funcAfterDeleteEntry[j][1]();
-                        funcAfterDeleteEntry[j] = undefined;
-                      }
-                    }
-                  }
-                }
-
-              }
-
             }
-          }, pollInterval)
+
+          }, 200)
 
           callback();
         }, 2000);
@@ -1823,16 +1386,15 @@ function Service_Airtable() {
      */
     async function updateRecord(recordID, fields) {
       const updatedRecord = await table.update(recordID, fields);
-      // console.log(minifyRecord(updatedRecord));
+      console.log(minifyRecord(updatedRecord));
     }
 
     /** Creates a new entry of specified data fields that gets pushed to Airtable
-     * @private
     * @param {string} fields passed in data fields
     */
     const createName = async (fields) => {
       const createdName = await table.create(fields);
-      // console.log(minifyRecord(createdName));
+      console.log(minifyRecord(createdName));
     };
 
     /** Get the content of a record/row in minified format
@@ -1853,7 +1415,7 @@ function Service_Airtable() {
     */
     const getRecordById = async (id) => {
       const record = await table.find(id);
-      // console.log(record);
+      console.log(record);
     };
 
 
@@ -1927,7 +1489,7 @@ function Service_Airtable() {
           return false
         }
         else {
-          // console.log("%cTuftsCEEO ", "color: #3ba336;", stringInput.slice(0, stringInput.length - 1))
+          console.log(stringInput.slice(0, stringInput.length - 1))
           return checkCompletelySpace(stringInput.slice(0, stringInput.length - 1))
         }
       }
@@ -1956,207 +1518,21 @@ function Service_Airtable() {
       return convertedInput
     }
 
-    /** Get all the entries only in 'Name' column, which are keys
-    * @private
-    * @returns {array}
-    */
-    function getNames() {
-      var names = [];
-
-      for (var key in currentData) {
-        names.push(key);
-      }
-
-      return names;
-    }
-
-    /**
-     * 
-     * @private
-     * @param {any} array 
-     * @returns {number}
-     */
-    function getEmptyIndex (array) {
-      if (array.length === 0 )
-       return -1;
-      else {
-
-        for (let i = 0; i < array.length; i++) {
-          if (array[i] == undefined)
-            return i;
-        }
-
-        return -1;
-      }
-
-    }
-
-    /**
-     * @private
-     * @param {any} records 
-     */
-    function populateRecordIDNameMap (records) {
-
-      recordIDNameMap = {}; // re initialize recordIDNameMap
-
-      for (let key in records) {
-        var name = records[key].fields.Name;
-        var recordID = records[key].id;
-
-        if (recordIDNameMap[name] !== undefined) {
-          /* a record of a entry with the name already exists in recordIDNameMap */
-
-          recordIDNameMap[name].push(recordID);
-        }
-        else {
-          /* recordIDNameMap does not contain a entry with the name */
-
-          recordIDNameMap[name] = []; // make new array
-          recordIDNameMap[name].push(recordID);
-        }
-
-      }
-
-    }
-
-    /**
-     * 
-     * @private
-     * @param {any} records 
-     */
-    function populateCurrentData (records) {
-      currentData = {}; // reinitialize currentData in case some info was deleted outside
-      for (let key in records) {
-        var name = records[key].fields.Name;
-        var value = records[key].fields.Value;
-
-        if (name != undefined) {
-          currentData[name] = {
-            "value": undefined,
-            "type": undefined
-          };
-
-          let convertedValue = convertToDataType(value);
-          let dataType = getValueTypeStrict(convertedValue);
-
-          currentData[name].value = convertedValue;
-          currentData[name].type = dataType;
-        }
-      }
-    }
-
-    /**
-     * @private
-     * @param {any} name 
-     * @returns {array} array of Airtable record ids
-     */
-    function getAllRecordsIDsForName(name) {
-      let arrayIds = [];
-
-      let recordIds = recordIDNameMap[name];
-
-      if (recordIds !== undefined)
-        for ( let i = 0; i < recordIds.length; i++ ) {
-          let recordId = recordIds[i];
-        
-          arrayIds.push(recordId);
-        }
-
-      return arrayIds;
-    }
-
-    /** Helper function for getting data types in a format
-    * 
-    * @private
-    * @param {any} new_value the variable containing the new value of a entry
-    * @returns {any} data type of entry
-    */
-    function getValueType(new_value) {
-      //if the value is not a number
-      if (isNaN(new_value)) {
-        //if the value is a boolean
-        if (new_value == "true" || new_value == "false" || new_value == "True" || new_value == "False") {
-          return "BOOLEAN";
-        }
-        //if the value is a string
-        return "STRING";
-      }
-      //value is a number
-      else {
-        //if value is an integer
-        if (Number.isInteger(parseFloat(new_value))) {
-          return "INT"
-        }
-        //if value is a double
-        else {
-          return "DOUBLE"
-        }
-      }
-    }
-
-    /**
-    * @private
-    * @param {any} new_value 
-    * @returns {string} data type of entry 
-    */
-    function getValueTypeStrict(new_value) {
-      //if the value is a boolean
-      if (typeof new_value === "boolean") {
-        return "BOOLEAN";
-      }
-      else {
-        if (isNaN(new_value) === false) {
-          if (Number.isInteger(parseFloat(new_value))) {
-            return "INT"
-          }
-          //if value is a double
-          else {
-            return "DOUBLE"
-          }
-        }
-        else {
-          return "STRING";
-        } 
-      }
-    }
-
-    /** Helper function for converting values to correct type based on data type
-    * 
-    * @private
-    * @param {string} valueType data type of value in systemlink format
-    * @param {string} value value to convert
-    * @returns {any} converted value
-    */
-    function getValueFromType(valueType, value) {
-      if (valueType == "BOOLEAN") {
-        if (value == "true") {
-          return true;
-        }
-        else {
-          return false;
-        }
-      }
-      else if (valueType == "STRING") {
-        return value;
-      }
-      else if (valueType == "INT" || valueType == "DOUBLE") {
-        return parseFloat(value);
-      }
-      return value;
-    }
-  
-
     /* public members */
     return {
         init: init,
         executeAfterInit, executeAfterInit,
         isActive: isActive,
-        setEntryValueNotStrict: setEntryValueNotStrict,
-        setEntryValueStrict: setEntryValueStrict,
-        getEntriesInfo: getEntriesInfo,
-        getEntryValue: getEntryValue,
-        createEntry: createEntry,
-        deleteEntry: deleteEntry
+        updateValue: updateValue,
+        createNameValuePair: createNameValuePair,
+        getRecords: getRecords,
+        getValue: getValue,
+        getNames: getNames,
+        convertToString, convertToString,
+        deleteRecord: deleteRecord,
+        getRecordById: getRecordById,
+        minifyRecord: minifyRecord
+
     }
 }
 
@@ -2245,7 +1621,7 @@ class servicespike extends HTMLElement {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
                 if ('serial' in navigator) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating SPIKE Service");
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
                     var initSuccessful = await this.service.init();
                     if (initSuccessful) {
                         active = true;
@@ -2346,12 +1722,12 @@ LICENSE: MIT
  * ServiceDock library for interfacing with LEGO® SPIKE™ Prime
  * @example
  * // assuming you declared <service-spike> with the id, "service_spike"
- * var serviceSPIKE = document.getElemenyById("service_spike").getService();
- * serviceSPIKE.executeAfterInit(async function() {
+ * var mySPIKE = document.getElemenyById("service_spike").getService();
+ * mySPIKE.executeAfterInit(async function() {
  *     // write code here
  * })
  * 
- * serviceSPIKE.init();
+ * mySPIKE.init();
  */
 function Service_SPIKE() {
 
@@ -2567,6 +1943,8 @@ function Service_SPIKE() {
      */
     async function init() {
 
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.product is ", navigator.product);
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "navigator.appName is ", navigator.appName);
         // reinit variables in the case of hardware disconnection and Service reactivation
         reader = undefined;
         writer = undefined;
@@ -2582,9 +1960,6 @@ function Service_SPIKE() {
             await sleep(1000);
 
             triggerCurrentState();
-            getFirmwareInfo( function (version) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "This SPIKE Prime is using Hub OS ", version);
-            });
             serviceActive = true;
 
             await sleep(2000); // wait for service to init
@@ -2605,8 +1980,8 @@ function Service_SPIKE() {
      * @public
      * @param {function} callback Function to execute after initialization ( during init() )
      * @example
-     * serviceSPIKE.executeAfterInit( function () {
-     *     var motor = serviceSPIKE.Motor("A");
+     * mySPIKE.executeAfterInit( function () {
+     *     var motor = mySPIKE.Motor("A");
      *     var speed = motor.get_speed();
      *     // do something with speed
      * })
@@ -2638,8 +2013,8 @@ function Service_SPIKE() {
      * @public
      * @param {any} callback 
      * @example
-     * var motor = new serviceSPIKE.Motor('A')
-     * serviceSPIKE.executeWithStream( async function() {
+     * var motor = new mySPIKE.Motor('A')
+     * mySPIKE.executeWithStream( async function() {
      *      var speed = await motor.get_speed();
      *      // do something with motor speed
      * })
@@ -2713,7 +2088,7 @@ function Service_SPIKE() {
      * <p> <em> Run this function to exit micropython interpreter </em> </p>
      * @public
      * @example
-     * serviceSPIKE.rebootHub();
+     * mySPIKE.rebootHub();
      */
     function rebootHub() {
         console.log("%cTuftsCEEO ", "color: #3ba336;", "rebooting")
@@ -2734,7 +2109,7 @@ function Service_SPIKE() {
      * @example
      * // USAGE 
      * 
-     * var portsInfo = await serviceSPIKE.getPortsInfo();
+     * var portsInfo = await mySPIKE.getPortsInfo();
      * // ports.{yourPortLetter}.device --returns--> device type (ex. "smallMotor" or "ultrasonic") </p>
      * // ports.{yourPortLetter}.data --returns--> device info (ex. {"speed": 0, "angle":0, "uAngle": 0, "power":0} ) </p>
      * 
@@ -2782,7 +2157,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {object} Info of the hub
      * @example
-     * var hubInfo = await serviceSPIKE.getHubInfo();
+     * var hubInfo = await mySPIKE.getHubInfo();
      * 
      * var upDownDetector = hubInfo["gyro"][0];
      * var rightSideLeftSideDetector = hubInfo["gyro"][1];
@@ -2841,10 +2216,10 @@ function Service_SPIKE() {
      * <p> hub needs to be rebooted to return to UJSONRPC stream</p>
      * @ignore
      * @example
-     * serviceSPIKE.reachMicroPy();
-     * serviceSPIKE.sendDATA("from spike import PrimeHub");
-     * serviceSPIKE.sendDATA("hub = PrimeHub()");
-     * serviceSPIKE.sendDATA("hub.light_matrix.show_image('HAPPY')");
+     * mySPIKE.reachMicroPy();
+     * mySPIKE.sendDATA("from spike import PrimeHub");
+     * mySPIKE.sendDATA("hub = PrimeHub()");
+     * mySPIKE.sendDATA("hub.light_matrix.show_image('HAPPY')");
      */
     function reachMicroPy() {
         console.log("%cTuftsCEEO ", "color: #3ba336;", "starting micropy interpreter");
@@ -2873,7 +2248,7 @@ function Service_SPIKE() {
      * @public
      * @returns {boolean} True if service initialized, false otherwise
      * @example
-     * if (serviceSPIKE.isActive()) {
+     * if (mySPIKE.isActive()) {
      *      // do something
      * }
      */
@@ -2884,7 +2259,7 @@ function Service_SPIKE() {
     /**  Get the most recently detected event on the display of the hub
      * @public
      * @returns {string} ['tapped','doubletapped']
-     * var event = await serviceSPIKE.getHubEvent();
+     * var event = await mySPIKE.getHubEvent();
      * if (event == "tapped" ) {
      *      console.log("SPIKE is tapped");
      * }
@@ -2897,7 +2272,7 @@ function Service_SPIKE() {
      * @public
      * @returns {string} ['shaken', 'freefall', 'tapped', 'doubletapped']
      * @example
-     * var gesture = await serviceSPIKE.getHubGesture();
+     * var gesture = await mySPIKE.getHubGesture();
      * if (gesture == "shaken") {
      *      console.log("SPIKE is being shaked");
      * }
@@ -2910,7 +2285,7 @@ function Service_SPIKE() {
      * @public
      * @returns {string} ['up','down','front','back','leftside','rightside']
      * @example
-     * var orientation = await serviceSPIKE.getHubOrientation();
+     * var orientation = await mySPIKE.getHubOrientation();
      * if (orientation == "front") {
      *      console.log("SPIKE is facing up");
      * }
@@ -2924,7 +2299,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
-     * var bluetoothButtonInfo = await serviceSPIKE.getBluetoothButton();
+     * var bluetoothButtonInfo = await mySPIKE.getBluetoothButton();
      * var pressedBool = bluetoothButtonInfo["pressed"];
      * var pressedDuration = bluetoothButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
@@ -2936,7 +2311,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER }
      * @example
-     * var mainButtonInfo = await serviceSPIKE.getMainButton();
+     * var mainButtonInfo = await mySPIKE.getMainButton();
      * var pressedBool = mainButtonInfo["pressed"];
      * var pressedDuration = mainButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
@@ -2949,7 +2324,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
-     * var leftButtonInfo = await serviceSPIKE.getLeftButton();
+     * var leftButtonInfo = await mySPIKE.getLeftButton();
      * var pressedBool = leftButtonInfo["pressed"];
      * var pressedDuration = leftButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      * 
@@ -2962,7 +2337,7 @@ function Service_SPIKE() {
      * @ignore
      * @returns {object} { "pressed": BOOLEAN, "duration": NUMBER } 
      * @example
-     * var rightButtonInfo = await serviceSPIKE.getRightButton();
+     * var rightButtonInfo = await mySPIKE.getRightButton();
      * var pressedBool = rightButtonInfo["pressed"];
      * var pressedDuration = rightButtonInfo["duration"]; // duration is miliseconds the button was pressed until release
      */
@@ -2974,7 +2349,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Motors
      * @example
-     * var motorPorts = serviceSPIKE.getMotorPorts();
+     * var motorPorts = mySPIKE.getMotorPorts();
      *
      * // get the alphabetically earliest port connected to a motor
      * var randomPort = motorPorts[0];
@@ -2999,7 +2374,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Small Motors
      * @example
-     * var smallMotorPorts = serviceSPIKE.getSmallMotorPorts();
+     * var smallMotorPorts = mySPIKE.getSmallMotorPorts();
      *
      * // get the alphabetically earliest port connected to a small motor
      * var randomPort = smallMotorPorts[0];
@@ -3024,7 +2399,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Big Motors
      * @example
-     * var bigMotorPorts = serviceSPIKE.getBigMotorPorts();
+     * var bigMotorPorts = mySPIKE.getBigMotorPorts();
      *
      * // get the alphabetically earliest port connected to a big motor
      * var randomPort = bigMotorPorts[0];
@@ -3047,7 +2422,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Distance Sensors
      * @example
-     * var distanceSensorPorts = serviceSPIKE.getDistancePorts();
+     * var distanceSensorPorts = mySPIKE.getDistancePorts();
      *
      * // get the alphabetically earliest port connected to a DistanceSensor
      * var randomPort = distanceSensorPorts[0];
@@ -3074,7 +2449,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Color Sensors
      * @example
-     * var colorSensorPorts = serviceSPIKE.getColorPorts();
+     * var colorSensorPorts = mySPIKE.getColorPorts();
      *
      * // get the alphabetically earliest port connected to a ColorSensor
      * var randomPort = colorSensorPorts[0];
@@ -3101,7 +2476,7 @@ function Service_SPIKE() {
      * @public
      * @returns {(string|Array)} Ports that are connected to Force Sensors
      * @example
-     * var forceSensorPorts = serviceSPIKE.getForcePorts();
+     * var forceSensorPorts = mySPIKE.getForcePorts();
      * 
      * // get the alphabetically earliest port connected to a ForceSensor
      * var randomPort = forceSensorPorts[0];
@@ -3127,51 +2502,46 @@ function Service_SPIKE() {
     /**  Get all motor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {array} All connected Motor objects
+     * @returns {object} All connected Motor objects
      * @example
-     * var motors = serviceSPIKE.getMotors();
+     * var motors = await mySPIKE.getMotors();
      * 
-     * if (motors.length > 0) {
+     * // get Motor object connected to Port A
+     * var myMotor = motors["A"]
      * 
-     *      var myMotor = motors[0]; // get motor connected to most alphabetically early port
-     * 
-     *      // run motor for 10 seconds at 100 speed
-     *      myMotor.run_for_seconds(10,100);
-     * }
+     * // run motor for 10 seconds at 100 speed
+     * myMotor.run_for_seconds(10,100);
      */
     function getMotors() {
         var portsInfo = ports;
-        var motors = [];
+        var motors = {};
         for (var key in portsInfo) {
             if (portsInfo[key].device == "smallMotor" || portsInfo[key].device == "bigMotor") {
-                motors.push(new Motor(key));
+                motors[key] = new Motor(key);
             }
         }
         return motors;
     }
 
-    /** Get all distance sensor objects currently connected to SPIKE
+    /**  Get all distance sensor objects currently connected to SPIKE
      * 
      * @public
-     * @returns {array} All connected DistanceSensor objects
+     * @returns {object} All connected DistanceSensor objects
      * @example
-     * var distanceSensors = serviceSPIKE.getDistanceSensors();
+     * var distanceSensors = await mySPIKE.getDistanceSensors();
      * 
-     * if (distanceSensors.length > 0) {
-     *
-     *      var myDistanceSensor = distanceSensors[0]; // get DistanceSensor connected to most alphabetically early port
+     * // get DistanceSensor object connected to Port A
+     * var mySensor = distanceSensors["A"];
      * 
-     *      // get distance in centimeters
-     *      var distance = myDistanceSensor.get_distance_cm();
-     *      console.log("distance in CM: ", distance);
-     * }
+     * // get distance in centimeters
+     * console.log("distance in CM: ", mySensor.get_distance_cm())
      */
     function getDistanceSensors() {
         var portsInfo = ports;
-        var distanceSensors = [];
+        var distanceSensors = {};
         for (var key in portsInfo) {
             if (portsInfo[key].device == "ultrasonic") {
-                distanceSensors.push(new DistanceSensor(key));
+                distanceSensors[key] = new DistanceSensor(key);
             }
         }
         return distanceSensors;
@@ -3182,23 +2552,15 @@ function Service_SPIKE() {
      * @public
      * @returns {object} All connected ColorSensor objects
      * @example
-     * var colorSensors = serviceSPIKE.getColorSensors();
-     *
-     * if (colorSensors.length > 0) {
-     *
-     *      var color_sensor = colorSensors[0]; // get ColorSensor connected to most alphabetically early port
-     *
-     *      // get detected color
-     *      var color = color_sensor.get_color();
-     *      console.log("detected color: ", color);
-     * }
+     * var colorSensors = await mySPIKE.getColorSensors();
+     * var mySensor = colorSensors["A"];
      */
     function getColorSensors() {
         var portsInfo = ports;
-        var colorSensors = [];
+        var colorSensors = {};
         for (var key in portsInfo) {
             if (portsInfo[key].device == "color") {
-                colorSensors.push( new ColorSensor(key));
+                colorSensors[key] = new ColorSensor(key);
             }
         }
         return colorSensors;
@@ -3209,25 +2571,22 @@ function Service_SPIKE() {
      * @public
      * @returns {object} All connected ForceSensor objects
      * @example
-     * var forceSensors = serviceSPIKE.getForceSensors();
+     * var forceSensors = mySPIKE.getForceSensors();
      *
-     * if (forceSensors.length > 0) {
+     * // get ForceSensor object connected to port A
+     * var mySensor = forceSensors["A"];
      *
-     *      var force_sensor = forceSensors[0]; // get ForceSensor connected to most alphabetically early port
-     *
-     *      // when ForceSensor is pressed, indicate button state on console
-     *      force_sensor.wait_until_pressed( function() {
-     *           console.log("ForceSensor at port A was pressed");
-     *      })
-     * }
-     * 
+     * // when ForceSensor is pressed, indicate button state on console
+     * mySensor.wait_until_pressed( function() {
+     *      console.log("ForceSensor at port A was pressed");
+     * })
      */
     function getForceSensors() {
         var portsInfo = ports;
-        var forceSensors = [];
+        var forceSensors = {};
         for (var key in portsInfo) {
             if (portsInfo[key].device == "force") {
-                forceSensors.push( new ForceSensor(key));
+                forceSensors[key] = new ForceSensor(key);
             }
         }
         return forceSensors;
@@ -3247,7 +2606,7 @@ function Service_SPIKE() {
      * @param {string} program program to write must be in TEMPLATE LITERAL
      * @ignore
      * @example
-     * serviceSPIKE.micropython(10, `
+     * mySPIKE.micropython(10, `
      *from spike import PrimeHub, LightMatrix, Motor, MotorPair
      *from spike.control import wait_for_seconds, wait_until, Timer
      *
@@ -3387,7 +2746,7 @@ function Service_SPIKE() {
      * @param {integer} slotid slot of which program to execute
      * @example
      * // execute program in slot 1 of SPIKE Prime hub
-     * serviceSPIKE.executeProgram(1);
+     * mySPIKE.executeProgram(1);
      */
     function executeProgram(slotid) {
         UJSONRPC.programExecute(slotid)
@@ -3404,7 +2763,7 @@ function Service_SPIKE() {
     * @memberof Service_SPIKE
     * @example
     * // Initialize the Hub
-    * var hub = new serviceSPIKE.PrimeHub()
+    * var hub = new mySPIKE.PrimeHub()
     */
     PrimeHub = function () {
         var newOrigin = 0;
@@ -3414,7 +2773,7 @@ function Service_SPIKE() {
         * @memberof! PrimeHub
         * @returns {functions} - functions from PrimeHub.left_button
         * @example
-        * var hub = new serviceSPIKE.PrimeHub();
+        * var hub = new mySPIKE.PrimeHub();
         * var left_button = hub.left_button;
         * // do something with left_button
         */
@@ -3423,7 +2782,7 @@ function Service_SPIKE() {
         /** execute callback after this button is pressed
         * @param {function} callback function to run when button is pressed
         * @example
-        * var hub = new serviceSPIKE.PrimeHub();
+        * var hub = new mySPIKE.PrimeHub();
         * var left_button = hub.left_button;
         * left_button.wait_until_pressed ( function () {
         *     console.log("left_button was pressed");
@@ -3437,7 +2796,7 @@ function Service_SPIKE() {
          *
          * @param {function} callback function to run when button is released
          * @example
-         * var hub = new serviceSPIKE.PrimeHub();
+         * var hub = new mySPIKE.PrimeHub();
          * var left_button = hub.left_button;
          * left_button.wait_until_released ( function () {
          *     console.log("left_button was released");
@@ -3485,7 +2844,7 @@ function Service_SPIKE() {
          * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.right_button
          * @example
-         * var hub = serviceSPIKE.PrimeHub();
+         * var hub = mySPIKE.PrimeHub();
          * var right_button = hub.right_button;
          * // do something with right_button
          */
@@ -3495,7 +2854,7 @@ function Service_SPIKE() {
         *
         * @param {function} callback function to run when button is pressed
         * @example
-        * var hub = new serviceSPIKE.PrimeHub();
+        * var hub = new mySPIKE.PrimeHub();
         * var right_button = hub.right_button;
         * right_button.wait_until_pressed ( function () {
         *     console.log("right_button was pressed");
@@ -3510,7 +2869,7 @@ function Service_SPIKE() {
          * 
          * @param {function} callback function to run when button is released
          * @example
-         * var hub = new serviceSPIKE.PrimeHub();
+         * var hub = new mySPIKE.PrimeHub();
          * var right_button = hub.right_button;
          * right_button.wait_until_released ( function () {
          *     console.log("right_button was released");
@@ -3525,7 +2884,7 @@ function Service_SPIKE() {
          * 
          * @returns {boolean} - True if was pressed, false otherwise
          * @example
-         * var hub = new serviceSPIKE.PrimeHub();
+         * var hub = new mySPIKE.PrimeHub();
          * if ( hub.right_button.was_pressed() ) {
          *     console.log("right_button was pressed");
          * }
@@ -3560,7 +2919,7 @@ function Service_SPIKE() {
          * @memberof! PrimeHub
          * @returns {functions} - functions from PrimeHub.light_matrix
          * @example
-         * var hub = serviceSPIKE.PrimeHub();
+         * var hub = mySPIKE.PrimeHub();
          * var status_light = hub.status_light;
          * // do something with status_light
         */
@@ -3606,7 +2965,7 @@ function Service_SPIKE() {
          * @memberof! PrimeHub
          * @returns {functions} - functions from PrimeHub.light_matrix
          * @example
-         * var hub = serviceSPIKE.PrimeHub();
+         * var hub = mySPIKE.PrimeHub();
          * var light_matrix = hub.light_matrix;
          * // do something with light_matrix
          */
@@ -3649,7 +3008,7 @@ function Service_SPIKE() {
          * @memberof! PrimeHub
          * @returns {functions} functions from Primehub.speaker
          * @example
-         * var hub = serviceSPIKE.PrimeHub();
+         * var hub = mySPIKE.PrimeHub();
          * var speaker = hub.speaker;
          * // do something with speaker
          */
@@ -3702,8 +3061,8 @@ function Service_SPIKE() {
          * @memberof! PrimeHub
          * @returns {functions} functions from PrimeHub.motion_sensor
          * @example
-         * var hub = serviceSPIKE.PrimeHub();
-         * var motion_sensor = hub.motion_sensor;
+         * var hub = mySPIKE.PrimeHub();
+         * var motion_sensor = hub.motion_sensor();
          * // do something with motion_sensor
          */
         var motion_sensor = {};
@@ -3741,7 +3100,7 @@ function Service_SPIKE() {
          * 
          * @param  {function(string)} callback - A callback of which argument is name of the gesture
          * @example
-         * motion_sensor.wait_for_new_gesture( function ( newGesture ) {
+         * mySPIKE.wait_for_new_gesture( function ( newGesture ) {
          *      if ( newGesture == 'tapped') {
          *             console.log("SPIKE was tapped")
          *      }
@@ -3766,7 +3125,7 @@ function Service_SPIKE() {
          * 
          * @param  {function(string)} callback - A callback whose signature is name of the orientation
          * @example
-         * motion_sensor.wait_for_new_orientation( function ( newOrientation ) {
+         * mySPIKE.wait_for_new_orientation( function ( newOrientation ) {
          *        if (newOrientation == "up") {
          *              console.log("orientation is up");
          *        }
@@ -3883,7 +3242,7 @@ function Service_SPIKE() {
      * @returns {functions}
      * @example
      * // Initialize the Motor
-     * var motor = new serviceSPIKE.Motor("A")
+     * var motor = new mySPIKE.Motor("A")
      */
     Motor = function (port) {
 
@@ -3991,7 +3350,7 @@ function Service_SPIKE() {
          * @param {function} callback Params: "stalled" or "done"
          * @ignore
          * @example
-         * motor.run_to_position(180, 100, function() {
+         * mySPIKE.run_to_position(180, 100, function() {
          *      console.log("motor finished moving");
          * })
          */
@@ -4047,7 +3406,7 @@ function Service_SPIKE() {
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
          * @example
-         * motor.run_for_seconds(10, 100, function() {
+         * mySPIKE.run_for_seconds(10, 100, function() {
          *      console.log("motor just ran for 10 seconds");
          * })
          */
@@ -4065,7 +3424,7 @@ function Service_SPIKE() {
          * @param {integer} degrees 
          * @param {integer} speed [-100 to 100]
          * @param {function} [callback==undefined] Parameters:"stalled" or "done"
-         * motor.run_for_degrees(720, 100, function () {
+         * mySPIKE.run_for_degrees(720, 100, function () {
          *      console.log("motor just ran for 720 degrees");
          * })
          */
@@ -4109,7 +3468,7 @@ function Service_SPIKE() {
      * @memberof Service_SPIKE
      * @example
      * // Initialize the Color Sensor
-     * var color = new serviceSPIKE.ColorSensor("E")
+     * var color = new mySPIKE.ColorSensor("E")
      */
     ColorSensor = function (port) {
         var waitForNewColorFirst = false;
@@ -4253,15 +3612,15 @@ function Service_SPIKE() {
      * @memberof Service_SPIKE
      * @example
      * // Initialize the DistanceSensor
-     * var distance_sensor = new serviceSPIKE.DistanceSensor("A");
+     * var distance_sensor = new mySPIKE.DistanceSensor("A");
      */
-    var  DistanceSensor = function (port) {
-        var distanceSensor = ports[port]; // get the distance sensor info by port
+    DistanceSensor = function (port) {
+
+        var distanceSensor = ports[port] // get the distance sensor info by port
 
         // check if device is a distance sensor
         if (distanceSensor.device != "ultrasonic") {
-            console.error("Ports Info: ", ports);
-            throw new Error("No DistanceSensor detected at port " + port);
+            throw new Error("No Distance Sensor detected at port " + port);
         }
 
         /** Retrieves the measured distance in centimeters.
@@ -4424,7 +3783,7 @@ function Service_SPIKE() {
      * @memberof Service_SPIKE
      * @example
      * // Initialize the ForceSensor
-     * var force_sensor = new serviceSPIKE.ForceSensor("E")
+     * var force = new mySPIKE.ForceSensor("E")
      */
     ForceSensor = function (port) {
 
@@ -4437,10 +3796,6 @@ function Service_SPIKE() {
         /** Tests whether the button on the sensor is pressed.
          * 
          * @returns {boolean} true if force sensor is pressed, false otherwise
-         * @example
-         * if (force_sensor.is_pressed() === true) {
-         *      console.log("force sensor is pressed");
-         * }
          */
         function is_pressed() {
             var sensor = ports[port]; // get the force sensor info by port
@@ -4452,8 +3807,6 @@ function Service_SPIKE() {
         /** Retrieves the measured force, in newtons.
          * 
          * @returns {number}  Force in newtons [0 to 10]
-         * @example
-         * var newtons = force_sensor.get_force_newtons();
          */
         function get_force_newton() {
             var sensor = ports[port]; // get the force sensor info by port
@@ -4465,7 +3818,6 @@ function Service_SPIKE() {
         /** Retrieves the measured force as a percentage of the maximum force.
          * 
          * @returns {number} percentage [0 to 100]
-         * var percentage = force_sensor.get_force_percentage();
          */
         function get_force_percentage() {
             var sensor = ports[port]; // get the force sensor info by port
@@ -4479,11 +3831,8 @@ function Service_SPIKE() {
 
         /** Executes callback when Force Sensor is pressed
          * The function is executed in updateHubPortsInfo()'s Force Sensor part
+         * 
          * @param {function} callback 
-         * @example
-         * force_sensor.wait_until_pressed( function () {
-         *      console.log("force sensor is pressed!");
-         * })
          */
         function wait_until_pressed(callback) {
             funcAfterForceSensorPress = callback;
@@ -4492,10 +3841,6 @@ function Service_SPIKE() {
         /** Executes callback when Force Sensor is released
          * The function is executed in updateHubPortsInfo()'s Force Sensor part
          * @param {function} callback 
-         * @example
-         * force_sensor.wait_until_released ( function () {
-         *      console.log("force sensor is released!");
-         * })
          */
         function wait_until_released(callback) {
             funcAfterForceSensorRelease = callback;
@@ -4517,7 +3862,7 @@ function Service_SPIKE() {
      * @param {string} rightPort
      * @memberof Service_SPIKE
      * @example
-     * var pair = new serviceSPIKE.MotorPair("A", "B")
+     * var pair = new mySPIKE.MotorPair("A", "B")
      */
     MotorPair = function (leftPort, rightPort) {
         // settings 
@@ -4563,27 +3908,32 @@ function Service_SPIKE() {
          * 
          * @param {integer} left_speed [-100 to 100]
          * @param {integer} right_speed [-100 to 100]
-         * @example
-         * pair.start_tank(100,100);
          */
         function start_tank(left_speed, right_speed) {
             UJSONRPC.moveTankSpeeds(left_speed, right_speed, leftPort, rightPort);
         }
 
+        // /** Starts moving the Driving Base without speed control.
+        //  * 
+        //  * @param {any} power 
+        //  * @param {any} steering 
+        //  * @todo Implement this function
+        //  */
+        // function start_at_power (power, steering) {
+
+        // }
+
         /** Starts moving the Driving Base
          * 
-         * @param {integer} leftPower [-100 to 100]
-         * @param {integer} rightPower [-100 to 100]
-         * @example
-         * pair.start_tank_at_power(10, 10);
+         * @param {integer} leftPower 
+         * @param {integer} rightPower  
          */
         function start_tank_at_power(leftPower, rightPower) {
             UJSONRPC.moveTankPowers(leftPower, rightPower, leftPort, rightPort);
         }
 
         /** Stops the 2 motors simultaneously, which will stop a Driving Base.
-         * @example
-         * pair.stop();
+         * 
          */
         function stop() {
             UJSONRPC.moveTankPowers(0, 0, leftPort, rightPort);
@@ -5028,7 +4378,6 @@ function Service_SPIKE() {
                 if (funcAfterError != undefined) {
                     funcAfterError("5 seconds have passed without response... Please reboot the hub and try again.")
                 }
-                console.error("%cTuftsCEEO ", "color: #3ba336;", "5 seconds have passed without response... Please reboot the hub and try again.");
             }
         }, 5000)
 
@@ -5276,41 +4625,22 @@ function Service_SPIKE() {
                 await port.open({ baudRate: 115200 });
             }
             catch (er) {
-                console.error("%cTuftsCEEO ", "color: #3ba336;", er);
-
+                console.log("%cTuftsCEEO ", "color: #3ba336;", er);
                 // check if system requires baudRate syntax
                 if (er.message.indexOf("baudrate") > -1) {
                     console.log("%cTuftsCEEO ", "color: #3ba336;", "baudRate needs to be baudrate");
                     await port.open({ baudrate: 115200 });
                 }
-
                 // check if error is due to unsuccessful closing of previous port
                 else if (er.message.indexOf("close") > -1) {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
-                    console.error("%cTuftsCEEO ", "color: #3ba336;", "Please check if you have any other window or app currently connected to your SPIKE Prime.");
-
                     await port.close();
-                }
-
-                // check if error in port.open was because it was already open
-                /* "failed to open serial port" */
-                else if (er.message.indexOf("open") > -1) {
-                    try {
-                        await port.close();
-                    }
-                    catch (err) {
-                        console.error("%cTuftsCEEO ", "color: #3ba336;", err);
-                        console.error("%cTuftsCEEO ", "color: #3ba336;", "Please check if you have any other window or app currently connected to your SPIKE Prime.");
-                    }
-                }
-
-                else {
+                } else {
                     if (funcAfterError != undefined) {
                         funcAfterError(er + "\nPlease try again. If error persists, refresh this environment.");
                     }
-                    console.error("%cTuftsCEEO ", "color: #3ba336;", "If error persists, refresh this environment");
                 }
                 await port.close();
             }
@@ -5326,16 +4656,11 @@ function Service_SPIKE() {
 
 
         } catch (e) {
-            if (e.message.indexOf("close") > -1) {
-                await port.close;
+            console.log("%cTuftsCEEO ", "color: #3ba336;", "Cannot read port:", e);
+            if (funcAfterError != undefined) {
+                funcAfterError(e);
             }
-            else {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Cannot read port:", e);
-                if (funcAfterError != undefined) {
-                    funcAfterError(e);
-                }
-                return false;
-            }
+            return false;
         }
     }
 
@@ -5391,7 +4716,7 @@ function Service_SPIKE() {
 
             // update hub information using lastUJSONRPC
             if (parseTest["m"] == 0) {
-                await updateHubPortsInfo();
+                updateHubPortsInfo();
             }
             PrimeHubEventHandler();
 
@@ -5467,18 +4792,7 @@ function Service_SPIKE() {
 
                 /* Case 1: lastUJSONRPC is a valid, complete, and standard UJSONRPC packet */
                 if (lastUJSONRPC[0] == "{" && lastUJSONRPC[lastUJSONRPC.length - 1] == "}") {
-
-                    let arrayLeftCurly = lastUJSONRPC.match(/{/g);
-                    let arrayRightCurly = lastUJSONRPC.match(/}/g);
-                    if (arrayLeftCurly.length === arrayRightCurly.length) {
-                        /* Case 1A: complete packet*/
-                        
-                        await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
-                    }
-                    else {
-                        /* Case 1B: {"i": 1234, "r": {} */
-                        jsonline = lastUJSONRPC;    
-                    }
+                    await processFullUJSONRPC(lastUJSONRPC, cleanedJsonString, json_string, testing, callback);   
                 }
                 /* Case 3: lastUJSONRPC is a micropy print result */
                 else if (lastUJSONRPC != "" && lastUJSONRPC.indexOf('"p":') == -1 && lastUJSONRPC.indexOf('],') == -1 && lastUJSONRPC.indexOf('"m":') == -1 && 
@@ -5654,7 +4968,7 @@ function Service_SPIKE() {
                 let device_value = { "device": "none", "data": {} }; // value to go in ports associated with the port letter keys
 
                 try {
-                    var letter = index_to_port[key];
+                    var letter = index_to_port[key]
 
                     // get SMALL MOTOR information
                     if (data_stream[key][0] == 48) {
@@ -5779,10 +5093,7 @@ function Service_SPIKE() {
                         device_value.device = "color";
 
                         // convert Ccolor to lower case because in the SPIKE APP the color is lower case
-                        if (Ccolor !== undefined)
-                            Ccolor = Ccolor.toLowerCase();
-                        else
-                            Ccolor = "null";
+                        Ccolor = Ccolor.toLowerCase();
                         device_value.data = { "reflected": Creflected, "color": Ccolor, "RGB": rgb_array };
 
                         // execute wait_until_color callback when color matches its argument
@@ -5802,6 +5113,7 @@ function Service_SPIKE() {
 
                             lastDetectedColor = Ccolor;
                         }
+
                         ports[letter] = device_value;
                     }
                     /// NOTHING is connected
@@ -5811,8 +5123,6 @@ function Service_SPIKE() {
                         device_value.data = {};
                         ports[letter] = device_value;
                     }
-
-                    ports.time = Date.now();
 
                     //parse hub information
                     var gyro_x = data_stream[6][0];
@@ -5842,9 +5152,7 @@ function Service_SPIKE() {
                     var pos = [posi_x, posi_y, posi_z];
                     hub["pos"] = pos;
 
-                } catch (e) {
-                    console.log(e);
-                 } //ignore errors
+                } catch (e) { } //ignore errors
             }
         }
     }
@@ -6095,7 +5403,7 @@ function Service_SPIKE() {
                             stringVersion = stringVersion + version[index];
                         }
                     }
-                    // console.log("%cTuftsCEEO ", "color: #3ba336;", "firmware version: ", stringVersion);
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "firmware version: ", stringVersion);
                     getFirmwareInfoCallback[1](stringVersion);
                 }
             }
