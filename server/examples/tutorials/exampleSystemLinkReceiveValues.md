@@ -16,14 +16,14 @@ Knowing that, the code becomes fairly simple; we get the current speed from Syst
 In code, that process would look something like this:
 
 ```javascript
-serviceSystemLink.executeAfterInit(function() {
+mySystemLink.executeAfterInit(function() {
     // start the periodic checks and updates
     checkAndUpdate(0)
 })
 
 // checks SystemLink for new motor speed, updates page display accordingly, and sets up next check if program is still active
 function checkAndUpdate(pastSpeed) {
-    var currentSpeed = serviceSystemLink.getTagValue("motor_speed")
+    var currentSpeed = mySystemLink.getTagValue("motor_speed")
     // if speed has been changed since last check, update page display
     if(currentSpeed != pastSpeed)
     updateSpeed(currentSpeed)
@@ -47,7 +47,7 @@ Knowing that, we can write a function very similar to `checkAndUpdate` that chec
 
 ```javascript
 function startChecking() {
-    if(serviceSystemLink.getTagsInfo()["motor_speed"] != undefined)
+    if(mySystemLink.getTagsInfo()["motor_speed"] != undefined)
         checkAndUpdate(null)
     else
         setTimeout(startChecking, 1000)
@@ -60,7 +60,8 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
         <style>
             #speed_display {
                 text-align: center;
@@ -77,21 +78,21 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
         <div id = "speed_display">Speed: unknown</div>
     </body>
     <script>
-        var elementServiceSystemLink = document.getElementById("service_SystemLink")
-        elementServiceSystemLink.setAttribute("apikey", "your_API_key")
-        elementServiceSystemLink.init()
+        var systemLinkElement = document.getElementById("service_SystemLink")
+        systemLinkElement.setAttribute("apikey", "your_API_key")
+        systemLinkElement.init()
 
-        var serviceSystemLink = elementServiceSystemLink.getService()
-        var serviceSPIKE = document.getElementById("service_spike").getService()
+        var mySystemLink = systemLinkElement.getService()
+        var mySPIKE = document.getElementById("service_spike").getService()
 
 
-        serviceSystemLink.executeAfterInit(function() {
+        mySystemLink.executeAfterInit(function() {
             // start the periodic checks and updates
             startChecking()
         })
 
         function startChecking() {
-            if(serviceSystemLink.getTagsInfo()["motor_speed"] != undefined)
+            if(mySystemLink.getTagsInfo()["motor_speed"] != undefined)
                 checkAndUpdate(null)
             else
                 setTimeout(startChecking, 1000)
@@ -99,7 +100,7 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
 
         // checks SystemLink for new motor speed, updates page display and SPIKE motor accordingly, and sets up next check if program is still active
         function checkAndUpdate(pastSpeed) {
-            var currentSpeed = serviceSystemLink.getTagValue("motor_speed")
+            var currentSpeed = mySystemLink.getTagValue("motor_speed")
             // if speed has been changed since last check, update page display
             if(currentSpeed != pastSpeed)
                 updateSpeed(currentSpeed)
@@ -113,8 +114,8 @@ Now that we have the speed, all we have to do is send it to a motor! Assuming so
             document.getElementById("speed_display").innerText = "Speed: " + newSpeed
 
             // run motor if SPIKE is connected
-            if(serviceSPIKE.isActive())
-                serviceSPIKE.Motor("A").start(newSpeed)
+            if(mySPIKE.isActive())
+                mySPIKE.Motor("A").start(newSpeed)
         }
     </script>
 </html>

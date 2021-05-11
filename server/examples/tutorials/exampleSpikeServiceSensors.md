@@ -10,7 +10,8 @@ We already declared the references to these DOM elements and wrote the basic sta
 
 ```html
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
+            type="text/javascript"></script>
     </head>
     <body>
         <div id="servicedock" style="float:right;">
@@ -165,7 +166,7 @@ Combine everything so far, and you should end with this! Try out the example by 
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
 
     <body>

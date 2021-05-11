@@ -9,7 +9,7 @@ One is to do it all inline, using the Service_Airtable function `init(APIKey, Ba
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -17,13 +17,13 @@ One is to do it all inline, using the Service_Airtable function `init(APIKey, Ba
         </div>
     </body>
     <script>
-        var serviceAirtable =  document.getElementById("service_airtable").getService();
+        var myTable =  document.getElementById("service_airtable").getService();
         // your API key, base ID, and table name go here
         var apiKey = "your_API_key";
         var baseID = "your_base_ID";
         var tableName = "your_table_name";
 
-        serviceAirtable.init(apiKey, baseID, tableName)
+        myTable.init(apiKey, baseID, tableName)
     </script>
 </html>
 ```
@@ -36,11 +36,11 @@ Alternatively, you can set the API Key, Base ID, and Table Name individually as 
 ```
 or JavaScript
 ```javascript
-var elementServiceAirtable = document.getElementById("service_airtable")
-// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on elementServiceAirtable)
-elementServiceAirtable.setAttribute("apikey", "your_API_key")
-elementServiceAirtable.setAttribute("baseid", "your_base_ID")
-elementServiceAirtable.setAttribute("tablename", "your_table_name")
+var airtableElement = document.getElementById("service_airtable")
+// note that we are setting attributes of the HTML element, and not the Service_Airtable object itself (which we would access by calling .getService() on airtableElement)
+airtableElement.setAttribute("apikey", "your_API_key")
+airtableElement.setAttribute("baseid", "your_base_ID")
+airtableElement.setAttribute("tablename", "your_table_name")
 ```
 
 ## Method 3: On the Page
@@ -50,11 +50,11 @@ The third and final way to initialize your Service_Airtable is done on the webpa
 Once your values are set, you have to initialize the HTML `service-airtable` element (which is, again, different from the Service_Airtable object accessed by calling `getService()` on said HTML element) with either the `init()` function, e.g.
 
 ```javascript
-var elementServiceAirtable = document.getElementById("service_airtable")
+var airtableElement = document.getElementById("service_airtable")
 
 // code for setting key/id/name goes here
 
-elementServiceAirtable.init()
+airtableElement.init()
 ```
 or, if using method 3, by clicking the Airtable icon a second time.
 

@@ -9,20 +9,16 @@ Users can interact with your dynamic webpage by clicking on the ServiceDock icon
 
 *Geolocation icon attributed to Freepik
 
-## Latest Version
-1.0.0
-
 ## Framework 
 
 To use ServiceDock, you will need to import the framework from a CDN as shown. 
 
 ```html
 <head>
-    <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
+        type="text/javascript"></script>
     <!-- ServiceDock -->
     <div id = "servicedock" style = "float:left;">
-        <!--Airtable Service -->
-        <service-airtable id = "service_airtable"></service-airtable>
         <!-- SystemLink Cloud Service -->
         <service-systemlink id = "service_systemlink"></service-systemlink>
         <!-- SPIKE Service -->

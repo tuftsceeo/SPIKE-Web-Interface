@@ -6,7 +6,7 @@ We start with some HTML that will show the percentage of force on the ForceSenso
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
 
     <body>
@@ -98,7 +98,7 @@ Here is the final code you should end up with!
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
 
     <body>

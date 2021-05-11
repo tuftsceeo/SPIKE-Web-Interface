@@ -4,7 +4,7 @@ Unlike in the Python library, the JavaScript functions for running motors for sp
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -12,12 +12,12 @@ Unlike in the Python library, the JavaScript functions for running motors for sp
         </div>
     </body>
     <script>
-        var serviceSPIKE = document.getElementById("service_spike").getService()
+        var mySPIKE = document.getElementById("service_spike").getService()
 
-        serviceSPIKE.executeAfterInit(function () {
+        mySPIKE.executeAfterInit(function () {
 
-            var fastMotor = new serviceSPIKE.Motor("A")
-            var slowMotor = new serviceSPIKE.Motor("B")
+            var fastMotor = new mySPIKE.Motor("A")
+            var slowMotor = new mySPIKE.Motor("B")
 
             fastMotor.run_for_degrees(360, 100)
             slowMotor.run_for_degrees(360, 50)
@@ -45,7 +45,7 @@ You can also use MotorPairs to control motors simultaneously, though they can ge
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -53,11 +53,11 @@ You can also use MotorPairs to control motors simultaneously, though they can ge
         </div>
     </body>
     <script>
-        var serviceSPIKE = document.getElementById("service_spike").getService()
+        var mySPIKE = document.getElementById("service_spike").getService()
 
-        serviceSPIKE.executeAfterInit(function () {
+        mySPIKE.executeAfterInit(function () {
 
-            var pair = new serviceSPIKE.MotorPair("A", "B")
+            var pair = new mySPIKE.MotorPair("A", "B")
 
             pair.start(50, 50)
 

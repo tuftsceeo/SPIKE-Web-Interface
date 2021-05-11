@@ -8,7 +8,7 @@ One is to do it all inline, using the Service_SystemLink function `init(APIKey, 
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SystemLink.js"></script>
     </head>
     <body>
          <div id = "servicedock" style = "float:right;">
@@ -16,11 +16,11 @@ One is to do it all inline, using the Service_SystemLink function `init(APIKey, 
         </div>
     </body>
     <script>
-        var serviceSystemLink = document.getElementById("service_systemlink").getService();
+        var mySystemLink = document.getElementById("service_systemlink").getService();
         // your API key goes here
         var apiKey = "your_API_key";  
 
-        serviceSystemLink.init(apiKey)
+        mySystemLink.init(apiKey)
     </script>
 </html>
 ```
@@ -33,9 +33,9 @@ Alternatively, you can set the API Key as attribute of the `service-systemlink` 
 ```
 or JavaScript
 ```javascript
-var elementServiceSystemLink = document.getElementById("service_systemlink")
-// note that we are setting an attribute of the HTML element, and not the Service_SystemJink object itself (which we would access by calling .getService() on elementServiceSystemLink)
-elementServiceSystemLink.setAttribute("apikey", "your_API_key")
+var systemlinkElement = document.getElementById("service_systemlink")
+// note that we are setting an attribute of the HTML element, and not the Service_SystemJink object itself (which we would access by calling .getService() on systemLinkElement)
+systemLinkElement.setAttribute("apikey", "your_API_key")
 ```
 
 ## Method 3: On the Page
@@ -45,11 +45,11 @@ The third and final way to initialize your Service_SystemLink is done on the web
 Once your values are set, you have to initialize the HTML `service-systemlink` element (which is, again, different from the Service_SystemlLink object accessed by calling `getService()` on said HTML element) with either the `init()` function, e.g.
 
 ```javascript
-var elementServiceSystemLink = document.getElementById("service_systemlink")
+var systemLinkElement = document.getElementById("service_systemlink")
 
 // code for setting API Key goes here
 
-elementServiceSystemLink.init()
+systemLinkElement.init()
 ```
 or, if using method 3, by clicking the System Link icon a second time.
 

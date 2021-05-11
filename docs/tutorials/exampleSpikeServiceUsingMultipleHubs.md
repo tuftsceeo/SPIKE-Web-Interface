@@ -70,7 +70,7 @@ Do the same for serviceSPIKE2's DistanceSensor, and you should get this result!
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="./modules/ServiceDock_SPIKE.js"></script>
     </head>
 
     <body>

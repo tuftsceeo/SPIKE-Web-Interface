@@ -6,10 +6,11 @@ The following code creates the ServiceDock interface you see on the top left cor
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.js"
+            type="text/javascript"></script>
     </head>
     <body>
-        <!-- this style must be kept for normal rendering (either left or right)-->
+        <!-- this style must be kept for normal rendering-->
         <div id = "servicedock" style = "float:left;">
             <!-- include the Services to use -->
             <service-systemlink id = "service_systemlink"></service-systemlink>
@@ -24,12 +25,12 @@ The following code creates the ServiceDock interface you see on the top left cor
 
 
 ## Using Services 
-To use the Services in your web page, you will need to get its object from its corresponding ServiceDock HTML element. For example, ``` <service-spike id = "service_spike"></service-spike>``` is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, serviceSPIKE, you will need to do:
+To use the Services in your web page, you will need to get its object from its corresponding ServiceDock HTML element. For example, ``` <service-spike id = "service_spike"></service-spike>``` is the ServiceDock HTML element for the SPIKE Prime Service. To obtain the SPIKE Prime Service object, mySPIKE, you will need to do:
 ```HTML
 <script>
-    var serviceSPIKEElement = document.getElementbyId("service_spike");
-    var serviceSPIKE = serviceSPIKEElement.getService(); // your Service object
-    serviceSPIKE.executeAfterInit( function () {
+    var SPIKEService = document.getElementbyId("service_spike");
+    var mySPIKE = SPIKEService.getService(); // your Service object
+    mySPIKE.executeAfterInit( function () {
         // do something with SPIKE Service
     })
 </script>
@@ -48,9 +49,9 @@ Getting the Service object for other types of Services is the same! If you want 
 Service are not initialized automatically when the web page loads, so it is important to ensure that your code for your Services only run after they have been activated. Use ``` executeAfterInit(callback)```. The argument is a callback function, a fundamental way in Javascript for ensuring flow of execution. A callback function means that it will not execute until its parent function, ```executeAfterInit```, has finished. For example:
 ```HTML
 <script>
-    var serviceSPIKEElement = document.getElementbyId("service_spike");
-    var serviceSPIKE = serviceSPIKEElement.getService(); // your Service object
-    serviceSPIKE.executeAfterInit( function () {
+    var SPIKEService = document.getElementbyId("service_spike");
+    var mySPIKE = SPIKEService.getService(); // your Service object
+    mySPIKE.executeAfterInit( function () {
         // do something with SPIKE Service
     })
 </script>

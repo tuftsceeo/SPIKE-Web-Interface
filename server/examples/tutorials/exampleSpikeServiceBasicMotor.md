@@ -4,7 +4,7 @@ Begin your HTML file with the ServiceDock template and include `<service-spike>`
 ```HTML
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:right;">
@@ -26,16 +26,16 @@ The status light for your SPIKE Service should have turned from red to green. Yo
 Although what you just clicked was the `<service-spike>` element, what was initialized is the SPIKE Service object that can be obtained by running `getService()` on the `<service-spike>` element as such:
 
 ```javascript
-var elementServiceSPIKE = document.getElementById("service_spike");
-var serviceSPIKE = elementServiceSPIKE.getService();
+var buttonServiceSPIKE = document.getElementById("service_spike");
+var serviceSPIKE = buttonServiceSPIKE.getService();
 ```
 
 `serviceSPIKE` is the SPIKE Service object with which you can program with your SPIKE Prime. The SPIKE Service, `serviceSPIKE`, gets automatically initialized when the user of your webpage clicks on `<service-spike>` and connects their SPIKE Prime to Google Chrome. So far, your `<script>` should look like this
 
 ```html
 <script>
-    var elementServiceSPIKE = document.getElementById("service_spike");
-    var serviceSPIKE = elementServiceSPIKE.getService();
+    var buttonServiceSPIKE = document.getElementById("service_spike");
+    var serviceSPIKE = buttonServiceSPIKE.getService();
 </script>
 ```
 
@@ -63,8 +63,8 @@ Right now, we are figuring out a way to run SPIKE Service code after detecting t
 If we were to want to print the message "SPIKE Service is initialized!" to the console after the user clicks `<service-spike>`, we would need to do:
 ```html
 <script>
-    var elementServiceSPIKE = document.getElementById("service_spike");
-    var serviceSPIKE = elementServiceSPIKE.getService();
+    var buttonServiceSPIKE = document.getElementById("service_spike");
+    var serviceSPIKE = buttonServiceSPIKE.getService();
 
     serviceSPIKE.executeAfterInit( function () {
         console.log("SPIKE Service is initialized!");
@@ -121,7 +121,7 @@ Now save the HTML and run the web page again. Connect a Motor to port "A". Click
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@0.1.1/cdn/ServiceDock.min.js"></script>
     </head>
     <body>
         <div id="servicedock" style="float:left;">
@@ -130,8 +130,8 @@ Now save the HTML and run the web page again. Connect a Motor to port "A". Click
         </div>
     </body>
     <script>
-        var elementServiceSPIKE = document.getElementById("service_spike"); // get <service-spike>
-        var serviceSPIKE = elementServiceSPIKE.getService(); // get SPIKE Service object
+        var buttonServiceSPIKE = document.getElementById("service_spike"); // get <service-spike>
+        var serviceSPIKE = buttonServiceSPIKE.getService(); // get SPIKE Service object
 
         
         serviceSPIKE.executeAfterInit(function () {

@@ -168,7 +168,7 @@ And that's all the functions we need! You can see them all put together, as well
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
         <style>
             #controls {
                 text-align: center;
@@ -195,10 +195,10 @@ And that's all the functions we need! You can see them all put together, as well
         </div>
     </body>
     <script>
-        var elementServiceAirtable = document.getElementById("service_airtable")
-        var serviceAirtable = elementServiceAirtable.getService()
+        var airtableElement = document.getElementById("service_airtable")
+        var myTable = airtableElement.getService()
 
-        serviceAirtable.executeAfterInit(function() { 
+        myTable.executeAfterInit(function() { 
             // set up table with default values
             sendSliderVal("left_speed", 0)
             sendSliderVal("right_speed", 0)
@@ -207,11 +207,11 @@ And that's all the functions we need! You can see them all put together, as well
         })
 
         function shoot() {
-            serviceAirtable.setEntryValueStrict("shoot_mode", "shoot")
+            myTable.setEntryValueStrict("shoot_mode", "shoot")
         }
 
         function sendSliderVal(entryName, val) {
-            serviceAirtable.setEntryValueStrict(entryName, parseInt(val))
+            myTable.setEntryValueStrict(entryName, parseInt(val))
         }
     </script>
 </html>
@@ -221,7 +221,8 @@ And that's all the functions we need! You can see them all put together, as well
 ```html
 <html>
     <head>
-        <script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_Airtable.js"></script>
+        <script type="text/javascript" src="./modules/ServiceDock_SPIKE.js"></script>
         <style>
             #displays {
                 text-align: center;
@@ -243,10 +244,10 @@ And that's all the functions we need! You can see them all put together, as well
         </div>
     </body>
     <script>
-        var elementServiceAirtable = document.getElementById("service_airtable")
-        var serviceAirtable = elementServiceAirtable.getService()
+        var airtableElement = document.getElementById("service_airtable")
+        var myTable = airtableElement.getService()
 
-        var serviceSPIKE = document.getElementById("service_spike").getService()
+        var mySPIKE = document.getElementById("service_spike").getService()
 
         // object for storing most recent motor speeds (for use in shooting)
         var motorSpeeds = {
@@ -254,7 +255,7 @@ And that's all the functions we need! You can see them all put together, as well
             right: null,
         }
 
-        serviceAirtable.executeAfterInit(function() {
+        myTable.executeAfterInit(function() {
             // start the periodic checks and updates
            checkTable({})
         })
@@ -262,7 +263,7 @@ And that's all the functions we need! You can see them all put together, as well
 
         // checks current table values against those of last check and controls motors and page displays accordingly
         function checkTable(pastTable) {
-            var  currentTable = serviceAirtable.getEntriesInfo()
+            var  currentTable = myTable.getEntriesInfo()
 
             checkEntry("shooter_angle", currentTable, pastTable, updateAngle)
             checkEntry("left_speed", currentTable, pastTable, function(newSpeed) { updateSpeed("left", newSpeed) } )
@@ -289,15 +290,15 @@ And that's all the functions we need! You can see them all put together, as well
             document.getElementById("displays").style.backgroundColor = "rgb(163,255,143)"
 
             // if spike is connected, run shooter motors w/ specified speeds
-            if(serviceSPIKE.isActive()) {
-                serviceSPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
-                serviceSPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
+            if(mySPIKE.isActive()) {
+                mySPIKE.Motor("A").run_for_seconds(2, motorSpeeds.left)
+                mySPIKE.Motor("B").run_for_seconds(2, -motorSpeeds.right)
             }
 
             // revert div color back once shooting is done
             setTimeout(function() { document.getElementById("displays").style.backgroundColor = "rgb(0,255,133)" }, 2000)
 
-            serviceAirtable.setEntryValueStrict("shoot_mode", "wait")
+            myTable.setEntryValueStrict("shoot_mode", "wait")
         }
 
         /* updates stored speed value and screen display for specified side (a)
@@ -317,8 +318,8 @@ And that's all the functions we need! You can see them all put together, as well
             document.getElementById("angle_display").innerText = "angle: " + newAngle
             
             // run motor to new position if SPIKE is connected
-            if(serviceSPIKE.isActive())
-                serviceSPIKE.Motor("C").run_to_degrees_counted(newAngle)
+            if(mySPIKE.isActive())
+                mySPIKE.Motor("C").run_to_degrees_counted(newAngle)
         }
     </script>
 </html>
