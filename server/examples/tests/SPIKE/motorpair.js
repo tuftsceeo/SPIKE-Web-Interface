@@ -9,6 +9,8 @@ var testMotorPairMoveLeft = document.getElementById("motorPairMoveLeft");
 var testMotorPairMoveRight = document.getElementById("motorPairMoveRight");
 var testMotorPairMoveLeftSlightly = document.getElementById("motorPairMoveLeftSlightly");
 var testMotorPairMoveRightSlightly = document.getElementById("motorPairMoveRightSlightly");
+var testMotorPairStartTank = document.getElementById("motorPairStartTank");
+var testMotorPairStop = document.getElementById("motorPairStop");
 
 testMotorPairStop.addEventListener("click", function () {
     console.log("###### BEGINNING UNIT TEST ON motorPair.stop() #######");
@@ -92,4 +94,12 @@ testMotorPairMoveRightSlightly.addEventListener("click", function () {
 
     console.log("Expected result: driving base moving right SLIGHTLY and stopping")
     console.log("###### ENDING UNIT TEST ON motorPair.move(100, 'cm', 50, 100) #######");
+})
+
+testMotorPairStartTank.addEventListener("click", function () {
+    console.log("###### BEGINNING UNIT TEST ON motorPair.start_tank(10,10) #######");
+    var motorPair = new mySPIKE.MotorPair("A", "B");
+
+    motorPair.start_tank(50,50);
+    console.log("###### ENDING UNIT TEST ON motorPair.start_tank(10,10) #######");
 })

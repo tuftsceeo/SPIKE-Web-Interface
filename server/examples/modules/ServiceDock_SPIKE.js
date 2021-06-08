@@ -2821,7 +2821,7 @@ function Service_SPIKE() {
      * @param {string} data entire data to send in ASCII
      * @param {integer} slotid slot to which to assign the program
      */
-    UJSONRPC.startWriteProgram = async function startWriteProgram(projectName, type, data, slotid) {
+    UJSONRPC.startWriteProgram = async function startWriteProgram (projectName, type, data, slotid) {
 
         console.log("%cTuftsCEEO ", "color: #3ba336;", "in startWriteProgram...");
         console.log("%cTuftsCEEO ", "color: #3ba336;", "constructing start_write_program script...");
