@@ -6,22 +6,12 @@
             <script src="./modules/ServiceDock_Gmail.js"></script>
             <script src = "./modules/ServiceDock.js" type = "text/javascript"></script>
         -->
-            <script src="./modules/ServiceDock_SPIKE.js"></script>
-            <!--
-            <script type="text/javascript" src="./modules/SPIKE/classSPIKE.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/HTML_SPIKE.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/general/initUtils.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/spike/ujsonrpc.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/webserial/parsing.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/webserial/webserial.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/misc/misc.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/spike/motor.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/spike/interfaces.js"></script>
-            <script type="text/javascript" src="./modules/SPIKE/spike/getters.js"></script>
+        <!--
+                <script src="./modules/ServiceDock_SPIKE.js"></script>
+                <script src="./modules/ServiceDock_SystemLink.js"></script>
+                <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
                 -->
-            <script src="./modules/ServiceDock_SystemLink.js"></script>
-            <script src="./modules/ServiceDock_Airtable.js" type = "text/javascript"></script>
-
+        <script src="../../cdn/ServiceDock_scaled.js"></script>
         <script src="./modules/libraries/jquery_351.js" type="text/javascript"></script>
         <script src="./modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
         <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script> -->
@@ -30,7 +20,7 @@
     <body style="background-image: url('./examples/modules/views/CEEOInnovationsbackground.png');">
         <!-- SERVICE DOCK -->
         <div id="servicedock" style="float:left;">
-            <service-spike id="service_spike"></service-spike>
+            <service-spike dev = "true" id="service_spike"></service-spike>
             <service-systemlink id="service_systemlink"></service-systemlink>
             <service-airtable id="service_airtable"></service-airtable>
             <service-gmail ></service-gmail>
@@ -80,9 +70,10 @@
                     value="motor.run_to_degrees_counted() with CALLBACK ( NO stall detection )">
                 <input type="button" id="degreesCounted" class="SPIKEtestCase motor" value="motor get degrees counted">
                 <input type="button" id="motorPosition" class="SPIKEtestCase motor" value="motor get position">
-                <input type="button" id="getPower" class="SPIKEtestCase motor" value="motor get power">
-                <input type="button" id="getSpeed" class="SPIKEtestCase motor" value="motor get speed">
+                <input type="button" id="motorGetPower" class="SPIKEtestCase motor" value="motor get power">
+                <input type="button" id="motorGetSpeed" class="SPIKEtestCase motor" value="motor get speed">
                 <input type="button" id="motorStartAtPower" class="SPIKEtestCase motor" value="motor startAtPower">
+                <input type="button" id="motorStop" class="SPIKEtestCase motor" value="motor stop">
 
                 <!-- motor pair functions -->
                 <input type="button" id="motorPairMove" class="SPIKEtestCase motorPair" value="motorPair move(100, 'cm', 0, 100)">
@@ -93,6 +84,7 @@
                 <input type="button" id="motorPairStart" class="SPIKEtestCase motorPair" value="motorPair start(0, 100)">
                 <input type="button" id="motorPairStartLeft" class="SPIKEtestCase motorPair" value="motorPair start left">
                 <input type="button" id="motorPairStartRight" class="SPIKEtestCase motorPair" value="motorPair start right">
+                <input type="button" id="motorPairStartTank" class="SPIKEtestCase motorPair" value="motorPair start_tank()">
                 <input type="button" id="motorPairStop" class="SPIKEtestCase motorPair" value="motorPair stop()">
                 
                 <!-- motion sensor functions-->
@@ -298,12 +290,11 @@
                 })
             })
         })
-        
-        
         // var hub = new mySPIKE.PrimeHub(); (commented by jeremy 1/19/21)
     </script>
 
     <!-- SPIKE tests -->
+    <script src="./tests/SPIKE/init.js"></script>
     <script src="./tests/SPIKE/motor.js"></script>
     <script src="./tests/SPIKE/motorpair.js"></script>
     <script src="./tests/SPIKE/buttons.js"></script>
@@ -331,10 +322,9 @@
         displayTests(); // display the tests of Service picked during window load
         selectService.addEventListener("change", () => {
             displayTests();
-        })
+        });
 
         function displayTests () {
-            
             let testsSPIKE = document.getElementById("SPIKEbox");
             let testsSL = document.getElementById("SLbox");
             let testsAT = document.getElementById("ATbox");
@@ -399,13 +389,23 @@
             testDegreesCounted.style.backgroundColor = "lightgreen";
             testMotorStartAtPower.style.backgroundColor = "lightgreen";
             testMotorPosition.style.backgroundColor = "lightgreen";
+            testMotorStop.style.backgroundColor = "lightgreen";
+            testMotorGetSpeed.style.backgroundColor = "lightgreen";
+            testMotorGetPower.style.backgroundColor = "lightgreen";
 
+            //testMotorPairStart
+            testMotorPairMove.style.backgroundColor = "red";
+            testMotorPairMoveLeft.style.backgroundColor = "red";
+            testMotorPairMoveRight.style.backgroundColor = "red";
+            testMotorPairMoveLeftSlightly.style.backgroundColor = "red";
+            testMotorPairMoveRightSlightly.style.backgroundColor = "red";
+            testMotorPairStartTank.style.backgroundColor = "lightgreen"
+            testMotorPairStop.style.backgroundColor = "lightgreen";
             // TEST motion sensor functions
             testGetAngles.style.backgroundColor = "lightgreen";
             testWasGesture.style.backgroundColor = "lightgreen";
             testWaitForNewGesture.style.backgroundColor = "lightgreen";
             testWaitForNewOri.style.backgroundColor = "lightgreen";
-            testSetHubOrientation.style.backgroundColor = "lightgreen";
             testResetYaw.style.backgroundColor = "red";
             testResetYawSource.style.backgroundColor = "red";
             testGetGesture.style.backgroundColor = "lightgreen";
@@ -419,56 +419,60 @@
             testGetForcePercentage.style.backgroundColor = "lightgreen";
 
             // TEST Primehub.speaker functions
-            testBeep.style.backgroundColor = "lightgreen";
-            testStartBeep.style.backgroundColor = "lightgreen";
-            testStopBeep.style.backgroundColor = "lightgreen";
+            testBeep.style.backgroundColor = "orange";
+            testStartBeep.style.backgroundColor = "orange";
+            testStopBeep.style.backgroundColor = "orange";
 
             // TEST Primehub.button functions
             testButtonIsPressed.style.backgroundColor = "lightgreen";
             testButtonWaitPressed.style.backgroundColor = "lightgreen";
             testButtonWaitRelease.style.backgroundColor = "lightgreen";
             testButtonWasPressed.style.backgroundColor = "lightgreen";
+            
+            // TEST ColorSensor
+            testGetColor.style.backgroundColor = "lightgreen";
+            testWaitUntilColor.style.backgroundColor = "lightgreen";
+            testWaitForNewColor.style.backgroundColor = "lightgreen";
 
-            //testMotorPairStart
-            testMotorPairStop.style.backgroundColor = "lightgreen";
-            testMotorPairMove.style.backgroundColor = "red";
-            testMotorPairMoveLeft.style.backgroundColor = "red";
-            testMotorPairMoveRight.style.backgroundColor = "red";
-            testMotorPairMoveLeftSlightly.style.backgroundColor = "red";
-            testMotorPairMoveRightSlightly.style.backgroundColor = "red";
+            // TEST Distance Sensor
+            testLightUp.style.backgroundColor = "lightgreen";
+            testGetDistanceCM.style.backgroundColor = "lightgreen";
+            testGetDistanceIN.style.backgroundColor = "lightgreen";
+            testWaitForDistanceFartherThan.style.backgroundColor = "lightgreen";
+            testWaitForDistanceCloserThan.style.backgroundColor = "lightgreen";
 
             // test MISC buttons
-            test_getMotorPorts.style.backgroundColor = "lightgreen";
+            test_getMotorPorts.style.backgroundColor = "red";
 
             // test MISC buttons: UJSONRPC
-            testUJSONRPC.style.backgroundColor = "lightgreen";
-            testUJSONRPCdisplayClear.style.backgroundColor = "lightgreen";
-            testUJSONRPCdisplaySetPixel.style.backgroundColor = "lightgreen";
-            testUJSONRPCdisplayText.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorGoRelPos.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorGoRelPos1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorGoRelPos2.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorGoRelPos3.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorPwm.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorPwm1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunDegrees.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunDegrees1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunDegrees2.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunDegrees3.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunTimed.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunTimed1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunTimed2.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorRunTimed3.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorStart.style.backgroundColor = "lightgreen";
-            testUJSONRPCmotorStart1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankDegrees.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankDegrees1.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankPowers.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankSpeeds.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankTime.style.backgroundColor = "lightgreen";
-            testUJSONRPCmoveTankTime1.style.backgroundColor = "lightgreen";
-            testUJSONRPCsoundBeep.style.backgroundColor = "lightgreen";
-            testUJSONRPCsoundStop.style.backgroundColor = "lightgreen";
+            testUJSONRPC.style.backgroundColor = "red";
+            testUJSONRPCdisplayClear.style.backgroundColor = "red";
+            testUJSONRPCdisplaySetPixel.style.backgroundColor = "red";
+            testUJSONRPCdisplayText.style.backgroundColor = "red";
+            testUJSONRPCmotorGoRelPos.style.backgroundColor = "red";
+            testUJSONRPCmotorGoRelPos1.style.backgroundColor = "red";
+            testUJSONRPCmotorGoRelPos2.style.backgroundColor = "red";
+            testUJSONRPCmotorGoRelPos3.style.backgroundColor = "red";
+            testUJSONRPCmotorPwm.style.backgroundColor = "red";
+            testUJSONRPCmotorPwm1.style.backgroundColor = "red";
+            testUJSONRPCmotorRunDegrees.style.backgroundColor = "red";
+            testUJSONRPCmotorRunDegrees1.style.backgroundColor = "red";
+            testUJSONRPCmotorRunDegrees2.style.backgroundColor = "red";
+            testUJSONRPCmotorRunDegrees3.style.backgroundColor = "red";
+            testUJSONRPCmotorRunTimed.style.backgroundColor = "red";
+            testUJSONRPCmotorRunTimed1.style.backgroundColor = "red";
+            testUJSONRPCmotorRunTimed2.style.backgroundColor = "red";
+            testUJSONRPCmotorRunTimed3.style.backgroundColor = "red";
+            testUJSONRPCmotorStart.style.backgroundColor = "red";
+            testUJSONRPCmotorStart1.style.backgroundColor = "red";
+            testUJSONRPCmoveTankDegrees.style.backgroundColor = "red";
+            testUJSONRPCmoveTankDegrees1.style.backgroundColor = "red";
+            testUJSONRPCmoveTankPowers.style.backgroundColor = "red";
+            testUJSONRPCmoveTankSpeeds.style.backgroundColor = "red";
+            testUJSONRPCmoveTankTime.style.backgroundColor = "red";
+            testUJSONRPCmoveTankTime1.style.backgroundColor = "red";
+            testUJSONRPCsoundBeep.style.backgroundColor = "red";
+            testUJSONRPCsoundStop.style.backgroundColor = "red";
 
             getTagsInfo.style.backgroundColor = "lightgreen";
             createNewTag.style.backgroundColor = "lightgreen";
@@ -726,7 +730,7 @@
         #SLbox, #SPIKEbox, #ATbox {
             position: absolute;
             top: 200px;
-            left: 500px;
+            left: 100px;
             height: 400px;
             width: 400px;
             background-color: #4CE0D2;

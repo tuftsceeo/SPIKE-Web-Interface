@@ -1,14 +1,18 @@
 /*
 Project Name: SPIKE Prime Web Interface
-File name: ServiceDock_SPIKE.js
+File name: ServiceDock_SPIKE_HTML.js
 Author: Jeremy Jung
-Last update: 11/5/2020
+Last update: 3/14/2021
 Description: HTML Element definition for <service-spike> to be used in ServiceDocks
 Credits/inspirations:
 History:
     Created by Jeremy on 7/16/20
+    Fixed baudRate by Teddy on 10/11/20
 (C) Tufts Center for Engineering Education and Outreach (CEEO)
+TODO:
+uncomment executeAfterDisconnect
 */
+
 class servicespike extends HTMLElement {
 
     constructor() {
@@ -73,8 +77,16 @@ class servicespike extends HTMLElement {
             // check active flag so once activated, the service doesnt reinit
             if (!active) {
                 if ('serial' in navigator) {
-                    console.log("%cTuftsCEEO ", "color: #3ba336;", "activating service");
-                    var initSuccessful = await this.service.init();
+                    console.log("%cTuftsCEEO ", "color: #3ba336;", "Activating SPIKE Service");
+
+                    // Determine if Service is for testing
+                    if (this.isDev == "true" || this.isDev == "t" 
+                            || this.isDev == "T" || this.isDev == "True")
+                        this.isDev = true;
+                    else 
+                        this.isDev = false;
+
+                    var initSuccessful = await this.service.init(this.isDev);
                     if (initSuccessful) {
                         active = true;
                         status.style.backgroundColor = "green";
@@ -136,6 +148,29 @@ class servicespike extends HTMLElement {
         button.appendChild(status);
         wrapper.appendChild(button);
 
+    }
+
+    static get observedAttributes() {
+        return ["dev"];
+    }
+
+    get dev() {
+        return this.getAttribute("dev");
+    }
+
+    set dev(val) {
+        // console.log("%cTuftsCEEO ", "color: #3ba336;", val);
+        if (val) {
+            this.setAttribute("dev", val);
+        }
+        else {
+            this.removeAttribute("dev");
+        }
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+        console.log("%cTuftsCEEO ", "color: #3ba336;", "new value of dev: ", newValue);
+        this.isDev = newValue;
     }
 
     /* get the Service_SPIKE object */

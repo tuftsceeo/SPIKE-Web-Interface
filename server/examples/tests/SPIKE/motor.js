@@ -9,11 +9,13 @@ var testMotorDegreesCounted1CB = document.getElementById("motordeg1cb");
 var testDegreesCounted = document.getElementById("degreesCounted");
 var testMotorStartAtPower = document.getElementById("motorStartAtPower");
 var testMotorPosition = document.getElementById("motorPosition");
+var testMotorStop = document.getElementById("motorStop");
+var testMotorGetSpeed = document.getElementById("motorGetSpeed");
+var testMotorGetPower = document.getElementById("motorGetPower");
 
 testMotorDegreesCounted.addEventListener("click", async function () {
     console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
     var motor = new mySPIKE.Motor("A");
-
     motor.set_stall_detection(true);
 
     motor.run_to_degrees_counted(200, 50);
@@ -25,7 +27,6 @@ testMotorDegreesCounted1.addEventListener("click", async function () {
     console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
 
     var motor = new mySPIKE.Motor("A");
-
     motor.set_stall_detection(false);
 
     motor.run_to_degrees_counted(200, 50);
@@ -36,7 +37,6 @@ testMotorDegreesCounted1.addEventListener("click", async function () {
 testMotorDegreesCountedCB.addEventListener("click", async function () {
     console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
     var motor = new mySPIKE.Motor("A");
-
     motor.set_stall_detection(true);
 
     motor.run_to_degrees_counted(200, 50, function (result) {
@@ -49,7 +49,6 @@ testMotorDegreesCounted1CB.addEventListener("click", async function () {
     console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
 
     var motor = new mySPIKE.Motor("A");
-
     motor.set_stall_detection(false);
 
     motor.run_to_degrees_counted(200, 50, function (result) {
@@ -62,9 +61,8 @@ testMotorDegreesCounted1CB.addEventListener("click", async function () {
 
 /* go to rel pos without stall detection */
 testMotorStartAtPower.addEventListener("click", async function () {
-
     var motor = new mySPIKE.Motor("A");
-    motor.run_for_degrees(30, 100);
+    motor.start_at_power(100);
 
 })
 
@@ -80,4 +78,25 @@ testMotorPosition.addEventListener("click", async function () {
     var motor = new mySPIKE.Motor("A");
     console.log(motor.get_position())
     console.log("###### ENDING UNIT TEST ON motor.get_position() #######");
+})
+
+testMotorStop.addEventListener("click", async function () {
+    console.log("###### BEGINNING UNIT TEST ON motor.stop() #######");
+    var motor = new mySPIKE.Motor("A");
+    motor.stop();
+    console.log("###### ENDING UNIT TEST ON motor.stop() #######");
+})
+
+testMotorGetSpeed.addEventListener("click", async function () {
+    console.log("###### BEGINNING UNIT TEST ON motor.get_speed() #######");
+    var motor = new mySPIKE.Motor("A");
+    console.log("motor speed: ", motor.get_speed());
+    console.log("###### ENDING UNIT TEST ON motor.get_speed() #######");
+})
+
+testMotorGetPower.addEventListener("click", async function () {
+    console.log("###### BEGINNING UNIT TEST ON motor.get_power() #######");
+    var motor = new mySPIKE.Motor("A");
+    console.log("motor power: ", motor.get_power());
+    console.log("###### ENDING UNIT TEST ON motor.get_power() #######");
 })
