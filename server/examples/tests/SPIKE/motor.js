@@ -20,7 +20,7 @@ testMotorDegreesCounted.addEventListener("click", async function () {
 
     motor.run_to_degrees_counted(200, 50);
 
-    console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
+    //console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) WITH STALL DETECTION #######");
 })
 
 testMotorDegreesCounted1.addEventListener("click", async function () {
@@ -31,7 +31,7 @@ testMotorDegreesCounted1.addEventListener("click", async function () {
 
     motor.run_to_degrees_counted(200, 50);
 
-    console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
+    //console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50) NO STALL DETECTION #######");
 })
 
 testMotorDegreesCountedCB.addEventListener("click", async function () {
@@ -42,7 +42,7 @@ testMotorDegreesCountedCB.addEventListener("click", async function () {
     motor.run_to_degrees_counted(200, 50, function (result) {
         console.log("MOTOR STOPPED WITH RESULT: ", result)
     });
-    console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
+    //console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) WITH STALL DETECTION #######");
 })
 
 testMotorDegreesCounted1CB.addEventListener("click", async function () {
@@ -55,7 +55,7 @@ testMotorDegreesCounted1CB.addEventListener("click", async function () {
         console.log("MOTOR STOPPED WITH RESULT: ", result)
     });
 
-    console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
+    //console.log("###### BEGINNING UNIT TEST ON motor.run_to_degrees_counted(200, 50, cb) NO STALL DETECTION #######");
 })
 
 

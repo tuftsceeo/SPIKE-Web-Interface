@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
-    "builddocs": "./node_modules/.bin/jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json -u ./server/examples/tutorials",
-    "combine": "./node_modules/.bin/concat -o ./cdn/ServiceDock.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js",
-    "combineScaled": "./node_modules/.bin/concat -o ./cdn/ServiceDock_scaled.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/scaledSPIKE/webserial/WebSerial.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeRPC.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeUjsonLib.js ./server/examples/modules/scaledSPIKE/virtualSpike.js ./server/examples/modules/scaledSPIKE/Service_SPIKE_HTML.js ./server/examples/modules/scaledSPIKE/Service_SPIKE.js"
+    "docs": "jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
+    "builddocs": "jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json -u ./server/examples/tutorials",
+    "combine": "concat -o ./cdn/ServiceDock.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js",
+    "combineScaled": "concat -o ./cdn/ServiceDock_scaled.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/scaledSPIKE/webserial/WebSerial.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeRPC.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeUjsonLib.js ./server/examples/modules/scaledSPIKE/virtualSpike.js ./server/examples/modules/scaledSPIKE/Service_SPIKE_HTML.js ./server/examples/modules/scaledSPIKE/Service_SPIKE.js"
   },
   "repository": {
     "type": "git",
@@ -22,10 +22,12 @@
   "homepage": "https://github.com/tuftsceeo/SPIKE-Web-Interface#readme",
   "dependencies": {
     "@exlinc/cc-web-exec-sdk": "^1.0.6",
-    "concat": "^1.0.3",
-    "jsdoc": "^3.6.5"
+    "concat": "^1.0.3"
   },
   "devDependencies": {
     "tui-jsdoc-template": "^1.2.2"
+  },
+  "directories": {
+    "doc": "docs"
   }
 }

@@ -9,7 +9,7 @@ testButtonIsPressed.addEventListener("click", function () {
     console.log("###### BEGINNING UNIT TEST ON button.is_pressed() #######");
     console.log("Test: start the test pressing either the left button or the right button");
 
-
+    var hub = new mySPIKE.PrimeHub();
     var left_button = hub.left_button;
     var right_button = hub.right_button;
 
@@ -29,7 +29,7 @@ testButtonWasPressed.addEventListener("click", function () {
     console.log("###### BEGINNING UNIT TEST ON button.was_pressed() #######");
     console.log("Test: press either the left button or the right button. Then, after some time start the test.");
 
-
+    var hub = new mySPIKE.PrimeHub();
     var left_button = hub.left_button;
     var right_button = hub.right_button;
 
@@ -49,7 +49,7 @@ testButtonWaitPressed.addEventListener("click", function () {
     console.log("###### BEGINNING UNIT TEST ON button.wait_until_pressed() #######");
     console.log("Test: Start the test. Then, after some time press either left button or right button");
 
-
+    var hub = new mySPIKE.PrimeHub();
     var left_button = hub.left_button;
     var right_button = hub.right_button;
 
@@ -74,7 +74,7 @@ testButtonWaitRelease.addEventListener("click", function () {
     console.log("###### BEGINNING UNIT TEST ON button.wait_until_released() #######");
     console.log("Test: Start the test. Then, after some time press either left button or right button and release them");
 
-
+    var hub = new mySPIKE.PrimeHub();
     var left_button = hub.left_button;
     var right_button = hub.right_button;
 

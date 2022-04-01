@@ -112,8 +112,7 @@
             
                 <h3>Example</h3>
                 
-    <pre class="prettyprint"><code>// Initialize the ForceSensor
-var force_sensor = new serviceSPIKE.ForceSensor("E")</code></pre>
+    <pre class="prettyprint"><code>// Initialize the ForceSensorvar force_sensor = new serviceSPIKE.ForceSensor("E")</code></pre>
 
             
         
@@ -246,9 +245,7 @@ var force_sensor = new serviceSPIKE.ForceSensor("E")</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>if (force_sensor.is_pressed() === true) {
-     console.log("force sensor is pressed");
-}</code></pre>
+    <pre class="prettyprint"><code>if (force_sensor.is_pressed() === true) {     console.log("force sensor is pressed");}</code></pre>
 
     
 
@@ -619,9 +616,7 @@ The function is executed in updateHubPortsInfo()'s Force Sensor part</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>force_sensor.wait_until_pressed( function () {
-     console.log("force sensor is pressed!");
-})</code></pre>
+    <pre class="prettyprint"><code>force_sensor.wait_until_pressed( function () {     console.log("force sensor is pressed!");})</code></pre>
 
     
 
@@ -766,9 +761,7 @@ The function is executed in updateHubPortsInfo()'s Force Sensor part</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>force_sensor.wait_until_released ( function () {
-     console.log("force sensor is released!");
-})</code></pre>
+    <pre class="prettyprint"><code>force_sensor.wait_until_released ( function () {     console.log("force sensor is released!");})</code></pre>
 
     
 

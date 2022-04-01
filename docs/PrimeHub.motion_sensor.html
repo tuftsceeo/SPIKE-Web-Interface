@@ -111,9 +111,7 @@
             
                 <h3>Example</h3>
                 
-    <pre class="prettyprint"><code>var hub = serviceSPIKE.PrimeHub();
-var motion_sensor = hub.motion_sensor;
-// do something with motion_sensor</code></pre>
+    <pre class="prettyprint"><code>var hub = serviceSPIKE.PrimeHub();var motion_sensor = hub.motion_sensor;// do something with motion_sensor</code></pre>
 
             
         
@@ -436,20 +434,7 @@ was used or since the beginning of the program (for the first use).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>motion_sensor.wait_for_new_gesture( function ( newGesture ) {
-     if ( newGesture == 'tapped') {
-            console.log("SPIKE was tapped")
-     }
-     else if ( newGesture == 'doubletapped') {
-            console.log("SPIKE was doubletapped")
-     }
-     else if ( newGesture == 'shaken') {
-            console.log("SPIKE was shaken")
-     }
-     else if ( newGesture == 'freefall') {
-            console.log("SPIKE was freefall")
-     }
-})</code></pre>
+    <pre class="prettyprint"><code>motion_sensor.wait_for_new_gesture( function ( newGesture ) {     if ( newGesture == 'tapped') {            console.log("SPIKE was tapped")     }     else if ( newGesture == 'doubletapped') {            console.log("SPIKE was doubletapped")     }     else if ( newGesture == 'shaken') {            console.log("SPIKE was shaken")     }     else if ( newGesture == 'freefall') {            console.log("SPIKE was freefall")     }})</code></pre>
 
     
 
@@ -593,26 +578,7 @@ was used or since the beginning of the program (for the first use).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>motion_sensor.wait_for_new_orientation( function ( newOrientation ) {
-       if (newOrientation == "up") {
-             console.log("orientation is up");
-       }
-       else if (newOrientation == "down") {
-             console.log("orientation is down");
-       }
-       else if (newOrientation == "front") {
-             console.log("orientation is front");
-       }
-       else if (newOrientation == "back") {
-             console.log("orientation is back");
-       }
-       else if (newOrientation == "leftSide") {
-             console.log("orientation is leftSide");
-       }
-       else if (newOrientation == "rightSide") {
-             console.log("orientation is rightSide");
-       }
-})</code></pre>
+    <pre class="prettyprint"><code>motion_sensor.wait_for_new_orientation( function ( newOrientation ) {       if (newOrientation == "up") {             console.log("orientation is up");       }       else if (newOrientation == "down") {             console.log("orientation is down");       }       else if (newOrientation == "front") {             console.log("orientation is front");       }       else if (newOrientation == "back") {             console.log("orientation is back");       }       else if (newOrientation == "leftSide") {             console.log("orientation is leftSide");       }       else if (newOrientation == "rightSide") {             console.log("orientation is rightSide");       }})</code></pre>
 
     
 
