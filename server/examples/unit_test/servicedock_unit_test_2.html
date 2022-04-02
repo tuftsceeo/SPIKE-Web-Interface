@@ -1,0 +1,76 @@
+<html>
+
+    <head>
+        <!--<script src="../../../cdn/ServiceDock_scaled.js"></script>-->
+        <script src=".././modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src=".././modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="output.css">
+        <script type="text/javascript" src=".././modules/ServiceDock_SPIKE.js"></script>
+        <script src="servicedock_unit_test_2.js"></script>
+        
+        <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script> -->
+    </head>
+
+    <body>
+        <div>
+
+        </div>
+        <div class="text-center my-6 mx-auto font-sans border-2 md:w-1/2 justify-center">
+            <h1 class="text-3xl mx-4 my-2 ">Service Dock Unit Testing</h1>
+        </div>
+
+        <div id="pre-check" class="text-center my-4 mx-auto font-sans w-1/2 justify-center">
+            <h1 class="text-xl mx-4 my-4">Is your SPIKE Prime Ready for testing?</h1>
+
+            <table class="table-auto text-center justify-center border mx-auto">
+                <thead>
+                    <tr>
+                    <th class="border">Port</th>
+                    <th class="border">Device</th>
+                    <th class="border">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border p-2 m-2">
+                        <td class="border">A</td>
+                        <td class="border">Medium Motor</td>
+                        <td class="border text-red-500" id="APortCheck">Not Detected</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="border">B</td>
+                        <td class="border">Medium Motor</td>
+                        <td class="border text-red-500" id="BPortCheck">Not Detected</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="border">C</td>
+                        <td class="border">Large Motor</td>
+                        <td class="border text-red-500" id="CPortCheck">Not Detected</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="border">D</td>
+                        <td class="border">Distance Sensor</td>
+                        <td class="border text-red-500" id="DPortCheck">Not Detected</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="border">E</td>
+                        <td class="border">Force Sensor</td>
+                        <td class="border text-red-500" id="EPortCheck">Not Detected</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="border">F</td>
+                        <td class="border">Color Sensor</td>
+                        <td class="border text-red-500" id="FPortCheck">Not Detected</td>
+                    </tr>
+                </tbody>
+                </table>
+        </div>
+        <div class="justify-center mx-auto w-1/2 text-center">
+            <p class="inline-block">Connect your SPIKE Prime Here: </p>
+            <div class="inline-block mx-2" id="service_spike"></div>
+            
+        </div>
+        
+
+    </body>
+    
+</html>

@@ -2189,7 +2189,7 @@ class servicespike extends HTMLElement {
         var active = false; // whether the service was activated
         this.service = new Service_SPIKE(); // instantiate a service object ( one object per button )
 
-        this.service.serviceDockExecuteAfterDisconnect(function () {
+        this.service.executeAfterDisconnect(function () {
             active = false;
             status.style.backgroundColor = "red";
         })
@@ -2221,7 +2221,7 @@ class servicespike extends HTMLElement {
         var status = document.createElement("div");
         status.setAttribute("class", "status");
         var length = 20; // for width and height of circle
-        var statusBackgroundColor = "red"; // default background color of service (inactive color)
+        var statusBackgroundColor = "red" // default background color of service (inactive color)
         var posLeft = 30;
         var posTop = 20;
         var statusStyle = "border-radius: 50%; height:" + length + "px; width:" + length + "px; background-color:" + statusBackgroundColor +
@@ -2229,6 +2229,7 @@ class servicespike extends HTMLElement {
         status.setAttribute("style", statusStyle);
 
         /* event listeners */
+        
         button.addEventListener("mouseleave", function (event) {
             button.style.backgroundColor = "#A2E1EF";
             button.style.color = "#000000";
@@ -2386,15 +2387,6 @@ function Service_SPIKE() {
     //define for json concatenation
     let jsonline = "";
 
-    // for testing program efficiency
-    var countProcessedUJSONRPC = 0;
-    var countPrimeHubEventHandlerUJSONRPC = 0;
-    var countHubInfoUpdateUJSONRPC = 0;
-    var totalUJSONRPCProcessed = [];
-    var totalUJSONRPCPrimeHubEventHandled = [];
-    var totalUJSONRPCHubInfoUpdated = [];
-    var flagPrimeHubEventHandlerCounter = true;
-    var flagForUpdatePortsInfoCounter = true;
     // contains latest full json object from SPIKE readings
     let lastUJSONRPC;
 
@@ -2459,8 +2451,11 @@ function Service_SPIKE() {
 
     // 
     let hubMainButton = { "pressed": false, "duration": 0 };
+
     let hubBluetoothButton = { "pressed": false, "duration": 0 };
+
     let hubLeftButton = { "pressed": false, "duration": 0 };
+
     let hubRightButton = { "pressed": false, "duration": 0 };
 
     /* PrimeHub data storage arrays for was_***() functions */
@@ -2552,8 +2547,7 @@ function Service_SPIKE() {
     var funcAfterError = undefined; // function to call for errors in ServiceDock
 
     var funcAfterDisconnect = undefined; // function to call after SPIKE Prime is disconnected
-    var serviceDockFuncAfterDisconnect = undefined; // servicedock function to call after SPIKE Prime is disconnected
-    
+
     var funcWithStream = undefined; // function to call after every parsed UJSONRPC package
 
     var triggerCurrentStateCallback = undefined;
@@ -2563,50 +2557,6 @@ function Service_SPIKE() {
     //          Public Functions            //
     //                                      //
     //////////////////////////////////////////
-    
-    /* Testing functions */
-
-    async function getTotalUJSONRPCProcessed() {
-        return totalUJSONRPCProcessed;
-    }
-
-    async function getTotalUJSONRPCPrimeHubEventHandled () {
-        return totalUJSONRPCPrimeHubEventHandled;
-    }
-
-    async function getTotalUJSONRPCHubInfoUpdated () {
-        return totalUJSONRPCHubInfoUpdated;
-    }
-    
-    /**  Test the streamUJSONRPC function
-     * @private
-     */
-    async function testStreamUJSONRPC(input) {
-        console.log("%cTuftsCEEO ", "color: #3ba336;" ,"starting test");
-
-        var testsResults = [true];
-
-        for (var test in input) {
-            var testInput = input[test];
-
-            for (var packetIndex in testInput) {
-                await parsePacket(testInput[packetIndex], true, () => {
-                    testsResults[test] = false;
-                });
-            }
-
-        }
-
-        // reset variables
-        jsonline = "";
-        lastUJSONRPC = undefined;
-        json_string = undefined;
-        cleanedJsonString = undefined;
-
-        return testsResults;
-    }
-
-    /* Public functions */
 
     /**  initialize SPIKE_service
      * <p> Makes prompt in Google Chrome ( Google Chrome Browser needs "Experimental Web Interface" enabled) </p>
@@ -2699,18 +2649,11 @@ function Service_SPIKE() {
     }
 
     /**  Get the callback function to execute after service is disconnected
+     * @ignore
      * @param {any} callback 
      */
     function executeAfterDisconnect(callback) {
         funcAfterDisconnect = callback;
-    }
-
-    /**  Get the callback function to execute after service is disconnected
-    * (only to be used by servicedock implementation)
-    * @param {any} callback 
-    */
-    function serviceDockExecuteAfterDisconnect (callback) {
-        serviceDockFuncAfterDisconnect = callback;
     }
 
     /**  Send command to the SPIKE Prime (UJSON RPC or Micropy depending on current interpreter)
@@ -5446,21 +5389,14 @@ function Service_SPIKE() {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "processing FullUJSONRPC line: ", lastUJSONRPC);
             }
 
-            // increment processUJSONRPC counter for efficiency checking
-            countProcessedUJSONRPC = countProcessedUJSONRPC + 1;
-
             // update hub information using lastUJSONRPC
             if (parseTest["m"] == 0) {
                 await updateHubPortsInfo();
             }
             PrimeHubEventHandler();
-            try {
-                if (funcWithStream) {
-                    await funcWithStream();
-                }
-            }
-            catch (errFuncWithStream) {
-                console.log("%cTuftsCEEO ", "color: #3ba336;", "Error executing callback function of executeWithStream: ", errFuncWithStream);
+
+            if (funcWithStream) {
+                await funcWithStream();
             }
 
         }
@@ -5581,12 +5517,14 @@ function Service_SPIKE() {
                 }
             }
         }
+
     }
+
 
     /**  Continuously take UJSON RPC input from SPIKE Prime
      * @private
      */
-    async function streamUJSONRPC () {
+    async function streamUJSONRPC() {
         try {
             // COMMENTED BY JEREMY JUNG (DECEMBER/10/2020)
             // var triggerCurrentStateInterval = setInterval(function() {
@@ -5611,12 +5549,6 @@ function Service_SPIKE() {
                             console.log("%cTuftsCEEO ", "color: #3ba336;", "jsonline: ", jsonline);
                             console.log("%cTuftsCEEO ", "color: #3ba336;", "lastUJSONRPC: ", lastUJSONRPC);
                             firstReading = false;
-                            setInterval(function () {
-                                console.log("%cTuftsCEEO ", "color: #3ba336;", "UJSONRPC messages processed in the last 10 seconds: ", countProcessedUJSONRPC);
-                                
-                                totalUJSONRPCProcessed.push(countProcessedUJSONRPC);
-                                countProcessedUJSONRPC = 0;
-                            }, 10000)
                         }
                         // read UJSON RPC stream ( actual data in {value} )
                         ({ value, done } = await reader.read());
@@ -5646,10 +5578,6 @@ function Service_SPIKE() {
 
                         if (funcAfterDisconnect != undefined) {
                             funcAfterDisconnect();
-                        }
-
-                        if (serviceDockFuncAfterDisconnect != undefined) {
-                            serviceDockFuncAfterDisconnect();
                         }
 
                         if (funcAfterError != undefined) {
@@ -5706,18 +5634,6 @@ function Service_SPIKE() {
             try {
                 data_stream = await JSON.parse(lastUJSONRPC);
                 data_stream = data_stream.p;
-                if (flagForUpdatePortsInfoCounter) {
-                    // COMMENTED ON SEP 7
-                    setInterval( async function() {
-                        console.log("%cTuftsCEEO ", "color: #3ba336;", "updatePortsInfo: UJSONRPC messages count in last 10 seconds: ", countHubInfoUpdateUJSONRPC);
-                        
-                        totalUJSONRPCHubInfoUpdated.push(countHubInfoUpdateUJSONRPC);
-
-                        countHubInfoUpdateUJSONRPC = 0;
-                    }, 10000);
-                    flagForUpdatePortsInfoCounter = false;
-                }
-                countHubInfoUpdateUJSONRPC = countHubInfoUpdateUJSONRPC + 1;
             }
             catch (e) {
                 console.log("%cTuftsCEEO ", "color: #3ba336;", "error parsing lastUJSONRPC at updateHubPortsInfo", lastUJSONRPC);
@@ -5896,6 +5812,8 @@ function Service_SPIKE() {
                         ports[letter] = device_value;
                     }
 
+                    ports.time = Date.now();
+
                     //parse hub information
                     var gyro_x = data_stream[6][0];
                     var gyro_y = data_stream[6][1];
@@ -5942,20 +5860,6 @@ function Service_SPIKE() {
         var parsedUJSON = await JSON.parse(lastUJSONRPC);
 
         var messageType = parsedUJSON["m"];
-
-        if (flagPrimeHubEventHandlerCounter) {
-            // COMMENTED ON SEP 7
-            setInterval(async function () {
-                //console.log("%cTuftsCEEO ", "color: #3ba336;", "PrimeHubEventHandler: UJSONRPC messages count in last 10 seconds: ", countPrimeHubEventHandlerUJSONRPC);
-                
-                totalUJSONRPCPrimeHubEventHandled.push(countPrimeHubEventHandlerUJSONRPC);
-
-                countPrimeHubEventHandlerUJSONRPC = 0;
-
-            }, 10000);
-            flagPrimeHubEventHandlerCounter = false;
-        }
-        countPrimeHubEventHandlerUJSONRPC = countPrimeHubEventHandlerUJSONRPC + 1;
 
         //catch runtime_error made at ujsonrpc level
         if (messageType == "runtime_error") {
@@ -6408,7 +6312,6 @@ function Service_SPIKE() {
         executeAfterPrint: executeAfterPrint,
         executeAfterError: executeAfterError,
         executeAfterDisconnect: executeAfterDisconnect,
-        serviceDockExecuteAfterDisconnect: serviceDockExecuteAfterDisconnect,
         executeWithStream: executeWithStream,
         getPortsInfo: getPortsInfo,
         getPortInfo: getPortInfo,
@@ -6445,11 +6348,7 @@ function Service_SPIKE() {
         writeProgram: writeProgram,
         stopCurrentProgram: stopCurrentProgram,
         executeProgram: executeProgram,
-        micropython: micropython, // for final projects
-        testStreamUJSONRPC: testStreamUJSONRPC,
-        getTotalUJSONRPCHubInfoUpdated: getTotalUJSONRPCHubInfoUpdated,
-        getTotalUJSONRPCPrimeHubEventHandled: getTotalUJSONRPCPrimeHubEventHandled,
-        getTotalUJSONRPCProcessed: getTotalUJSONRPCProcessed
+        micropython: micropython // for final projects
     };
 }
 

@@ -8,7 +8,9 @@
     "docs": "jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./server/docsHome.html -c jsdoc.json",
     "builddocs": "jsdoc ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js --readme ./jsdocTemplate/docsHome.md -c jsdoc.json -u ./server/examples/tutorials",
     "combine": "concat -o ./cdn/ServiceDock.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js",
-    "combineScaled": "concat -o ./cdn/ServiceDock_scaled.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/scaledSPIKE/webserial/WebSerial.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeRPC.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeUjsonLib.js ./server/examples/modules/scaledSPIKE/virtualSpike.js ./server/examples/modules/scaledSPIKE/Service_SPIKE_HTML.js ./server/examples/modules/scaledSPIKE/Service_SPIKE.js"
+    "combineScaled": "concat -o ./cdn/ServiceDock_scaled.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/scaledSPIKE/webserial/WebSerial.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeRPC.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeUjsonLib.js ./server/examples/modules/scaledSPIKE/virtualSpike.js ./server/examples/modules/scaledSPIKE/Service_SPIKE_HTML.js ./server/examples/modules/scaledSPIKE/Service_SPIKE.js",
+    "tailwind": "npx tailwindcss -i ./server/examples/unit_test/input.css -o ./server/examples/unit_test/output.css",
+    "ts": "tsc --target ES6 ./server/examples/unit_test/servicedock_unit_test_2.ts"
   },
   "repository": {
     "type": "git",
@@ -22,9 +24,11 @@
   "homepage": "https://github.com/tuftsceeo/SPIKE-Web-Interface#readme",
   "dependencies": {
     "@exlinc/cc-web-exec-sdk": "^1.0.6",
-    "concat": "^1.0.3"
+    "concat": "^1.0.3",
+    "tailwindcss": "^3.0.23"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.14",
     "tui-jsdoc-template": "^1.2.2"
   },
   "directories": {

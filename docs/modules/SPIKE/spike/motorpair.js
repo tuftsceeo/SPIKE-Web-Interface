@@ -33,7 +33,7 @@ Service_SPIKE.prototype.MotorPair = function (leftPort, rightPort) {
      * It will only have an effect the next time one of the move or start methods is used.
      * 
      * @param {number} amount 
-     * @param {string} unit 'cm','in'
+     * @param {string} units 'cm','in'
      */
     function set_motor_rotation(amount, unit) {
 
