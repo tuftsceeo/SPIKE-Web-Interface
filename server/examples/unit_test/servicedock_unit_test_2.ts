@@ -1,9 +1,11 @@
 
 class UnitTest {
     private service: any; // Should be an initialized SPIKE Service
+    private primehub;
     private motorA;
     private motorB;
     private motorC;
+    private motorPair;
     private distSensor;
     private forceSensor;
     private colorSensor;
@@ -71,12 +73,15 @@ class UnitTest {
         this.motorA = new this.service.Motor(UnitTest.MED_MOTORS_PORTS[0]);
         this.motorB = new this.service.Motor(UnitTest.MED_MOTORS_PORTS[1]);
         this.motorC = new this.service.Motor(UnitTest.LARGE_MOTORS_PORTS[0]);
+        this.motorPair = new this.service.MotorPair
+            (UnitTest.MED_MOTORS_PORTS[0], UnitTest.MED_MOTORS_PORTS[1])
         this.distSensor = 
             new this.service.DistanceSensor(UnitTest.DIST_SENSOR_PORTS[0]);
         this.forceSensor = 
             new this.service.ForceSensor(UnitTest.FORCE_SENSOR_PORTS[0]);
         this.colorSensor = 
             new this.service.ColorSensor(UnitTest.COLOR_SENSOR_PORTS[0]);
+        this.primehub = this.service.Primehub;
     }
 
 
@@ -254,12 +259,12 @@ class UnitTest {
             return ["set_stall_detection()", "Passed", "-"];
         }
         catch(error) {
+            console.error(error);
             return ["set_stall_detection()", "Failed", "cannot set stall detection"];
         }
     }
 
     public async runDegreesCountedTest() {
-        
         try {
             this.motorA.run_to_degrees_counted(90, 50);
             this.motorB.run_to_degrees_counted(45, 30);
@@ -268,10 +273,9 @@ class UnitTest {
             return ["run_to_degrees_counted()", "Passed", "-"];
         }
         catch (error) {
+            console.error(error);
             return ["run_to_degrees_counted()", "Failed", "Cannot run motors to degrees specified"];
         }
-        
-
         
     }
 
@@ -286,18 +290,18 @@ class UnitTest {
             
         }
         catch (error) {
+            console.error(error);
             this.stopAllMotors();
             return ["run_to_degrees_counted()", "Failed", "Cannot run motors to degrees specified"];
-            
         }
     }
 
     public async runForSecondsTest() {
         try {
-            this.motorA.run_for_seconds(this.timePerTest, 20);
-            this.motorB.run_for_seconds(this.timePerTest*2, 40);
-            this.motorC.run_for_seconds(this.timePerTest*3, 60);
-            await this.sleep(this._timePerTest + 100);
+            this.motorA.run_for_seconds(this.timePerTest*2, 20);
+            this.motorB.run_for_seconds(this.timePerTest*4, 40);
+            this.motorC.run_for_seconds(this.timePerTest*6, 60);
+            await this.sleep(this._timePerTest*2 + 250);
             if (this.motorA.get_speed() > 1) {
                 throw "Motor A not stopped on-time"
             }
@@ -305,7 +309,7 @@ class UnitTest {
             if (this.motorB.get_speed() > 1) {
                 throw "Motor B not stopped on-time"
             }
-            await this.sleep(this._timePerTest*3 + 100);
+            await this.sleep(this._timePerTest*2 + 100);
             if (this.motorC.get_speed() > 1) {
                 throw "Motor C not stopped on-time"
             }
@@ -313,13 +317,316 @@ class UnitTest {
 
         }
         catch(error) {
+            console.error(error);
             this.stopAllMotors();
             return ["run_for_seconds()", "Failed", error];
         }
     }
 
-    
+    public async runForDegreesTest() {
+        try {
+            this.motorA.run_for_degrees(90, 50);
+            this.motorB.run_for_degrees(45, 30);
+            this.motorC.run_for_degrees(120, 90);
+            await this.sleep(this._timePerTest * 3);
+            return ["run_for_degrees()", "Passed", "-"];
+        }
+        catch (error) {
+            console.error(error);
+            return ["run_for_degrees()", "Failed", "Cannot run motors for degrees specified"];
+        }
+    }
 
+    public setMotorRotationTest() {
+        try {
+            this.motorPair.set_motor_rotation(10, 'cm');
+            return ["set_motor_rotation()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["set_motor_rotation()", "Failed", "Cannot set rotation length"];
+        }
+    }
+
+    public async startTankTest() {
+        try {
+            this.motorPair.start_tank(30, 30);
+            await this.sleep(this._timePerTest);
+            this.stopAllMotors();
+            return ["start_tank()", "Passed", "-"];
+        }
+        catch (error) {
+            console.error(error);
+            this.stopAllMotors();
+            return ["start_tank()", "Failed", "Cannot start tank drive"];
+        }
+    }
+
+    public async startTankPowerTest() {
+        try {
+            this.motorPair.start_tank_at_power(50, 50);
+            await this.sleep(this._timePerTest);
+            this.stopAllMotors();
+            return ["start_tank_at_power()", "Passed", "-"];
+        }
+        catch (error) {
+            console.error(error);
+            this.stopAllMotors();
+            return ["start_tank_at_power()", "Failed", "Cannot start tank drive at given power"];
+        }
+    }
+
+    public async stopMotorPairTest() {
+        try {
+            this.motorPair.start_tank(30, 30);
+            this.motorPair.stop();
+            await this.sleep(this._timePerTest);
+            if (this.motorA.get_speed() > 5 || this.motorB.get_speed() > 5) {
+                throw "MotorPair did not stop on-time";
+            }
+            return ["stop()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["stop()", "Failed", error];
+        }
+        
+    }
+
+
+    public getDistCmTest() {
+        try {
+            let distCM = this.distSensor.get_distance_cm();
+            return ["get_dist_cm()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_dist_cm()", "Failed", error];
+        }
+    }
+
+    public getDistInchesTest() {
+        try {
+            let distIn = this.distSensor.get_distance_inches();
+            return ["get_distance_inches()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_distance_inches()", "Failed", error];
+        }
+    }
+
+    public getDistPercentTest() {
+        try {
+            let distPercet = this.distSensor.get_distance_percentage();
+            return ["get_distance_percentage()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_distance_percentage()", "Failed", error];
+        }
+        
+    }
+
+    public lightUpTest() {
+        try {
+            this.distSensor.light_up(100,100,100,100);
+            this.distSensor.light_up(0,100,0,100);
+            this.distSensor.light_up(50,25,25,50);
+            this.distSensor.light_up(0,0,0,0);
+            return ["light_up()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["light_up()", "Failed", error];
+        }
+    }
+
+    public lightUpAllTest() {
+        try {
+            this.distSensor.light_up_all(100);
+            this.distSensor.light_up_all(25);
+            this.distSensor.light_up_all(75);
+            this.distSensor.light_up_all(50);
+            this.distSensor.light_up_all(0);
+            return ["light_up_all()", "Passed", "-"];
+            
+        }
+        catch(error) {
+            console.error(error);
+            return ["light_up_all()", "Failed", error];
+        }
+    }
+
+    public forceSensorPressedTest() {
+        try {
+            if (this.forceSensor.is_pressed()) {
+                throw "Force sensor should not be pressed";
+            }
+            return ["is_pressed()", "Passed", "-"]; 
+        }
+        catch(error) {
+            console.error(error);
+            return ["is_pressed()", "Failed", error];
+        }
+    }
+
+    public getForceNTest() {
+        try {
+            if (this.forceSensor.get_force_newton() != 0) {
+                throw "Force sensor should not be pressed";
+            }
+            return ["get_force_newton()", "Passed", "-"]; 
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_force_newton()", "Failed", error];
+        }
+    }
+
+    public getForcePercent() {
+        try {
+            if (this.forceSensor.get_force_percentage() > 5) {
+                throw "Force sensor should not be pressed";
+            }
+            return ["get_force_percentage()", "Passed", "-"]; 
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_force_percentage()", "Failed", error];
+        }
+    }
+
+    public testGetColor() {
+        try {
+            this.colorSensor.get_color();
+            return ["get_color()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_color()", "Failed", error];
+        }
+    }
+
+    public testReflectedLight() {
+        try {
+            this.colorSensor.get_reflected_light();
+            return ["get_reflected_light()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_reflected_light()", "Failed", error];
+        }
+    }
+
+    public testGetRed() {
+        try {
+            this.colorSensor.get_red();
+            return ["get_red()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_red()", "Failed", error];
+        }
+    }
+
+    public testGetGreen() {
+        try {
+            this.colorSensor.get_green();
+            return ["get_green()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_green()", "Failed", error];
+        }
+    }
+
+    public testGetBlue() {
+        try {
+            this.colorSensor.get_blue();
+            return ["get_blue()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["get_blue()", "Failed", error];
+        }
+    }
+
+    public testStatusLightColor() {
+        try {
+            this.primehub.status_light.on("blue");
+            this.primehub.status_light.on("azure");
+            this.primehub.status_light.on("black");
+            this.primehub.status_light.on("green");
+            this.primehub.status_light.on("white");
+            this.primehub.status_light.on("violet");
+            this.primehub.status_light.on("orange");
+            return ["Status Light", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["Status Light", "Failed", error];
+        }
+    }
+
+    public turnOffStatusLight() {
+        try {
+            this.primehub.status_light.off();
+            return ["Status Light Off", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["Status Light Off", "Failed", error];
+        }
+
+    }
+    public testSetPixel() {
+        try {
+            let lightMatrix = this.primehub.light_matrix;
+            lightMatrix.set_pixel(2, 3, 50);
+            lightMatrix.set_pixel(0, 4, 25);
+            lightMatrix.set_pixel(4, 1, 100);
+            return ["set_pixel()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["set_pixel()", "Failed", error];
+        }
+
+    }
+
+    public testWriteLM() {
+        try {
+            let lightMatrix = this.primehub.light_matrix;
+            lightMatrix.write("Hi");
+            lightMatrix.write("LEGO");
+            return ["LM: write()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["LM: write()", "Failed", error];
+        }
+
+    }
+
+    public turnOffLightMatrix() {
+        console.log(this.primehub);
+        try {
+            let lightMatrix = this.primehub.light_matrix;
+            lightMatrix.off();
+            return ["LM: off()", "Passed", "-"];
+        }
+        catch(error) {
+            console.error(error);
+            return ["LM: off", "Failed", error];
+        }
+
+    }
 }
 
 
@@ -397,24 +704,37 @@ let detectedDeviceFailure = (portLetter: string) => {
 }
 
 // Initiates the automatic testing process
-let runAutomaticTests = (test:UnitTest) => {
-    let testingChart = createTestingChart();
+let runAutomaticTests = async (test:UnitTest) => {
+    let testingChart = createTestingChart("TestRows");
+    console.log(testingChart.innerHTML);
     test.initializeTest();
-    runMotorTests(test);
+    await runMotorTests(test);
+    await runMotorPairTests(test);
+    if ($(window).width() > 900) {
+        createNewTestCols(testingChart);
+    }
+    runDistanceSensorTests(test);
+    runForceSensorTests(test);
+    runColorSensorTests(test);
+    runHubTests(test);
 }
 
-let createTestingChart = () => {
+let createTestingChart = (idName:string) => {
     $("#pre-test-content").remove();
     let newChart = document.createElement('table');
-    $(newChart).html('<thead><tr><th class="border">Test Name</th><th class="border">Status</th><th class="border">Errors</th></tr></thead><tbody id="TestRows"></tbody>');
-    $(newChart).attr("class", "table-auto text-center justify-center border mx-auto");
+    $(newChart).html('<thead><tr><th class="border">Test Name</th><th class="border">Status</th><th class="border">Errors</th></tr></thead><tbody id="' + idName + '"></tbody>');
+    $(newChart).attr("class", "table-auto text-center justify-center border mx-auto mb-8");
 
-    document.body.append(newChart);
+    let firstCol = document.createElement('div');
+    $(firstCol).append(newChart)
+
+    $(firstCol).appendTo("#col1");
+
     return newChart;
 }
 
 // Displays test results to the user
-let addNewRow = (testResults:Array<string>) => {
+let addNewRow = (testResults:Array<string>, id:string) => {
     let newRow = document.createElement('tr');
     $(newRow).attr("class", "border p-2 m-2");
     let col1 = document.createElement('td');
@@ -435,20 +755,94 @@ let addNewRow = (testResults:Array<string>) => {
     $(newRow).append(col2);
     $(newRow).append(col3);
 
-    $("#TestRows").append(newRow);
+    $(id).append(newRow);
 
 }
 
+let createNewTestCols = (chartDiv: HTMLElement) => {
+    $("#tests-content").addClass("grid grid-cols-3");
+    let col2 = document.createElement('div');
+    let col3 = document.createElement('div');
+    $(col2).append(createTestingChart("TestRows2"));
+    $(col3).append(createTestingChart("TestRows3"));
+    $(col2).appendTo("#col2");
+    $(col3).appendTo("#col3");
+}
+
 let runMotorTests = async (test:UnitTest) => {
-    addNewRow(await test.startMotorTest());
-    addNewRow(await test.stopMotorTest());
-    addNewRow(await test.getSpeedTest());
-    addNewRow(await test.getPositionTest());
-    addNewRow(await test.getDegreesCountedTest());
-    addNewRow(await test.getMotorPower());
-    addNewRow(test.defaultSpeedTest());
-    addNewRow(test.setStallDetectionTest());
-    addNewRow(await test.getDegreesCountedTest());
-    addNewRow(await test.startAtPowerTest());
-    addNewRow(await test.runForSecondsTest());
+    let tableId = "#TestRows";
+    addNewRow(["MOTOR TESTS:", "", ""], tableId);
+    addNewRow(await test.startMotorTest(), tableId);
+    addNewRow(await test.stopMotorTest(), tableId);
+    addNewRow(await test.getSpeedTest(), tableId);
+    addNewRow(await test.getPositionTest(), tableId);
+    addNewRow(await test.getDegreesCountedTest(), tableId);
+    addNewRow(await test.getMotorPower(), tableId);
+    addNewRow(test.defaultSpeedTest(), tableId);
+    addNewRow(test.setStallDetectionTest(), tableId);
+    addNewRow(await test.getDegreesCountedTest(), tableId);
+    addNewRow(await test.startAtPowerTest(), tableId);
+    addNewRow(await test.runForSecondsTest(), tableId);
+    addNewRow(await test.runForDegreesTest(), tableId);
 } 
+
+let runMotorPairTests = async (test:UnitTest) => {
+    let tableId = "#TestRows";
+    addNewRow(["MotorPair Tests: ", "", ""], tableId);
+    addNewRow(test.setMotorRotationTest(), tableId);
+    addNewRow(await test.startTankTest(), tableId);
+    addNewRow(await test.startTankPowerTest(), tableId);
+    addNewRow(await test.stopMotorPairTest(), tableId);
+}
+
+let runDistanceSensorTests = (test:UnitTest) => {
+    let tableId = "#TestRows2";
+    if ($(window).width() <= 900) {
+        tableId = "#TestRows";
+    }
+    addNewRow(["Distance Sensor Tests:", "", ""], tableId);
+    addNewRow(test.getDistCmTest(), tableId);
+    addNewRow(test.getDistInchesTest(), tableId);
+    addNewRow(test.getDistPercentTest(), tableId);
+    addNewRow(test.lightUpTest(), tableId);
+    addNewRow(test.lightUpAllTest(), tableId);
+}
+
+let runForceSensorTests = (test:UnitTest) => {
+    let tableId = "#TestRows2";
+    if ($(window).width() <= 900) {
+        tableId = "#TestRows";
+    }
+    addNewRow(["Force Sensor Tests:", "", ""], tableId);
+    addNewRow(test.forceSensorPressedTest(), tableId);
+    addNewRow(test.getForceNTest(), tableId);
+    addNewRow(test.getForcePercent(), tableId);
+
+}
+
+let runColorSensorTests = (test:UnitTest) => { 
+    let tableId = "#TestRows2";
+    if ($(window).width() <= 900) {
+        tableId = "#TestRows";
+    }
+    addNewRow(["Color Sensor Tests:", "", ""], tableId);
+    addNewRow(test.testGetColor(), tableId);
+    addNewRow(test.testReflectedLight(), tableId);
+    addNewRow(test.testGetRed(), tableId);
+    addNewRow(test.testGetGreen(), tableId);
+    addNewRow(test.testGetBlue(), tableId);
+}
+
+let runHubTests = (test:UnitTest) => {
+    let tableId = "#TestRows3";
+    if ($(window).width() <= 900) {
+        tableId = "#TestRows";
+    }
+    addNewRow(["Hub Tests:", "", ""], tableId);
+    addNewRow(test.testStatusLightColor(), tableId);
+    addNewRow(test.turnOffStatusLight(), tableId);
+    addNewRow(test.testSetPixel(), tableId);
+    addNewRow(test.testWriteLM(), tableId);
+    addNewRow(test.turnOffLightMatrix(), tableId);
+
+}
