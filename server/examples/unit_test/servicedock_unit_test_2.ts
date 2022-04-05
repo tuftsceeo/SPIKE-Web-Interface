@@ -81,7 +81,9 @@ class UnitTest {
             new this.service.ForceSensor(UnitTest.FORCE_SENSOR_PORTS[0]);
         this.colorSensor = 
             new this.service.ColorSensor(UnitTest.COLOR_SENSOR_PORTS[0]);
-        this.primehub = this.service.Primehub;
+        console.log(this.service);
+        this.primehub = new this.service.PrimeHub();
+        
     }
 
 
@@ -174,9 +176,6 @@ class UnitTest {
             // NOTE: A should always be the slowest motor!
             // Change this condition if you changed the power values
             // in previous tests!
-            console.log(degA);
-            console.log(degB);
-            console.log(degC);
             if (degA > degB || degB > degC) {
                 throw "Inaccurate degree counts"
             }
@@ -559,6 +558,7 @@ class UnitTest {
 
     public testStatusLightColor() {
         try {
+            console.log(this.primehub);
             this.primehub.status_light.on("blue");
             this.primehub.status_light.on("azure");
             this.primehub.status_light.on("black");
@@ -615,7 +615,6 @@ class UnitTest {
     }
 
     public turnOffLightMatrix() {
-        console.log(this.primehub);
         try {
             let lightMatrix = this.primehub.light_matrix;
             lightMatrix.off();
@@ -627,6 +626,268 @@ class UnitTest {
         }
 
     }
+
+    public async testBeep() {
+        try {
+            let beepLength = 1; // In seconds
+            this.primehub.speaker.beep(60, beepLength);
+            await this.sleep(beepLength * 1000);
+            this.primehub.speaker.beep(80, beepLength);
+            this.primehub.speaker.beep(100, beepLength);
+            this.primehub.speaker.beep(44, beepLength);
+            this.primehub.speaker.beep(123, beepLength);
+            return ["beep()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["beep()", "Failed", error];
+        }
+    }
+
+    public async testStartBeep() {
+        try {
+            this.primehub.speaker.start_beep(60);
+            await this.sleep(this.timePerTest);
+            return ["start_beep()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["start_beep()", "Failed", error];
+        }
+    }
+
+    public setVolumeTest() {
+        try {
+            this.primehub.speaker.set_volume(100);
+            this.primehub.speaker.set_volume(0);
+            this.primehub.speaker.set_volume(50);
+            return ["set_volume()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["set_volume()", "Failed", error];
+        }
+    }
+
+    public getVolumeTest() {
+        try {
+            if (this.primehub.speaker.get_volume() == 0) {
+                throw "No Volume Detected"
+            }
+            return ["get_volume()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["get_volume()", "Failed", error];
+        }
+    }
+
+    public testStopBeep() {
+        try {
+            this.primehub.speaker.stop();
+            return ["stop beep", "Passed", "-"];
+        }
+        catch(error) {
+            return ["stop beep", "Failed", error];
+        }
+    }
+
+    public testLeftButtonWasPressed() {
+        try {
+            let pressed = this.primehub.left_button.was_pressed();
+            if (typeof(pressed) != "boolean")
+                throw "Returned Non-Boolean"
+            return ["left_button.was_pressed()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["left_button.was_pressed()", "Failed", error];
+        }
+    }
+
+    public testRightButtonWasPressed() {
+        try {
+            let pressed = this.primehub.right_button.was_pressed();
+            if (typeof(pressed) != "boolean")
+                throw "Returned Non-Boolean"
+            return ["right_button.was_pressed()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["right_button.was_pressed()", "Failed", error];
+        }
+    }
+
+    public testLeftButtonIsPressed() {
+        try {
+            let pressed = this.primehub.left_button.is_pressed();
+            if (typeof(pressed) != "boolean")
+                throw "Returned Non-Boolean"
+            if (pressed)
+                throw "Button should not be pressed"
+            return ["left_button.is_pressed()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["left_button.is_pressed()", "Failed", error];
+        }
+    }
+
+    public testRightButtonIsPressed() {
+        try {
+            let pressed = this.primehub.right_button.is_pressed();
+            if (typeof(pressed) != "boolean")
+                throw "Returned Non-Boolean"
+            if (pressed)
+                throw "Button should not be pressed"
+            return ["right_button.is_pressed()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["right_button.is_pressed()", "Failed", error];
+        }
+    }
+
+    public testWasGesture() {
+        try {
+            let gesture = this.primehub.motion_sensor.was_gesture("tap");
+            if (typeof(gesture) != "boolean")
+                throw "Returned Non-Boolean"
+            return ["was_gesture()", "Passed", "-"];
+        }
+        catch(error) {
+            return ["was_gesture()", "Failed", error];
+        }
+    }
+
+    public testGetAngles() {
+        let failedTests = "";
+        try {
+            this.primehub.motion_sensor.get_yaw_angle();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Yaw Angle Test Failed. "
+        }
+        try {
+            this.primehub.motion_sensor.get_pitch_angle();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Pitch Angle Test Failed. "
+        }
+        try {
+            this.primehub.motion_sensor.get_roll_angle();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Roll Angle Test Failed. "
+        }
+        if (failedTests == "") 
+            return (["Angles Tests", "Passed", "-"]);
+        return (["Angles Tests", "Failed", failedTests]);
+    }
+
+    public testGetAccelerations() {
+        let failedTests = "";
+        try {
+            this.primehub.motion_sensor.get_yaw_acceleration();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Yaw Acceleration Test Failed. "
+        }
+        try {
+            this.primehub.motion_sensor.get_pitch_acceleration();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Pitch Acceleration Test Failed. "
+        }
+        try {
+            this.primehub.motion_sensor.get_roll_acceleration();
+        }
+        catch(error) {
+            console.error(error);
+            failedTests += "Roll Acceleration Test Failed. "
+        }
+        if (failedTests == "") 
+            return (["Acceleration Tests", "Passed", "-"]);
+        return (["Acceleration Tests", "Failed", failedTests]);
+    }
+
+
+    public getGestureTest() {
+        try{
+            this.primehub.motion_sensor.get_gesture();
+            return(["get_gesture()", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["get_gesture()", "Failed", error]);
+        }
+    }
+
+
+    public getOrientationTest() {
+        try{
+            this.primehub.motion_sensor.get_orientation();
+            return(["get_orientation()", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["get_orientation()", "Failed", error]);
+        }
+    }
+
+    // Some Manual Tests below, requires human verification
+    // ----------------------------------------------------
+    public rebootHubTest() {
+        this.service.rebootHub();
+    }
+
+    // Auto Test
+    public getHubNameTest() {
+        try{
+            this.service.getHubName();
+            return(["getHubName()", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["getHubName()", "Failed", error]);
+        }
+    }
+
+    // Auto Test
+    public isActiveTest() {
+        try{
+            this.service.isActive();
+            return(["isActive()", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["isActive()", "Failed", error]);
+        }
+    }
+
+    public hubTappedTest() {
+        try{
+            let hubEvent = this.service.getHubEvent();
+            if (hubEvent != "tapped")
+                throw "Hub was not (single) tapped"
+            return(["Hub (Single) Tap", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["Hub (Single) Tap", "Failed", error]);
+        }
+    }
+
+    public hubDoubleTappedTest() {
+        try{
+            let hubEvent = this.service.getHubEvent();
+            if (hubEvent != "doubletapped")
+                throw "Hub was not (double) tapped"
+            return(["Hub (Double) Tap", "Passed", "-"]);
+        }
+        catch(error) {
+            console.error(error);
+            return (["Hub (Double) Tap", "Failed", error]);
+        }
+    }
+
 }
 
 
@@ -706,17 +967,23 @@ let detectedDeviceFailure = (portLetter: string) => {
 // Initiates the automatic testing process
 let runAutomaticTests = async (test:UnitTest) => {
     let testingChart = createTestingChart("TestRows");
-    console.log(testingChart.innerHTML);
     test.initializeTest();
+    /*
     await runMotorTests(test);
     await runMotorPairTests(test);
+
+    // Responsiveness test
     if ($(window).width() > 900) {
         createNewTestCols(testingChart);
     }
+
     runDistanceSensorTests(test);
     runForceSensorTests(test);
     runColorSensorTests(test);
-    runHubTests(test);
+    await runHubTests(test);
+    
+    */
+    createStartManualTestsButton(test);
 }
 
 let createTestingChart = (idName:string) => {
@@ -741,7 +1008,6 @@ let addNewRow = (testResults:Array<string>, id:string) => {
     let col2 = document.createElement('td');
     let col3 = document.createElement('td');
     $(col1).html(testResults[0]);
-    console.log(testResults[0]);
     if (testResults[1] == "Passed")
         $(col1).attr("class", "border text-green-500");
     else if (testResults[1] == "Failed")
@@ -771,7 +1037,7 @@ let createNewTestCols = (chartDiv: HTMLElement) => {
 
 let runMotorTests = async (test:UnitTest) => {
     let tableId = "#TestRows";
-    addNewRow(["MOTOR TESTS:", "", ""], tableId);
+    addNewRow(["Motor Tests:", "", ""], tableId);
     addNewRow(await test.startMotorTest(), tableId);
     addNewRow(await test.stopMotorTest(), tableId);
     addNewRow(await test.getSpeedTest(), tableId);
@@ -833,16 +1099,97 @@ let runColorSensorTests = (test:UnitTest) => {
     addNewRow(test.testGetBlue(), tableId);
 }
 
-let runHubTests = (test:UnitTest) => {
+let runHubTests = async (test:UnitTest) => {
     let tableId = "#TestRows3";
     if ($(window).width() <= 900) {
         tableId = "#TestRows";
     }
     addNewRow(["Hub Tests:", "", ""], tableId);
+    /*
+    Status light not an attribute of primehub, not implemented correctly
     addNewRow(test.testStatusLightColor(), tableId);
     addNewRow(test.turnOffStatusLight(), tableId);
+    */
     addNewRow(test.testSetPixel(), tableId);
     addNewRow(test.testWriteLM(), tableId);
     addNewRow(test.turnOffLightMatrix(), tableId);
+    addNewRow(await test.testBeep(), tableId);
+    addNewRow(await test.testStartBeep(), tableId);
+    addNewRow(test.setVolumeTest(), tableId);
+    addNewRow(test.getVolumeTest(), tableId);
+    addNewRow(test.testStopBeep(), tableId);
+    addNewRow(test.testLeftButtonIsPressed(), tableId);
+    addNewRow(test.testLeftButtonWasPressed(), tableId);
+    addNewRow(test.testRightButtonWasPressed(), tableId);
+    addNewRow(test.testRightButtonIsPressed(), tableId);
+    addNewRow(test.testWasGesture(), tableId);
+    addNewRow(test.testGetAngles(), tableId);
+    addNewRow(test.testGetAccelerations(), tableId);
+    addNewRow(test.getGestureTest(), tableId);
+    addNewRow(test.getOrientationTest(), tableId);
+}
 
+let createStartManualTestsButton = (test:UnitTest) => {
+    let manualTestsButton = document.createElement("div");
+
+    const buttonHTML = 
+    `<div class="w-1/2 justify-center mx-auto text-center mb-4">
+        <button id="manualTests" class="bg-blue-500 text-white shadow-lg rounded-lg py-1 px-3 transition ease-in-out delay-75 hover:scale-110 hover:bg-blue-800 duration-300">Start Manual Tests</button>
+    </div>`;
+
+    $(manualTestsButton).html(buttonHTML);
+    $("#manualTestButton").append(manualTestsButton);
+    $(manualTestsButton).on("click", () => {
+        twoColManualReformat();
+        runManualTests(test);
+    })
+} 
+
+let twoColManualReformat = () => {
+    $("#tests-content").removeClass('grid-cols-3');
+    $("#tests-content").addClass('grid-cols-2');
+    $("#tests-content").addClass('grid');
+    $("#col3").remove();
+    const instructionsBoxHTML = `<h1 class='text-center text-xl'>Test Instructions:</h1><p id='instructions' class='text-center my-4'></p> 
+    <div class='grid grid-cols-2'>
+        <div class="w-1/2 justify-center mx-auto text-center mb-4">
+            <button id="testPassed" class=" hidden bg-green-500 text-white shadow-lg rounded-lg py-1 px-3 transition ease-in-out delay-75 hover:scale-110 hover:bg-green-700 duration-300">Test Passed</button>
+        </div>
+        <div class="w-1/2 justify-center mx-auto text-center mb-4">
+            <button id="testFailed" class="hidden bg-red-500 text-white shadow-lg rounded-lg py-1 px-3 transition ease-in-out delay-75 hover:scale-110 hover:bg-red-700 duration-300">Test Failed</button>
+        </div>
+    </div>`
+    $("#col2").html(instructionsBoxHTML)
+    $("#col1").html(createTestingChart("ManualTestRows"));
+    $("#manualTestButton").remove();
+}
+
+let runManualTests = async (test:UnitTest) => {
+    let tableId = "#ManualTestRows"
+    
+    addNewRow(test.getHubNameTest(), tableId);
+    addNewRow(test.isActiveTest(), tableId);
+    addNewRow(await rebootHubTest(test), tableId);
+}
+
+let confirmTest = async (instructions:string, buttons:boolean) => {
+    if (buttons) {
+        $("#testPassed").removeClass("hidden");
+        $("#testFailed").removeClass("hidden");
+    }
+    let passed:boolean;
+    $("#instructions").html(instructions);
+    $("#testPassed").on("click", () =>{
+        return true;
+    });
+
+    return passed;
+}
+
+let rebootHubTest = async (test:UnitTest) => {
+    test.rebootHubTest();
+    let passedTest:boolean = await confirmTest("Was the hub successfully rebooted?", true);
+    if (passedTest)
+        return(["rebootHub()", "Passed", "-"])
+    return (["rebootHub()", "Failed", "Unable to reboot hub"])
 }
