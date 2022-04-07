@@ -100,18 +100,18 @@ let createTestingChart = (idName) => {
 // Displays test results to the user
 let addNewRow = (testResults, id) => {
     let newRow = document.createElement('tr');
-    $(newRow).attr("class", "border p-2 m-2");
+    $(newRow).attr("class", "border border-black p-2 m-2");
     let col1 = document.createElement('td');
     let col2 = document.createElement('td');
     let col3 = document.createElement('td');
     $(col1).html(testResults[0]);
     if (testResults[1] == "Passed")
-        $(col1).attr("class", "border text-green-500");
+        $(col1).attr("class", "border border-black text-green-500");
     else if (testResults[1] == "Failed")
-        $(col1).attr("class", "border text-red-500");
-    $(col2).attr("class", "border");
+        $(col1).attr("class", "border border-black text-red-500");
+    $(col2).attr("class", "border border-black");
     $(col2).html(testResults[1]);
-    $(col3).attr("class", "border");
+    $(col3).attr("class", "border border-black");
     $(col3).html(testResults[2]);
     $(newRow).append(col1);
     $(newRow).append(col2);

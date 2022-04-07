@@ -1,4 +1,3 @@
-
 class UnitTest {
     private service: any; // Should be an initialized SPIKE Service
     private primehub;
@@ -1221,9 +1220,5 @@ hub.light_matrix.show_image('HAPPY')`;
             return (["wait_for_distance_farther_than()", "Failed", error]);
         }
     }
-
-
-    
-
 
 }
