@@ -10,7 +10,7 @@
     "combine": "concat -o ./cdn/ServiceDock.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/ServiceDock_SPIKE.js",
     "combineScaled": "concat -o ./cdn/ServiceDock_scaled.js ./server/examples/modules/ServiceDock_SystemLink.js ./server/examples/modules/ServiceDock_Airtable.js ./server/examples/modules/scaledSPIKE/webserial/WebSerial.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeRPC.js ./server/examples/modules/scaledSPIKE/spikeRPC/SpikeUjsonLib.js ./server/examples/modules/scaledSPIKE/virtualSpike.js ./server/examples/modules/scaledSPIKE/Service_SPIKE_HTML.js ./server/examples/modules/scaledSPIKE/Service_SPIKE.js",
     "tailwind": "npx tailwindcss -i ./server/examples/unit_test/input.css -o ./server/examples/unit_test/output.css",
-    "ts": "tsc --target ES6 ./server/examples/unit_test/servicedock_unit_test_2.ts ./server/examples/unit_test/unit_test.ts"
+    "ts": "tsc --target ES6 ./server/examples/unit_test/servicedock_unit_test_2.ts ./server/examples/unit_test/unit_test.ts ./server/examples/unit_test/test_classes.ts"
   },
   "repository": {
     "type": "git",

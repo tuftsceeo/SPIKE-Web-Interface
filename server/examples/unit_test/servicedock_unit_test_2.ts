@@ -73,6 +73,7 @@ let detectedDeviceFailure = (portLetter: string) => {
 
 // Initiates the automatic testing process
 let runAutomaticTests = async (test:UnitTest) => {
+    $("#startTests").remove();
     let testingChart = createTestingChart("TestRows");
     test.initializeTest();
     

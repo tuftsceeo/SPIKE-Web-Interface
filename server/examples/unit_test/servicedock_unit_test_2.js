@@ -73,6 +73,7 @@ let detectedDeviceFailure = (portLetter) => {
 };
 // Initiates the automatic testing process
 let runAutomaticTests = (test) => __awaiter(this, void 0, void 0, function* () {
+    $("#startTests").remove();
     let testingChart = createTestingChart("TestRows");
     test.initializeTest();
     yield runMotorTests(test);

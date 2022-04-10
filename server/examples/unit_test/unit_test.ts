@@ -1,10 +1,10 @@
 class UnitTest {
     private service: any; // Should be an initialized SPIKE Service
     private primehub;
-    private motorA;
-    private motorB;
-    private motorC;
-    private motorPair;
+    private motorA; // Medium Motor
+    private motorB; // Medium Motor
+    private motorC; // Large Motor
+    private motorPair; // Pair of motors
     private distSensor;
     private forceSensor;
     private colorSensor;
