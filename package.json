@@ -25,6 +25,7 @@
   "dependencies": {
     "@exlinc/cc-web-exec-sdk": "^1.0.6",
     "concat": "^1.0.3",
+    "npm-check-updates": "^12.5.8",
     "tailwindcss": "^3.0.23"
   },
   "devDependencies": {
