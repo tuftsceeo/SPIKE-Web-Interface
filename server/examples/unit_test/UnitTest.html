@@ -1,0 +1,78 @@
+<html>
+    <head>
+        
+    </head>
+
+    <head>
+        <!--<script src="../../../cdn/ServiceDock_scaled.js"></script>-->
+        <script src=".././modules/libraries/jquery_351.js" type="text/javascript"></script>
+        <script src=".././modules/libraries/hoverscript_jquery.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="output.css">
+        <script type="text/javascript" src=".././modules/ServiceDock_SPIKE.js"></script>
+
+        <!--<script src="https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface@1.0/cdn/ServiceDock.min.js"></script>-->
+        <!-- ServiceDock -->
+        
+        
+        
+        <script src="test_classes.js"></script>
+        <script src = "unit_test_3.js"></script>
+        
+        
+        
+        <!-- <script src = "https://cdn.jsdelivr.net/gh/tuftsceeo/SPIKE-Web-Interface/cdn/ServiceDock.min.js"></script> -->
+    </head>
+    <body>
+        <!-- Based off of a template from https://www.creative-tim.com/learning-lab/tailwind-starter-kit/documentation/css/navbars -->
+
+        <nav class="relative flex flex-wrap items-center justify-between px-2 py-3 bg-gray-900  font-sans">
+            <div class="container px-4 mx-auto flex flex-wrap items-center justify-between">
+              <div class="w-full relative flex justify-between lg:w-auto  px-4 lg:static lg:block lg:justify-start">
+                <a class="font-bold leading-relaxed inline-block mr-4 py-2 whitespace-nowrap text-white text-xl" href="#">
+                  ServiceDock Unit Testing
+                </a>
+                
+              </div>
+              <div class="lg:flex flex-grow items-center" id="example-navbar-warning">
+                <ul class="flex flex-col lg:flex-row list-none ml-auto">
+                    <li class="nav-item">
+                      <a class="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75" href="https://tuftsceeo.github.io/SPIKE-Web-Interface/index.html">
+                        Documentation
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75" href="https://github.com/tuftsceeo/SPIKE-Web-Interface">
+                        GitHub
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75" href="#">
+                        Settings
+                      </a>
+                    </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+
+          <div class="w-full h-full bg-no-repeat bg-cover bg-fixed bg-bg-scatter">
+            <div class="sm:flex sm:justify-center lg:grid lg:grid-cols-3">
+                <div></div>
+            
+                <div class="bg-white py-4 px-8 justify-center shadow-lg mb-12 mt-16 inline-block object-center rounded-md border" id="window">
+
+                <div></div>
+
+            </div>
+
+          </div>
+
+          <div id = "servicedock" style = "float:left;">
+            <service-spike class="hidden" id = "service_spike"></service-spike>
+            <!-- Etc. -->
+        </div>
+
+        
+    </body>
+    
+</html>
